@@ -34,7 +34,7 @@ Instalación rápida
    mysql -u root -p < sql/schema.sql
 3. Configura conexión DB en [config/config.php](config/config.php).
 4. Inicia Apache + MySQL (XAMPP) y abre:
-   http://localhost/CBTIS168-StudyGame/index.php
+   http://localhost/LC-ADVANCE/index.php
 
 Configuración importante
 -----------------------
