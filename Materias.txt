@@ -1,0 +1,25 @@
+Materias:
+
+Pensamiento Matemático III (derivadas solo con x, sin logaritmos, seno o coseno ni exponencial, puntos máximos y mínimos, pendientes, dominio)
+
+Ecosistemas (Niveles de Organización y Células de materia, como se relacionan los órganos humanos con las células ejemplo(Núcleo - Cerebro), leyes de la termodinámica, radiación electromagnética, movimientos de la tierra(rotación, Traslación, Nutación, Precesión etc., Respiración celular, componentes del sistema climático, ciclo del carbono, Ley de Liebing, Ley de Sheldford, Factores ambientales, factores ambientales (conceptos y todo), biomas, redes tróficas, relaciones en ecosistemas, homeostasis, Producción primaria y transferencia de energía, huella de carbono, cambio climático, variabilidad climática, huella hídrica, huella ecológica, Flecha dorada, Obsolescencia percibida, absdescencia programada, fast fashion, esclavitud moderna, flecha dorada, efecto invernadero natural, influencia y relación con la huella ecológica, desertificación, deforestación, sucesión primaria, sucesión secundaria, Servicios ambientales (soporte, provisión, regulación, servicio), hábitos de la sustentabilidad (con métodos como devaste primario, carbono activado etc.), comunidad sustentable, método científico)
+
+Química I: Los anti nutrientes, biodisponibilidad, método científico, Teoría Atómica, Átomo, La radiación, gases toxicos, radiación electromagnética, Gases tóxicos, Ondas, La materia, Hielo seco, el big bang, Contaminación, Propiedades de la metería, cambios químicos de la materia, Propiedades físicas de la materia, estados de la materia (y como se le dice cuando cambia de uno a otro ej. solido a gas = sublimación, solido a liquido = fusión, etc.), clasificación de la materia, mezclas, sustancias puras, elementos y compuestos, tipos de mezclas, métodos de separación de mezcla, partículas subatómicas (historia, conceptos, tabla periódica, moles, etc.), configuraciones electrónicas, números cuánticos, principio de construcción(Regla de Aufbau, regla de la lluvia), números cuánticos (tipos, conceptos, descripción de cada uno), electrones de valencia, electron diferencial, diagrama de orbitales, electronegatividad, clases de elementos)
+
+Física I: La energía, conservación de la energía, ejemplos de energía, tipos de energía y transformaciones (energía eléctrica, nuclear, solar, eólica, fósil, hidroeléctrica, hidráulica, biomasa, geotérmica, ), fracking, Joule, biomasa, tipos de energía (calorífica, eléctrica, química, radiante, hidrógeno, mecánica, evolución del concepto de energía (Gottfried Leibniz, Thomas Young, Gaspard de Coriolis, James Joule, Energía cinética, Energía potencial gravitacional, energía potencial elástica, ley de Hooke, el trabajo (T = F* cos(Angulo)*d), energía y colisiones, impulso mecánico, cantidad de movimiento, relación entre el impulso y la cantidad de movimiento (F = m*a), Conservación de la energía(Energía total = EPG + ECT), Velocidad final( Vf = √(2*g*h)), ley de conservación de la cantidad de movimiento, choques elásticos e inelásticos, coeficiente de restitución, cantidad de movimiento, cantidad de calor, capacidad de calor especifico, capacidad calorífica)
+
+Ciencias Sociales(El bienestar y la satisfacción de las necesidades, la organización de la sociedad, normas sociales y juridicas, el estado, relaciones de poderes)
+
+Aplicaciones de la administración(Proceso Administrativo(Historia, enfoque: trabajo, ser social, saber como; Henry Fayol etapas, planeacin, organización, dirección y control), administración, objetivo, Meta, eficiencia, eficacia, Valor instrumental, unidad temporal, aplitud del ejercicio, especificidad, interdiciplinariedad, flexibilidad, habilidades de la administración, conceptuales, humanas, técnicas, papelas administrativos (interpersonal, informativos, de decisión), Frederich W. Taylor, Escualas de la administración (conceptos, fundador, topicos, principios, etc.), Análisis transaccional (concepot, principios estados del yo, etc.)
+
+Historia (Historia de México)
+
+Programación:
+Estas son por separado:
+- Bases de datos Relacionales(SQL, relaciones, conceptos, ejercicios), lenguajes de programación (Python, SQL, Sqlite)
+- Bases de datos no relacionales(MongoDB, conceptos, ejercicios), Metodologías Para el desarrollo de software (SCRUM), Desarrollo de aplicaciones Web, lenguajes de programación(C# (Programación de aplicaciones en Frameworks y consola), JS (animaciones), HTML(Página web), CSS(estilos), PHP(backend, página web)).
+
+Temas Selectos de matematicas I y II(derivadas de todo tipo, máximos y mínimos, segundas derivadas, integrales)
+
+
+Inglés(Aprender inglés desde 0 hasta un nivel apto para tener una conversación)
