@@ -1,4 +1,4 @@
-# CBTIS168 - Study Game (CUCO Advance)
+# LC-ADVANCE
 
 Resumen
 -------
@@ -29,7 +29,7 @@ Requisitos
 
 Instalación rápida
 ------------------
-1. Copia el proyecto dentro de la carpeta pública de tu servidor (ej.: `c:\xampp\htdocs\CBTIS168-StudyGame`).
+1. Copia el proyecto dentro de la carpeta pública de tu servidor (ej.: `c:\xampp\htdocs\LC-ADVANCE`).
 2. Importa la base de datos:
    mysql -u root -p < sql/schema.sql
 3. Configura conexión DB en [config/config.php](config/config.php).
