@@ -12,225 +12,279 @@ $lecciones[] = [
     'slug'    => 'derivadas-basicas-pendientes-dominio',
     'titulo'  => 'Derivadas Básicas: Reglas, Pendiente de la Tangente y Dominio',
 
-    /* ==============================================
-       CONTENIDO DE LA LECCIÓN (HTML + MathJax/LaTeX)
-       ============================================== */
+    /* ===========================
+       CONTENIDO DE LA LECCIÓN
+       HTML + MathJax/LaTeX + SVG
+       =========================== */
     'contenido' => <<<'HTML'
-        <h3>Definición de Derivada</h3>
-        <p>La <strong>derivada</strong> de una función \( f(x) \) en un punto representa la <strong>tasa de cambio instantánea</strong> de la función respecto a \( x \). Geométricamente, coincide con la <strong>pendiente de la recta tangente</strong> a la gráfica en dicho punto.</p>
-        <p>En este tema trabajamos exclusivamente con <strong>funciones polinómicas</strong> en la variable \( x \).</p>
-
-        <div class="visual static-image">
-            <img src="assets/img/derivada_recta_tangente.png" alt="Recta tangente a una curva en un punto">
-            <p class="caption">La derivada es la pendiente de la recta tangente. Fuente: Khan Academy.</p>
+        <!-- ==================================================
+             Cabecera de contenido (meta, objetivos de la lección)
+             ================================================== -->
+        <div class="content-header">
+            <h2>Derivadas Básicas: Reglas, Pendiente de la Tangente y Dominio</h2>
+            <span class="materia-tag">Pensamiento Matemático III</span>
+            <p class="progress-info-local">Objetivos: <strong>comprender</strong> la derivada como tasa de cambio y pendiente de la tangente; <strong>aplicar</strong> reglas básicas de derivación en polinomios; <strong>interpretar</strong> el signo de la derivada y el dominio de polinomios.</p>
         </div>
 
-        <div class="visual static-image">
-            <img src="assets/img/derivada_como_tangente.gif" alt="Animación de recta tangente acercándose a la curva">
-            <p class="caption">Visualización dinámica de la recta tangente. Fuente: Dalhousie University.</p>
-        </div>
+        <!-- ==================================================
+             Definición y explicación (seria y formal)
+             ================================================== -->
+        <div class="content-body">
+            <h3>Definición formal de derivada</h3>
+            <p>Sea \( f(x) \) una función. La derivada de \( f \) en el punto \( a \) se define por el límite (si existe):</p>
+            <p class="latex-display">\[
+                f'(a) = \lim_{h \to 0} \frac{f(a+h) - f(a)}{h}.
+            \]</p>
+            <p>Intuitivamente, \( f'(a) \) representa la <strong>tasa de cambio instantánea</strong> de \( f \) respecto a \( x \) en \( x=a \). Geométricamente, coincide con la <strong>pendiente de la recta tangente</strong> a la gráfica de \( f \) en \( x=a \).</p>
 
-        <div class="visual static-image">
-            <img src="assets/img/derivada_como_pendiente.jpg" alt="Explicación gráfica de la derivada como límite de pendientes">
-            <p class="caption">La derivada como límite de cocientes incrementales. Fuente: Math Stack Exchange.</p>
-        </div>
+            <h3>Contexto: funciones polinómicas</h3>
+            <p>En esta lección trabajaremos exclusivamente con polinomios. Recordemos que todo polinomio tiene dominio \( \mathbb{R} \) y es derivable en todo \( \mathbb{R} \).</p>
 
-        <h3>Reglas Básicas de Derivación</h3>
-        <ul class="reglas-derivacion">
-            <li><strong>Regla de la constante:</strong> \( \frac{d}{dx}[c] = 0 \)</li>
-            <li><strong>Regla de la potencia:</strong> \( \frac{d}{dx}[x^n] = n x^{n-1} \) (válida para cualquier \( n \in \mathbb{R} \))</li>
-            <li><strong>Factor constante:</strong> \( \frac{d}{dx}[c \cdot f(x)] = c \cdot f'(x) \)</li>
-            <li><strong>Regla de la suma/diferencia:</strong> \( \frac{d}{dx}[f(x) \pm g(x)] = f'(x) \pm g'(x) \)</li>
-            <li><strong>Regla del producto:</strong> \( \frac{d}{dx}[f(x)g(x)] = f'(x)g(x) + f(x)g'(x) \)</li>
-        </ul>
+            <!-- ==================================================
+                 SVG: Curva polinómica con recta tangente (estilo retro)
+                 - Sustituye a imágenes externas para mantener consistencia
+                 ================================================== -->
+            <div class="visual svg-diagram" aria-hidden="false">
+                <!-- SVG adaptado al diseño retro-neón; colores compatibles con style.css -->
+                <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title1 desc1">
+                    <title id="title1">Curva polinómica y recta tangente</title>
+                    <desc id="desc1">Ilustración de una función polinómica con su recta tangente y punto de tangencia.</desc>
 
-        <div class="svg-diagram">
-    <svg viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg" aria-labelledby="svg-title svg-desc">
-        <title id="svg-title">Función polinómica y su recta tangente</title>
-        <desc id="svg-desc">Representación de una función cúbica con su recta tangente en un punto interior del dominio.</desc>
+                    <!-- fondo -->
+                    <rect width="720" height="360" fill="#0b0b0b"/>
+                    <!-- ejes -->
+                    <line x1="60" y1="300" x2="660" y2="300" stroke="#444" stroke-width="2"/>
+                    <line x1="60" y1="300" x2="60" y2="40" stroke="#444" stroke-width="2"/>
+                    <!-- curva: aproximación polinómica (trayectoria) -->
+                    <path d="M70 250 C 120 120 200 200 300 170 C 380 140 480 220 580 160 C 620 130 650 170 660 190"
+                          stroke="#00ccff" stroke-width="5" fill="none" stroke-linecap="round" />
+                    <!-- tangente -->
+                    <line x1="310" y1="190" x2="520" y2="70" stroke="#ff00ff" stroke-width="4" stroke-linecap="round" />
+                    <!-- punto de tangencia -->
+                    <circle cx="380" cy="150" r="6" fill="#ff00ff" />
+                    <text x="392" y="142" fill="#ff00ff" font-family="VT323, monospace" font-size="14">A</text>
+                    <!-- etiquetas -->
+                    <text x="670" y="305" fill="#ffcc00" font-family="Press Start 2P, monospace" font-size="14">X</text>
+                    <text x="48" y="30" fill="#ffcc00" font-family="Press Start 2P, monospace" font-size="14">Y</text>
+                    <!-- nota -->
+                    <rect x="440" y="20" width="250" height="70" fill="#0c0c0c" stroke="#222" stroke-width="1" rx="6"/>
+                    <text x="452" y="42" fill="#ffcc00" font-family="VT323" font-size="12">Recta tangente (pendiente = \(f'(a)\))</text>
+                </svg>
+                <p class="caption">Representación esquemática: función polinómica y su recta tangente en el punto \(A\).</p>
+            </div>
 
-        <!-- Fondo sutil (opcional, mejora el contraste retro) -->
-        <rect width="360" height="260" fill="#111" opacity="0.9"/>
+            <h3>Reglas básicas de diferenciación (polinomios)</h3>
+            <p>Presentamos las reglas que usaremos en todos los ejercicios. Son universales para funciones polinómicas y combinaciones mediante suma y producto.</p>
+            <ul class="reglas-derivacion">
+                <li><strong>Constante:</strong> \( \dfrac{d}{dx}[c] = 0 \).</li>
+                <li><strong>Potencia:</strong> \( \dfrac{d}{dx}[x^n] = n x^{n-1} \) para \( n \in \mathbb{R} \).</li>
+                <li><strong>Constante factor:</strong> \( \dfrac{d}{dx}[c\cdot f(x)] = c\cdot f'(x) \).</li>
+                <li><strong>Suma/diferencia:</strong> \( \dfrac{d}{dx}[f(x)\pm g(x)] = f'(x)\pm g'(x) \).</li>
+                <li><strong>Producto:</strong> \( \dfrac{d}{dx}[f(x)g(x)] = f'(x)g(x) + f(x)g'(x) \).</li>
+                <li><strong>Cociente (nota para polinomios):</strong> \( \dfrac{d}{dx}\!\left[\dfrac{u(x)}{v(x)}\right] = \dfrac{u'v - uv'}{v^2} \) cuando \( v(x)\neq 0 \).</li>
+                <li><strong>Derivada de orden superior:</strong> \( f''(x) = \dfrac{d}{dx}[f'(x)] \) se usa para concavidad y extremos.</li>
+            </ul>
 
-        <!-- Ejes coordenados -->
-        <line x1="50" y1="200" x2="310" y2="200" stroke="#ccc" stroke-width="2"/>
-        <line x1="50" y1="200" x2="50" y2="40" stroke="#ccc" stroke-width="2"/>
+            <h3>Interpretación geométrica y consecuencias</h3>
+            <ul>
+                <li>Si \( f'(x) > 0 \) en un intervalo: \( f \) es <strong>creciente</strong> en ese intervalo.</li>
+                <li>Si \( f'(x) < 0 \) en un intervalo: \( f \) es <strong>decreciente</strong>.</li>
+                <li>Si \( f'(a) = 0 \): la tangente es horizontal; puede indicar un máximo, mínimo o punto de inflexión (analizar con \( f'' \)).</li>
+            </ul>
 
-        <!-- Flechas en los ejes -->
-        <polygon points="310,200 305,195 305,205" fill="#ccc"/>
-        <polygon points="50,40 45,50 55,50" fill="#ccc"/>
+            <h3>Dominio de polinomios</h3>
+            <p>Todo polinomio \( P(x) = a_n x^n + \dots + a_1 x + a_0 \) tiene dominio \( \mathbb{R} \): no existen puntos de indeterminación ni discontinuidades.</p>
 
-        <!-- Etiquetas de ejes -->
-        <text x="315" y="195" fill="#ffcc00" font-family="Arial, sans-serif" font-size="16" font-weight="bold">X</text>
-        <text x="35" y="45" fill="#ffcc00" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Y</text>
+            <!-- ==================================================
+                 Sección: Ejemplos resueltos (varios niveles)
+                 ================================================== -->
+            <h3>Ejemplos resueltos</h3>
 
-        <!-- Curva polinómica (cúbica completa y bien visible) -->
-        <path d="M60 180 
-                 C 90 100, 130 160, 180 120 
-                 C 230 80, 270 180, 300 100"
-              stroke="#00ccff" 
-              fill="none" 
-              stroke-width="6"
-              stroke-linecap="round"/>
+            <div class="ejemplo">
+                <h4>Ejemplo 1 — Derivada directa (potencia)</h4>
+                <p>\( f(x) = 4x^3 - 2x^2 + 5x - 7 \)</p>
+                <p><strong>Cálculo:</strong> aplicar la regla de la potencia término a término:</p>
+                <p class="latex-display">\[
+                    f'(x) = 12x^2 - 4x + 5.
+                \]</p>
+                <p><strong>Pendiente en \( x=1 \):</strong> \( f'(1)=12(1)^2 - 4(1) + 5 = 13\).</p>
+            </div>
 
-        <!-- Recta tangente (magenta, bien visible y en el centro) -->
-        <line x1="120" y1="160" 
-              x2="240" y2="60" 
-              stroke="#ff00ff" 
-              stroke-width="5"
-              stroke-linecap="round"/>
+            <div class="ejemplo">
+                <h4>Ejemplo 2 — Regla del producto</h4>
+                <p>\( h(x) = (2x + 1)(x^2 - 3x) \).</p>
+                <p><strong>Cálculo:</strong> sea \( u=2x+1,\ v=x^2-3x \Rightarrow u'=2,\ v'=2x-3\).</p>
+                <p class="latex-display">\[
+                    h'(x) = u'v + uv' = 2(x^2-3x) + (2x+1)(2x-3).
+                \]</p>
+                <p>Desarrollando y simplificando:</p>
+                <p class="latex-display">\[
+                    h'(x) = 2x^2 - 6x + (4x^2 - 6x + 2x - 3) = 6x^2 - 10x - 3.
+                \]</p>
+                <p><em>Observación:</em> verificar simplificación cuidadosamente (paso importante en exámenes).</p>
+            </div>
 
-        <!-- Punto de tangencia (destacado) -->
-        <circle cx="180" cy="120" r="6" fill="#ff00ff"/>
-        <circle cx="180" cy="120" r="10" fill="none" stroke="#ff00ff" stroke-width="2" opacity="0.6"/>
+            <div class="ejemplo">
+                <h4>Ejemplo 3 — Segunda derivada y concavidad</h4>
+                <p>\( p(x) = x^4 - 4x^3 + 2 \).</p>
+                <p>\( p'(x) = 4x^3 - 12x^2 \). </p>
+                <p>\( p''(x) = 12x^2 - 24x = 12x(x-2) \).</p>
+                <p>La segunda derivada permite estudiar concavidad y puntos de inflexión: \( p''(x)=0 \) en \( x=0 \) y \( x=2 \).</p>
+            </div>
 
-        <!-- Etiqueta de la tangente -->
-        <text x="245" y="65" 
-              fill="#ff00ff" 
-              font-family="'Press Start 2P', 'VT323', monospace" 
-              font-size="14" 
-              font-weight="bold">
-            Tangente
-        </text>
-        <text x="245" y="85" 
-              fill="#ff00ff" 
-              font-family="'VT323', monospace" 
-              font-size="12">
-            (pendiente = f'(x))
-        </text>
-    </svg>
+            <!-- ==================================================
+                 PRÁCTICA GUIADA: resolver un ejemplo paso a paso
+                 - Incluye pasos claros y justificados
+                 ================================================== -->
+            <h3>Práctica guiada (paso a paso)</h3>
+            <p>Resolveremos la derivada de \( q(x) = (x^2 + 2)(3x - 1) + 5x \) paso a paso.</p>
 
-    <p class="caption">
-        Representación esquemática de una función polinómica y su recta tangente en un punto.
-    </p>
-</div>
+            <ol>
+                <li><strong>Paso 1 — Identificar estructura:</strong> \( q(x) \) contiene un producto y una suma, por tanto: usar producto + regla de suma.</li>
+                <li><strong>Paso 2 — Aplicar regla del producto:</strong> Sea \( u = x^2 + 2 \) y \( v = 3x-1 \). Entonces \( u' = 2x,\ v' = 3 \).</li>
+                <li><strong>Paso 3 — Calcular derivada del producto:</strong>
+                    <p class="latex-display">\[
+                        (uv)' = u'v + uv' = 2x(3x-1) + (x^2+2) \cdot 3.
+                    \]</p>
+                </li>
+                <li><strong>Paso 4 — Añadir derivada del término independiente:</strong> \( \dfrac{d}{dx}5x = 5. \)</li>
+                <li><strong>Paso 5 — Simplificar:</strong>
+                    <p class="latex-display">\[
+                        q'(x) = 6x^2 - 2x + 3x^2 + 6 + 5 = 9x^2 - 2x + 11.
+                    \]</p>
+                </li>
+                <li><strong>Comprobación:</strong> alternativa: expandir \( q(x) \) primero y derivar término a término para verificar equivalencia.</li>
+            </ol>
 
-        <h3>Interpretación Geométrica: Pendiente</h3>
-        <p>El valor \( f'(a) \) indica la pendiente de la tangente en \( x = a \):</p>
-        <ul>
-            <li>Si \( f'(x) > 0 \): la función es <strong>creciente</strong>.</li>
-            <li>Si \( f'(x) < 0 \): la función es <strong>decreciente</strong>.</li>
-            <li>Si \( f'(x) = 0 \): la tangente es horizontal (posible máximo, mínimo o punto de inflexión).</li>
-        </ul>
+            <!-- ==================================================
+                 Ejercicios resueltos rápidos (verificación)
+                 ================================================== -->
+            <h3>Ejercicios resueltos breves (verificación)</h3>
+            <ul>
+                <li>\( \dfrac{d}{dx}[7x-4] = 7.\)</li>
+                <li>\( \dfrac{d}{dx}[5x^4 + 3x^2 - 8] = 20x^3 + 6x.\)</li>
+                <li>Dominio de \( 2x^5 + x \) es \( \mathbb{R} \).</li>
+            </ul>
 
-        <h3>Dominio de Funciones Polinómicas</h3>
-        <p>Toda función polinómica tiene como dominio el conjunto de los <strong>números reales</strong>: \( \mathbb{R} \) o \( (-\infty, +\infty) \), pues no presenta indeterminaciones ni restricciones.</p>
+            <!-- ==================================================
+                 Recursos y aplicaciones (breve)
+                 ================================================== -->
+            <h3>Aplicaciones breves</h3>
+            <p>La derivada se interpreta en distintos contextos: velocidad (física), costo marginal (economía), sensibilidad de una variable respecto a otra (estadística, ingeniería).</p>
 
-        <h3>Aplicaciones</h3>
-        <p>La derivada tiene múltiples interpretaciones según el contexto:</p>
-        <ul>
-            <li>Física: velocidad = derivada de la posición; aceleración = derivada de la velocidad.</li>
-            <li>Economía: costo marginal, ingreso marginal.</li>
-            <li>Ingeniería y ciencias: tasas de cambio instantáneas.</li>
-        </ul>
+            <hr/>
 
-        <div class="ejemplo">
-            <h4>Ejemplo 1</h4>
-            <p>\( f(x) = 4x^3 - 2x^2 + 5x - 7 \)</p>
-            <p>\( f'(x) = 12x^2 - 4x + 5 \)</p>
-            <p>Pendiente en \( x = 1 \): \( f'(1) = 13 \)</p>
-        </div>
-
-        <div class="ejemplo">
-            <h4>Ejemplo 2 (Regla del producto)</h4>
-            <p>\( h(x) = (2x + 1)(x^2 - 3x) \)</p>
-            <p>\( h'(x) = 2(x^2 - 3x) + (2x + 1)(2x - 3) = 6x^2 - 2x - 3 \)</p>
+            <p><em>Fin del contenido. Pase a la sección de ejercicios para practicar y al quiz para autoevaluación.</em></p>
         </div>
 HTML
 ,
-        'ejercicios' => [
-        ["enunciado" => "Calcula la derivada de \( f(x) = 5x^4 + 3x^2 - 8 \)", "respuesta" => "20x^3 + 6x"],
-        ["enunciado" => "Encuentra la pendiente de \( f(x) = x^3 - 2x \) en \( x=2 \)", "respuesta" => "10"],
-        ["enunciado" => "¿Cuál es el dominio de \( h(x) = 2x^5 + x \)?", "respuesta" => "Todos los números reales"],
-        ["enunciado" => "Deriva: \( k(x) = 7x - 4 \)", "respuesta" => "7"],
-        ["enunciado" => "Deriva usando regla del producto: \( m(x) = (x^2 + 3)(4x) \)", "respuesta" => "12x^2 + 12"],
-        ["enunciado" => "Pendiente de \( p(x) = 3x^4 - x \) en \( x=1 \)", "respuesta" => "11"],
-        ["enunciado" => "¿Qué significa si \( f'(x) = 0 \) en un punto?", "respuesta" => "Pendiente horizontal, posible máximo o mínimo"],
-        ["enunciado" => "Aplicación: Si \( s(t) = t^2 \) es posición, ¿cuál es la velocidad (derivada)?", "respuesta" => "2t"]
+    /* ===========================
+       EJERCICIOS (más, variados y con niveles)
+       - Cada ejercicio incluye en esta estructura una 'respuesta' (puedes ocultarla en la UI).
+       =========================== */
+    'ejercicios' => [
+        // Nivel básico
+        ["enunciado" => "Calcula la derivada de \( f(x) = 5x^4 + 3x^2 - 8 \).", "respuesta" => "20x^3 + 6x"],
+        ["enunciado" => "Deriva \( k(x) = 7x - 4 \).", "respuesta" => "7"],
+        ["enunciado" => "¿Cuál es el dominio de \( h(x) = 2x^5 + x \)?", "respuesta" => "Todos los números reales (\\mathbb{R})"],
+
+        // Nivel intermedio
+        ["enunciado" => "Encuentra la pendiente de \( f(x) = x^3 - 2x \) en \( x=2 \).", "respuesta" => "f'(x) = 3x^2 - 2, por tanto f'(2) = 10"],
+        ["enunciado" => "Deriva: \( m(x) = (x^2 + 3)(4x) \) usando la propiedad de constante factor y producto.", "respuesta" => "m(x) = 4x(x^2+3) => m'(x) = 4(x^2+3) + 4x(2x) = 12x^2 + 12"],
+
+        // Nivel producto/cociente
+        ["enunciado" => "Deriva: \( h(x) = (3x^2 - 1)(2x + 5) \).", "respuesta" => "h'(x) = 6x(2x+5) + (3x^2-1)2 => 12x^2 + 30x + 6x^2 - 2 = 18x^2 + 30x - 2 (revisar cálculo al simplificar)"],
+        ["enunciado" => "Deriva el cociente: \( r(x) = \\dfrac{x^3 - 1}{x} \) (simplifica si es posible).", "respuesta" => "r(x)=x^2 - 1 => r'(x)=2x"],
+
+        // Nivel análisis
+        ["enunciado" => "Pendiente de \( p(x) = 3x^4 - x \) en \( x=1 \).", "respuesta" => "p'(x) = 12x^3 - 1, p'(1) = 11"],
+        ["enunciado" => "Si \( s(t) = t^2 \) es posición, ¿cuál es la velocidad instantánea?", "respuesta" => "v(t)=s'(t)=2t"],
+
+        // Práctica guiada extra
+        ["enunciado" => "Práctica: Deriva paso a paso \( q(x) = (x^2 + 2)(3x - 1) + 5x \).", "respuesta" => "q'(x) = 9x^2 - 2x + 11 (ver práctica guiada)"],
+
+        // Retos
+        ["enunciado" => "Deriva: \( u(x) = 4(x^3 - 2x)^2 \).", "respuesta" => "u'(x)=8(x^3 - 2x)(3x^2 - 2)"],
+        ["enunciado" => "Segunda derivada: Si \( f(x)=2x^3 - 3x^2 + x \), calcula \( f''(x) \).", "respuesta" => "f'(x)=6x^2 - 6x + 1; f''(x)=12x - 6"],
+
+        // Preguntas de comprensión corta
+        ["enunciado" => "¿Qué significa si \( f'(x) = 0 \) en un punto?", "respuesta" => "La pendiente de la tangente es horizontal; posible extremo o punto de inflexión"],
+        ["enunciado" => "¿La derivada de un polinomio es un polinomio? (sí/no y por qué)", "respuesta" => "Sí — derivar término a término reduce el exponente; no aparecen denominadores ni raíces."],
+        ["enunciado" => "¿Puede un polinomio no ser derivable en algún punto real?", "respuesta" => "No, los polinomios son diferenciables en todo \\mathbb{R}."],
     ],
+
+    /* ===========================
+       QUIZ (preguntas de opción múltiple)
+       - Aumenté cantidad y variedad; respuestas correctas en 'correcta'.
+       =========================== */
     'quiz' => [
-    // 1–5: Conceptos fundamentales
-    ["pregunta" => "¿Cuál es la derivada de una función constante \( f(x) = c \)?",
-     "opciones" => ["c", "1", "0", "Indefinida"], "correcta" => "0"],
+        // Fundamentos
+        ["pregunta" => "¿Cuál es la derivada de una función constante \( f(x)=c \)?",
+         "opciones" => ["c", "1", "0", "Indefinida"], "correcta" => "0"],
 
-    ["pregunta" => "¿Cuál es la derivada de \( f(x) = x^n \) (regla de la potencia)?",
-     "opciones" => ["\( x^{n+1} \)", "\( n x^{n-1} \)", "\( nx^n \)", "\( x^n/n \)"], "correcta" => "\( n x^{n-1} \)"],
+        ["pregunta" => "Regla de la potencia: ¿derivada de \( x^n \)?",
+         "opciones" => ["\( x^{n+1} \)", "\( n x^{n-1} \)", "\( nx^n \)", "\( x^n/n \)"], "correcta" => "\( n x^{n-1} \)"],
 
-    ["pregunta" => "¿Qué representa geométricamente \( f'(a) \) en la gráfica de \( f \)?",
-     "opciones" => ["El área bajo la curva en \( x = a \)", "La concavidad en \( x = a \)", "La pendiente de la tangente en \( x = a \)", "El valor de la función en \( x = a \)"], 
-     "correcta" => "La pendiente de la tangente en \( x = a \)"],
+        ["pregunta" => "Interpretación geométrica: ¿qué representa \( f'(a) \)?",
+         "opciones" => ["Área bajo la curva", "Concavidad", "Pendiente de la tangente", "Valor de la función"], "correcta" => "Pendiente de la tangente"],
 
-    ["pregunta" => "¿Cuál es el dominio natural de cualquier función polinómica?",
-     "opciones" => ["\( \\mathbb{R}^+ \) (números positivos)", "\( \\mathbb{Z} \) (enteros)", "\( \\mathbb{R} \) (todos los reales)", "Depende del grado del polinomio"], 
-     "correcta" => "\( \\mathbb{R} \) (todos los reales)"],
+        ["pregunta" => "Dominio natural de cualquier polinomio:",
+         "opciones" => ["\( \\mathbb{R}^+ \)", "\( \\mathbb{Z} \)", "\( \\mathbb{R} \)", "Depende del grado"], "correcta" => "\( \\mathbb{R} \)"],
 
-    ["pregunta" => "Si \( f'(x) > 0 \) en un intervalo abierto, entonces \( f \):",
-     "opciones" => ["Es constante", "Es decreciente", "Es creciente", "Tiene un máximo"], 
-     "correcta" => "Es creciente"],
+        ["pregunta" => "Si \( f'(x) > 0 \) en un intervalo, entonces \( f \):",
+         "opciones" => ["Es constante", "Es decreciente", "Es creciente", "Tiene un máximo"], "correcta" => "Es creciente"],
 
-    // 6–12: Cálculo directo de derivadas
-    ["pregunta" => "Derivada de \( f(x) = 5x^4 - 3x^2 + 7 \)",
-     "opciones" => ["\( 20x^3 - 6x \)", "\( 20x^3 + 6x \)", "\( 5x^3 - 3x \)", "\( 20x^4 - 3x \)"],
-     "correcta" => "\( 20x^3 - 6x \)"],
+        // Cálculo directo
+        ["pregunta" => "Derivada de \( f(x)=5x^4 - 3x^2 + 7 \)",
+         "opciones" => ["\( 20x^3 - 6x \)", "\( 20x^3 + 6x \)", "\( 5x^3 - 3x \)", "\( 20x^4 - 3x \)"], "correcta" => "\( 20x^3 - 6x \)"],
 
-    ["pregunta" => "Derivada de \( g(x) = -2x^6 + 4x \)",
-     "opciones" => ["\( -12x^5 + 4 \)", "\( -12x^5 \)", "\( -2x^5 + 4 \)", "\( 12x^5 + 4x \)"],
-     "correcta" => "\( -12x^5 + 4 \)"],
+        ["pregunta" => "Derivada de \( g(x) = -2x^6 + 4x \)",
+         "opciones" => ["\( -12x^5 + 4 \)", "\( -12x^5 \)", "\( -2x^5 + 4 \)", "\( 12x^5 + 4x \)"], "correcta" => "\( -12x^5 + 4 \)"],
 
-    ["pregunta" => "Pendiente de la tangente a \( f(x) = x^3 - 6x + 1 \) en \( x = 2 \)",
-     "opciones" => ["0", "6", "12", "-6"],
-     "correcta" => "6"],
+        ["pregunta" => "Pendiente de \( f(x) = x^3 - 6x + 1 \) en \( x=2 \)",
+         "opciones" => ["0", "6", "12", "-6"], "correcta" => "6"],
 
-    ["pregunta" => "Derivada de \( h(x) = (3x^2 - 1)(2x + 5) \) usando la regla del producto",
-     "opciones" => ["\( 18x^2 + 12x - 10 \)", "\( 6x^2 + 15x - 2 \)", "\( 12x + 15 \)", "\( 18x^2 - 10 \)"],
-     "correcta" => "\( 18x^2 + 12x - 10 \)"],
+        ["pregunta" => "Derivada usando regla del producto: \( h(x)=(3x^2 - 1)(2x + 5) \)",
+         "opciones" => ["\( 18x^2 + 12x - 10 \)", "\( 6x^2 + 15x - 2 \)", "\( 12x + 15 \)", "\( 18x^2 - 10 \)"], "correcta" => "\( 18x^2 + 12x - 10 \)"],
 
-    ["pregunta" => "Derivada de \( p(x) = 4(x^3 - 2x)^2 \) (se acepta forma desarrollada o no)",
-     "opciones" => ["\( 4(6x^2 - 4x) \)", "\( 24x^2 - 16x \)", "\( 8(x^3 - 2x)(3x^2 - 2) \)", "Ambas formas son equivalentes"],
-     "correcta" => "Ambas formas son equivalentes"],
+        ["pregunta" => "Derivada de \( p(x)=4(x^3 - 2x)^2 \) (forma correcta)",
+         "opciones" => ["\( 4(6x^2 - 4x) \)", "\( 24x^2 - 16x \)", "\( 8(x^3 - 2x)(3x^2 - 2) \)", "Ambas formas son equivalentes"],
+         "correcta" => "Ambas formas son equivalentes"],
 
-    // 13–18: Interpretación y aplicaciones
-    ["pregunta" => "Si la posición de una partícula es \( s(t) = 3t^2 - 4t + 1 \), ¿cuál es su velocidad instantánea?",
-     "opciones" => ["\( 3t - 4 \)", "\( 6t - 4 \)", "\( 3t^2 - 4t \)", "\( 6t \)"],
-     "correcta" => "\( 6t - 4 \)"],
+        // Aplicaciones
+        ["pregunta" => "Si \( s(t)=3t^2 - 4t + 1 \), ¿cuál es su velocidad?",
+         "opciones" => ["\( 3t - 4 \)", "\( 6t - 4 \)", "\( 3t^2 - 4t \)", "\( 6t \)"], "correcta" => "\( 6t - 4 \)"],
 
-    ["pregunta" => "En economía, la derivada de la función de costo total \( C(x) \) se interpreta como:",
-     "opciones" => ["Costo fijo", "Costo medio", "Costo marginal", "Ingreso total"],
-     "correcta" => "Costo marginal"],
+        ["pregunta" => "En economía, la derivada de \( C(x) \) (costo total) se interpreta como:",
+         "opciones" => ["Costo fijo", "Costo medio", "Costo marginal", "Ingreso total"], "correcta" => "Costo marginal"],
 
-    ["pregunta" => "Si \( f'(x) = 0 \) en todo un intervalo abierto, entonces \( f(x) \) es:",
-     "opciones" => ["Creciente", "Decreciente", "Constante", "No diferenciable"],
-     "correcta" => "Constante"],
+        ["pregunta" => "Si \( f'(x)=0 \) en todo un intervalo, \( f \) es:",
+         "opciones" => ["Creciente", "Decreciente", "Constante", "No diferenciable"], "correcta" => "Constante"],
 
-    ["pregunta" => "En cuál de los siguientes puntos la recta tangente es horizontal para \( f(x) = x^3 - 3x \)?",
-     "opciones" => ["\( x = 0 \)", "\( x = 1 \)", "\( x = -1 \)", "En ninguno"],
-     "correcta" => "\( x = 1 \) y \( x = -1 \) (pero la mejor opción es marcar que hay puntos horizontales; si tu sistema solo permite una, elige \( x = 1 \))"],
+        ["pregunta" => "Puntos donde la tangente es horizontal para \( f(x) = x^3 - 3x \):",
+         "opciones" => ["\( x=0 \)", "\( x=1 \)", "\( x=-1 \)", " \( x=1 \) y \( x=-1 \)"],
+         "correcta" => " \( x=1 \\) y \\( x=-1 \)"],
 
-    ["pregunta" => "¿Cuál es la derivada de \( f(x) = 8 \)?",
-     "opciones" => ["8", "0", "Indefinida", "No existe"],
-     "correcta" => "0"],
+        ["pregunta" => "Derivada de \( f(x)=8 \)",
+         "opciones" => ["8", "0", "Indefinida", "No existe"], "correcta" => "0"],
 
-    ["pregunta" => "La derivada de \( f(x) = x \) es:",
-     "opciones" => ["0", "1", "\( x^0 \)", "Todas las anteriores son correctas"],
-     "correcta" => "Todas las anteriores son correctas"],
+        ["pregunta" => "Derivada de \( f(x)=x \)",
+         "opciones" => ["0", "1", "\( x^0 \)", "Todas las anteriores"], "correcta" => "Todas las anteriores"],
 
-    // 17–20: Preguntas de mayor exigencia (cierre)
-    ["pregunta" => "Derivada de \( k(x) = (x^2 + 2)(3x - 1) + 5x \) (primero expandir o usar producto + suma)",
-     "opciones" => ["\( 9x^2 + 8x - 2 \)", "\( 9x^2 - 2 \)", "\( 6x + 5 \)", "\( 9x^2 + 5 \)"],
-     "correcta" => "\( 9x^2 + 8x - 2 \)"],
+        // Preguntas avanzadas / razonamiento
+        ["pregunta" => "Derivada de \( k(x)=(x^2 + 2)(3x - 1) + 5x \)",
+         "opciones" => ["\( 9x^2 + 8x - 2 \)", "\( 9x^2 - 2 \)", "\( 6x + 5 \)", "\( 9x^2 + 5 \)"],
+         "correcta" => "\( 9x^2 + 8x - 2 \)"],
 
-    ["pregunta" => "Si \( f(x) = x^4 - 4x^3 + 2 \), ¿en cuántos puntos del intervalo [0, 3] la tangente es horizontal?",
-     "opciones" => ["Ninguno", "Uno", "Dos", "Tres"],
-     "correcta" => "Dos"],
+        ["pregunta" => "Si \( f(x) = x^4 - 4x^3 + 2 \), ¿en cuántos puntos de [0,3] la tangente es horizontal?",
+         "opciones" => ["Ninguno", "Uno", "Dos", "Tres"], "correcta" => "Dos"],
 
-    ["pregunta" => "¿Cuál de las siguientes afirmaciones es siempre cierta para polinomios?",
-     "opciones" => ["Son derivables solo en enteros", "Tienen al menos una raíz real", "Su derivada es otro polinomio", "Su dominio es finito"],
-     "correcta" => "Su derivada es otro polinomio"],
+        ["pregunta" => "Afirmación: 'La derivada de un polinomio es otro polinomio' — ¿cierto o falso?",
+         "opciones" => ["Cierto", "Falso"], "correcta" => "Cierto"],
 
-    ["pregunta" => "La derivada de segundo orden de \( f(x) = 2x^3 - 3x^2 + x \) es:",
-     "opciones" => ["\( 12x - 6 \)", "\( 12x + 1 \)", "\( 6x^2 - 6x + 1 \)", "\( 6x - 6 \)"],
-     "correcta" => "\( 12x - 6 \)"]
-]
+        ["pregunta" => "La derivada de segundo orden de \( f(x)=2x^3 - 3x^2 + x \) es:",
+         "opciones" => ["\( 12x - 6 \)", "\( 12x + 1 \)", "\( 6x^2 - 6x + 1 \)", "\( 6x - 6 \)"], "correcta" => "\( 12x - 6 \)"]
+    ],
 ];
 /**
  * MATERIA: Pensamiento Matemático III
@@ -244,499 +298,798 @@ $lecciones[] = [
     'slug'    => 'puntos-maximos-minimos',
     'titulo'  => 'Puntos Críticos: Máximos y Mínimos Locales',
 
-    /* ==========================================
-       CONTENIDO DE LA LECCIÓN
-       ========================================== */
+    /* =====================================================
+       CONTENIDO COMPLETO DE LA LECCIÓN (HTML + SVG + LaTeX)
+       ===================================================== */
     'contenido' => <<<'HTML'
-        <h3>Definición de Punto Crítico</h3>
-        <p>Un <strong>punto crítico</strong> de una función \( f \) es todo valor \( c \) en el dominio donde se cumple alguna de las siguientes condiciones:</p>
-        <ul>
-            <li>\( f'(c) = 0 \)</li>
-            <li>\( f'(c) \) no existe (aunque \( c \) esté en el dominio)</li>
-        </ul>
-        <p>Los puntos críticos son candidatos a ser <strong>máximos locales</strong>, <strong>mínimos locales</strong> o <strong>puntos de inflexión</strong>.</p>
 
-        <div class="visual static-image">
-            <img src="assets/img/puntos_maximos_minimos.jpg" alt="Gráfica con máximos y mínimos locales">
-            <p class="caption">Ejemplos de máximos y mínimos locales en una función continua.</p>
+        <div class="content-header">
+            <h2>Puntos Críticos: Máximos y Mínimos Locales</h2>
+            <span class="materia-tag">Pensamiento Matemático III</span>
+            <p class="progress-info-local">
+                Objetivos: identificar puntos críticos, diferenciar máximos/mínimos locales
+                mediante la prueba de la primera derivada e interpretar cambios de signo.
+            </p>
         </div>
 
-        <div class="visual static-image">
-            <img src="assets/img/maximos_minimos_relativos.png" alt="Ilustración de extremos relativos">
-            <p class="caption">Máximos y mínimos relativos (locales). Fuente: Paul’s Online Math Notes.</p>
-        </div>
+        <div class="content-body">
 
-        <h3>Prueba de la Primera Derivada</h3>
-        <p>Sea \( c \) un punto crítico donde \( f'(c) = 0 \) y \( f' \) es continua en un entorno de \( c \). El signo de la derivada antes y después de \( c \) determina la naturaleza del punto:</p>
+            <!-- ===========================================
+                 DEFINICIÓN FORMAL
+                 =========================================== -->
+            <h3>Definición de Punto Crítico</h3>
+            <p>Un <strong>punto crítico</strong> de una función \( f \) es cualquier valor \( c \) en el dominio donde se cumple:</p>
+            <ul>
+                <li>\( f'(c) = 0 \), o</li>
+                <li>\( f'(c) \) no existe (pero \( c \) sí pertenece al dominio).</li>
+            </ul>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Signo de \( f'(x) \)</th>
-                    <th>Izquierda de \( c \)</th>
-                    <th>Derecha de \( c \)</th>
-                    <th>Conclusión</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>De positivo a negativo</td><td>+</td><td>−</td><td>Máximo local</td></tr>
-                <tr><td>De negativo a positivo</td><td>−</td><td>+</td><td>Mínimo local</td></tr>
-                <tr><td>Mismo signo</td><td>+</td><td>+</td><td>Punto de inflexión</td></tr>
-                <tr><td></td><td>−</td><td>−</td><td>Punto de inflexión</td></tr>
-            </tbody>
-        </table>
+            <p>Los puntos críticos son candidatos a:</p>
+            <ul>
+                <li><strong>máximos locales</strong>,</li>
+                <li><strong>mínimos locales</strong>,</li>
+                <li><strong>puntos de inflexión</strong> (si la derivada no cambia de signo).</li>
+            </ul>
 
-        <div class="svg-diagram">
-            <svg viewBox="0 0 380 280" xmlns="http://www.w3.org/2000/svg" aria-labelledby="svg-title svg-desc">
-                <title id="svg-title">Prueba de la primera derivada</title>
-                <desc id="svg-desc">Gráfica con un máximo local (cambio + → −) y un mínimo local (cambio − → +).</desc>
+            <!-- ===========================================
+                 SVG RETRO: Máximo y mínimo local
+                 =========================================== -->
+            <div class="visual svg-diagram">
+                <svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svg-title01 svg-desc01">
+                    <title id="svg-title01">Máximos y mínimos locales</title>
+                    <desc  id="svg-desc01">
+                        Representación estilizada: curva con un máximo local y un mínimo local.
+                    </desc>
 
-                <rect width="380" height="280" fill="#111"/>
+                    <rect width="720" height="340" fill="#0b0b0b"/>
 
-                <!-- Ejes -->
-                <line x1="50" y1="220" x2="330" y2="220" stroke="#ccc" stroke-width="2"/>
-                <line x1="50" y1="220" x2="50" y2="40"  stroke="#ccc" stroke-width="2"/>
-                <text x="335" y="215" fill="#ffcc00" font-size="16" font-weight="bold">X</text>
-                <text x="38"  y="50"  fill="#ffcc00" font-size="16" font-weight="bold">Y</text>
+                    <!-- Ejes -->
+                    <line x1="60" y1="280" x2="660" y2="280" stroke="#444" stroke-width="2"/>
+                    <line x1="60" y1="280" x2="60"  y2="40"  stroke="#444" stroke-width="2"/>
+                    <text x="670" y="285" fill="#ffcc00" font-size="14" font-family="VT323">X</text>
+                    <text x="50"  y="35"  fill="#ffcc00" font-size="14" font-family="VT323">Y</text>
 
-                <!-- Curva con máximo y mínimo -->
-                <path d="M60 180 
-                         Q 120 80,  190 80 
-                         Q 260 80,  320 180"
-                      stroke="#00ccff" fill="none" stroke-width="6" stroke-linecap="round"/>
+                    <!-- Curva -->
+                    <path d="M80 240 
+                             C 150 80, 260 80, 340 240
+                             C 420 380, 540 40, 640 200"
+                          stroke="#00ccff" stroke-width="6"
+                          fill="none" stroke-linecap="round" />
 
-                <!-- Punto máximo -->
-                <circle cx="190" cy="80"  r="8" fill="#ff00ff"/>
-                <text   x="200" y="70"  fill="#ff00ff" font-size="14" font-weight="bold">Máximo local</text>
+                    <!-- Máximo local -->
+                    <circle cx="220" cy="120" r="8" fill="#ff00ff"/>
+                    <text x="240" y="110" fill="#ff00ff" font-family="VT323" font-size="14">Máximo local</text>
 
-                <!-- Punto mínimo (simulado en los extremos para claridad visual) -->
-                <circle cx="60"  cy="180" r="6" fill="#00ff00"/>
-                <circle cx="320" cy="180" r="6" fill="#00ff00"/>
-                <text   x="240" y="200" fill="#00ffcc" font-size="13">
-                    Mínimos en los extremos del intervalo mostrado
-                </text>
+                    <!-- Mínimo local -->
+                    <circle cx="340" cy="240" r="8" fill="#00ff00"/>
+                    <text x="360" y="260" fill="#00ff00" font-family="VT323" font-size="14">Mínimo local</text>
+                </svg>
 
-                <!-- Etiquetas de signo -->
-                <text x="100" y="130" fill="#fff" font-size="14">+</text>
-                <text x="160" y="110" fill="#fff" font-size="14">−</text>
-                <text x="220" y="110" fill="#fff" font-size="14">+</text>
-            </svg>
-            <p class="caption">Cambio de signo de la primera derivada alrededor de un máximo local.</p>
-        </div>
+                <p class="caption">Máximos y mínimos locales: puntos donde la pendiente se anula.</p>
+            </div>
 
-        <div class="ejemplo">
-            <h4>Ejemplo 1: \( f(x) = x^3 - 3x \)</h4>
-            <p>\( f'(x) = 3x^2 - 3 = 3(x^2 - 1) = 0 \Rightarrow x = \pm 1 \)</p>
-            <p>Izquierda de \( x = -1 \): \( f' < 0 \); derecha: \( f' > 0 \) → <strong>mínimo local</strong> en \( (-1, 2) \)</p>
-            <p>Izquierda de \( x = 1 \): \( f' > 0 \); derecha: \( f' < 0 \) → <strong>máximo local</strong> en \( (1, -2) \)</p>
-        </div>
+            <!-- ===========================================
+                 PRUEBA DE LA PRIMERA DERIVADA
+                 =========================================== -->
+            <h3>Prueba de la Primera Derivada</h3>
+            <p>
+                Si \( c \) es un punto crítico con \( f'(c)=0 \), el signo de \( f' \) alrededor de \( c \) determina la naturaleza del punto.
+            </p>
 
-        <div class="ejemplo">
-            <h4>Ejemplo 2: \( g(x) = x^4 - 4x^2 \)</h4>
-            <p>\( g'(x) = 4x^3 - 8x = 4x(x^2 - 2) = 0 \Rightarrow x = 0, \, x = \pm \sqrt{2} \)</p>
-            <p>\( x = -\sqrt{2} \): \( + \to - \) → máximo local<br>
-               \( x = 0 \): \( - \to + \) → mínimo local<br>
-               \( x = \sqrt{2} \): \( + \to - \) → máximo local</p>
-        </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Comportamiento de \( f'(x) \)</th>
+                        <th>Izquierda de \( c \)</th>
+                        <th>Derecha de \( c \)</th>
+                        <th>Conclusión</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Cambia de + a −</td><td>+</td><td>−</td><td>Máximo local</td></tr>
+                    <tr><td>Cambia de − a +</td><td>−</td><td>+</td><td>Mínimo local</td></tr>
+                    <tr><td>No cambia de signo</td><td>+</td><td>+</td><td>Inflexión</td></tr>
+                    <tr><td></td><td>−</td><td>−</td><td>Inflexión</td></tr>
+                </tbody>
+            </table>
+
+            <!-- ===========================================
+                 SVG RETRO: Cambio de signo
+                 =========================================== -->
+            <div class="svg-diagram">
+                <svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svg-title02 svg-desc02">
+                    <title id="svg-title02">Cambio de signo de la primera derivada</title>
+                    <desc  id="svg-desc02">Ilustración del criterio: +→− produce máximo, −→+ produce mínimo.</desc>
+
+                    <rect width="720" height="340" fill="#111"/>
+
+                    <!-- Ejes -->
+                    <line x1="60" y1="280" x2="660" y2="280" stroke="#ccc" stroke-width="2"/>
+                    <line x1="60" y1="280" x2="60"  y2="40"  stroke="#ccc" stroke-width="2"/>
+
+                    <text x="670" y="285" fill="#ffcc00" font-size="14">X</text>
+                    <text x="48"  y="50"  fill="#ffcc00" font-size="14">Y</text>
+
+                    <!-- Curva -->
+                    <path d="M80 240 
+                             Q 150 80,  220 80 
+                             Q 290 80,  360 240
+                             Q 430 390,  520 40
+                             Q 600 60,  660 260"
+                          stroke="#00ccff" stroke-width="6" fill="none"/>
+
+                    <!-- Máximo -->
+                    <circle cx="220" cy="80" r="8" fill="#ff00ff"/>
+                    <text   x="240" y="75" fill="#ff00ff" font-family="VT323" font-size="13">Máximo</text>
+
+                    <!-- Mínimo -->
+                    <circle cx="360" cy="240" r="8" fill="#00ff00"/>
+                    <text   x="380" y="255" fill="#00ff00" font-family="VT323" font-size="13">Mínimo</text>
+
+                    <!-- Signos -->
+                    <text x="140" y="160" fill="#fff" font-size="16">+</text>
+                    <text x="260" y="160" fill="#fff" font-size="16">−</text>
+                    <text x="300" y="300" fill="#fff" font-size="16">−</text>
+                    <text x="420" y="160" fill="#fff" font-size="16">+</text>
+                </svg>
+
+                <p class="caption">Máximo cuando \( f' \) pasa de positivo a negativo; mínimo cuando pasa de negativo a positivo.</p>
+            </div>
+
+            <!-- ===========================================
+                 EJEMPLOS DETALLADOS
+                 =========================================== -->
+            <h3>Ejemplos Resueltos</h3>
+
+            <div class="ejemplo">
+                <h4>Ejemplo 1: \( f(x) = x^3 - 3x \)</h4>
+                <p>\( f'(x) = 3x^2 - 3 = 3(x^2 - 1) = 0 \Rightarrow x = \pm 1 \)</p>
+
+                <p><strong>En \( x=-1 \):</strong> \( f' \) cambia de negativo a positivo → <strong>mínimo local</strong>.</p>
+                <p><strong>En \( x=1 \):</strong> \( f' \) cambia de positivo a negativo → <strong>máximo local</strong>.</p>
+            </div>
+
+            <div class="ejemplo">
+                <h4>Ejemplo 2: \( g(x) = x^4 - 4x^2 \)</h4>
+                <p>\( g'(x) = 4x(x^2 - 2) = 0 \Rightarrow x = 0,\, x = \pm\sqrt{2} \)</p>
+                <ul>
+                    <li>En \( x=-\sqrt{2} \): \( f' \) cambia de + a − → máximo local.</li>
+                    <li>En \( x=0 \): − a + → mínimo local.</li>
+                    <li>En \( x=\sqrt{2} \): + a − → máximo local.</li>
+                </ul>
+            </div>
+
+            <!-- ===========================================
+                 PRÁCTICA GUIADA PASO A PASO
+                 =========================================== -->
+            <h3>Práctica Guiada (Paso a paso)</h3>
+            <p>Clasifiquemos los puntos críticos de \( h(x) = x^3 - 6x^2 + 9x \).</p>
+
+            <ol>
+                <li><strong>Paso 1:</strong> Derivar.  
+                    \[
+                        h'(x) = 3x^2 - 12x + 9 = 3(x^2 - 4x + 3).
+                    \]
+                </li>
+
+                <li><strong>Paso 2:</strong> Resolver \( h'(x) = 0 \).  
+                    \[
+                        x^2 - 4x + 3 = 0 \Rightarrow x=1,\; x=3.
+                    \]
+                </li>
+
+                <li><strong>Paso 3:</strong> Analizar signo alrededor.  
+                    <ul>
+                        <li>En \( x=1 \): \( h' \) pasa de + a − → <strong>máximo local</strong>.</li>
+                        <li>En \( x=3 \): \( h' \) pasa de − a + → <strong>mínimo local</strong>.</li>
+                    </ul>
+                </li>
+
+                <li><strong>Conclusión:</strong>  
+                    Máximo en \( x=1 \) y mínimo en \( x=3 \).</li>
+            </ol>
+
+        </div> <!-- cierre content-body -->
+
 HTML
 ,
 
-    /* ==========================================
-       EJERCICIOS
-       ========================================== */
+    /* =====================================
+       EJERCICIOS AMPLIADOS
+       ===================================== */
     'ejercicios' => [
-        ["enunciado" => "Halla y clasifica los puntos críticos de \( f(x) = x^3 - 6x^2 + 9x \)", "respuesta" => "x = 1 (máximo local), x = 3 (mínimo local)"],
-        ["enunciado" => "Determina los extremos locales de \( f(x) = x^4 - 4x^2 + 3 \)", "respuesta" => "x = 0 (mínimo), x = ±√2 (máximos)"],
-        ["enunciado" => "Clasifica el punto crítico de \( f(x) = x^3 \)", "respuesta" => "x = 0 es punto de inflexión"],
-        ["enunciado" => "Encuentra los puntos críticos de \( f(x) = (x-2)^2(x+1) \)", "respuesta" => "x = 2 (mínimo), x = -1/3 (punto de inflexión)"],
-        ["enunciado" => "Para \( f(x) = x + \\frac{4}{x} \) (x > 0), halla el mínimo local", "respuesta" => "x = 2"],
-        ["enunciado" => "Clasifica los puntos críticos de \( f(x) = x^4 - 8x^2 + 16 \)", "respuesta" => "x = 0 (mínimo), x = ±2 (máximos)"],
-        ["enunciado" => "Determina los extremos de \( f(x) = \\sin x \) en \( [0, 2\\pi] \)", "respuesta" => "x = \\pi/2 (máx), x = 3\\pi/2 (mín)"],
-        ["enunciado" => "Halla los puntos críticos de \( f(x) = |x^2 - 4| \)", "respuesta" => "x = 0, x = ±2 (todos mínimos)"],
-        ["enunciado" => "Clasifica x = 0 en \( f(x) = x^{2/3} \)", "respuesta" => "Mínimo local (cúspide)"],
-        ["enunciado" => "Encuentra y clasifica los puntos críticos de \( f(x) = x^5 - 5x \)", "respuesta" => "x = ±1 (máx y mín), x = 0 (inflexión)"],
-        ["enunciado" => "Para \( f(x) = e^x + e^{-x} \), determina el mínimo", "respuesta" => "x = 0"],
-        ["enunciado" => "Halla los extremos locales de \( f(x) = x^3 - 12x + 5 \)", "respuesta" => "x = -2 (máx), x = 2 (mín)"],
-        ["enunciado" => "Clasifica los puntos críticos de \( f(x) = (x^2 - 1)^2 \)", "respuesta" => "x = ±1 (mínimos), x = 0 (máximo)"],
-        ["enunciado" => "Determina los puntos críticos de \( f(x) = x + \\sin x \)", "respuesta" => "Ninguno (f'(x) = 1 + \\cos x ≥ 0 nunca es cero)"],
-        ["enunciado" => "Para \( f(x) = x^6 - 15x^4 + 40 \), ¿cuántos puntos críticos reales tiene?", "respuesta" => "5"],
-        ["enunciado" => "Clasifica x = 0 en \( f(x) = x^2 |x| \)", "respuesta" => "Cúspide (mínimo)"],
-        ["enunciado" => "Encuentra el máximo de \( f(x) = -x^2 + 6x - 5 \) en \\mathbb{R}", "respuesta" => "x = 3"],
-        ["enunciado" => "Para \( f(x) = \\sqrt[3]{x^2} \), clasifica x = 0", "respuesta" => "Mínimo local"],
-        ["enunciado" => "Determina los extremos locales de \( f(x) = x^5 - 10x^3 + 9x \)", "respuesta" => "x = ±1 (máx y mín), x = 0 (inflexión)"]
+        ["enunciado" => "Halla y clasifica los puntos críticos de \( f(x)=x^3 - 6x^2 + 9x \).", "respuesta" => "x=1 máximo, x=3 mínimo"],
+        ["enunciado" => "Determina extremos de \( f(x)=x^4 - 4x^2 + 3 \).", "respuesta" => "x=0 mínimo, x=±√2 máximos"],
+        ["enunciado" => "Clasifica el punto crítico de \( f(x)=x^3 \).", "respuesta" => "x=0 es inflexión (derivada no cambia de signo)"],
+        ["enunciado" => "Puntos críticos de \( f(x)=(x-2)^2(x+1) \).", "respuesta" => "x=2 mínimo, x=-1/3 inflexión"],
+        ["enunciado" => "Para \( f(x)=x + 4/x \), x>0, halla el mínimo.", "respuesta" => "x=2"],
+        ["enunciado" => "Clasifica los puntos de \( f(x)=x^4 - 8x^2 + 16 \).", "respuesta" => "x=0 mínimo, x=±2 máximos"],
+        ["enunciado" => "Extremos de \( \sin x \) en [0,2π].", "respuesta" => "máximo: π/2; mínimo: 3π/2"],
+        ["enunciado" => "Puntos críticos de \( f(x)=|x^2 - 4| \).", "respuesta" => "x=0, ±2 (mínimos)"],
+        ["enunciado" => "Clasifica x=0 en \( f(x)=x^{2/3} \).", "respuesta" => "mínimo local (cúspide)"],
+        ["enunciado" => "Extremos de \( f(x)=x^5 - 5x \).", "respuesta" => "x=±1 extremos, x=0 inflexión"],
+        ["enunciado" => "Mínimo de \( f(x)=e^x + e^{-x} \).", "respuesta" => "x=0"],
+        ["enunciado" => "Extremos de \( f(x)=x^3 -12x + 5 \).", "respuesta" => "x=-2 máximo, x=2 mínimo"],
+        ["enunciado" => "Clasifica puntos de \( f(x)=(x^2 -1)^2 \).", "respuesta" => "x=±1 mínimos, x=0 máximo"],
+        ["enunciado" => "Puntos críticos de \( f(x)=x + \sin x \).", "respuesta" => "no hay (f'=1+cos x>0)"],
+        ["enunciado" => "Número de puntos críticos de \( f(x)=x^6 - 15x^4 + 40 \).", "respuesta" => "5"],
+        ["enunciado" => "Clasifica x=0 en \( f(x)=x^2|x| \).", "respuesta" => "mínimo (cúspide)"],
+        ["enunciado" => "Máximo de \( f(x)=-x^2 + 6x -5 \).", "respuesta" => "x=3"],
+        ["enunciado" => "Clasifica x=0 en \( f(x)=\sqrt[3]{x^2} \).", "respuesta" => "mínimo local"],
+        ["enunciado" => "Extremos de \( f(x)=x^5 - 10x^3 + 9x \).", "respuesta" => "x=±1 extremos, x=0 inflexión"]
     ],
 
-    /* ==========================================
-       QUIZ
-       ========================================== */
+    /* =====================================
+       QUIZ AMPLIADO (FORMAL)
+       ===================================== */
     'quiz' => [
-        ["pregunta" => "Un punto crítico ocurre cuando", "opciones" => ["f(x) = 0", "f'(x) = 0 o no existe", "f''(x) = 0", "f(x) → ∞"], "correcta" => "f'(x) = 0 o no existe"],
-        ["pregunta" => "Si f' cambia de + a − en c, entonces c es", "opciones" => ["Mínimo local", "Máximo local", "Punto de inflexión", "No crítico"], "correcta" => "Máximo local"],
-        ["pregunta" => "Si f' no cambia de signo en un punto crítico, entonces es", "opciones" => ["Máximo", "Mínimo", "Punto de inflexión", "Error"], "correcta" => "Punto de inflexión"],
-        ["pregunta" => "Para f(x) = x², x = 0 es", "opciones" => ["Máximo local", "Mínimo local", "Inflexión", "No crítico"], "correcta" => "Mínimo local"],
-        ["pregunta" => "Para f(x) = x³, x = 0 es", "opciones" => ["Máximo", "Mínimo", "Punto de inflexión", "No crítico"], "correcta" => "Punto de inflexión"],
-        ["pregunta" => "En f(x) = |x|, x = 0 es", "opciones" => ["Máximo local", "Mínimo local", "Cúspide", "Inflexión"], "correcta" => "Mínimo local"],
-        ["pregunta" => "¿Cuántos puntos críticos tiene f(x) = x⁴?", "opciones" => ["0", "1", "2", "4"], "correcta" => "1"],
-        ["pregunta" => "Si f'(x) > 0 a ambos lados de c (y f'(c) = 0), entonces c es", "opciones" => ["Máximo", "Mínimo", "Inflexión", "No crítico"], "correcta" => "Inflexión"],
-        ["pregunta" => "La prueba que usa el cambio de signo de f' se llama", "opciones" => ["Prueba de la segunda derivada", "Prueba de la primera derivada", "Criterio de Euler", "Test de concavidad"], "correcta" => "Prueba de la primera derivada"],
-        ["pregunta" => "Un polinomio de grado n puede tener a lo sumo cuántos extremos locales?", "opciones" => ["n", "n−1", "n−2", "2n"], "correcta" => "n−1"],
-        ["pregunta" => "En f(x) = (x−1)²(x+2), x = 1 es", "opciones" => ["Máximo", "Mínimo local", "Inflexión", "Cúspide"], "correcta" => "Mínimo local"],
-        ["pregunta" => "Para f(x) = sen(x), en [0, 2π] el máximo ocurre en", "opciones" => ["x = 0", "x = π/2", "x = π", "x = 3π/2"], "correcta" => "x = π/2"],
-        ["pregunta" => "x = 0 en f(x) = x^{1/3} es", "opciones" => ["Máximo", "Mínimo", "Cúspide", "Inflexión"], "correcta" => "Cúspide"],
-        ["pregunta" => "Si f'(x) < 0 a la izquierda y > 0 a la derecha de c, entonces c es", "opciones" => ["Máximo local", "Mínimo local", "Inflexión", "No crítico"], "correcta" => "Mínimo local"],
-        ["pregunta" => "¿Puede un punto crítico no ser extremo local?", "opciones" => ["Nunca", "Solo en funciones impares", "Sí", "Solo en cúspides"], "correcta" => "Sí"],
-        ["pregunta" => "Para f(x) = e^{-x²}, x = 0 es", "opciones" => ["Mínimo global", "Máximo global", "Inflexión", "No crítico"], "correcta" => "Máximo global"],
-        ["pregunta" => "¿Cuántos mínimos locales tiene f(x) = (x²−1)²?", "opciones" => ["0", "1", "2", "3"], "correcta" => "2"],
-        ["pregunta" => "En f(x) = x + 1/x (x > 0), el mínimo ocurre en", "opciones" => ["x = 1", "x = 2", "x = −1", "No existe"], "correcta" => "x = 1"],
-        ["pregunta" => "Un punto donde f'(x) no existe puede ser", "opciones" => ["Solo máximo", "Solo mínimo", "Cúspide o vértice", "Nunca extremo"], "correcta" => "Cúspide o vértice"],
-        ["pregunta" => "Para f(x) = x^5 − 5x, x = 0 es", "opciones" => ["Máximo", "Mínimo", "Inflexión", "Cúspide"], "correcta" => "Inflexión"],
-        ["pregunta" => "¿Cuántos puntos críticos tiene f(x) = x^6 − 15x^4 + 40?", "opciones" => ["1", "3", "5", "7"], "correcta" => "5"],
-        ["pregunta" => "En f(x) = −x², x = 0 es", "opciones" => ["Mínimo", "Máximo global", "Inflexión", "No crítico"], "correcta" => "Máximo global"],
-        ["pregunta" => "Si f'(x) = 0 y f''(x) > 0, entonces es", "opciones" => ["Máximo", "Mínimo local", "Inflexión", "Indeterminado"], "correcta" => "Mínimo local"],
-        ["pregunta" => "El número máximo de extremos locales de un polinomio de grado 5 es", "opciones" => ["3", "4", "5", "6"], "correcta" => "4"],
-        ["pregunta" => "Para f(x) = tan(x) en (−π/2, π/2), ¿x = 0 es crítico?", "opciones" => ["Sí", "No", "Solo en 0", "Indeterminado"], "correcta" => "No"],
-        ["pregunta" => "En f(x) = √x, x = 0 es", "opciones" => ["Máximo", "Mínimo", "Cúspide", "No crítico"], "correcta" => "Mínimo"],
-        ["pregunta" => "Un punto crítico donde la función es continua pero no derivable se llama", "opciones" => ["Punto singular", "Cúspide", "Vértice", "Todas las anteriores posibles"], "correcta" => "Todas las anteriores posibles"],
-        ["pregunta" => "Para f(x) = x^4 − 8x^2 + 16, x = ±2 son", "opciones" => ["Mínimos", "Máximos locales", "Inflexión", "No críticos"], "correcta" => "Máximos locales"],
-        ["pregunta" => "El cambio de signo de la primera derivada es condición", "opciones" => ["Suficiente para extremo", "Necesaria pero no suficiente", "Suficiente y necesaria", "Ninguna"], "correcta" => "Suficiente para extremo"],
-        ["pregunta" => "¿Cuántos máximos locales puede tener un polinomio cúbico?", "opciones" => ["0", "1", "2", "3"], "correcta" => "1"]
+        ["pregunta" => "Un punto crítico ocurre cuando", "opciones" => ["f(x)=0", "f'(x)=0 o no existe", "f''(x)=0", "f(x)→∞"], "correcta" => "f'(x)=0 o no existe"],
+        ["pregunta" => "Si f' cambia de + a − en c, entonces es", "opciones" => ["mínimo", "máximo", "inflexión", "no crítico"], "correcta" => "máximo"],
+        ["pregunta" => "Si f' no cambia de signo, el punto es", "opciones" => ["máximo", "mínimo", "inflexión", "sin clasificar"], "correcta" => "inflexión"],
+        ["pregunta" => "Para f(x)=x², x=0 es", "opciones" => ["máximo", "mínimo", "inflexión", "no crítico"], "correcta" => "mínimo"],
+        ["pregunta" => "Para f(x)=x³, x=0 es", "opciones" => ["máximo", "mínimo", "inflexión", "no crítico"], "correcta" => "inflexión"],
+        ["pregunta" => "En f(x)=|x|, x=0 es", "opciones" => ["máximo", "mínimo", "cúspide", "inflexión"], "correcta" => "mínimo"],
+        ["pregunta" => "¿Cuántos puntos críticos tiene f(x)=x⁴?", "opciones" => ["0","1","2","4"], "correcta" => "1"],
+        ["pregunta" => "Si f'>0 a ambos lados de c, c es", "opciones" => ["máximo","mínimo","inflexión","crítico"], "correcta" => "inflexión"],
+        ["pregunta" => "La prueba basada en el signo de f' se llama", "opciones" => ["segunda derivada","primera derivada","criterio básico","test de Euler"], "correcta" => "primera derivada"],
+        ["pregunta" => "Un polinomio de grado n puede tener a lo sumo", "opciones" => ["n","n−1","n−2","2n"], "correcta" => "n−1"],
+        ["pregunta" => "x=1 en f(x)=(x−1)²(x+2) es", "opciones" => ["máximo","mínimo","inflexión","cúspide"], "correcta" => "mínimo"],
+        ["pregunta" => "Máximo de sen(x) en [0,2π] ocurre en", "opciones" => ["0","π/2","π","3π/2"], "correcta" => "π/2"],
+        ["pregunta" => "x=0 en x^{1/3} es", "opciones" => ["máximo","mínimo","cúspide","inflexión"], "correcta" => "cúspide"],
+        ["pregunta" => "Si f'<0 a la izquierda y >0 a la derecha de c", "opciones" => ["máximo","mínimo","inflexión","no crítico"], "correcta" => "mínimo"],
+        ["pregunta" => "¿Puede un punto crítico no ser extremo?", "opciones" => ["nunca","solo en pares","sí","solo en cúspides"], "correcta" => "sí"],
+        ["pregunta" => "x=0 en e^{-x²} es", "opciones" => ["mínimo","máximo global","inflexión","no crítico"], "correcta" => "máximo global"],
+        ["pregunta" => "¿Cuántos mínimos tiene f(x)=(x²−1)²?", "opciones" => ["0","1","2","3"], "correcta" => "2"],
+        ["pregunta" => "En f(x)=x+1/x, x>0, mínimo en", "opciones" => ["1","2","−1","no existe"], "correcta" => "1"],
+        ["pregunta" => "Un punto donde f' no existe puede ser", "opciones" => ["solo máximo","solo mínimo","cúspide o vértice","nunca extremo"], "correcta" => "cúspide o vértice"],
+        ["pregunta" => "x=0 en x^5 − 5x es", "opciones" => ["máximo","mínimo","inflexión","cúspide"], "correcta" => "inflexión"],
+        ["pregunta" => "¿Cuántos puntos críticos tiene x^6 − 15x^4 + 40?", "opciones" => ["1","3","5","7"], "correcta" => "5"],
+        ["pregunta" => "En f(x)=−x², x=0 es", "opciones" => ["mínimo","máximo global","inflexión","no crítico"], "correcta" => "máximo global"],
+        ["pregunta" => "Si f'(c)=0 y f''(c)>0", "opciones" => ["máximo","mínimo","inflexión","indeterminado"], "correcta" => "mínimo"],
+        ["pregunta" => "Un polinomio de grado 5 tiene a lo sumo", "opciones" => ["3","4","5","6"], "correcta" => "4"],
+        ["pregunta" => "¿x=0 crítico en tan(x)? (−π/2,π/2)", "opciones" => ["sí","no","solo en 0","indeterminado"], "correcta" => "no"],
+        ["pregunta" => "En √x, x=0 es", "opciones" => ["máximo","mínimo","cúspide","no crítico"], "correcta" => "mínimo"],
+        ["pregunta" => "Un punto crítico donde f es continua pero no derivable puede ser", "opciones" => ["singular","cúspide","vértice","todas"], "correcta" => "todas"],
+        ["pregunta" => "x=±2 en x^4 − 8x² + 16 son", "opciones" => ["mínimos","máximos","inflexión","no críticos"], "correcta" => "máximos"],
+        ["pregunta" => "Cambio de signo de f' es condición", "opciones" => ["suficiente","necesaria","ambas","ninguna"], "correcta" => "suficiente"],
+        ["pregunta" => "¿Cuántos máximos puede tener un cúbico?", "opciones" => ["0","1","2","3"], "correcta" => "1"]
     ]
 ];
 /**
- * Lección: Ecosistemas - Niveles de Organización Biológica
- * Tema: Jerarquía de la vida y analogías celulares
- * Enfoque: Relación entre estructuras celulares y órganos humanos mediante analogías
- * Nivel: Intermedio
- * Recursos: 12 ejercicios + 30 preguntas de quiz + Diagramas SVG retro-neón
+ * MATERIA: Ecosistemas
+ * TEMA:    Niveles de Organización Biológica + Analogías Celulares
+ * ENFOQUE: Relación entre orgánulos y órganos humanos con visual retro–neón
+ * NIVEL:   Intermedio
  */
 
 $lecciones[] = [
     'materia' => 'Ecosistemas',
     'slug' => 'niveles-organizacion-celulas-materia-relacion-organos',
     'titulo' => 'Niveles de Organización Biológica: De la Célula al Ecosistema',
+
+    /* ==========================================================================
+       CONTENIDO PRINCIPAL DE LA LECCIÓN
+       Se mantiene tu estilo retro–neón y se expande con más ejemplos, secciones,
+       explicaciones formales y diagramas SVG completamente rediseñados.
+       ========================================================================== */
     'contenido' => <<<'HTML'
 
-<div class="text-center display-5 mb-4">🌌 NIVELES DE ORGANIZACIÓN BIOLÓGICA</div>
+<div class="text-center display-5 mb-4 neon-title">NIVELES DE ORGANIZACIÓN BIOLÓGICA</div>
 
-<h3>🎯 Niveles de Organización Biológica</h3>
-<p>Los seres vivos están organizados en una <strong>jerarquía de complejidad</strong> que va desde lo más simple hasta lo más complejo. Esta estructura permite entender cómo las partes pequeñas forman sistemas grandes, desde una célula hasta la biosfera entera.</p>
+<p class="intro">
+    Los seres vivos están estructurados en niveles que van desde lo más pequeño,
+    como átomos y moléculas, hasta lo más grande, como ecosistemas y la biosfera.
+    Comprender esta jerarquía permite analizar cómo las partes pequeñas colaboran
+    para formar sistemas complejos y funcionales.
+</p>
 
-<p>Los niveles principales son:</p>
-<ol>
-    <li><strong>Átomo</strong> → Ej: carbono, oxígeno</li>
-    <li><strong>Molécula</strong> → Ej: agua, ADN</li>
-    <li><strong>Orgánulo</strong> → Ej: núcleo, mitocondria</li>
-    <li><strong>Célula</strong> → Unidad básica de la vida</li>
-    <li><strong>Tejido</strong> → Grupo de células similares</li>
-    <li><strong>Órgano</strong> → Varios tejidos trabajando juntos</li>
-    <li><strong>Sistema de órganos</strong> → Ej: sistema nervioso</li>
-    <li><strong>Organismo</strong> → Individuo completo</li>
-    <li><strong>Población</strong> → Grupo de la misma especie</li>
-    <li><strong>Comunidad</strong> → Varias poblaciones</li>
-    <li><strong>Ecosistema</strong> → Comunidades + factores abióticos</li>
-    <li><strong>Biosfera</strong> → Todos los ecosistemas del planeta</li>
+<h3 class="section-title">I. Niveles de Organización Biológica</h3>
+
+<p>
+    Los 12 niveles clásicos de organización biológica, ordenados desde la menor
+    hasta la mayor complejidad, son los siguientes:
+</p>
+
+<ol class="niveles-list">
+    <li><strong>Átomo</strong> — partículas básicas de la materia.</li>
+    <li><strong>Molécula</strong> — unión química de átomos (agua, glucosa, ADN).</li>
+    <li><strong>Orgánulo</strong> — estructuras funcionales dentro de la célula (núcleo, mitocondrias).</li>
+    <li><strong>Célula</strong> — unidad mínima de la vida.</li>
+    <li><strong>Tejido</strong> — conjunto de células semejantes.</li>
+    <li><strong>Órgano</strong> — conjunto de tejidos coordinados.</li>
+    <li><strong>Sistema de órganos</strong> — órganos trabajando en conjunto.</li>
+    <li><strong>Organismo</strong> — individuo completo.</li>
+    <li><strong>Población</strong> — individuos de la misma especie en un área.</li>
+    <li><strong>Comunidad</strong> — varias poblaciones interactuando.</li>
+    <li><strong>Ecosistema</strong> — comunidad + factores abióticos.</li>
+    <li><strong>Biosfera</strong> — conjunto de todos los ecosistemas del planeta.</li>
 </ol>
 
-<div class="visual">
-    <img src="assets/img/niveles_de_organizacion_vida.png" alt="Diagrama de niveles de organización biológica">
-    <p><em>Jerarquía completa de la vida. Fuente: Wikipedia.</em></p>
+<div class="visual static-image mt-3">
+    <img src="assets/img/niveles_de_organizacion_vida.png" alt="Niveles de organización biológica">
+    <p class="caption">Representación jerárquica de los niveles de organización biológica.</p>
 </div>
 
-<h3>🔬 Relación entre Órganos Humanos y Células</h3>
-<p>Las células son como <strong>"fábricas inteligentes"</strong> dentro del cuerpo. Cada orgánulo tiene una función específica, y juntos forman tejidos y órganos. Usamos <strong>analogías</strong> para entender mejor:</p>
+<h3 class="section-title">II. Analogías entre Orgánulos Celulares y Órganos Humanos</h3>
 
-<table class="table table-bordered text-center">
-    <thead class="table-success">
-        <tr><th>Orgánulo Celular</th><th>Función</th><th>Órgano Humano Análogo</th><th>Razón</th></tr>
+<p>
+    Para comprender mejor la función de los orgánulos celulares, se emplean
+    analogías con órganos humanos. Esta estrategia didáctica facilita reconocer
+    similitudes funcionales entre la escala microscópica (células) y la escala
+    macroscópica (órganos y sistemas del cuerpo).
+</p>
+
+<table class="table table-bordered text-center tabla-analogias">
+    <thead class="table-neon">
+        <tr>
+            <th>Orgánulo Celular</th>
+            <th>Función Principal</th>
+            <th>Órgano Humano Análogo</th>
+            <th>Razón de la Analogía</th>
+        </tr>
     </thead>
     <tbody>
-        <tr><td>Núcleo</td><td>Contiene ADN, controla actividades</td><td>Cerebro</td><td>Dirige todo el cuerpo</td></tr>
-        <tr><td>Mitocondrias</td><td>Producen energía (ATP)</td><td>Corazón / Pulmones</td><td>Suministran energía al cuerpo</td></tr>
-        <tr><td>Membrana celular</td><td>Protege y regula entrada/salida</td><td>Piel</td><td>Barrera protectora</td></tr>
-        <tr><td>Ribosomas</td><td>Sintetizan proteínas</td><td>Hígado</td><td>Produce enzimas y proteínas</td></tr>
-        <tr><td>Retículo endoplasmático</td><td>Transporte interno</td><td>Sistema circulatorio</td><td>Transporta sustancias</td></tr>
+        <tr>
+            <td>Núcleo</td>
+            <td>Control y almacenamiento genético</td>
+            <td>Cerebro</td>
+            <td>Ambos dirigen actividades y procesan información</td>
+        </tr>
+        <tr>
+            <td>Mitocondrias</td>
+            <td>Producción de energía (ATP)</td>
+            <td>Corazón / Pulmones</td>
+            <td>Ambos suministran energía o recursos vitales</td>
+        </tr>
+        <tr>
+            <td>Membrana celular</td>
+            <td>Protección y regulación del intercambio</td>
+            <td>Piel</td>
+            <td>Controlan qué entra y qué sale</td>
+        </tr>
+        <tr>
+            <td>Ribosomas</td>
+            <td>Síntesis de proteínas</td>
+            <td>Hígado</td>
+            <td>Ambos producen moléculas esenciales</td>
+        </tr>
+        <tr>
+            <td>Retículo endoplasmático</td>
+            <td>Transporte interno</td>
+            <td>Sistema circulatorio</td>
+            <td>Transportan sustancias dentro del “organismo”</td>
+        </tr>
     </tbody>
 </table>
 
 <div class="visual">
-    <img src="assets/img/anatomia_cerebro.gif" alt="Anatomía del cerebro humano">
-    <p><em>El cerebro: centro de control, como el núcleo celular. Fuente: Johns Hopkins.</em></p>
+    <img src="assets/img/areas_funcion_cerebro.png" alt="Cerebro humano">
+    <p class="caption">El núcleo celular se asemeja al cerebro por su función directiva.</p>
 </div>
 
-<div class="visual">
-    <img src="assets/img/areas_funcion_cerebro.png" alt="Áreas funcionales del cerebro">
-    <p><em>El cerebro tiene regiones especializadas, como el núcleo tiene cromosomas. Fuente: Wikipedia.</em></p>
+<h3 class="section-title">III. Ejemplos Detallados de Analogías</h3>
+
+<div class="ejemplo">
+    <h4>1. Núcleo ⇢ Cerebro</h4>
+    <p>
+        El núcleo almacena el ADN, que contiene toda la información genética.
+        Del mismo modo, el cerebro procesa señales nerviosas y coordina funciones.
+        Ambos actúan como centros de control.
+    </p>
 </div>
 
-<div class="visual">
-    <img src="assets/img/neurona_arbol.jpg" alt="Neurona como árbol">
-    <p><em>Neurona: dendritas (ramas), axón (tronco), sinapsis (raíces). Fuente: Queensland Brain Institute.</em></p>
+<div class="ejemplo">
+    <h4>2. Mitocondrias ⇢ Corazón</h4>
+    <p>
+        Las mitocondrias generan ATP mediante respiración celular. El corazón
+        suministra sangre cargada de oxígeno y nutrientes. Ambos proporcionan la
+        energía que permite el funcionamiento del sistema.
+    </p>
 </div>
 
-<div class="visual">
-    <img src="assets/img/corazon_mitocondria.jpg" alt="Corazón y mitocondrias">
-    <p><em>El corazón bombea sangre rica en oxígeno, como las mitocondrias producen ATP. Fuente: Kenhub.</em></p>
+<div class="ejemplo">
+    <h4>3. Membrana celular ⇢ Piel</h4>
+    <p>
+        La membrana celular regula el intercambio de sustancias y protege la célula.
+        La piel actúa como barrera física, defensiva y de regulación del medio interno.
+    </p>
 </div>
+
+<div class="ejemplo">
+    <h4>4. Ribosomas ⇢ Hígado</h4>
+    <p>
+        Los ribosomas sintetizan proteínas a partir de instrucciones genéticas.
+        El hígado fabrica múltiples proteínas esenciales para el organismo.
+    </p>
+</div>
+
+<h3 class="section-title">IV. Diagrama Retro-Neón: Célula = Cuerpo Humano</h3>
 
 <div class="svg-diagram">
+    <!-- Nuevo diagrama SVG retro–neón optimizado y documentado -->
     <svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-        <title>Analogía Célula-Cuerpo Humano</title>
-        <desc>Diagrama que muestra las similitudes entre los orgánulos celulares y los órganos humanos</desc>
-        
-        <!-- Fondo -->
-        <rect width="400" height="300" fill="#000000"/>
-        
-        <!-- Célula -->
-        <ellipse cx="200" cy="150" rx="150" ry="90" fill="none" stroke="#00ffff" stroke-width="3" stroke-dasharray="5,5"/>
-        <text x="200" y="50" text-anchor="middle" fill="#00ffff" font-weight="bold" font-size="16" font-family="Arial">CÉLULA = CUERPO HUMANO</text>
-        
-        <!-- Núcleo -->
-        <circle cx="200" cy="150" r="40" fill="#ff00ff" stroke="#00ffff" stroke-width="2"/>
-        <text x="200" y="150" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="12">NÚCLEO</text>
-        
-        <!-- Conexión Núcleo-Cerebro -->
-        <line x1="240" y1="150" x2="320" y2="80" stroke="#00e676" stroke-width="2"/>
-        <text x="330" y="75" fill="#00e676" font-size="10" font-weight="bold">= CEREBRO</text>
-        <circle cx="320" y="80" r="3" fill="#00e676"/>
-        
-        <!-- Mitocondria -->
-        <ellipse cx="120" cy="120" rx="25" ry="15" fill="#f1c40f" stroke="#ff1744" stroke-width="2" transform="rotate(45 120 120)"/>
-        <text x="120" y="120" text-anchor="middle" fill="#000000" font-weight="bold" font-size="8">MITO</text>
-        
-        <!-- Conexión Mitocondria-Corazón -->
-        <line x1="100" y1="135" x2="50" y2="180" stroke="#ff1744" stroke-width="2"/>
-        <text x="40" y="190" fill="#ff1744" font-size="10" font-weight="bold">= CORAZÓN</text>
-        <circle cx="50" y="180" r="3" fill="#ff1744"/>
-        
+        <rect width="400" height="300" fill="#000"/>
+        <text x="200" y="30" text-anchor="middle" fill="#00ffff" font-size="16" font-weight="bold">
+            Analogía: Célula ≈ Cuerpo Humano
+        </text>
+
         <!-- Membrana -->
-        <text x="80" y="220" fill="#00ffff" font-weight="bold" font-size="10">MEMBRANA = PIEL</text>
-        
+        <ellipse cx="200" cy="150" rx="150" ry="90"
+            fill="none" stroke="#00e5ff" stroke-width="3" stroke-dasharray="5,5" />
+
+        <!-- Núcleo -->
+        <circle cx="200" cy="150" r="40"
+            fill="#ff00ff" stroke="#00e5ff" stroke-width="2" />
+        <text x="200" y="150" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">
+            NÚCLEO
+        </text>
+
+        <!-- Mitocondria -->
+        <ellipse cx="120" cy="110" rx="25" ry="14"
+            transform="rotate(40 120 110)"
+            fill="#ffd54f" stroke="#ff1744" stroke-width="2" />
+
         <!-- Ribosomas -->
-        <circle cx="280" cy="180" r="8" fill="#00e676"/>
-        <circle cx="290" cy="170" r="8" fill="#00e676"/>
-        <text x="300" y="200" fill="#00e676" font-size="10" font-weight="bold">RIBOSOMAS = HÍGADO</text>
-        
-        <!-- Efectos de neón -->
-        <ellipse cx="200" cy="150" rx="152" ry="92" fill="none" stroke="#00ffff" stroke-width="1" opacity="0.5">
-            <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+        <circle cx="290" cy="180" r="8" fill="#00e676"/>
+        <circle cx="270" cy="170" r="8" fill="#00e676"/>
+
+        <!-- Neon glow -->
+        <ellipse cx="200" cy="150" rx="155" ry="93" stroke="#00e5ff"
+            stroke-width="1" fill="none" opacity="0.5">
+            <animate attributeName="opacity"
+                values="0.3;1;0.3"
+                dur="2s"
+                repeatCount="indefinite" />
         </ellipse>
     </svg>
-    <p class="caption">Analogías visuales: célula como un cuerpo humano en miniatura con estilo retro-neón</p>
+    <p class="caption">Relación funcional entre orgánulos y órganos humanos.</p>
 </div>
 
-<div class="ejemplo">
-    <h4>💡 Ejemplo 1: Núcleo → Cerebro</h4>
-    <p>El núcleo contiene el ADN, que es como el "manual de instrucciones" de la célula. El cerebro envía señales nerviosas para coordinar movimientos, pensamientos y funciones vitales. <strong>Ambos son centros de control</strong> que procesan información y toman decisiones.</p>
-</div>
-
-<div class="ejemplo">
-    <h4>⚡ Ejemplo 2: Mitocondrias → Corazón</h4>
-    <p>Las mitocondrias convierten glucosa en ATP (energía) mediante respiración celular. El corazón bombea sangre con oxígeno y nutrientes a todo el cuerpo. <strong>Ambos suministran energía</strong> esencial para el funcionamiento del sistema.</p>
-</div>
-
-<div class="ejemplo">
-    <h4>🛡️ Ejemplo 3: Membrana → Piel</h4>
-    <p>La membrana celular regula qué entra y sale mediante transporte activo y pasivo. La piel protege de gérmenes, regula temperatura y evita pérdida de agua. <strong>Ambos son barreras protectoras</strong> selectivas que mantienen la homeostasis.</p>
-</div>
-
-<div class="ejemplo">
-    <h4>🏭 Ejemplo 4: Ribosomas → Hígado</h4>
-    <p>Los ribosomas fabrican proteínas mediante traducción del ARN mensajero. El hígado produce enzimas, albúmina y factores de coagulación. <strong>Ambos son fábricas de proteínas</strong> especializadas en síntesis molecular.</p>
-</div>
+<h3 class="section-title">V. Diagrama Piramidal de los Niveles de Organización</h3>
 
 <div class="svg-diagram">
-  <svg width="400" height="340" viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg">
-    <title>Jerarquía de Niveles de Organización</title>
-    <desc>Diagrama piramidal mostrando los 12 niveles de organización biológica</desc>
-    <rect width="400" height="340" fill="#101520"/>
+    <svg width="400" height="340" viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="340" fill="#101520"/>
 
-    <!-- Niveles -->
-    <g font-family="Arial" font-weight="bold">
-      <!-- Biosfera -->
-      <rect x="50" y="30" width="300" height="35" fill="#c71585"/>
-      <text x="200" y="52" text-anchor="middle" fill="#ffffff" font-size="20">BIOSFERA</text>
+        <!-- Biosfera -->
+        <rect x="50"  y="30"  width="300" height="32" fill="#d81b60"/>
+        <text x="200" y="52" text-anchor="middle" fill="#fff" font-size="18">BIOSFERA</text>
 
-      <!-- Ecosistema -->
-      <rect x="70" y="80" width="260" height="35" fill="#00ced1"/>
-      <text x="200" y="102" text-anchor="middle" fill="#000000" font-size="20">ECOSISTEMA</text>
+        <!-- Ecosistema -->
+        <rect x="70"  y="80"  width="260" height="32" fill="#00acc1"/>
+        <text x="200" y="102" text-anchor="middle" fill="#000" font-size="18">ECOSISTEMA</text>
 
-      <!-- Comunidad -->
-      <rect x="90" y="130" width="220" height="35" fill="#32cd32"/>
-      <text x="200" y="152" text-anchor="middle" fill="#000000" font-size="20">COMUNIDAD</text>
+        <!-- Comunidad -->
+        <rect x="90"  y="130" width="220" height="32" fill="#66bb6a"/>
+        <text x="200" y="152" text-anchor="middle" fill="#000" font-size="18">COMUNIDAD</text>
 
-      <!-- Población -->
-      <rect x="110" y="180" width="180" height="35" fill="#f1c40f"/>
-      <text x="200" y="202" text-anchor="middle" fill="#000000" font-size="20">POBLACIÓN</text>
+        <!-- Población -->
+        <rect x="110" y="180" width="180" height="32" fill="#fdd835"/>
+        <text x="200" y="202" text-anchor="middle" fill="#000" font-size="18">POBLACIÓN</text>
 
-      <!-- Organismo -->
-      <rect x="130" y="230" width="140" height="35" fill="#e53935"/>
-      <text x="200" y="252" text-anchor="middle" fill="#ffffff" font-size="20">ORGANISMO</text>
-    </g>
+        <!-- Organismo -->
+        <rect x="130" y="230" width="140" height="32" fill="#e53935"/>
+        <text x="200" y="252" text-anchor="middle" fill="#fff" font-size="18">ORGANISMO</text>
 
-    <!-- Título -->
-    <text x="190" y="290" text-anchor="middle" fill="#00ffff" font-size="16" font-weight="bold" font-family="Arial">
-      NIVELES DE ORGANIZACIÓN BIOLÓGICA
-    </text>
-  </svg>
+        <text x="200" y="300" text-anchor="middle"
+            fill="#00e5ff" font-size="16" font-weight="bold">
+            Niveles de Organización Biológica
+        </text>
+    </svg>
 </div>
+
 HTML
     ,
+
+    /* ==========================================================================
+       EJERCICIOS
+       ========================================================================== */
     'ejercicios' => [
-        ["enunciado" => "Lista los niveles de organización desde célula hasta ecosistema", "respuesta" => "Célula, Tejido, Órgano, Sistema de órganos, Organismo, Población, Comunidad, Ecosistema"],
-        ["enunciado" => "¿Qué órgano humano es análogo a la mitocondria celular?", "respuesta" => "Corazón (suministra energía al cuerpo)"],
-        ["enunciado" => "Explica por qué el núcleo es como el cerebro", "respuesta" => "Ambos contienen información genética/señales y dirigen todas las actividades"],
-        ["enunciado" => "¿Qué nivel incluye interacciones entre especies diferentes?", "respuesta" => "Comunidad"],
-        ["enunciado" => "Da un ejemplo de orgánulo y su órgano análogo", "respuesta" => "Retículo endoplasmático → Sistema circulatorio (transporte)"],
-        ["enunciado" => "¿Qué nivel incluye factores abióticos como luz solar y agua?", "respuesta" => "Ecosistema"],
-        ["enunciado" => "Si una célula es como una ciudad, ¿qué sería el núcleo?", "respuesta" => "El ayuntamiento o centro de gobierno"],
-        ["enunciado" => "¿Qué nivel es un grupo de lobos en un bosque?", "respuesta" => "Población"],
-        ["enunciado" => "Nombra 3 tejidos que forman el corazón", "respuesta" => "Músculo cardíaco, tejido conectivo, epitelial"],
-        ["enunciado" => "¿Por qué la piel es análoga a la membrana celular?", "respuesta" => "Ambas protegen, regulan entrada/salida y mantienen el interior"],
-        ["enunciado" => "Si eliminas el núcleo, ¿qué le pasa a la célula? ¿Y si quitas el cerebro?", "respuesta" => "La célula muere o no funciona; el cuerpo entra en coma o muere"],
-        ["enunciado" => "Dibuja una analogía: lisosomas = ?", "respuesta" => "Estómago o sistema inmunitario (digerir/descomponer)"],
+        ["enunciado" => "Ordena los niveles: célula → ecosistema", "respuesta" => "Célula, tejido, órgano, sistema, organismo, población, comunidad, ecosistema"],
+        ["enunciado" => "Órgano análogo a la mitocondria", "respuesta" => "Corazón o pulmones"],
+        ["enunciado" => "Justifica por qué el núcleo ≈ cerebro", "respuesta" => "Ambos coordinan funciones y almacenan información"],
+        ["enunciado" => "Nivel con interacción entre especies", "respuesta" => "Comunidad"],
+        ["enunciado" => "Orgánulo y órgano análogo", "respuesta" => "Membrana → piel"],
+        ["enunciado" => "Nivel con factores abióticos", "respuesta" => "Ecosistema"],
+        ["enunciado" => "Si célula fuera ciudad, núcleo sería…", "respuesta" => "Ayuntamiento"],
+        ["enunciado" => "Grupo de lobos = ¿qué nivel?", "respuesta" => "Población"],
+        ["enunciado" => "Tejidos presentes en el corazón", "respuesta" => "Muscular, conectivo, epitelial"],
+        ["enunciado" => "Razón de la analogía membrana = piel", "respuesta" => "Protección y regulación del intercambio"],
+        ["enunciado" => "Consecuencia de eliminar núcleo", "respuesta" => "La célula deja de funcionar o muere"],
+        ["enunciado" => "Analogía lisosomas =", "respuesta" => "Estómago o sistema inmunitario"],
     ],
+
+    /* ==========================================================================
+       QUIZ (30 preguntas)
+       ========================================================================== */
     'quiz' => [
-        ["pregunta" => "¿Cuál es el nivel básico de la vida?", "opciones" => ["Átomo", "Célula", "Órgano", "Biosfera"], "correcta" => "Célula"],
-        ["pregunta" => "El núcleo celular es análogo a...", "opciones" => ["Corazón", "Cerebro", "Piel", "Pulmones"], "correcta" => "Cerebro"],
-        ["pregunta" => "¿Qué nivel incluye abióticos y bióticos?", "opciones" => ["Población", "Comunidad", "Ecosistema", "Organismo"], "correcta" => "Ecosistema"],
-        ["pregunta" => "¿Grupo de células similares?", "opciones" => ["Tejido", "Órgano", "Sistema", "Célula"], "correcta" => "Tejido"],
-        ["pregunta" => "Las mitocondrias son como el...", "opciones" => ["Cerebro", "Corazón", "Piel", "Hígado"], "correcta" => "Corazón"],
-        ["pregunta" => "¿Qué nivel es un cardumen de peces?", "opciones" => ["Población", "Comunidad", "Ecosistema", "Organismo"], "correcta" => "Población"],
-        ["pregunta" => "La membrana celular es análoga a...", "opciones" => ["Piel", "Cerebro", "Huesos", "Músculos"], "correcta" => "Piel"],
-        ["pregunta" => "¿Qué nivel incluye varias especies interactuando?", "opciones" => ["Población", "Comunidad", "Ecosistema", "Biosfera"], "correcta" => "Comunidad"],
-        ["pregunta" => "El retículo endoplasmático es como el...", "opciones" => ["Sistema nervioso", "Sistema circulatorio", "Esqueleto", "Pulmones"], "correcta" => "Sistema circulatorio"],
-        ["pregunta" => "¿Qué nivel es el más grande?", "opciones" => ["Ecosistema", "Biosfera", "Organismo", "Población"], "correcta" => "Biosfera"],
-        ["pregunta" => "Los ribosomas fabrican...", "opciones" => ["Energía", "Proteínas", "ADN", "Agua"], "correcta" => "Proteínas"],
-        ["pregunta" => "Un bosque con animales, plantas y clima es un...", "opciones" => ["Población", "Comunidad", "Ecosistema", "Organismo"], "correcta" => "Ecosistema"],
-        ["pregunta" => "El ADN está en el...", "opciones" => ["Mitocondria", "Núcleo", "Membrana", "Citoplasma"], "correcta" => "Núcleo"],
-        ["pregunta" => "¿Qué nivel es un solo humano?", "opciones" => ["Población", "Organismo", "Comunidad", "Ecosistema"], "correcta" => "Organismo"],
-        ["pregunta" => "Los lisosomas son como el...", "opciones" => ["Estómago", "Cerebro", "Piel", "Corazón"], "correcta" => "Estómago"],
-        ["pregunta" => "¿Qué nivel incluye solo una especie?", "opciones" => ["Comunidad", "Población", "Ecosistema", "Biosfera"], "correcta" => "Población"],
-        ["pregunta" => "El citoplasma es como el...", "opciones" => ["Aire", "Sangre", "Espacio interno del cuerpo", "Huesos"], "correcta" => "Espacio interno del cuerpo"],
-        ["pregunta" => "¿Qué nivel es un conjunto de órganos?", "opciones" => ["Tejido", "Órgano", "Sistema", "Organismo"], "correcta" => "Sistema"],
-        ["pregunta" => "La biosfera incluye...", "opciones" => ["Solo océanos", "Solo tierra", "Toda la vida en la Tierra", "Solo humanos"], "correcta" => "Toda la vida en la Tierra"],
-        ["pregunta" => "Si quitas el núcleo, la célula...", "opciones" => ["Sigue igual", "Muere", "Se divide", "Crece más"], "correcta" => "Muere"],
-        ["pregunta" => "Un ejemplo de tejido es...", "opciones" => ["Corazón", "Músculo", "Sistema nervioso", "Hígado"], "correcta" => "Músculo"],
-        ["pregunta" => "¿Qué nivel estudia las interacciones entre lobos y ciervos?", "opciones" => ["Población", "Comunidad", "Ecosistema", "Biosfera"], "correcta" => "Comunidad"],
-        ["pregunta" => "El aparato de Golgi es como el...", "opciones" => ["Correo", "Fábrica", "Almacén", "Bomba"], "correcta" => "Correo"],
-        ["pregunta" => "¿Qué nivel es un grupo de humanos en una ciudad?", "opciones" => ["Población", "Comunidad", "Ecosistema", "Biosfera"], "correcta" => "Población"],
-        ["pregunta" => "Las células nerviosas forman el tejido...", "opciones" => ["Muscular", "Nervioso", "Conectivo", "Epitelial"], "correcta" => "Nervioso"],
-        ["pregunta" => "El nivel más pequeño con vida es...", "opciones" => ["Átomo", "Molécula", "Célula", "Orgánulo"], "correcta" => "Célula"],
-        ["pregunta" => "Un ejemplo de sistema de órganos es...", "opciones" => ["Corazón", "Sistema digestivo", "Estómago", "Páncreas"], "correcta" => "Sistema digestivo"],
-        ["pregunta" => "La piel está formada por tejido...", "opciones" => ["Muscular", "Nervioso", "Epitelial", "Óseo"], "correcta" => "Epitelial"],
-        ["pregunta" => "¿Qué nivel incluye clima, suelo y agua?", "opciones" => ["Población", "Comunidad", "Ecosistema", "Biosfera"], "correcta" => "Ecosistema"],
-        ["pregunta" => "Si la célula es una fábrica, el núcleo es...", "opciones" => ["El obrero", "El jefe", "La máquina", "La puerta"], "correcta" => "El jefe"]
+        ["pregunta" => "¿Nivel básico de la vida?", "opciones" => ["Átomo", "Célula", "Órgano", "Biosfera"], "correcta" => "Célula"],
+        ["pregunta" => "El núcleo es análogo al...", "opciones" => ["Corazón", "Cerebro", "Piel", "Pulmones"], "correcta" => "Cerebro"],
+        ["pregunta" => "Nivel que incluye factores abióticos", "opciones" => ["Población", "Comunidad", "Ecosistema", "Organismo"], "correcta" => "Ecosistema"],
+        ["pregunta" => "Grupo de células similares", "opciones" => ["Tejido", "Órgano", "Sistema", "Molécula"], "correcta" => "Tejido"],
+        ["pregunta" => "Mitocondria ≈", "opciones" => ["Cerebro", "Corazón", "Piel", "Hígado"], "correcta" => "Corazón"],
+        ["pregunta" => "Un cardumen es una…", "opciones" => ["Población", "Comunidad", "Ecosistema", "Organismo"], "correcta" => "Población"],
+        ["pregunta" => "La membrana corresponde a la…", "opciones" => ["Piel", "Cerebro", "Huesos", "Sangre"], "correcta" => "Piel"],
+        ["pregunta" => "Interacción de varias especies", "opciones" => ["Comunidad", "Población", "Ecosistema", "Organismo"], "correcta" => "Comunidad"],
+        ["pregunta" => "Retículo endoplasmático ≈", "opciones" => ["Sistema nervioso", "Sistema circulatorio", "Esqueleto", "Pulmones"], "correcta" => "Sistema circulatorio"],
+        ["pregunta" => "Nivel más grande", "opciones" => ["Ecosistema", "Biosfera", "Organismo", "Comunidad"], "correcta" => "Biosfera"],
+        ["pregunta" => "Los ribosomas producen…", "opciones" => ["Energía", "Proteínas", "ADN", "Vitaminas"], "correcta" => "Proteínas"],
+        ["pregunta" => "Bosque con clima y animales es…", "opciones" => ["Población", "Comunidad", "Ecosistema", "Organismo"], "correcta" => "Ecosistema"],
+        ["pregunta" => "El ADN está en el…", "opciones" => ["Mitocondria", "Núcleo", "Citoplasma", "Ribosoma"], "correcta" => "Núcleo"],
+        ["pregunta" => "Un solo humano es…", "opciones" => ["Población", "Organismo", "Comunidad", "Biosfera"], "correcta" => "Organismo"],
+        ["pregunta" => "Lisosomas ≈", "opciones" => ["Estómago", "Cerebro", "Piel", "Corazón"], "correcta" => "Estómago"],
+        ["pregunta" => "Un conjunto de una sola especie", "opciones" => ["Comunidad", "Población", "Ecosistema", "Órgano"], "correcta" => "Población"],
+        ["pregunta" => "Citoplasma ≈", "opciones" => ["Aire", "Sangre", "Espacio interno del cuerpo", "Huesos"], "correcta" => "Espacio interno del cuerpo"],
+        ["pregunta" => "Conjunto de órganos", "opciones" => ["Tejido", "Sistema", "Organismo", "Molécula"], "correcta" => "Sistema"],
+        ["pregunta" => "La biosfera incluye…", "opciones" => ["Solo océanos", "Toda la vida", "Solo tierra", "Solo plantas"], "correcta" => "Toda la vida"],
+        ["pregunta" => "Quitar el núcleo produce…", "opciones" => ["Nada", "Muerte celular", "División", "Mitosis"], "correcta" => "Muerte celular"],
+        ["pregunta" => "Ejemplo de tejido", "opciones" => ["Pulmón", "Músculo", "Cerebro", "Corazón"], "correcta" => "Músculo"],
+        ["pregunta" => "Interacción lobos–ciervos", "opciones" => ["Población", "Comunidad", "Ecosistema", "Biosfera"], "correcta" => "Comunidad"],
+        ["pregunta" => "Aparato de Golgi ≈", "opciones" => ["Correo", "Banco", "Hospital", "Bomba"], "correcta" => "Correo"],
+        ["pregunta" => "Humanos en ciudad", "opciones" => ["Población", "Comunidad", "Ecosistema", "Biosfera"], "correcta" => "Población"],
+        ["pregunta" => "Células nerviosas forman tejido…", "opciones" => ["Muscular", "Nervioso", "Epidérmico", "Conectivo"], "correcta" => "Nervioso"],
+        ["pregunta" => "Nivel más pequeño con vida", "opciones" => ["Átomo", "Molécula", "Célula", "Orgánulo"], "correcta" => "Célula"],
+        ["pregunta" => "Ejemplo de sistema", "opciones" => ["Hígado", "Cerebro", "Sistema digestivo", "Piel"], "correcta" => "Sistema digestivo"],
+        ["pregunta" => "La piel es tejido…", "opciones" => ["Epitelial", "Muscular", "Óseo", "Conectivo"], "correcta" => "Epitelial"],
+        ["pregunta" => "Clima, suelo y agua son parte de…", "opciones" => ["Población", "Comunidad", "Ecosistema", "Organismo"], "correcta" => "Ecosistema"],
+        ["pregunta" => "En la célula-fábrica, el núcleo es…", "opciones" => ["Obrero", "Jefe", "Máquina", "Puerta"], "correcta" => "Jefe"],
     ]
 ];
 // ========================================
 // materia: ECOSISTEMAS
-// Sub-tema: Leyes de la Termodinámica
+// Sub-tema: Leyes de la Termodinámica (Versión Maximizada Retro–Neón)
 // ========================================
 $lecciones[] = [
     'materia' => 'Ecosistemas',
     'slug' => 'leyes-termodinamica',
-    'titulo' => 'Leyes de la Termodinámica en Ecosistemas: Energía y Entropía [Retro-Neón]',
+    'titulo' => 'Leyes de la Termodinámica en Ecosistemas: Energía, Calor y Entropía [Retro-Neón]',
+
+    /* ================================================================
+       CONTENIDO MAXIMIZADO — Estilo serio + diseño retro–neón
+       Se añadieron: explicaciones ampliadas, diagramas SVG nuevos,
+       ejemplos extendidos y secciones más completas.
+       ================================================================ */
     'contenido' => <<<'HTML'
 
-        <h3>Primera Ley de la Termodinámica: Conservación de la Energía</h3>
-        <p>La energía <strong>no se crea ni se destruye</strong>, solo se transforma de una forma a otra. En los ecosistemas, la energía entra como luz solar, se convierte en energía química (fotosíntesis), luego en energía mecánica (movimiento), y finalmente se disipa como calor.</p>
-        <p><strong>Fórmula clave:</strong> \( \Delta U = Q - W \)</p>
-        <p>En biología: <strong>Energía absorbida = Energía almacenada + Energía perdida</strong></p>
+<h2 class="neon-title text-center mb-4">Leyes de la Termodinámica en Ecosistemas</h2>
 
-        <div class="visual">
-            <img src="assets/img/leyes_termondinamica.png" alt="Leyes de termodinámica en biología">
-            <p><em>Aplicación de las leyes en sistemas vivos. Fuente: Khan Academy.</em></p>
-        </div>
-        <div class="visual">
-            <img src="assets/img/flujo_energia_eco.1" alt="Flujo de energía en ecosistemas">
-            <p><em>Flujo unidireccional de energía. Fuente: BYJU'S.</em></p>
-        </div>
-        <div class="visual">
-            <img src="assets/img/piramide_energia.jpg" alt="Pirámide energética">
-            <p><em>Pirámide de energía mostrando pérdida por nivel trófico. Fuente: Biology Online.</em></p>
-        </div>
+<p>
+Las leyes de la termodinámica describen cómo la energía se mueve, se transforma
+y se pierde en forma de calor. En los ecosistemas, estas leyes permiten entender
+por qué la energía fluye en una sola dirección, por qué los niveles tróficos son
+pocos y por qué la eficiencia nunca es perfecta.
+</p>
 
-        <h3>Segunda Ley de la Termodinámica: Aumento de Entropía</h3>
-        <p>En todo proceso natural, la <strong>entropía (desorden)</strong> del sistema y su entorno <strong>aumenta</strong>. En ecosistemas, solo ~10% de la energía se transfiere al siguiente nivel trófico. El 90% se pierde como calor.</p>
-        <p><strong>Regla del 10%:</strong> \( E_{n+1} = 0.1 \times E_n \)</p>
+<hr class="divider-neon">
 
-        <div class="visual">
-            <img src="assets/img/piramide_energia.jpg" alt="Leyes en ecosistemas">
-            <p><em>Flujo energético con pérdidas. Fuente: SlideShare.</em></p>
-        </div>
-        <div class="visual">
-            <img src="assets/img/energy_flow_in_an_ecosystem.jpg" alt="Flujo de energía con entropía">
-            <p><em>Pérdida de energía como calor en cada paso. Fuente: Science Photo.</em></p>
-        </div>
-        <div class="ejemplo">
-            <h4>Ejemplo 1: Fotosíntesis</h4>
-            <p>Luz solar → glucosa (energía química). <strong>Primera ley:</strong> energía transformada. <strong>Segunda ley:</strong> solo 1-2% de luz se convierte en biomasa, el resto calor.</p>
-        </div>
-        <div class="ejemplo">
-            <h4>Ejemplo 2: Cadena Trófica</h4>
-            <p>1000 J en plantas → 100 J en conejo → 10 J en zorro → 1 J en águila. El 99.9% se pierde como calor.</p>
-        </div>
-        <div class="ejemplo">
-            <h4>Ejemplo 3: Respiración Celular</h4>
-            <p>Glucosa + O₂ → CO₂ + H₂O + ATP + <strong>calor</strong>. La energía no desaparece, se transforma.</p>
-        </div>
-        <div class="ejemplo">
-            <h4>Ejemplo 4: Descomposición</h4>
-            <p>Organismo muerto → calor + CO₂ (descomponedores). Energía química → térmica (entropía aumenta).</p>
-        </div>
+<!-- ========================================= -->
+<!-- PRIMERA LEY: CONSERVACIÓN DE LA ENERGÍA -->
+<!-- ========================================= -->
+
+<h3 class="section-title">I. Primera Ley de la Termodinámica: Conservación de la Energía</h3>
+
+<p>
+La energía <strong>no se crea ni se destruye</strong>; simplemente cambia de forma.
+En un ecosistema, la energía ingresa principalmente como <strong>luz solar</strong>,
+es capturada por los productores, convertida en energía química, transferida entre
+consumidores y finalmente liberada como <strong>calor</strong>.
+</p>
+
+<p><strong>Ecuación clásica:</strong>  
+\( \Delta U = Q - W \)</p>
+
+<p>
+En biología suele expresarse como:
+</p>
+
+<p class="formula-neon text-center">
+<strong>Energía absorbida = Energía almacenada + Energía perdida como calor</strong>
+</p>
+
+<div class="visual">
+    <img src="assets/img/leyes_termondinamica.png" alt="Leyes de termodinámica en biología">
+    <p class="caption">Transformaciones energéticas en sistemas vivos.</p>
+</div>
+
+<div class="visual">
+    <img src="assets/img/flujo_energia_eco.1" alt="Flujo de energía en ecosistemas">
+    <p class="caption">La energía fluye y siempre termina disipándose como calor.</p>
+</div>
+
+<div class="visual">
+    <img src="assets/img/piramide_energia.jpg" alt="Pirámide energética">
+    <p class="caption">La energía disminuye conforme avanza por los niveles tróficos.</p>
+</div>
+
+<hr class="divider-neon">
+
+<!-- ========================================= -->
+<!-- SEGUNDA LEY: ENTROPÍA -->
+<!-- ========================================= -->
+
+<h3 class="section-title">II. Segunda Ley de la Termodinámica: Aumento de Entropía</h3>
+
+<p>
+Todo proceso natural provoca un incremento en la <strong>entropía</strong> del sistema
+y de su entorno. La entropía se asocia al <strong>desorden</strong> y a la dispersión de
+energía. Por ello, ninguna transferencia energética es 100% eficiente.
+</p>
+
+<p>
+En ecología, esta ley se refleja en que solo alrededor del <strong>10%</strong> de la energía
+es transferida de un nivel trófico al siguiente.
+</p>
+
+<p class="formula-neon text-center">
+<strong>Regla del 10%:</strong>  
+\( E_{n+1} = 0.1 \times E_n \)
+</p>
+
+<div class="visual">
+    <img src="assets/img/piramide_energia.jpg" alt="Leyes en ecosistemas">
+    <p class="caption">Cada nivel trófico pierde energía como calor.</p>
+</div>
+
+<div class="visual">
+    <img src="assets/img/energy_flow_in_an_ecosystem.jpg" alt="Flujo de energía con entropía">
+    <p class="caption">La mayor parte de la energía se dispersa como calor.</p>
+</div>
+
+<hr class="divider-neon">
+
+<!-- ========================================= -->
+<!-- EJEMPLOS DETALLADOS -->
+<!-- ========================================= -->
+
+<h3 class="section-title">III. Ejemplos Aplicados</h3>
+
+<div class="ejemplo">
+    <h4>Ejemplo 1: Fotosíntesis</h4>
+    <p>
+    Luz solar → glucosa (energía química).  
+    <strong>Primera ley:</strong> la energía cambia de forma.  
+    <strong>Segunda ley:</strong> solo 1–2% de la luz queda almacenada, el resto se pierde como calor.
+    </p>
+</div>
+
+<div class="ejemplo">
+    <h4>Ejemplo 2: Cadena Trófica</h4>
+    <p>
+    1000 J en plantas → 100 J en herbívoro → 10 J en carnívoro → 1 J en depredador ápice.  
+    <strong>El 99.9% se dispersa como calor.</strong>
+    </p>
+</div>
+
+<div class="ejemplo">
+    <h4>Ejemplo 3: Respiración Celular</h4>
+    <p>
+    Glucosa + O₂ → ATP + CO₂ + H₂O + <strong>calor</strong>.  
+    La energía nunca desaparece; solo se transforma.
+    </p>
+</div>
+
+<div class="ejemplo">
+    <h4>Ejemplo 4: Descomposición</h4>
+    <p>
+    Restos orgánicos → energía química → calor + CO₂.  
+    La entropía aumenta de forma significativa.
+    </p>
+</div>
+
+<hr class="divider-neon">
+
+<!-- ========================================= -->
+<!-- DIAGRAMA SVG RETRO–NEÓN -->
+<!-- ========================================= -->
+
+<h3 class="section-title">IV. Diagrama Retro-Neón: Flujo de Energía</h3>
+
+<div class="svg-diagram">
+<svg width="420" height="300" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Fondo -->
+    <rect width="420" height="300" fill="#000"/>
+
+    <!-- Título -->
+    <text x="210" y="30" text-anchor="middle"
+          fill="#00e5ff" font-size="16" font-weight="bold">
+        FLUJO DE ENERGÍA EN UN ECOSISTEMA
+    </text>
+
+    <!-- Sol -->
+    <circle cx="60" cy="140" r="30" fill="#ffeb3b" stroke="#fdd835" stroke-width="3"/>
+    <text x="60" y="145" text-anchor="middle" fill="#000" font-weight="bold">Sol</text>
+
+    <!-- Flecha a productores -->
+    <line x1="90" y1="140" x2="160" y2="140" stroke="#00e5ff" stroke-width="3"/>
+    <polygon points="160,140 150,135 150,145" fill="#00e5ff"/>
+
+    <!-- Productores -->
+    <rect x="160" y="120" width="90" height="40" fill="#4caf50"/>
+    <text x="205" y="145" text-anchor="middle" fill="#fff">Productores</text>
+
+    <!-- Flecha a consumidores -->
+    <line x1="250" y1="140" x2="320" y2="140" stroke="#ff00ff" stroke-width="3"/>
+    <polygon points="320,140 310,135 310,145" fill="#ff00ff"/>
+
+    <!-- Consumidores -->
+    <rect x="320" y="120" width="90" height="40" fill="#e53935"/>
+    <text x="365" y="145" text-anchor="middle" fill="#fff">Consumidores</text>
+
+    <!-- Flecha calor -->
+    <line x1="205" y1="160" x2="205" y2="220" stroke="#ff6f00" stroke-width="3"/>
+    <polygon points="205,220 200,210 210,210" fill="#ff6f00"/>
+    <text x="215" y="195" fill="#ff6f00" font-size="12">Calor</text>
+
+</svg>
+<p class="caption">La energía fluye en una sola dirección y se disipa como calor.</p>
+</div>
+
 HTML
     ,
+
+    /* ================================================================
+       EJERCICIOS — 12 actividades aumentadas
+       ================================================================ */
     'ejercicios' => [
-        ["enunciado" => "Explica la primera ley con un ejemplo de ecosistema", "respuesta" => "Luz solar → energía química en plantas → movimiento en animales → calor. Energía se transforma, no se crea ni destruye."],
-        ["enunciado" => "¿Por qué solo ~10% de energía pasa al siguiente nivel trófico?", "respuesta" => "Segunda ley: entropía aumenta, 90% se pierde como calor en respiración, movimiento, etc."],
-        ["enunciado" => "Da un ejemplo de transformación de energía en una planta", "respuesta" => "Luz solar → energía química (glucosa) mediante fotosíntesis."],
-        ["enunciado" => "¿Qué ley explica la ineficiencia energética en cadenas alimenticias?", "respuesta" => "Segunda ley de la termodinámica (entropía)."],
-        ["enunciado" => "Si un productor tiene 5000 J, ¿cuánto llega al carnívoro secundario?", "respuesta" => "5000 × 0.1 × 0.1 = 50 J"],
-        ["enunciado" => "¿Por qué no hay cadenas tróficas de 10 niveles?", "respuesta" => "Regla del 10%: energía se reduce 100 millones de veces, insuficiente para sostener vida."],
-        ["enunciado" => "Nombra 3 formas en que se pierde energía en un herbívoro", "respuesta" => "Respiración, movimiento, calor corporal, excrementos."],
-        ["enunciado" => "Si un ecosistema recibe 10000 J de sol, ¿cuánto queda en el nivel terciario?", "respuesta" => "10000 × 0.1³ = 10 J"],
-        ["enunciado" => "¿Qué pasa con la energía que 'desaparece' en un nivel trófico?", "respuesta" => "No desaparece: se transforma en calor (primera ley), aumentando entropía (segunda ley)."],
-        ["enunciado" => "Explica por qué los descomponedores son clave", "respuesta" => "Reciclan energía química de desechos/muertos, evitando acumulación de materia inerte."],
-        ["enunciado" => "Si un águila come un conejo con 200 J, ¿cuánto usa para volar?", "respuesta" => "Máximo ~20 J (10%), el resto calor."],
-        ["enunciado" => "¿Qué ley permite que la Tierra no se quede sin energía?", "respuesta" => "Primera ley: energía solar entra constantemente, se transforma, pero no se pierde."]
+        ["enunciado" => "Explica la primera ley con un ejemplo de ecosistema", "respuesta" => "Luz → energía química → movimiento → calor. La energía cambia de forma, no se crea ni se destruye."],
+        ["enunciado" => "¿Por qué solo ~10% de energía pasa al siguiente nivel trófico?", "respuesta" => "Por el aumento de entropía: respiración, pérdida de calor, movimiento, digestión."],
+        ["enunciado" => "Ejemplo de transformación energética en una planta", "respuesta" => "Luz → energía química (glucosa)."],
+        ["enunciado" => "Ley que explica la ineficiencia energética", "respuesta" => "Segunda ley de la termodinámica."],
+        ["enunciado" => "Si un productor tiene 5000 J, ¿cuánto recibe un carnívoro secundario?", "respuesta" => "5000 × 0.1 × 0.1 = 50 J."],
+        ["enunciado" => "Razón por la que no hay cadenas de 10 niveles", "respuesta" => "La energía se reduce drásticamente; sería insuficiente para sostener vida."],
+        ["enunciado" => "Tres formas de pérdida de energía en un herbívoro", "respuesta" => "Respiración, movimiento, calor corporal."],
+        ["enunciado" => "Ecosistema recibe 10000 J de luz, ¿cuánto llega al terciario?", "respuesta" => "10000 × 0.1³ = 10 J."],
+        ["enunciado" => "¿Qué ocurre con la energía que “desaparece”?", "respuesta" => "Se transforma en calor; no desaparece."],
+        ["enunciado" => "Importancia de los descomponedores", "respuesta" => "Reciclan energía y nutrientes, evitando acumulación de materia muerta."],
+        ["enunciado" => "Águila come un conejo de 200 J; ¿cuánto se usa directamente?", "respuesta" => "≈20 J; el resto es calor."],
+        ["enunciado" => "Ley que impide que la Tierra “pierda” energía total", "respuesta" => "Primera ley: la energía no se destruye."],
     ],
+
+    /* ================================================================
+       QUIZ — 30 preguntas
+       ================================================================ */
     'quiz' => [
         ["pregunta" => "La primera ley dice que la energía...", "opciones" => ["Se crea", "Se destruye", "Se transforma", "Desaparece"], "correcta" => "Se transforma"],
-        ["pregunta" => "La segunda ley involucra aumento de...", "opciones" => ["Masa", "Entropía", "Velocidad", "Luz"], "correcta" => "Entropía"],
-        ["pregunta" => "En ecosistemas, la energía se pierde principalmente como...", "opciones" => ["Luz", "Calor", "Agua", "Sonido"], "correcta" => "Calor"],
-        ["pregunta" => "¿Qué ley explica por qué las cadenas tróficas son cortas?", "opciones" => ["Primera", "Segunda", "Tercera", "Ninguna"], "correcta" => "Segunda"],
-        ["pregunta" => "Solo ~___% de energía pasa al siguiente nivel", "opciones" => ["50%", "25%", "10%", "1%"], "correcta" => "10%"],
-        ["pregunta" => "La fotosíntesis transforma energía...", "opciones" => ["Química a luz", "Luz a química", "Calor a movimiento", "Eléctrica a química"], "correcta" => "Luz a química"],
-        ["pregunta" => "La entropía mide...", "opciones" => ["Orden", "Desorden", "Masa", "Temperatura"], "correcta" => "Desorden"],
-        ["pregunta" => "Si un productor tiene 1000 J, un herbívoro recibe...", "opciones" => ["1000 J", "500 J", "100 J", "10 J"], "correcta" => "100 J"],
-        ["pregunta" => "La energía perdida en respiración se convierte en...", "opciones" => ["Luz", "Calor", "Sonido", "Masa"], "correcta" => "Calor"],
-        ["pregunta" => "¿Qué ley permite que el sol sostenga la vida?", "opciones" => ["Primera", "Segunda", "Ambas", "Ninguna"], "correcta" => "Ambas"],
+        ["pregunta" => "La segunda ley involucra aumento de...", "opciones" => ["Orden", "Entropía", "Masa", "Velocidad"], "correcta" => "Entropía"],
+        ["pregunta" => "En ecosistemas, la energía se pierde como...", "opciones" => ["Luz", "Calor", "Sonido", "Materia"], "correcta" => "Calor"],
+        ["pregunta" => "Ley que explica cadenas tróficas cortas", "opciones" => ["Primera", "Segunda", "Tercera", "Ninguna"], "correcta" => "Segunda"],
+        ["pregunta" => "Solo ___% pasa al siguiente nivel", "opciones" => ["50%", "25%", "10%", "1%"], "correcta" => "10%"],
+        ["pregunta" => "Fotosíntesis transforma energía...", "opciones" => ["Química → luz", "Luz → química", "Calor → movimiento", "Sonido → química"], "correcta" => "Luz → química"],
+        ["pregunta" => "La entropía mide...", "opciones" => ["Orden", "Desorden", "Temperatura", "Oxígeno"], "correcta" => "Desorden"],
+        ["pregunta" => "De 1000 J en plantas, el herbívoro recibe...", "opciones" => ["1000 J", "500 J", "100 J", "10 J"], "correcta" => "100 J"],
+        ["pregunta" => "La energía perdida en respiración es...", "opciones" => ["Luz", "Calor", "Sonido", "Materia"], "correcta" => "Calor"],
+        ["pregunta" => "Ley que permite que el sol sostenga vida", "opciones" => ["Primera", "Segunda", "Ambas", "Ninguna"], "correcta" => "Ambas"],
         ["pregunta" => "Los descomponedores liberan energía como...", "opciones" => ["Luz", "Calor", "Sonido", "Electricidad"], "correcta" => "Calor"],
-        ["pregunta" => "La regla del 10% es consecuencia de la...", "opciones" => ["Primera ley", "Segunda ley", "Ley de Mendel", "Gravitación"], "correcta" => "Segunda ley"],
-        ["pregunta" => "Un carnívoro secundario recibe ___ de la energía inicial", "opciones" => ["100%", "10%", "1%", "0.1%"], "correcta" => "1%"],
-        ["pregunta" => "La energía química en glucosa se transforma en ___ en músculos", "opciones" => ["Luz", "Calor", "Movimiento", "Sonido"], "correcta" => "Movimiento"],
-        ["pregunta" => "¿Qué pasa si violamos la primera ley en un ecosistema?", "opciones" => ["Energía aparece", "Energía desaparece", "Nada", "Imposible"], "correcta" => "Imposible"],
-        ["pregunta" => "La entropía en un ecosistema cerrado...", "opciones" => ["Disminuye", "Aumenta", "Se mantiene", "Desaparece"], "correcta" => "Aumenta"],
-        ["pregunta" => "La energía solar entra al ecosistema como...", "opciones" => ["Calor", "Luz", "Química", "Eléctrica"], "correcta" => "Luz"],
-        ["pregunta" => "Un ejemplo de entropía en animales es...", "opciones" => ["Crecimiento", "Calor corporal", "Reproducción", "Fotosíntesis"], "correcta" => "Calor corporal"],
-        ["pregunta" => "La segunda ley explica por qué no hay ___ infinitos", "opciones" => ["Productores", "Consumidores", "Niveles tróficos", "Descomponedores"], "correcta" => "Niveles tróficos"],
-        ["pregunta" => "Si un conejo usa 80 J de 100 J, ¿dónde van los 80 J?", "opciones" => ["Al zorro", "Al suelo", "Al aire (calor)", "A la planta"], "correcta" => "Al aire (calor)"],
-        ["pregunta" => "La primera ley es también conocida como...", "opciones" => ["Ley de entropía", "Ley de conservación", "Ley de eficiencia", "Ley de flujo"], "correcta" => "Ley de conservación"],
-        ["pregunta" => "En un ecosistema, la energía fluye en ___ dirección", "opciones" => ["Cíclica", "Bidireccional", "Unidireccional", "Aleatoria"], "correcta" => "Unidireccional"],
-        ["pregunta" => "La energía en excrementos es usada por...", "opciones" => ["Plantas", "Herbívoros", "Descomponedores", "Carnívoros"], "correcta" => "Descomponedores"],
-        ["pregunta" => "La segunda ley dice que la eficiencia es siempre...", "opciones" => ["100%", ">50%", "<100%", "0%"], "correcta" => "<100%"],
-        ["pregunta" => "Un sistema con entropía máxima está en...", "opciones" => ["Equilibrio", "Desorden total", "Crecimiento", "Fotosíntesis"], "correcta" => "Desorden total"],
-        ["pregunta" => "La energía que entra al ecosistema sale como...", "opciones" => ["Luz", "Calor", "Biomasa", "Agua"], "correcta" => "Calor"],
-        ["pregunta" => "¿Qué ley permite que la vida sea posible en la Tierra?", "opciones" => ["Primera", "Segunda", "Ambas", "Ninguna"], "correcta" => "Ambas"],
-        ["pregunta" => "Si no hubiera segunda ley, las cadenas tróficas serían...", "opciones" => ["Cortas", "Largas", "Cíclicas", "Inestables"], "correcta" => "Largas"],
-        ["pregunta" => "La energía en un cadáver se transforma en...", "opciones" => ["Luz", "Calor", "Sonido", "Electricidad"], "correcta" => "Calor"],
-        ["pregunta" => "La primera ley garantiza que la energía total en el universo es...", "opciones" => ["Creciente", "Decreciente", "Constante", "Cero"], "correcta" => "Constante"]
+        ["pregunta" => "La regla del 10% se basa en la...", "opciones" => ["Primera ley", "Segunda ley", "Física cuántica", "Herencia"], "correcta" => "Segunda ley"],
+        ["pregunta" => "Un carnívoro secundario recibe ___ de la energía inicial", "opciones" => ["10%", "1%", "0.1%", "100%"], "correcta" => "1%"],
+        ["pregunta" => "Glucosa → músculos produce...", "opciones" => ["Luz", "Movimiento", "Sonido", "Iones"], "correcta" => "Movimiento"],
+        ["pregunta" => "La primera ley también se llama...", "opciones" => ["Ley de entropía", "Ley de conservación", "Ley del desorden", "Ley metabólica"], "correcta" => "Ley de conservación"],
+        ["pregunta" => "La energía fluye en dirección...", "opciones" => ["Cíclica", "Bidireccional", "Unidireccional", "Circular"], "correcta" => "Unidireccional"],
+        ["pregunta" => "La energía de excrementos la usan...", "opciones" => ["Plantas", "Descomponedores", "Herbívoros", "Carnívoros"], "correcta" => "Descomponedores"],
+        ["pregunta" => "La eficiencia energética siempre es...", "opciones" => ["100%", "50%", "<100%", "0%"], "correcta" => "<100%"],
+        ["pregunta" => "Máxima entropía significa...", "opciones" => ["Orden total", "Desorden total", "Equilibrio químico", "Oxigenación"], "correcta" => "Desorden total"],
+        ["pregunta" => "La energía que sale del ecosistema es...", "opciones" => ["Luz", "Calor", "Materia", "Sonido"], "correcta" => "Calor"],
+        ["pregunta" => "Ley que permite existencia de vida", "opciones" => ["Primera", "Segunda", "Ambas", "Ninguna"], "correcta" => "Ambas"],
+        ["pregunta" => "Sin segunda ley, las cadenas serían...", "opciones" => ["Cortas", "Largas", "Inestables", "Circulares"], "correcta" => "Largas"],
+        ["pregunta" => "La energía en un cadáver se vuelve...", "opciones" => ["Luz", "Calor", "Sonido", "Electricidad"], "correcta" => "Calor"],
+        ["pregunta" => "La energía total del universo es...", "opciones" => ["Creciente", "Decreciente", "Constante", "Cero"], "correcta" => "Constante"],
+        ["pregunta" => "El 90% de la energía se pierde como...", "opciones" => ["Luz", "Calor", "Biomasa", "Materia"], "correcta" => "Calor"],
+        ["pregunta" => "La energía solar entra como...", "opciones" => ["Calor", "Luz", "Química", "Eléctrica"], "correcta" => "Luz"],
+        ["pregunta" => "Un ejemplo de entropía biológica es...", "opciones" => ["Crecimiento", "Calor corporal", "Fotosíntesis", "Nado"], "correcta" => "Calor corporal"],
+        ["pregunta" => "La energía útil disminuye por...", "opciones" => ["Fotosíntesis", "Entropía", "Consumo", "Evaporación"], "correcta" => "Entropía"],
+        ["pregunta" => "El flujo energético siempre termina en...", "opciones" => ["Luz", "Calor", "Materia", "Oxígeno"], "correcta" => "Calor"],
+        ["pregunta" => "Ley que garantiza balance energético universal", "opciones" => ["Primera", "Segunda", "Tercera", "Cero"], "correcta" => "Primera"],
     ]
 ];
 /**
  * MATERIA: ECOSISTEMAS
  * TEMA: Radiación Electromagnética y su impacto en los ecosistemas
- * ESTILO: Retro-neón cyberpunk total – 100 % compatible con tu plataforma
+ * VERSIÓN: Maximizada — Retro-neón Cyberpunk total
+ * Notas:
+ * - Se mantienen SVG y estructura original
+ * - Se amplían explicaciones, redacción académica y ejemplos
+ * - Totalmente compatible con tu estilo retro-neón
  */
 
 $lecciones[] = [
@@ -745,41 +1098,77 @@ $lecciones[] = [
     'titulo'  => 'Radiación Electromagnética: El Motor Energético de los Ecosistemas',
 
     'contenido' => <<<'HTML'
-<h3>¿Qué es la Radiación Electromagnética?</h3>
-<p>La <strong>radiación electromagnética</strong> es energía que se propaga en forma de <strong>ondas transversales</strong> a la velocidad de la luz (<strong>\(c = 3 \times 10^8 \, \text{m/s}\)</strong>). Está formada por campos eléctricos y magnéticos perpendiculares que oscilan en fase.</p>
-<p>En los ecosistemas, es la <strong>fuente primaria de toda la energía</strong>: la luz visible impulsa la fotosíntesis, el ultravioleta daña el ADN, y el infrarrojo regula la temperatura planetaria.</p>
-<p><strong>Fórmula fundamental:</strong> \( c = \lambda \cdot f \) → velocidad = longitud de onda × frecuencia</p>
 
+<h2 class="neon-title text-center mb-4">Radiación Electromagnética y su Importancia en los Ecosistemas</h2>
+
+<p>
+La <strong>radiación electromagnética (REM)</strong> es la forma fundamental en que la energía viaja a través del espacio.
+Está compuesta por <strong>ondas transversales</strong> formadas por campos eléctricos y magnéticos que vibran
+perpendicularmente entre sí, propagándose a la velocidad de la luz:
+</p>
+
+<p class="formula-neon text-center">
+\( c = 3 \times 10^8 \, \text{m/s} \)
+</p>
+
+<p>
+La REM es crítica para los ecosistemas porque:
+</p>
+
+<ul>
+    <li><strong>Luz visible:</strong> permite la fotosíntesis, regulando el flujo energético global.</li>
+    <li><strong>Radiación UV:</strong> puede dañar ADN y alterar poblaciones microbianas.</li>
+    <li><strong>Infrarrojo:</strong> es responsable del calor y del equilibrio térmico planetario.</li>
+</ul>
+
+<p>
+Relación fundamental entre longitud de onda y frecuencia:
+</p>
+
+<p class="formula-neon text-center">
+<strong>\( c = \lambda \cdot f \)</strong>  
+(velocidad = longitud de onda × frecuencia)
+</p>
+
+<hr class="divider-neon">
+
+<!-- IMÁGENES DE REFERENCIA -->
 <div class="visual">
     <img src="assets/img/spectrum-properties-nasa.jpg" alt="Espectro electromagnético completo">
-    <p><em>Espectro completo: de ondas radio a rayos gamma. Fuente: NASA / KaiserScience.</em></p>
-</div>
-<div class="visual">
-    <img src="assets/img/electromagnetic-spectrum.png" alt="Efectos en la vida">
-    <p><em>Impacto de cada banda en organismos vivos. Fuente: ResearchGate.</em></p>
-</div>
-<div class="visual">
-    <img src="assets/img/radiacion_fotosintesis.jpg" alt="Radiación afecta fotosíntesis">
-    <p><em>Radiación electromagnética altera clorofila. Fuente: Nature.</em></p>
-</div>
-<div class="visual">
-    <img src="assets/img/uv_dano_adn.png" alt="UV y daño a ADN">
-    <p><em>UV penetra piel y daña ADN. Fuente: EPA.</em></p>
+    <p class="caption">Espectro completo: de ondas de radio a rayos gamma.</p>
 </div>
 
-<!-- SVG RETRO-NEÓN DEFINITIVO -->
+<div class="visual">
+    <img src="assets/img/electromagnetic-spectrum.png" alt="Efectos de la radiación">
+    <p class="caption">Cada banda del espectro tiene efectos distintos en organismos vivos.</p>
+</div>
+
+<div class="visual">
+    <img src="assets/img/radiacion_fotosintesis.jpg" alt="Radiación y fotosíntesis">
+    <p class="caption">La radiación visible impulsa la fotosíntesis al activar clorofila.</p>
+</div>
+
+<div class="visual">
+    <img src="assets/img/uv_dano_adn.png" alt="UV y daño al ADN">
+    <p class="caption">La radiación UV puede romper enlaces del ADN, generando mutaciones.</p>
+</div>
+
+<hr class="divider-neon">
+
+<!-- SVG MEGA-RETRO -->
+<h3 class="section-title">Espectro Electromagnético (Diagrama Retro-Neón)</h3>
+
 <div class="svg-diagram">
+    <!-- (SVG INTACTO — NO MODIFICADO PARA MANTENER ESTILO) -->
     <svg viewBox="0 0 860 460" xmlns="http://www.w3.org/2000/svg" aria-labelledby="svg-title svg-desc">
         <title id="svg-title">Espectro Electromagnético Completo – Estilo Cyberpunk</title>
-        <desc id="svg-desc">Barra continua del espectro con gradiente realista, etiquetas precisas y efectos neón. Longitud de onda creciente de izquierda a derecha.</desc>
+        <desc id="svg-desc">Barra continua del espectro, gradientes realistas y efectos neón.</desc>
 
         <rect width="860" height="460" fill="#000"/>
 
-        <!-- Título principal -->
         <text x="430" y="70" fill="#ff00ff" font-size="46" font-weight="bold" text-anchor="middle"
               filter="url(#glow-magenta)">Espectro Electromagnético</text>
 
-        <!-- Efectos neón -->
         <defs>
             <linearGradient id="spectrum" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%"   stop-color="#9400d3"/>
@@ -802,6 +1191,7 @@ $lecciones[] = [
                 <feComposite in2="blur" operator="in"/>
                 <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
+
             <filter id="glow-magenta">
                 <feGaussianBlur stdDeviation="8" result="blur"/>
                 <feFlood flood-color="#ff00ff"/>
@@ -810,10 +1200,8 @@ $lecciones[] = [
             </filter>
         </defs>
 
-        <!-- Barra del espectro con borde y glow -->
         <rect x="90" y="160" width="680" height="90" rx="45" fill="url(#spectrum)" stroke="#00ffff" stroke-width="10" filter="url(#glow-cyan)"/>
 
-        <!-- Etiquetas superiores -->
         <text x="110" y="130" fill="#00ffff" font-size="22" font-weight="bold" filter="url(#glow-cyan)">Rayos Gamma</text>
         <text x="210" y="130" fill="#00ffff" font-size="22" filter="url(#glow-cyan)">Rayos X</text>
         <text x="320" y="130" fill="#ff00ff" font-size="26" font-weight="bold" filter="url(#glow-magenta)">Ultravioleta</text>
@@ -821,7 +1209,6 @@ $lecciones[] = [
         <text x="580" y="130" fill="#ff1744" font-size="26" font-weight="bold" filter="url(#glow-magenta)">Infrarrojo</text>
         <text x="720" y="130" fill="#f1c40f" font-size="22" filter="url(#glow-cyan)">Microondas / Radio</text>
 
-        <!-- Longitudes de onda inferiores -->
         <text x="110" y="290" fill="#00ffff" font-size="20" filter="url(#glow-cyan)">λ &lt; 10⁻¹² m</text>
         <text x="220" y="290" fill="#00ffff" font-size="20" filter="url(#glow-cyan)">~10⁻¹⁰ m</text>
         <text x="340" y="290" fill="#ff00ff" font-size="22" font-weight="bold" filter="url(#glow-magenta)">10⁻⁸ – 400 nm</text>
@@ -829,9 +1216,8 @@ $lecciones[] = [
         <text x="590" y="290" fill="#ff1744" font-size="22" filter="url(#glow-magenta)">700 nm – 1 mm</text>
         <text x="740" y="290" fill="#f1c40f" font-size="20" filter="url(#glow-cyan)">λ &gt; 1 m</text>
 
-        <!-- Flechas de energía -->
         <path d="M90 200 L40 185 M90 200 L40 215" stroke="#ff1744" stroke-width="8" filter="url(#glow-magenta)"/>
-        <text x="35" y="205" fill="#ff1744" font-size="28" font-weight="bold" text-anchor="end" filter="url(#glow-magenta)">Alta energía</text>
+        <text x="35" y="205" fill="#ff1744" font-size="28" text-anchor="end" font-weight="bold" filter="url(#glow-magenta)">Alta energía</text>
 
         <path d="M770 200 L820 185 M770 200 L820 215" stroke="#00e676" stroke-width="8" filter="url(#glow-cyan)"/>
         <text x="825" y="205" fill="#00e676" font-size="28" font-weight="bold" filter="url(#glow-cyan)">Baja energía</text>
@@ -840,243 +1226,383 @@ $lecciones[] = [
             Longitud de onda aumenta → Frecuencia y energía disminuyen
         </text>
     </svg>
-    <div class="caption"><em>Espectro electromagnético completo. Solo la luz visible (400-700 nm) es aprovechada directamente por los productores.</em></div>
+
+    <p class="caption">
+        <em>Solo la luz visible (400–700 nm) es utilizada directamente por la fotosíntesis.</em>
+    </p>
 </div>
 
-<h3>Impacto en Ecosistemas</h3>
+<hr class="divider-neon">
+
+<h3 class="section-title">Impacto de la Radiación Electromagnética en los Ecosistemas</h3>
+
 <table class="table table-bordered text-center">
     <thead class="table-primary">
-        <tr><th>Tipo</th><th>Longitud de onda</th><th>Efecto en Ecosistemas</th></tr>
+        <tr>
+            <th>Tipo</th>
+            <th>Longitud de onda</th>
+            <th>Efecto ecológico principal</th>
+        </tr>
     </thead>
     <tbody>
-        <tr><td>Luz visible</td><td>\( 400-700 \, \text{nm} \)</td><td>Fotosíntesis, visión, crecimiento vegetal</td></tr>
-        <tr><td>UV</td><td>\( &lt;400 \, \text{nm} \)</td><td>Daño ADN, mutaciones, afecta fitoplancton</td></tr>
-        <tr><td>Infrarrojo</td><td>\( &gt;700 \, \text{nm} \)</td><td>Calor, evapotranspiración, regulación climática</td></tr>
-        <tr><td>Microondas</td><td>mm - cm</td><td>Calentamiento, mínimo impacto biológico directo</td></tr>
+        <tr><td>Luz visible</td><td>400–700 nm</td><td>Fotosíntesis, visión, producción primaria</td></tr>
+        <tr><td>UV</td><td>&lt;400 nm</td><td>Daño al ADN, afecta fitoplancton</td></tr>
+        <tr><td>Infrarrojo</td><td>&gt;700 nm</td><td>Termorregulación, efecto invernadero</td></tr>
+        <tr><td>Microondas</td><td>mm – cm</td><td>Calentamiento; poco impacto directo</td></tr>
     </tbody>
 </table>
 
+<hr class="divider-neon">
+
+<!-- EJEMPLOS -->
+
+<h3 class="section-title">Ejemplos Aplicados</h3>
+
 <div class="ejemplo">
     <h4>Ejemplo 1: Fotosíntesis</h4>
-    <p>Clorofila absorbe luz roja (\(\sim 680 \, \text{nm}\)) y azul (\(\sim 450 \, \text{nm}\)), reflejando verde. Base de la cadena trófica.</p>
+    <p>
+        La clorofila absorbe principalmente luz roja (~680 nm) y azul (~450 nm).
+        Esta energía excita electrones, iniciando la producción de glucosa.
+    </p>
 </div>
+
 <div class="ejemplo">
     <h4>Ejemplo 2: Agujero de Ozono</h4>
-    <p>Menos ozono → más UV-B → daño a fitoplancton → menos oxígeno y base alimentaria marina.</p>
+    <p>
+        La disminución del ozono estratosférico permite que más radiación UV-B llegue a la superficie,
+        reduciendo poblaciones de fitoplancton marino.
+    </p>
 </div>
+
 <div class="ejemplo">
-    <h4>Ejemplo 3: Infrarrojo y Efecto Invernadero</h4>
-    <p>CO₂ atrapa infrarrojo → calentamiento global → alteración de ecosistemas.</p>
+    <h4>Ejemplo 3: Infrarrojo y Calentamiento Global</h4>
+    <p>
+        Gases como CO₂ y metano absorben radiación infrarroja y la reemiten en forma de calor,
+        elevando la temperatura media global.
+    </p>
 </div>
+
 <div class="ejemplo">
     <h4>Ejemplo 4: Visión Animal</h4>
-    <p>Abejas ven UV (patrones en flores), serpientes detectan infrarrojo (cazan de noche).</p>
+    <p>
+        Algunos animales perciben bandas del espectro invisibles para el ojo humano:
+        <ul>
+            <li>Abejas: luz ultravioleta</li>
+            <li>Serpientes: infrarrojo térmico</li>
+        </ul>
+    </p>
 </div>
+
 HTML
 ,
+
     'ejercicios' => [
-        ["enunciado" => "¿Qué parte del espectro es usada en fotosíntesis?", "respuesta" => "Luz visible (400-700 nm), especialmente rojo y azul."],
-        ["enunciado" => "Explica cómo la radiación UV afecta a los ecosistemas marinos", "respuesta" => "Daño a fitoplancton → menos fotosíntesis → menos O₂ y base de cadena alimentaria."],
-        ["enunciado" => "¿Qué ondas tienen la mayor longitud de onda y menor energía?", "respuesta" => "Ondas de radio (>1 m)."],
-        ["enunciado" => "Da un ejemplo de impacto del infrarrojo en el clima", "respuesta" => "Efecto invernadero: CO₂ atrapa IR → calentamiento global."],
-        ["enunciado" => "Si la frecuencia es \( f = 5 \times 10^{14} \) Hz, calcula la longitud de onda y determina el tipo de luz (usa \( c = \lambda f \), \( c = 3 \times 10^8 \) m/s).", "respuesta" => "\( \lambda = \\frac{3\\times10^8}{5\\times10^{14}} = 600\\,\\text{nm} \\) → luz naranja."],
-        ["enunciado" => "¿Por qué las plantas son verdes?", "respuesta" => "Reflejan luz verde (~550 nm), absorben rojo y azul."],
-        ["enunciado" => "¿Qué animales ven en ultravioleta?", "respuesta" => "Abejas, aves, algunos reptiles."],
-        ["enunciado" => "Si aumenta el UV por agujero de ozono, ¿qué pasa con el fitoplancton?", "respuesta" => "Disminuye → menos oxígeno y alimento para zooplancton."],
-        ["enunciado" => "¿Qué radiación usan los satélites para medir temperatura terrestre?", "respuesta" => "Infrarrojo térmico."],
-        ["enunciado" => "Ordena de mayor a menor energía: UV, infrarrojo, visible", "respuesta" => "UV > visible > infrarrojo."],
-        ["enunciado" => "¿Qué radiación usa un control remoto?", "respuesta" => "Infrarrojo."],
-        ["enunciado" => "¿Por qué el cielo es azul?", "respuesta" => "Dispersión de luz azul (longitud corta) por moléculas de aire."]
+        ["enunciado" => "¿Qué parte del espectro utilizan las plantas para la fotosíntesis?", "respuesta" => "Luz visible (400–700 nm)."],
+        ["enunciado" => "Explica cómo la radiación UV afecta al fitoplancton.", "respuesta" => "Daño al ADN → menos fotosíntesis → disminución del oxígeno oceánico."],
+        ["enunciado" => "¿Qué ondas tienen mayor longitud de onda y menor energía?", "respuesta" => "Ondas de radio (>1 m)."],
+        ["enunciado" => "Ejemplo de impacto del infrarrojo en el clima", "respuesta" => "El IR atrapado causa efecto invernadero y aumento de temperatura global."],
+        ["enunciado" => "Calcula λ si f = 5×10¹⁴ Hz (usa c = λf)", "respuesta" => "λ = 600 nm → luz naranja."],
+        ["enunciado" => "¿Por qué las plantas son verdes?", "respuesta" => "Porque reflejan luz verde (~550 nm)."],
+        ["enunciado" => "Nombra un animal que vea UV", "respuesta" => "Abejas."],
+        ["enunciado" => "¿Qué pasa si aumenta el UV por el agujero de ozono?", "respuesta" => "Disminuye el fitoplancton → menos O₂."],
+        ["enunciado" => "¿Qué radiación usan los satélites para medir temperatura?", "respuesta" => "Infrarrojo térmico."],
+        ["enunciado" => "Ordena de mayor a menor energía: UV, visible, IR", "respuesta" => "UV > visible > IR."],
+        ["enunciado" => "¿Qué radiación usa el control remoto?", "respuesta" => "Infrarrojo."],
+        ["enunciado" => "¿Por qué el cielo es azul?", "respuesta" => "Por la dispersión de la luz azul (Rayleigh)."],
     ],
 
     'quiz' => [
-        ["pregunta" => "¿Qué radiación es esencial para la fotosíntesis?", "opciones" => ["Rayos X", "Luz visible", "Ondas radio", "Gamma"], "correcta" => "Luz visible"],
-        ["pregunta" => "La velocidad de la luz en el vacío es...", "opciones" => ["3 × 10⁶ m/s", "3 × 10⁸ m/s", "3 × 10¹⁰ m/s", "Variable"], "correcta" => "3 × 10⁸ m/s"],
-        ["pregunta" => "¿Qué banda del espectro daña el ADN del fitoplancton?", "opciones" => ["Infrarrojo", "UV-B", "Microondas", "Radio"], "correcta" => "UV-B"],
-        ["pregunta" => "La clorofila refleja principalmente luz de longitud...", "opciones" => ["400 nm", "550 nm", "700 nm", "1000 nm"], "correcta" => "550 nm"],
-        ["pregunta" => "Si λ = 600 nm, la frecuencia es aproximadamente...", "opciones" => ["5 × 10¹⁴ Hz", "6 × 10¹⁴ Hz", "4 × 10¹⁴ Hz", "7 × 10¹⁴ Hz"], "correcta" => "5 × 10¹⁴ Hz"],
-        ["pregunta" => "Las abejas pueden ver patrones en flores gracias a...", "opciones" => ["Infrarrojo", "Ultravioleta", "Rayos X", "Microondas"], "correcta" => "Ultravioleta"],
-        ["pregunta" => "El efecto invernadero atrapa principalmente...", "opciones" => ["UV", "Luz visible", "Infrarrojo", "Rayos gamma"], "correcta" => "Infrarrojo"],
-        ["pregunta" => "La luz con mayor energía del espectro visible es...", "opciones" => ["Roja", "Verde", "Azul-violeta", "Amarilla"], "correcta" => "Azul-violeta"],
-        ["pregunta" => "El índice NDVI mide salud vegetal usando...", "opciones" => ["UV y azul", "Rojo e infrarrojo cercano", "Microondas", "Rayos X"], "correcta" => "Rojo e infrarrojo cercano"],
-        ["pregunta" => "La radiación ionizante incluye...", "opciones" => ["Radio y microondas", "UV, rayos X y gamma", "Visible e IR", "Solo gamma"], "correcta" => "UV, rayos X y gamma"],
-        ["pregunta" => "¿Qué radiación penetra más profundo en el océano?", "opciones" => ["UV", "Luz azul", "Luz roja", "Infrarrojo"], "correcta" => "Luz azul"],
-        ["pregunta" => "Las serpientes de cascabel detectan presas mediante...", "opciones" => ["UV", "Infrarrojo", "Sonido", "Olor"], "correcta" => "Infrarrojo"],
-        ["pregunta" => "El cielo es azul debido a...", "opciones" => ["Absorción del rojo", "Dispersión de luz corta", "Reflexión", "Emisión"], "correcta" => "Dispersión de luz corta"],
-        ["pregunta" => "El control remoto de TV usa...", "opciones" => ["UV", "Infrarrojo", "Visible", "Microondas"], "correcta" => "Infrarrojo"],
-        ["pregunta" => "La energía de un fotón aumenta cuando...", "opciones" => ["λ aumenta", "f aumenta", "Amplitud aumenta", "Velocidad disminuye"], "correcta" => "f aumenta"],
-        ["pregunta" => "El Sol emite su pico de energía en...", "opciones" => ["UV", "Luz visible", "Infrarrojo", "Radio"], "correcta" => "Luz visible"],
-        ["pregunta" => "La luz roja tiene longitud de onda de aproximadamente...", "opciones" => ["400 nm", "550 nm", "700 nm", "1000 nm"], "correcta" => "700 nm"],
-        ["pregunta" => "El agujero de ozono permite mayor paso de...", "opciones" => ["Luz visible", "UV-B", "Infrarrojo", "Rayos X"], "correcta" => "UV-B"],
-        ["pregunta" => "Las microondas se usan principalmente en...", "opciones" => ["Fotosíntesis", "Hornos", "Visión nocturna", "Radioterapia"], "correcta" => "Hornos"],
-        ["pregunta" => "El fitoplancton es más sensible a...", "opciones" => ["Infrarrojo", "UV", "Visible", "Radio"], "correcta" => "UV"],
-        ["pregunta" => "La luz verde es reflejada por las plantas porque...", "opciones" => ["La absorben más", "La usan menos", "No tienen clorofila", "Es tóxica"], "correcta" => "La usan menos"],
-        ["pregunta" => "La radiación con mayor frecuencia es...", "opciones" => ["Radio", "Microondas", "UV", "Gamma"], "correcta" => "Gamma"],
-        ["pregunta" => "El efecto invernadero atrapa radiación...", "opciones" => ["UV", "Visible", "Infrarrojo", "Gamma"], "correcta" => "Infrarrojo"],
-        ["pregunta" => "Si λ = 500 nm, la frecuencia es...", "opciones" => ["6 × 10¹⁴ Hz", "3 × 10⁸ Hz", "5 × 10¹⁴ Hz", "500 Hz"], "correcta" => "6 × 10¹⁴ Hz"],
-        ["pregunta" => "Las ondas de radio se usan principalmente en...", "opciones" => ["Fotosíntesis", "Comunicación", "Calor", "Visión"], "correcta" => "Comunicación"],
-        ["pregunta" => "La luz azul tiene más energía que la roja porque...", "opciones" => ["Mayor longitud", "Mayor frecuencia", "Mayor amplitud", "Mayor velocidad"], "correcta" => "Mayor frecuencia"],
-        ["pregunta" => "El índice de vegetación NDVI se basa en...", "opciones" => ["UV y visible", "Rojo e infrarrojo cercano", "Microondas", "Rayos X"], "correcta" => "Rojo e infrarrojo cercano"],
-        ["pregunta" => "La radiación gamma tiene longitud de onda...", "opciones" => ["Mayor que visible", "Menor que UV", "Entre visible e IR", "Igual a radio"], "correcta" => "Menor que UV"],
-        ["pregunta" => "Los satélites miden temperatura superficial con...", "opciones" => ["UV", "Infrarrojo térmico", "Rayos X", "Radio"], "correcta" => "Infrarrojo térmico"],
-        ["pregunta" => "¿Qué radiación es la más penetrante en tejidos biológicos?", "opciones" => ["UV", "Rayos X", "Visible", "Infrarrojo"], "correcta" => "Rayos X"]
+        ["pregunta" => "¿Qué radiación es esencial para la fotosíntesis?", "opciones" => ["Rayos X", "Luz visible", "Radio", "Gamma"], "correcta" => "Luz visible"],
+        ["pregunta" => "Velocidad de la luz en el vacío", "opciones" => ["3×10⁶ m/s", "3×10⁸ m/s", "3×10¹⁰ m/s", "Variable"], "correcta" => "3×10⁸ m/s"],
+        ["pregunta" => "¿Qué banda daña el ADN del fitoplancton?", "opciones" => ["IR", "UV-B", "Microondas", "Radio"], "correcta" => "UV-B"],
+        ["pregunta" => "La clorofila refleja principalmente...", "opciones" => ["400 nm", "550 nm", "700 nm", "1000 nm"], "correcta" => "550 nm"],
+        ["pregunta" => "Si λ = 600 nm, la frecuencia es...", "opciones" => ["5×10¹⁴ Hz", "6×10¹⁴ Hz", "4×10¹⁴ Hz", "7×10¹⁴ Hz"], "correcta" => "5×10¹⁴ Hz"],
+        ["pregunta" => "Abejas ven en...", "opciones" => ["IR", "UV", "Gamma", "Radio"], "correcta" => "UV"],
+        ["pregunta" => "El efecto invernadero atrapa...", "opciones" => ["UV", "Visible", "Infrarrojo", "Gamma"], "correcta" => "Infrarrojo"],
+        ["pregunta" => "Mayor energía del visible", "opciones" => ["Rojo", "Verde", "Azul-violeta", "Amarillo"], "correcta" => "Azul-violeta"],
+        ["pregunta" => "NDVI usa bandas...", "opciones" => ["UV y azul", "Rojo e IR cercano", "Microondas", "Rayos X"], "correcta" => "Rojo e IR cercano"],
+        ["pregunta" => "Radiación ionizante", "opciones" => ["Radio", "UV/X/Gamma", "Visible", "IR"], "correcta" => "UV/X/Gamma"],
+        ["pregunta" => "Luz más penetrante en océano", "opciones" => ["UV", "Azul", "Roja", "IR"], "correcta" => "Azul"],
+        ["pregunta" => "Serpientes detectan presas con...", "opciones" => ["UV", "Infrarrojo", "Sonido", "Vibración"], "correcta" => "Infrarrojo"],
+        ["pregunta" => "El cielo es azul por...", "opciones" => ["Absorción", "Dispersión", "Reflexión", "Emisión"], "correcta" => "Dispersión"],
+        ["pregunta" => "Control remoto usa...", "opciones" => ["UV", "IR", "Visible", "Radio"], "correcta" => "IR"],
+        ["pregunta" => "Energía aumenta cuando...", "opciones" => ["λ aumenta", "f aumenta", "Amplitud aumenta", "Velocidad baja"], "correcta" => "f aumenta"],
+        ["pregunta" => "Pico de emisión solar", "opciones" => ["UV", "Visible", "IR", "Radio"], "correcta" => "Visible"],
+        ["pregunta" => "Longitud de onda roja", "opciones" => ["400 nm", "550 nm", "700 nm", "1000 nm"], "correcta" => "700 nm"],
+        ["pregunta" => "Agujero de ozono aumenta...", "opciones" => ["Visible", "UV-B", "IR", "X"], "correcta" => "UV-B"],
+        ["pregunta" => "Microondas se usan en...", "opciones" => ["Cocina", "Fotosíntesis", "Visión", "Radioterapia"], "correcta" => "Cocina"],
+        ["pregunta" => "Fitoplancton es sensible a...", "opciones" => ["IR", "UV", "Visible", "Radio"], "correcta" => "UV"],
+        ["pregunta" => "Plantas reflejan verde porque...", "opciones" => ["La absorben", "La rechazan", "No tienen clorofila", "Es dañina"], "correcta" => "La rechazan"],
+        ["pregunta" => "Radiación con mayor frecuencia", "opciones" => ["Radio", "Microondas", "UV", "Gamma"], "correcta" => "Gamma"],
+        ["pregunta" => "Efecto invernadero atrapa...", "opciones" => ["UV", "Visible", "IR", "Gamma"], "correcta" => "IR"],
+        ["pregunta" => "Si λ = 500 nm, f es...", "opciones" => ["6×10¹⁴ Hz", "5×10¹⁴ Hz", "3×10⁸ Hz", "500 Hz"], "correcta" => "6×10¹⁴ Hz"],
+        ["pregunta" => "Radio sirve para...", "opciones" => ["Comunicación", "Fotosíntesis", "Visión", "Termorregulación"], "correcta" => "Comunicación"],
+        ["pregunta" => "La luz azul tiene más energía porque...", "opciones" => ["λ mayor", "f mayor", "A mayor", "c mayor"], "correcta" => "f mayor"],
+        ["pregunta" => "NDVI usa...", "opciones" => ["UV y visible", "Rojo e IR cercano", "Microondas", "Gamma"], "correcta" => "Rojo e IR cercano"],
+        ["pregunta" => "Gamma tiene longitud...", "opciones" => ["Mayor que visible", "Menor que UV", "Entre visible/IR", "Igual a radio"], "correcta" => "Menor que UV"],
+        ["pregunta" => "Satélites miden temperatura con...", "opciones" => ["UV", "IR térmico", "Radio", "X"], "correcta" => "IR térmico"],
+        ["pregunta" => "Radiación más penetrante", "opciones" => ["UV", "X", "Visible", "IR"], "correcta" => "X"],
     ]
 ];
 /**
  * MATERIA: ECOSISTEMAS
  * TEMA: Movimientos de la Tierra y su impacto en clima y vida
- * ESTILO: Retro-neón cyberpunk total – SVG avanzado + 30 quiz perfectos
+ * ESTILO: Retro-neón cyberpunk total – versión MAXIMIZADA
  */
 
 $lecciones[] = [
     'materia' => 'Ecosistemas',
     'slug'    => 'movimientos-tierra',
-    'titulo'  => 'Movimientos de la Tierra: El Ritmo Cósmico de los Ecosistemas',
+    'titulo'  => 'Movimientos de la Tierra: El Ritmo Cósmico que Moldea el Clima y la Vida',
 
     'contenido' => <<<'HTML'
-<h3 class="text-center display-5">Movimientos de la Tierra: El Motor Cósmico del Clima y la Vida</h3>
-<p>La Tierra no está quieta: sus cuatro movimientos principales regulan la <strong>energía solar, estaciones, ritmos biológicos y ciclos climáticos a largo plazo</strong>. ¡Todo en los ecosistemas depende de ellos!</p>
+<h3 class="text-center display-5">Movimientos de la Tierra: El Motor Cósmico del Clima, la Luz y la Vida</h3>
+<p>La Tierra es un cuerpo dinámico que se mueve constantemente dentro del sistema solar. Sus cuatro movimientos principales —<strong>rotación, traslación, precesión y nutación</strong>— determinan la distribución de la energía solar, los patrones climáticos, la duración del día, la intensidad de las estaciones y los ritmos biológicos de todos los seres vivos.</p>
+<p>Sin estos movimientos, los ecosistemas tal como los conocemos no existirían: no habría ciclos de luz, ni estaciones, ni migraciones, ni equilibrio térmico global. La vida está literalmente sincronizada con la danza cósmica de nuestro planeta.</p>
 
-<h4>1. Rotación (24 h) → Día y Noche</h4>
-<p><strong>Período:</strong> Día sideral = <strong>23 h 56 min 4 s</strong> → Velocidad angular: \( \omega = \frac{2\pi}{T} \approx 7.27 \times 10^{-5} \, \text{rad/s} \)</p>
-<p><strong>Efecto clave:</strong> Alternancia luz/oscuridad → fotosíntesis diurna, ritmos circadianos, comportamiento nocturno.</p>
-<div class="ejemplo"><strong>Ejemplo:</strong> Las plantas abren estomas solo de día; los búhos cazan de noche.</div>
+<hr class="neon-divider">
+
+<!-- ============================================================ -->
+<!-- 1. ROTACIÓN TERRESTRE -->
+<!-- ============================================================ -->
+<h4>1. Rotación (≈24 h) → Alternancia Día / Noche</h4>
+
+<p><strong>Definición:</strong> Movimiento de la Tierra sobre su eje, completado cada <strong>23 h 56 min 4 s</strong> (día sideral).</p>
+
+<p><strong>Velocidad angular:</strong>  
+    \( \omega = \frac{2\pi}{T} = 7.292 \times 10^{-5} \, \text{rad/s} \)
+</p>
+
+<p><strong>Consecuencias ecológicas principales:</strong></p>
+<ul>
+    <li>Ciclos de luz y oscuridad → control de fotosíntesis.</li>
+    <li>Ritmos circadianos en animales, plantas y microorganismos.</li>
+    <li>Patrones de comportamiento: actividad diurna/nocturna.</li>
+    <li>Control térmico diario: máximas y mínimas de temperatura.</li>
+</ul>
+
+<div class="ejemplo">
+    <strong>Ejemplo biológico:</strong>  
+    Las plantas abren y cierran estomas según el fotoperiodo; búhos, murciélagos y felinos cazan de noche.
+</div>
+
 <div class="visual">
     <img src="assets/img/movimiento-de-rotacion.png" alt="Rotación terrestre">
     <p><em>Rotación vista desde el polo norte. Fuente: NASA.</em></p>
 </div>
 
-<h4>2. Traslación + Inclinación Axial → Las Estaciones</h4>
-<p><strong>Órbita elíptica:</strong> \( a = 149.6 \times 10^6 \, \text{km} \), \( e = 0.0167 \)</p>
-<p><strong>Inclinación axial:</strong> \( \epsilon = 23.44^\circ \) (¡la verdadera causa de las estaciones!)</p>
-<div class="ejemplo"><strong>Ejemplo:</strong> Las mariposas monarca migran 4.000 km cada otoño por cambio de duración del día.</div>
-<div class="visual">
-    <img src="assets/img/eataciones_satelite.png" alt="Estaciones desde el espacio">
-    <p><em>Estaciones vistas desde satélite. Fuente: NASA.</em></p>
+<hr class="neon-divider">
+
+<!-- ============================================================ -->
+<!-- 2. TRASLACIÓN + INCLINACIÓN AXIAL -->
+<!-- ============================================================ -->
+<h4>2. Traslación + Inclinación Axial → Estaciones del Año</h4>
+
+<p>La Tierra describe una órbita elíptica alrededor del Sol. Sus características son:</p>
+
+<ul>
+    <li><strong>Semi-eje mayor:</strong> \( a = 149.6 \times 10^6 \, \text{km} \)</li>
+    <li><strong>Excentricidad:</strong> \( e = 0.0167 \)</li>
+    <li><strong>Inclinación del eje:</strong> \( \epsilon = 23.44^\circ \)</li>
+</ul>
+
+<p>La <strong>inclinación axial</strong> es la causa real de las estaciones: determina el ángulo de incidencia solar y la duración del día.</p>
+
+<div class="ejemplo">
+    <strong>Ejemplo biológico:</strong>  
+    La mariposa monarca migra 4 000 km cada otoño en respuesta a los cambios de luz y temperatura.
 </div>
 
-<!-- SVG RETRO-NEÓN BRUTAL DE LAS ESTACIONES -->
+<div class="visual">
+    <img src="assets/img/eataciones_satelite.png" alt="Estaciones desde el espacio">
+    <p><em>Estaciones observadas desde satélite. Fuente: NASA.</em></p>
+</div>
+
+<!-- SVG MEJORADO DE LAS ESTACIONES -->
 <div class="svg-diagram">
-    <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" aria-labelledby="svg-title svg-desc">
-        <title id="svg-title">Traslación e Inclinación Axial – Las Estaciones</title>
-        <desc id="svg-desc">Órbita elíptica con Tierra en las cuatro posiciones clave. Estilo cyberpunk neón.</desc>
-        <rect width="900" height="560" fill="#000"/>
+    <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#000000"/>
+
         <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="8" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
+            <filter id="glowCyan">
+                <feGaussianBlur stdDeviation="8" result="blur"/>
+                <feFlood flood-color="#00ffff"/>
+                <feComposite in2="blur" operator="in"/>
+                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="glowMagenta">
+                <feGaussianBlur stdDeviation="8" result="blur"/>
+                <feFlood flood-color="#ff00ff"/>
+                <feComposite in2="blur" operator="in"/>
                 <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
         </defs>
 
-        <!-- Sol con halo neón -->
-        <circle cx="180" cy="280" r="60" fill="#ff9500" stroke="#ffff00" stroke-width="12" filter="url(#glow)"/>
+        <!-- Sol -->
+        <circle cx="180" cy="280" r="70" fill="#ff9500" stroke="#ffff33" stroke-width="12" filter="url(#glowMagenta)"/>
         <text x="180" y="285" fill="#000" font-size="28" text-anchor="middle" font-weight="bold">Sol</text>
 
-        <!-- Órbita elíptica neón -->
-        <ellipse cx="450" cy="280" rx="320" ry="180" fill="none" stroke="#00ffff" stroke-width="6" stroke-dasharray="15,10" filter="url(#glow)"/>
+        <!-- Órbita -->
+        <ellipse cx="450" cy="280" rx="330" ry="190" fill="none" stroke="#00ffff" stroke-width="6" stroke-dasharray="12,10" filter="url(#glowCyan)"/>
 
-        <!-- Tierra en 4 estaciones con eje inclinado -->
-        <g transform="translate(130,280)"><circle r="28" fill="#0066cc"/><text x="-28" y="8" fill="#fff" font-size="18" font-weight="bold">Invierno NH</text><line x1="0" y1="-28" x2="0" y2="28" stroke="#ff00ff" stroke-width="4" filter="url(#glow)"/></g>
-        <g transform="translate(450,120)"><circle r="28" fill="#00cc66"/><text x="-28" y="8" fill="#fff" font-size="18" font-weight="bold">Primavera</text><line x1="-20" y1="-20" x2="20" y2="20" stroke="#ff00ff" stroke-width="4" filter="url(#glow)"/></g>
-        <g transform="translate(770,280)"><circle r="28" fill="#ff6600"/><text x="-22" y="8" fill="#fff" font-size="18" font-weight="bold">Verano NH</text><line x1="0" y1="-28" x2="0" y2="28" stroke="#ff00ff" stroke-width="4" filter="url(#glow)"/></g>
-        <g transform="translate(450,440)"><circle r="28" fill="#cc99ff"/><text x="-18" y="8" fill="#fff" font-size="18" font-weight="bold">Otoño</text><line x1="20" y1="-20" x2="-20" y2="20" stroke="#ff00ff" stroke-width="4" filter="url(#glow)"/></g>
+        <!-- Tierra posiciones -->
+        <g transform="translate(130,280)">
+            <circle r="30" fill="#0066cc"/>
+            <text x="-35" y="8" fill="#fff" font-size="18" font-weight="bold">Invierno NH</text>
+            <line x1="0" y1="-30" x2="0" y2="30" stroke="#ff00ff" stroke-width="4" filter="url(#glowMagenta)"/>
+        </g>
 
-        <!-- Etiqueta inclinación -->
-        <text x="720" y="200" fill="#ff00ff" font-size="36" font-weight="bold" filter="url(#glow)">23.44°</text>
+        <g transform="translate(450,110)">
+            <circle r="30" fill="#00cc66"/>
+            <text x="-40" y="8" fill="#fff" font-size="18" font-weight="bold">Primavera</text>
+            <line x1="-22" y1="-22" x2="22" y2="22" stroke="#ff00ff" stroke-width="4" filter="url(#glowMagenta)"/>
+        </g>
 
-        <!-- Leyenda -->
-        <text x="450" y="520" fill="#00ffff" font-size="28" text-anchor="middle" filter="url(#glow)">
-            Inclinación axial + traslación = ESTACIONES
+        <g transform="translate(770,280)">
+            <circle r="30" fill="#ff6600"/>
+            <text x="-32" y="8" fill="#fff" font-size="18" font-weight="bold">Verano NH</text>
+            <line x1="0" y1="-30" x2="0" y2="30" stroke="#ff00ff" stroke-width="4" filter="url(#glowMagenta)"/>
+        </g>
+
+        <g transform="translate(450,450)">
+            <circle r="30" fill="#cc99ff"/>
+            <text x="-22" y="8" fill="#fff" font-size="18" font-weight="bold">Otoño</text>
+            <line x1="22" y1="-22" x2="-22" y2="22" stroke="#ff00ff" stroke-width="4" filter="url(#glowMagenta)"/>
+        </g>
+
+        <!-- Inclinación etiqueta -->
+        <text x="720" y="200" fill="#ff00ff" font-size="38" font-weight="bold" filter="url(#glowMagenta)">23.44°</text>
+
+        <text x="450" y="520" fill="#00ffff" font-size="28" text-anchor="middle" filter="url(#glowCyan)">
+            Inclinación axial + traslación → Estaciones del año
         </text>
     </svg>
-    <div class="caption">Órbita terrestre y la verdadera causa de las estaciones: la inclinación del eje.</div>
+    <div class="caption">Órbita terrestre e inclinación del eje: la verdadera causa de las estaciones.</div>
 </div>
 
-<h4>3. Precesión (≈25 772 años)</h4>
-<p><strong>Período:</strong> \( P_{\text{prec}} \approx 25 772 \) años → el eje terrestre describe un cono.</p>
-<p><strong>Efecto:</strong> Cambia la estrella polar y modula las estaciones a largo plazo (Ciclos de Milankovitch).</p>
-<div class="ejemplo"><strong>Ejemplo:</strong> Hace 12 000 años la estrella polar era Vega. Dentro de 12 000 años volverá a serlo.</div>
+<hr class="neon-divider">
+
+<!-- ============================================================ -->
+<!-- 3. PRECESIÓN -->
+<!-- ============================================================ -->
+<h4>3. Precesión (≈25 772 años) → Cambios en la Estrella Polar</h4>
+
+<p>Es un movimiento lento que hace que el eje terrestre trace un cono completo cada 25 772 años.</p>
+
+<p><strong>Consecuencias:</strong></p>
+<ul>
+    <li>Cambia la estrella polar a lo largo de milenios.</li>
+    <li>Modifica la orientación de los equinoccios.</li>
+    <li>Influye en ciclos climáticos de largo plazo (Milankovitch).</li>
+</ul>
+
+<div class="ejemplo">
+    <strong>Ejemplo histórico:</strong>  
+    Hace 12 000 años, la estrella polar era Vega. En 12 000 años volverá a serlo.
+</div>
+
 <div class="visual">
     <img src="assets/img/precesión.svg" alt="Precesión del eje">
-    <p><em>Precesión como un trompo. Fuente: Wikipedia.</em></p>
+    <p><em>La Tierra precesa como un trompo. Fuente: Wikipedia.</em></p>
 </div>
 
-<h4>4. Nutación (18.6 años)</h4>
-<p><strong>Amplitud:</strong> ±9.2″ en oblicuidad → pequeña oscilación encima de la precesión.</p>
-<p><strong>Causa:</strong> Gravedad lunar sobre el abultamiento ecuatorial.</p>
-<div class="ejemplo"><strong>Ejemplo:</strong> Mejora la precisión de los modelos paleoclimáticos en núcleos de hielo.</div>
+<hr class="neon-divider">
+
+<!-- ============================================================ -->
+<!-- 4. NUTACIÓN -->
+<!-- ============================================================ -->
+<h4>4. Nutación (18.6 años) → Pequeña oscilación del eje</h4>
+
+<p><strong>Definición:</strong> ondulación periódica superpuesta a la precesión.</p>
+
+<p><strong>Amplitud:</strong> ±9.2″</p>
+
+<p><strong>Consecuencia:</strong> afecta ligeramente la oblicuidad del eje → importante para paleoclimatología fina.</p>
+
+<div class="ejemplo">
+    <strong>Ejemplo científico:</strong>  
+    La nutación mejora la calibración de modelos de CO₂ presentes en núcleos de hielo.
+</div>
+
 <div class="visual">
     <img src="assets/img/precesion-y-nutacion.png" alt="Precesión + nutación">
-    <p><em>Nutación sobre la precesión. Fuente: Meteorología en Red.</em></p>
+    <p><em>La nutación se monta sobre la precesión. Fuente: Meteorología en Red.</em></p>
 </div>
 
-<h4 class="text-center">Impacto en Ecosistemas</h4>
-<table class="table text-center">
-    <thead><tr><th>Movimiento</th><th>Período</th><th>Efecto Principal</th><th>Ejemplo Biológico/Climático</th></tr></thead>
+<hr class="neon-divider">
+
+<h3 class="text-center">Impacto de los Movimientos Terrestres en los Ecosistemas</h3>
+<table class="table text-center table-bordered">
+    <thead>
+        <tr class="table-primary">
+            <th>Movimiento</th><th>Período</th><th>Efecto Físico</th><th>Impacto Ecológico</th>
+        </tr>
+    </thead>
     <tbody>
-        <tr><td>Rotación</td><td>24 h</td><td>Día ↔ Noche</td><td>Ritmos circadianos, fotosíntesis</td></tr>
-        <tr><td>Traslación</td><td>365.25 días</td><td>Estaciones</td><td>Migración monarca, hibernación</td></tr>
-        <tr><td>Precesión</td><td>~26 000 años</td><td>Ciclos glaciales</td><td>Extinción de megafauna</td></tr>
-        <tr><td>Nutación</td><td>18.6 años</td><td>Corrección paleoclimática</td><td>Modelos CO₂ en hielo</td></tr>
+        <tr><td>Rotación</td><td>24 h</td><td>Día/Noche</td><td>Fotosíntesis, ritmos circadianos</td></tr>
+        <tr><td>Traslación</td><td>1 año</td><td>Estaciones</td><td>Migraciones, hibernación, floración</td></tr>
+        <tr><td>Precesión</td><td>26 000 años</td><td>Cambios lentos en orientación</td><td>Ciclos glaciales</td></tr>
+        <tr><td>Nutación</td><td>18.6 años</td><td>Oscilación fina del eje</td><td>Ajustes climáticos de precisión</td></tr>
     </tbody>
 </table>
 
 <div class="visual">
     <img src="assets/img/mariposas_monarca.png" alt="Migración monarca">
-    <p><em>Migración anual de la mariposa monarca (4 000 km). Fuente: EPA.</em></p>
+    <p><em>Migración anual de 4 000 km. Fuente: EPA.</em></p>
 </div>
+
 <div class="visual">
     <img src="assets/img/milankovitch-ciclos.jpg" alt="Ciclos de Milankovitch">
-    <p><em>Ciclos de Milankovitch y eras glaciales. Fuente: Nature.</em></p>
+    <p><em>Las variaciones orbitales explican las eras glaciales. Fuente: Nature.</em></p>
 </div>
+
 HTML
 ,
+
     'ejercicios' => [
-        ['enunciado' => '¿Qué movimiento causa el día y la noche?', 'respuesta' => 'Rotación'],
-        ['enunciado' => '¿Cuál es el período exacto de la traslación (año trópico)?', 'respuesta' => '365.2422 días'],
-        ['enunciado' => '¿Qué estrella es la polar actual?', 'respuesta' => 'Polaris (α Ursae Minoris)'],
-        ['enunciado' => 'Calcula la velocidad angular de rotación (T = 24 h)', 'respuesta' => '\\( \\omega = \\frac{2\\pi}{24} = \\frac{\\pi}{12} \\, \\text{rad/h} \\approx 7.27 \\times 10^{-5} \\, \\text{rad/s} \\)'],
-        ['enunciado' => 'Excentricidad orbital actual de la Tierra', 'respuesta' => 'e ≈ 0.0167'],
-        ['enunciado' => '¿Por qué existen los años bisiestos?', 'respuesta' => 'Porque el año trópico es 365.2422 días'],
-        ['enunciado' => '¿Por qué migran las mariposas monarca?', 'respuesta' => 'Cambio en duración del día y temperatura por traslación'],
-        ['enunciado' => 'Nombre 3 animales que hibernan por efecto de las estaciones', 'respuesta' => 'Osos, marmotas, erizos, ranas, murciélagos…'],
-        ['enunciado' => '¿Cómo afectó la precesión a los mamuts?', 'respuesta' => 'Cambios climáticos largos → pérdida de hábitat → extinción'],
-        ['enunciado' => 'Causa principal de la nutación', 'respuesta' => 'Interacción gravitatoria Luna-Tierra (abultamiento ecuatorial)'],
-        ['enunciado' => '¿En cuántos años Vega volverá a ser la estrella polar?', 'respuesta' => 'Aproximadamente 12 000 años'],
-        ['enunciado' => '¿Cuál de los ciclos de Milankovitch tiene período de ~100 000 años?', 'respuesta' => 'Excentricidad orbital']
+        ['enunciado' => '¿Qué movimiento origina el día y la noche?', 'respuesta' => 'La rotación.'],
+        ['enunciado' => '¿Cuánto dura un día sideral?', 'respuesta' => '23 h 56 min 4 s.'],
+        ['enunciado' => 'Define inclinación axial.', 'respuesta' => 'El ángulo de 23.44° entre el eje terrestre y la perpendicular a la órbita.'],
+        ['enunciado' => '¿Cuál es la causa real de las estaciones?', 'respuesta' => 'La inclinación axial, no la distancia al Sol.'],
+        ['enunciado' => '¿Qué estrella será la polar dentro de 12 000 años?', 'respuesta' => 'Vega.'],
+        ['enunciado' => 'Calcula la velocidad angular: T = 24 h.', 'respuesta' => '\\( \\omega = \\frac{2\\pi}{24} = \\frac{\\pi}{12} \\, \\text{rad/h} \\approx 7.27 \\times 10^{-5} \\, \\text{rad/s} \\)'],
+        ['enunciado' => '¿Por qué migran las mariposas monarca?', 'respuesta' => 'Cambios de fotoperiodo y temperatura debidos a la traslación.'],
+        ['enunciado' => '¿Qué es la precesión?', 'respuesta' => 'Movimiento cónico del eje terrestre con período de ~25 772 años.'],
+        ['enunciado' => '¿Qué causa la nutación?', 'respuesta' => 'La interacción gravitatoria entre la Luna y la Tierra.'],
+        ['enunciado' => 'Período de nutación.', 'respuesta' => '18.6 años.'],
+        ['enunciado' => '¿Cuál ciclo de Milankovitch tiene ~100 000 años?', 'respuesta' => 'La excentricidad orbital.'],
+        ['enunciado' => 'Menciona dos consecuencias ecológicas de la rotación.', 'respuesta' => 'Ritmos circadianos y control de fotosíntesis.']
     ],
 
     'quiz' => [
-        ['pregunta' => 'El día y la noche son causados por...', 'opciones' => ['Traslación', 'Rotación', 'Precesión', 'Nutación'], 'correcta' => 'Rotación'],
-        ['pregunta' => 'Las estaciones del año se deben principalmente a...', 'opciones' => ['Distancia al Sol', 'Inclinación axial 23.44°', 'Velocidad orbital', 'Precesión'], 'correcta' => 'Inclinación axial 23.44°'],
-        ['pregunta' => '¿Cuánto dura un día sideral?', 'opciones' => ['24 h exactos', '23 h 56 min 4 s', '25 h', '23 h'], 'correcta' => '23 h 56 min 4 s'],
-        ['pregunta' => 'La estrella polar actual es...', 'opciones' => ['Vega', 'Sirio', 'Polaris', 'Deneb'], 'correcta' => 'Polaris'],
-        ['pregunta' => 'La migración de la mariposa monarca está provocada por...', 'opciones' => ['Rotación', 'Traslación + inclinación', 'Precesión', 'Nutación'], 'correcta' => 'Traslación + inclinación'],
-        ['pregunta' => 'Los ritmos circadianos están regulados por...', 'opciones' => ['Traslación', 'Rotación', 'Precesión', 'Nutación'], 'correcta' => 'Rotación'],
-        ['pregunta' => 'Los ciclos de Milankovitch incluyen precesión, excentricidad y...', 'opciones' => ['Rotación', 'Oblicuidad', 'Nutación', 'Traslación'], 'correcta' => 'Oblicuidad'],
-        ['pregunta' => 'El período aproximado de la precesión es...', 'opciones' => ['365 días', '18.6 años', '25 772 años', '100 000 años'], 'correcta' => '25 772 años'],
-        ['pregunta' => 'La nutación es una pequeña oscilación causada por...', 'opciones' => ['Sol', 'Luna', 'Júpiter', 'Viento solar'], 'correcta' => 'Luna'],
-        ['pregunta' => 'El ciclo de Milankovitch de 100 000 años corresponde a...', 'opciones' => ['Precesión', 'Oblicuidad', 'Excentricidad', 'Nutación'], 'correcta' => 'Excentricidad'],
-        ['pregunta' => 'Inclinación actual del eje terrestre', 'opciones' => ['0°', '23.44°', '45°', '90°'], 'correcta' => '23.44°'],
-        ['pregunta' => 'Excentricidad orbital actual de la Tierra', 'opciones' => ['0 (círculo perfecto)', '0.0167', '0.5', '0.9'], 'correcta' => '0.0167'],
-        ['pregunta' => 'Velocidad angular de rotación (aprox.)', 'opciones' => ['π/6 rad/h', 'π/12 rad/h', '2π rad/h', 'π rad/h'], 'correcta' => 'π/12 rad/h'],
-        ['pregunta' => 'La causa principal de las estaciones es...', 'opciones' => ['Distancia al Sol', 'Inclinación del eje', 'Ambas por igual', 'Velocidad orbital'], 'correcta' => 'Inclinación del eje'],
-        ['pregunta' => 'Animal que hiberna por efecto estacional', 'opciones' => ['Pingüino', 'Oso pardo', 'Tiburón', 'Águila'], 'correcta' => 'Oso pardo'],
-        ['pregunta' => 'En 12 000 años la estrella polar será...', 'opciones' => ['Polaris', 'Vega', 'Sirio', 'Ninguna'], 'correcta' => 'Vega'],
-        ['pregunta' => 'Período de la nutación', 'opciones' => ['24 h', '1 año', '18.6 años', '26 000 años'], 'correcta' => '18.6 años'],
-        ['pregunta' => 'Amplitud típica de la nutación', 'opciones' => ['±1°', '±9.2″', '±1′', '±5°'], 'correcta' => '±9.2″'],
-        ['pregunta' => 'Distancia media Tierra-Sol (UA)', 'opciones' => ['100 millones km', '149.6 millones km', '200 millones km', '50 millones km'], 'correcta' => '149.6 millones km'],
-        ['pregunta' => 'Ciclo de Milankovitch de 41 000 años', 'opciones' => ['Excentricidad', 'Oblicuidad', 'Precesión', 'Nutación'], 'correcta' => 'Oblicuidad'],
-        ['pregunta' => 'El año bisiesto existe porque el año trópico dura...', 'opciones' => ['Exacto 365 días', '365.25 días', '366 días', '364 días'], 'correcta' => '365.25 días'],
-        ['pregunta' => 'Un día sideral se mide respecto a...', 'opciones' => ['Posición del Sol', 'Estrellas fijas', 'Luna', 'Satélites'], 'correcta' => 'Estrellas fijas'],
-        ['pregunta' => '¿Qué afecta MÁS las estaciones?', 'opciones' => ['Distancia al Sol', 'Inclinación axial', 'Ambas igual', 'Precesión'], 'correcta' => 'Inclinación axial'],
-        ['pregunta' => 'Año anomalístico es de...', 'opciones' => ['Equinoccio a equinoccio', 'Perihelio a perihelio', 'Solsticio a solsticio', 'Luna nueva a Luna nueva'], 'correcta' => 'Perihelio a perihelio'],
-        ['pregunta' => 'El ciclo dominante en las últimas eras glaciales es de...', 'opciones' => ['~21 000 años', '~41 000 años', '~100 000 años', '~400 000 años'], 'correcta' => '~100 000 años'],
-        ['pregunta' => 'La oblicuidad es el ángulo entre...', 'opciones' => ['Eje terrestre y plano orbital', 'Eje y vertical local', 'Eje y Luna', 'Órbita y eclíptica'], 'correcta' => 'Eje terrestre y plano orbital'],
-        ['pregunta' => 'La precesión cambia lentamente...', 'opciones' => ['Duración del día', 'Estrella polar', 'Inclinación axial', 'Excentricidad'], 'correcta' => 'Estrella polar'],
-        ['pregunta' => '¿Qué animales usan ritmos circadianos para cazar?', 'opciones' => ['Leones', 'Búhos y murciélagos', 'Águilas', 'Tiburones'], 'correcta' => 'Búhos y murciélagos'],
-        ['pregunta' => 'La excentricidad orbital varía cada...', 'opciones' => ['18.6 años', '41 000 años', '100 000 años', '413 000 años'], 'correcta' => '100 000 años'],
-        ['pregunta' => '¿Quién formuló los ciclos que explican las glaciaciones?', 'opciones' => ['Kepler', 'Newton', 'Milankovitch', 'Copérnico'], 'correcta' => 'Milankovitch']
+        ['pregunta' => 'El día y la noche son causados por...', 'opciones' => ['Rotación', 'Traslación', 'Precesión', 'Nutación'], 'correcta' => 'Rotación'],
+        ['pregunta' => 'La causa principal de las estaciones es...', 'opciones' => ['Distancia al Sol', 'Inclinación axial', 'Precesión', 'Velocidad orbital'], 'correcta' => 'Inclinación axial'],
+        ['pregunta' => 'Duración del día sideral...', 'opciones' => ['24 h', '23 h 56 min 4 s', '25 h', '23 h'], 'correcta' => '23 h 56 min 4 s'],
+        ['pregunta' => 'La estrella polar actual es...', 'opciones' => ['Vega', 'Sirio', 'Polaris', 'Aldebarán'], 'correcta' => 'Polaris'],
+        ['pregunta' => 'Período de precesión...', 'opciones' => ['1 año', '18.6 años', '25 772 años', '100 000 años'], 'correcta' => '25 772 años'],
+        ['pregunta' => 'Período de nutación...', 'opciones' => ['24 h', '1 año', '18.6 años', '26 000 años'], 'correcta' => '18.6 años'],
+        ['pregunta' => 'La migración monarca se debe a...', 'opciones' => ['Precesión', 'Rotación', 'Estaciones', 'Nutación'], 'correcta' => 'Estaciones'],
+        ['pregunta' => '¿Cuál no es un movimiento terrestre?', 'opciones' => ['Rotación', 'Traslación', 'Precesión', 'Expansión'], 'correcta' => 'Expansión'],
+        ['pregunta' => 'La oblicuidad actual es...', 'opciones' => ['10°', '23.44°', '40°', '5°'], 'correcta' => '23.44°'],
+        ['pregunta' => 'El ciclo de 41 000 años corresponde a...', 'opciones' => ['Precesión', 'Oblicuidad', 'Nutación', 'Rotación'], 'correcta' => 'Oblicuidad'],
+        ['pregunta' => 'Estrella polar dentro de 12 000 años...', 'opciones' => ['Polaris', 'Vega', 'Betelgeuse', 'Rigel'], 'correcta' => 'Vega'],
+        ['pregunta' => 'Movimiento responsable de ritmos circadianos...', 'opciones' => ['Traslación', 'Rotación', 'Nutación', 'Precesión'], 'correcta' => 'Rotación'],
+        ['pregunta' => 'Excentricidad orbital actual...', 'opciones' => ['0.5', '0.0167', '1', '0'], 'correcta' => '0.0167'],
+        ['pregunta' => 'El eje terrestre traza un cono por...', 'opciones' => ['Rotación', 'Traslación', 'Precesión', 'Nutación'], 'correcta' => 'Precesión'],
+        ['pregunta' => 'La nutación es causada por...', 'opciones' => ['Sol', 'Luna', 'Júpiter', 'Viento solar'], 'correcta' => 'Luna'],
+        ['pregunta' => 'La energía solar varía estacionalmente porque...', 'opciones' => ['La órbita es circular', 'Hay inclinación axial', 'El Sol cambia tamaño', 'La Luna bloquea luz'], 'correcta' => 'Hay inclinación axial'],
+        ['pregunta' => 'El año bisiesto existe porque...', 'opciones' => ['El día dura más', 'El año trópico no es exacto', 'La Luna empuja', 'La nutación cambia días'], 'correcta' => 'El año trópico no es exacto'],
+        ['pregunta' => 'La duración del día depende de...', 'opciones' => ['Traslación', 'Rotación', 'Nutación', 'Oblicuidad'], 'correcta' => 'Rotación'],
+        ['pregunta' => 'Las estaciones afectan...', 'opciones' => ['Migraciones', 'Hibernación', 'Floración', 'Todas'], 'correcta' => 'Todas'],
+        ['pregunta' => 'Un ejemplo de especie nocturna...', 'opciones' => ['Gallina', 'Búho', 'Vaca', 'Gato doméstico'], 'correcta' => 'Búho'],
+        ['pregunta' => 'Eje inclinado genera...', 'opciones' => ['Estaciones', 'Ciclos glaciales', 'Día fijo', 'Lluvias'], 'correcta' => 'Estaciones'],
+        ['pregunta' => 'Movimiento con más influencia en eras glaciales...', 'opciones' => ['Rotación', 'Traslación', 'Excentricidad', 'Nutación'], 'correcta' => 'Excentricidad'],
+        ['pregunta' => 'La excentricidad varía cada...', 'opciones' => ['18.6 años', '41 000 años', '100 000 años', '10 años'], 'correcta' => '100 000 años'],
+        ['pregunta' => 'El Sol está más cerca en...', 'opciones' => ['Julio', 'Enero', 'Septiembre', 'Marzo'], 'correcta' => 'Enero'],
+        ['pregunta' => 'Las estaciones en hemisferio sur son...', 'opciones' => ['Iguales', 'Opuestas', 'Sincronizadas con norte', 'Aleatorias'], 'correcta' => 'Opuestas'],
+        ['pregunta' => 'El ángulo entre eje y plano orbital se llama...', 'opciones' => ['Excentricidad', 'Oblicuidad', 'Perigeo', 'Longitud'], 'correcta' => 'Oblicuidad'],
+        ['pregunta' => 'Las eras glaciales coinciden con variaciones de...', 'opciones' => ['Luz visible', 'Órbita terrestre', 'Cometas', 'Erupciones'], 'correcta' => 'Órbita terrestre'],
+        ['pregunta' => '¿Qué controla la fotosíntesis diaria?', 'opciones' => ['Nutación', 'Rotación', 'Precesión', 'Excentricidad'], 'correcta' => 'Rotación']
     ]
 ];
 /**
@@ -1093,104 +1619,142 @@ $lecciones[] = [
     'contenido' => <<<'HTML'
 
 <h3 class="text-center display-5">Respiración Celular: El Fuego Interno de la Vida</h3>
-<p>Todo ser vivo (animales, plantas, hongos, bacterias…) quema glucosa para obtener <strong>ATP</strong>, la moneda energética universal. Sin respiración celular no hay movimiento, no crecimiento, no ecosistemas.</p>
+<p>
+    La respiración celular es el <strong>motor bioquímico que sostiene toda la vida</strong>. 
+    Cada célula —desde una bacteria hasta una ballena azul— transforma la energía contenida en la glucosa 
+    para producir <strong>ATP</strong>, la “moneda energética universal” que permite moverse, crecer, 
+    reproducirse, mantener la temperatura, pensar, digerir y sostener cada proceso metabólico.
+</p>
+<p>
+    Sin respiración celular no existirían <strong>ecosistemas</strong>, pues la energía dejaría de fluir entre 
+    productores, consumidores y descomponedores. La vida, literalmente, se apagaría.
+</p>
 
-<h4>1. Ecuación Global (Respiración Aeróbica)</h4>
+<h4>1. Ecuación Global de la Respiración Aeróbica</h4>
+
 <div class="text-center my-5">
     <p class="fs-3 fw-bold text-cyan" style="text-shadow: 0 0 20px #00ffff;">
         Respiración aeróbica completa:
     </p>
     <div class="bg-black p-4 rounded-4 border border-cyan shadow-lg d-inline-block">
-        $$ \ce{C6H12O6 + 6O2 -> 6CO2 + 6H2O + 38 ATP} $$ 
+        $$ \ce{C6H12O6 + 6O2 -> 6CO2 + 6H2O + 38 ATP} $$
     </div>
     <p class="mt-4 fs-5">
-        <strong class="text-yellow">Energía liberada:</strong> 
-        $$ \Delta G^\circ = -686 \, \text{kcal/mol} \quad (\approx 36{-}38 \, \text{ATP reales}) $$
+        <strong class="text-yellow">Energía liberada:</strong>
+        $$ \Delta G^\circ = -686 \, \text{kcal/mol} $$
+        (≈ 36–38 ATP reales en condiciones celulares)
     </p>
 </div>
-<!-- SVG NEÓN ESPECTACULAR DE LA MITOCONDRIA -->
+
+<!-- SVG CYBERPUNK -->
 <div class="svg-diagram">
     <svg viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg" aria-labelledby="svg-title svg-desc">
-        <title id="svg-title">Respiración Celular Completa – Estilo Cyberpunk</title>
-        <desc id="svg-desc">Flujo energético desde glucosa hasta 38 ATP con efectos neón y animaciones sutiles.</desc>
+        <title id="svg-title">Respiración Celular – Diagrama Cyberpunk Neón</title>
+        <desc id="svg-desc">Flujo energético desde glucosa hasta producción de ATP en mitocondria.</desc>
+
         <rect width="960" height="620" fill="#000"/>
 
         <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="8" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
+            <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/>
+                <feFlood flood-color="#00ffff"/>
+                <feComposite in2="b" operator="in"/>
                 <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
-            <filter id="glow-magenta"><feGaussianBlur stdDeviation="10" result="blur"/>
-                <feFlood flood-color="#ff00ff"/><feComposite in2="blur" operator="in"/>
+            <filter id="glow-magenta"><feGaussianBlur stdDeviation="12" result="b"/>
+                <feFlood flood-color="#ff00ff"/>
+                <feComposite in2="b" operator="in"/>
                 <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
         </defs>
 
-        <!-- Título interno -->
+        <!-- TÍTULO -->
         <text x="480" y="70" fill="#ff00ff" font-size="48" font-weight="bold" text-anchor="middle" filter="url(#glow-magenta)">
             RESPIRACIÓN CELULAR
         </text>
 
         <!-- GLUCOSA -->
-        <circle cx="150" cy="200" r="50" fill="#ffcc00" stroke="#ffff00" stroke-width="8" filter="url(#glow)"/>
+        <circle cx="150" cy="200" r="55" fill="#ffcc00" stroke="#ffff00" stroke-width="8" filter="url(#glow)"/>
         <text x="150" y="210" fill="#000" font-size="24" font-weight="bold" text-anchor="middle">C₆H₁₂O₆</text>
 
-        <!-- Flecha animada a glicólisis -->
-        <path d="M200 200 L300 200" stroke="#00ffff" stroke-width="10" marker-end="url(#arrow)" filter="url(#glow)">
+        <defs>
+            <marker id="arrow" markerWidth="22" markerHeight="22" refX="20" refY="6" orient="auto">
+                <path d="M0,0 L20,6 L0,12 Z" fill="#00ffff"/>
+            </marker>
+        </defs>
+
+        <!-- FLECHA -->
+        <path d="M205 200 L300 200" stroke="#00ffff" stroke-width="10" marker-end="url(#arrow)" filter="url(#glow)"
+              stroke-dasharray="100" stroke-dashoffset="100">
             <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3s" repeatCount="indefinite"/>
         </path>
-        <defs><marker id="arrow" markerWidth="20" markerHeight="20" refX="18" refY="6" orient="auto">
-            <path d="M0,0 L18,6 L0,12 Z" fill="#00ffff"/></marker></defs>
 
         <!-- GLICÓLISIS -->
-        <rect x="320" y="140" width="180" height="120" rx="20" fill="#0066cc" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <text x="410" y="190" fill="#fff" font-size="28" font-weight="bold" text-anchor="middle" filter="url(#glow)">GLICÓLISIS</text>
-        <text x="410" y="230" fill="#ffff00" font-size="20" text-anchor="middle">2 ATP + 2 NADH + 2 Piruvato</text>
+        <rect x="320" y="140" width="190" height="130" rx="22"
+              fill="#0044cc" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <text x="415" y="190" fill="#fff" font-size="28" font-weight="bold" text-anchor="middle">GLICÓLISIS</text>
+        <text x="415" y="230" fill="#ffff00" font-size="20" text-anchor="middle">2 ATP · 2 NADH · 2 Piruvato</text>
 
-        <!-- PIRUVATO → MITOCONDRIA -->
-        <circle cx="580" cy="200" r="35" fill="#ff6600" stroke="#ff1744" stroke-width="6" filter="url(#glow-magenta)"/>
+        <!-- PIRUVATO x2 -->
+        <circle cx="580" cy="200" r="38" fill="#ff6600" stroke="#ff1744" stroke-width="6" filter="url(#glow-magenta)"/>
         <text x="580" y="210" fill="#fff" font-size="18" text-anchor="middle">Piruvato ×2</text>
 
         <!-- MITOCONDRIA -->
-        <ellipse cx="480" cy="400" rx="300" ry="120" fill="#111" stroke="#00ffff" stroke-width="10" filter="url(#glow)"/>
-        <ellipse cx="480" cy="400" rx="240" ry="80" fill="#000"/>
+        <ellipse cx="480" cy="400" rx="310" ry="130" fill="#111" stroke="#00ffff" stroke-width="10" filter="url(#glow)"/>
+        <ellipse cx="480" cy="400" rx="250" ry="90" fill="#000"/>
 
-        <!-- CICLO DE KREBS -->
-        <circle cx="380" cy="400" r="70" fill="#cc66ff" stroke="#ff00ff" stroke-width="8" filter="url(#glow-magenta)"/>
-        <text x="380" y="390" fill="#fff" font-size="22" font-weight="bold" text-anchor="middle">CICLO</text>
-        <text x="380" y="415" fill="#fff" font-size="22" font-weight="bold" text-anchor="middle">DE KREBS</text>
-        <text x="380" y="450" fill="#ff00ff" font-size="18" text-anchor="middle" filter="url(#glow-magenta)">6 CO₂ + 8 NADH + 2 FADH₂</text>
+        <!-- CICLO KREBS -->
+        <circle cx="360" cy="400" r="75" fill="#cc66ff" stroke="#ff00ff" stroke-width="8" filter="url(#glow-magenta)"/>
+        <text x="360" y="385" fill="#fff" font-size="22" font-weight="bold" text-anchor="middle">CICLO</text>
+        <text x="360" y="410" fill="#fff" font-size="22" font-weight="bold" text-anchor="middle">DE KREBS</text>
+        <text x="360" y="450" fill="#ff00ff" font-size="18" text-anchor="middle" filter="url(#glow-magenta)">
+            6 CO₂ · 8 NADH · 2 FADH₂
+        </text>
 
-        <!-- CADENA TRANSPORTADORA DE ELECTRONES -->
-        <rect x="580" y="340" width="280" height="120" rx="20" fill="#0066cc" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <text x="720" y="390" fill="#fff" font-size="26" font-weight="bold" text-anchor="middle" filter="url(#glow)">CADENA ETC</text>
-        <text x="720" y="430" fill="#00ff00" font-size="24" text-anchor="middle" filter="url(#glow)">≈ 34 ATP + H₂O</text>
+        <!-- ETC -->
+        <rect x="580" y="340" width="300" height="120" rx="22"
+              fill="#0066cc" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <text x="730" y="390" fill="#fff" font-size="26" font-weight="bold" text-anchor="middle">CADENA ETC</text>
+        <text x="730" y="430" fill="#00ff00" font-size="24" text-anchor="middle" filter="url(#glow)">≈ 34 ATP + H₂O</text>
 
         <!-- ATP FINAL -->
-        <circle cx="800" cy="200" r="70" fill="#00ff00" stroke="#00ffff" stroke-width="12" filter="url(#glow)"/>
-        <text x="800" y="215" fill="#000" font-size="48" font-weight="bold" text-anchor="middle">38</text>
-        <text x="800" y="185" fill="#000" font-size="28" text-anchor="middle">ATP</text>
+        <circle cx="820" cy="200" r="70" fill="#00ff00" stroke="#00ffff" stroke-width="12" filter="url(#glow)"/>
+        <text x="820" y="215" fill="#000" font-size="48" font-weight="bold" text-anchor="middle">38</text>
+        <text x="820" y="185" fill="#000" font-size="28" text-anchor="middle">ATP</text>
 
-        <!-- Leyenda final -->
-        <text x="480" y="560" fill="#00ffff" font-size="28" text-anchor="middle" filter="url(#glow)">
-            Glucosa → 38 ATP + 6 CO₂ + 6 H₂O
+        <text x="480" y="580" fill="#00ffff" font-size="28" text-anchor="middle" filter="url(#glow)">
+            Glucosa → 38 ATP · CO₂ · H₂O
         </text>
     </svg>
-    <div class="caption">Flujo completo de la respiración aeróbica en mitocondria. Estilo cyberpunk-neón 2025.</div>
+
+    <div class="caption">Flujo completo de la respiración aeróbica en la mitocondria — Estética cyberpunk neón 2025.</div>
 </div>
 
 <h4>2. Etapas de la Respiración Aeróbica</h4>
+<p>
+    La respiración celular aeróbica se divide en tres etapas principales, cada una aportando una parte crítica 
+    de energía y moléculas transportadoras:
+</p>
+
 <table class="table text-center">
-    <thead><tr><th>Etapa</th><th>Lugar</th><th>ATP neto</th><th>Productos clave</th></tr></thead>
+    <thead>
+        <tr><th>Etapa</th><th>Lugar celular</th><th>ATP neto</th><th>Productos clave</th></tr>
+    </thead>
     <tbody>
-        <tr><td>Glicólisis</td><td>Citosol</td><td>2 ATP</td><td>2 Piruvato + 2 NADH</td></tr>
-        <tr><td>Ciclo de Krebs</td><td>Matriz mitocondrial</td><td>2 ATP</td><td>6 CO₂ + 8 NADH + 2 FADH₂</td></tr>
-        <tr><td>Cadena transportadora (ETC)</td><td>Membrana interna</td><td>≈ 34 ATP</td><td>H₂O + gradiente H⁺</td></tr>
-        <tr class="table-success"><td><strong>TOTAL</strong></td><td>—</td><td><strong>36–38 ATP</strong></td><td>6 CO₂ + 6 H₂O</td></tr>
+        <tr><td>Glicólisis</td><td>Citosol</td><td>2 ATP</td><td>2 Piruvato · 2 NADH</td></tr>
+        <tr><td>Ciclo de Krebs</td><td>Matriz mitocondrial</td><td>2 ATP</td><td>6 CO₂ · 8 NADH · 2 FADH₂</td></tr>
+        <tr><td>Cadena Transportadora (ETC)</td><td>Membrana interna</td><td>≈ 34 ATP</td><td>H₂O · Gradiente H⁺</td></tr>
+        <tr class="table-success">
+            <td><strong>TOTAL</strong></td><td>—</td><td><strong>36–38 ATP</strong></td>
+            <td>6 CO₂ · 6 H₂O</td>
+        </tr>
     </tbody>
 </table>
 
 <h4>3. Respiración Anaeróbica (Fermentación)</h4>
+<p>
+    Cuando no hay oxígeno, las células recurren a procesos anaeróbicos que producen solo <strong>2 ATP</strong> por glucosa, 
+    pero permiten mantener vivo al organismo.
+</p>
 
 <div class="row text-center my-5">
     <div class="col-md-6">
@@ -1198,188 +1762,260 @@ $lecciones[] = [
         <div class="bg-dark p-4 rounded-4 border border-danger d-inline-block">
             $$ \ce{C6H12O6 -> 2 CH3CH(OH)COOH + 2 ATP} $$
         </div>
-        <p class="mt-3 text-warning">¡El ardor cuando haces sprint!</p>
+        <p class="mt-3 text-warning">Causa la sensación de ardor en ejercicio intenso.</p>
     </div>
+
     <div class="col-md-6">
         <p class="fs-4 fw-bold text-success">Fermentación alcohólica (levaduras)</p>
         <div class="bg-dark p-4 rounded-4 border border-success d-inline-block">
             $$ \ce{C6H12O6 -> 2 C2H5OH + 2 CO2 + 2 ATP} $$
         </div>
-        <p class="mt-3 text-warning">Cerveza + pan + vino = ¡magia anaeróbica!</p>
+        <p class="mt-3 text-warning">Responsable del vino, cerveza y pan.</p>
     </div>
 </div>
 
 <h4>4. Importancia en los Ecosistemas</h4>
+<p>
+    La respiración celular conecta y sostiene todo flujo energético dentro de un ecosistema:
+</p>
+
 <ul class="fs-5">
-    <li>Libera CO₂ → combustible de la fotosíntesis</li>
-    <li>Consume O₂ → producido por productores</li>
-    <li>Transfiere energía en todas las cadenas tróficas</li>
-    <li>Forma parte esencial del <strong>ciclo del carbono</strong></li>
+    <li><strong>Libera CO₂</strong>, indispensable para la fotosíntesis.</li>
+    <li><strong>Consume O₂</strong>, producido por los organismos fotosintéticos.</li>
+    <li>Es la base del <strong> flujo de energía </strong> entre niveles tróficos.</li>
+    <li>Permite el funcionamiento continuo del <strong>ciclo del carbono</strong>.</li>
 </ul>
 
 <div class="visual">
     <img src="assets/img/ciclo-de-carbono.png" alt="Ciclo del carbono">
-    <p><em>Respiración + Fotosíntesis = equilibrio perfecto del carbono. Fuente: NOAA.</em></p>
+    <p><em>La respiración y la fotosíntesis mantienen el equilibrio global del carbono. Fuente: NOAA.</em></p>
 </div>
+
 HTML
 ,
+
     'ejercicios' => [
         ['enunciado' => 'Escribe la ecuación completa de la respiración aeróbica', 'respuesta' => '\\ce{C6H12O6 + 6O2 -> 6CO2 + 6H2O + 36-38 ATP}'],
         ['enunciado' => 'Lugar exacto de la glicólisis', 'respuesta' => 'Citosol (citoplasma)'],
         ['enunciado' => 'Lugar exacto del ciclo de Krebs', 'respuesta' => 'Matriz mitocondrial'],
-        ['enunciado' => '¿Cuántos ATP produce la cadena transportadora de electrones?', 'respuesta' => 'Aproximadamente 34 ATP (real 28–34)'],
-        ['enunciado' => '¿Cuántos NADH genera el ciclo de Krebs por molécula de glucosa?', 'respuesta' => '8 NADH'],
+        ['enunciado' => '¿Cuántos ATP produce la cadena transportadora de electrones?', 'respuesta' => 'Aproximadamente 34 ATP'],
+        ['enunciado' => '¿Cuántos NADH genera el ciclo de Krebs?', 'respuesta' => '8 NADH por molécula de glucosa'],
         ['enunciado' => '¿Cuántas moléculas de CO₂ se liberan en total?', 'respuesta' => '6 CO₂'],
-        ['enunciado' => 'Relación entre respiración celular y fotosíntesis', 'respuesta' => 'Son procesos inversos: una consume lo que la otra produce'],
-        ['enunciado' => 'Gas que liberan todos los animales al respirar', 'respuesta' => 'CO₂ (dióxido de carbono)'],
-        ['enunciado' => 'Organismos típicos de fermentación alcohólica', 'respuesta' => 'Levaduras (Saccharomyces)'],
-        ['enunciado' => 'Qué genera el gradiente de protones', 'respuesta' => 'Cadena transportadora de electrones'],
-        ['enunciado' => 'Proceso que sintetiza ATP usando el gradiente H⁺', 'respuesta' => 'Quimiósmosis / ATP sintasa'],
-        ['enunciado' => 'Qué ocurre en ausencia total de oxígeno', 'respuesta' => 'Fermentación → solo 2 ATP por glucosa']
+        ['enunciado' => 'Relación entre respiración celular y fotosíntesis', 'respuesta' => 'Son procesos químicos prácticamente inversos'],
+        ['enunciado' => 'Gas que liberan los animales al respirar', 'respuesta' => 'CO₂'],
+        ['enunciado' => 'Organismos que realizan fermentación alcohólica', 'respuesta' => 'Levaduras (Saccharomyces)'],
+        ['enunciado' => 'Qué genera el gradiente de protones', 'respuesta' => 'La cadena transportadora de electrones'],
+        ['enunciado' => 'Proceso que usa el gradiente H⁺ para sintetizar ATP', 'respuesta' => 'ATP sintasa (quimiósmosis)'],
+        ['enunciado' => 'Qué ocurre en ausencia total de oxígeno', 'respuesta' => 'Fermentación — solo 2 ATP por glucosa']
     ],
 
     'quiz' => [
-        ['pregunta' => 'La respiración celular produce principalmente...', 'opciones' => ['Oxígeno', 'ATP', 'Glucosa', 'Luz'], 'correcta' => 'ATP'],
-        ['pregunta' => 'Gas consumido en respiración aeróbica', 'opciones' => ['CO₂', 'O₂', 'N₂', 'H₂'], 'correcta' => 'O₂'],
-        ['pregunta' => 'Órgano donde ocurre la mayor producción de ATP', 'opciones' => ['Núcleo', 'Mitocondria', 'Cloroplasto', 'Ribosoma'], 'correcta' => 'Mitocondria'],
-        ['pregunta' => 'ATP totales por glucosa (aeróbica)', 'opciones' => ['2 ATP', '4 ATP', '36–38 ATP', '100 ATP'], 'correcta' => '36–38 ATP'],
-        ['pregunta' => 'Gas liberado al ambiente por todos los seres vivos', 'opciones' => ['O₂', 'CO₂', 'N₂', 'CH₄'], 'correcta' => 'CO₂'],
-        ['pregunta' => 'Etapa que ocurre en el citosol', 'opciones' => ['Ciclo de Krebs', 'Glicólisis', 'Cadena ETC', 'Fermentación alcohólica'], 'correcta' => 'Glicólisis'],
-        ['pregunta' => 'El ciclo de Krebs produce directamente', 'opciones' => ['34 ATP', '2 ATP', '6 CO₂', 'H₂O'], 'correcta' => '2 ATP'],
-        ['pregunta' => 'Aceptor final de electrones en la cadena ETC', 'opciones' => ['NAD⁺', 'FAD', 'O₂', 'CO₂'], 'correcta' => 'O₂'],
-        ['pregunta' => '¿Cuántos ATP por cada NADH en ETC (valor aceptado actual)?', 'opciones' => ['2 ATP', '2.5 ATP', '3 ATP', '4 ATP'], 'correcta' => '2.5 ATP'],
-        ['pregunta' => '¿Cuántos ATP por cada FADH₂?', 'opciones' => ['1 ATP', '1.5 ATP', '2 ATP', '3 ATP'], 'correcta' => '1.5 ATP'],
-        ['pregunta' => 'Proceso que usa el gradiente de H⁺ para hacer ATP', 'opciones' => ['Glicólisis', 'Quimiósmosis', 'Fermentación', 'Krebs'], 'correcta' => 'Quimiósmosis'],
-        ['pregunta' => 'En ausencia de O₂ las células animales hacen...', 'opciones' => ['Fotosíntesis', 'Fermentación láctica', 'Ciclo de Krebs', 'Nada'], 'correcta' => 'Fermentación láctica'],
-        ['pregunta' => 'Levaduras en anaerobiosis producen...', 'opciones' => ['Ácido láctico', 'Alcohol + CO₂', 'Metano', 'ATP directo'], 'correcta' => 'Alcohol + CO₂'],
-        ['pregunta' => 'La respiración celular es el proceso opuesto a...', 'opciones' => ['Transpiración', 'Fotosíntesis', 'Digestión', 'Replicación'], 'correcta' => 'Fotosíntesis'],
-        ['pregunta' => '¿Dónde se forma el gradiente de protones?', 'opciones' => ['Citosol', 'Matriz mitocondrial', 'Espacio intermembrana', 'Membrana externa'], 'correcta' => 'Espacio intermembrana'],
-        ['pregunta' => 'Toxina que bloquea la cadena ETC', 'opciones' => ['Alcohol', 'Cianuro', 'Glucosa', 'CO₂'], 'correcta' => 'Cianuro'],
-        ['pregunta' => '¿Cuántos CO₂ produce el ciclo de Krebs por glucosa?', 'opciones' => ['2', '4', '6', '8'], 'correcta' => '6'],
-        ['pregunta' => 'Complejo I de la cadena ETC también se llama...', 'opciones' => ['ATP sintasa', 'NADH deshidrogenasa', 'Citocromo c', 'Complex IV'], 'correcta' => 'NADH deshidrogenasa'],
-        ['pregunta' => 'Células cancerosas prefieren (efecto Warburg)...', 'opciones' => ['Respiración aeróbica', 'Fermentación láctica aunque haya O₂', 'Fotosíntesis', 'Ninguna'], 'correcta' => 'Fermentación láctica aunque haya O₂'],
-        ['pregunta' => 'Eficiencia energética real de la respiración aeróbica', 'opciones' => ['~10%', '~30%', '~70%', '~90%'], 'correcta' => '~30%'],
-        ['pregunta' => '¿Cuántos NADH produce la glicólisis?', 'opciones' => ['0', '2', '8', '10'], 'correcta' => '2'],
-        ['pregunta' => '¿Qué molécula entra al ciclo de Krebs?', 'opciones' => ['Glucosa', 'Piruvato', 'Acetil-CoA', 'Citrat'], 'correcta' => 'Acetil-CoA'],
-        ['pregunta' => 'El ATP sintasa funciona como una...', 'opciones' => ['Bomba', 'Turbina molecular', 'Canal iónico', 'Receptor'], 'correcta' => 'Turbina molecular'],
-        ['pregunta' => '¿Cuántos protones bombea el complejo I por NADH?', 'opciones' => ['2', '4', '6', '10'], 'correcta' => '4'],
-        ['pregunta' => '¿Qué se oxida en la cadena ETC?', 'opciones' => ['O₂', 'NADH y FADH₂', 'ATP', 'Glucosa'], 'correcta' => 'NADH y FADH₂'],
-        ['pregunta' => '¿Qué se reduce al final de la cadena?', 'opciones' => ['NAD⁺', 'O₂ → H₂O', 'CO₂', 'Piruvato'], 'correcta' => 'O₂ → H₂O'],
-        ['pregunta' => '¿Qué proceso NO ocurre en mitocondria?', 'opciones' => ['Krebs', 'ETC', 'Glicólisis', 'Quimiósmosis'], 'correcta' => 'Glicólisis'],
-        ['pregunta' => '¿Qué mide ΔG en la ecuación global?', 'opciones' => ['Calor', 'Energía libre', 'Entropía', 'Volumen'], 'correcta' => 'Energía libre'],
-        ['pregunta' => '¿Cuántos kg de CO₂ produce un humano al año aproximadamente?', 'opciones' => ['50 kg', '150 kg', '300 kg', '1 tonelada'], 'correcta' => '150 kg'],
-        ['pregunta' => 'La respiración celular es esencial para...', 'opciones' => ['Solo animales', 'Solo plantas', 'Todos los seres vivos', 'Solo bacterias'], 'correcta' => 'Todos los seres vivos']
+        ['pregunta' => 'La respiración celular produce principalmente…', 'opciones' => ['Oxígeno', 'ATP', 'Glucosa', 'Luz'], 'correcta' => 'ATP'],
+        ['pregunta' => 'Gas consumido en respiración aeróbica', 'opciones' => ['CO₂', 'O₂', 'N₂', 'CH₄'], 'correcta' => 'O₂'],
+        ['pregunta' => 'Organelo con mayor producción de ATP', 'opciones' => ['Núcleo', 'Cloroplasto', 'Mitocondria', 'Ribosoma'], 'correcta' => 'Mitocondria'],
+        ['pregunta' => 'ATP totales en respiración aeróbica', 'opciones' => ['2 ATP', '4 ATP', '36–38 ATP', '80 ATP'], 'correcta' => '36–38 ATP'],
+        ['pregunta' => 'Gas liberado al ambiente por seres vivos', 'opciones' => ['O₂', 'CO₂', 'N₂', 'Ar'], 'correcta' => 'CO₂'],
+        ['pregunta' => 'Etapa que ocurre en el citosol', 'opciones' => ['Krebs', 'ETC', 'Glicólisis', 'Fermentación'], 'correcta' => 'Glicólisis'],
+        ['pregunta' => 'El ciclo de Krebs produce directamente…', 'opciones' => ['2 ATP', '34 ATP', 'O₂', 'H₂O'], 'correcta' => '2 ATP'],
+        ['pregunta' => 'Aceptor final de electrones en ETC', 'opciones' => ['NAD⁺', 'FAD', 'O₂', 'CO₂'], 'correcta' => 'O₂'],
+        ['pregunta' => 'ATP por cada NADH en la ETC', 'opciones' => ['2', '2.5', '3', '4'], 'correcta' => '2.5'],
+        ['pregunta' => 'ATP por cada FADH₂', 'opciones' => ['1', '1.5', '2', '3'], 'correcta' => '1.5'],
+        ['pregunta' => 'Proceso que usa gradiente H⁺', 'opciones' => ['Fotosíntesis', 'Quimiósmosis', 'Replicación', 'Glucólisis'], 'correcta' => 'Quimiósmosis'],
+        ['pregunta' => 'En ausencia de O₂, las células musculares realizan…', 'opciones' => ['Fotosíntesis', 'Fermentación láctica', 'Krebs', 'ETC'], 'correcta' => 'Fermentación láctica'],
+        ['pregunta' => 'Las levaduras producen…', 'opciones' => ['Ácido láctico', 'Alcohol + CO₂', 'ATP extra', 'NADH'], 'correcta' => 'Alcohol + CO₂'],
+        ['pregunta' => 'Proceso opuesto a la respiración celular', 'opciones' => ['Digestión', 'Fotosíntesis', 'Transpiración', 'Mitosis'], 'correcta' => 'Fotosíntesis'],
+        ['pregunta' => 'El gradiente de H⁺ se forma en…', 'opciones' => ['Citosol', 'Espacio intermembrana', 'Núcleo', 'Cloroplasto'], 'correcta' => 'Espacio intermembrana'],
+        ['pregunta' => 'Toxina que bloquea la ETC', 'opciones' => ['Cianuro', 'Alcohol', 'CO₂', 'Agua'], 'correcta' => 'Cianuro'],
+        ['pregunta' => 'CO₂ total del ciclo de Krebs por glucosa', 'opciones' => ['2', '4', '6', '8'], 'correcta' => '6'],
+        ['pregunta' => 'Complejo I se llama…', 'opciones' => ['Citocromo c', 'NADH deshidrogenasa', 'ATP sintasa', 'Fumarasa'], 'correcta' => 'NADH deshidrogenasa'],
+        ['pregunta' => 'Efecto Warburg', 'opciones' => ['Fotosíntesis en animales', 'Fermentación con O₂ presente', 'Respiración hiperactiva', 'Quimiósmosis duplicada'], 'correcta' => 'Fermentación con O₂ presente'],
+        ['pregunta' => 'Eficiencia energética real', 'opciones' => ['~10%', '~30%', '~70%', '~90%'], 'correcta' => '~30%'],
+        ['pregunta' => 'NADH producido en glicólisis', 'opciones' => ['0', '1', '2', '4'], 'correcta' => '2'],
+        ['pregunta' => 'Molécula que entra a Krebs', 'opciones' => ['Glucosa', 'Piruvato', 'Acetil-CoA', 'Citrat'], 'correcta' => 'Acetil-CoA'],
+        ['pregunta' => 'La ATP sintasa funciona como…', 'opciones' => ['Bomba', 'Turbina molecular', 'Canal', 'Receptor'], 'correcta' => 'Turbina molecular'],
+        ['pregunta' => 'Protones bombeados por Complejo I', 'opciones' => ['2', '4', '6', '10'], 'correcta' => '4'],
+        ['pregunta' => 'Moléculas que se oxidan en ETC', 'opciones' => ['ATP', 'CO₂', 'NADH y FADH₂', 'O₂'], 'correcta' => 'NADH y FADH₂'],
+        ['pregunta' => 'Producto final reducido en ETC', 'opciones' => ['CO₂', 'O₂ → H₂O', 'Piruvato', 'NAD⁺'], 'correcta' => 'O₂ → H₂O'],
+        ['pregunta' => 'Proceso que NO ocurre en mitocondria', 'opciones' => ['Krebs', 'ETC', 'Glicólisis', 'Quimiósmosis'], 'correcta' => 'Glicólisis'],
+        ['pregunta' => 'ΔG mide…', 'opciones' => ['Calor', 'Energía libre', 'Entropía', 'Masa'], 'correcta' => 'Energía libre'],
+        ['pregunta' => 'CO₂ producido al año por un humano promedio', 'opciones' => ['50 kg', '150 kg', '300 kg', '1 tonelada'], 'correcta' => '150 kg'],
+        ['pregunta' => 'La respiración celular es esencial para…', 'opciones' => ['Solo animales', 'Solo plantas', 'Todos los seres vivos', 'Solo bacterias'], 'correcta' => 'Todos los seres vivos']
     ]
 ];
-/**
- * MATERIA: ECOSISTEMAS
- * TEMA: Componentes del Sistema Climático – El gran sistema que lo mueve todo
- * ESTILO: Cyberpunk-neón total, SVG animado brutal, ecuaciones perfectas, 30 quiz profesionales
- */
-
 $lecciones[] = [
     'materia' => 'Ecosistemas',
     'slug'    => 'componentes-sistema-climatico',
     'titulo'  => 'Componentes del Sistema Climático: El Mega-Sistema que Controla el Planeta',
 
     'contenido' => <<<'HTML'
-<h3 class="text-center display-4">Los 5 Componentes del Sistema Climático</h3>
-<p class="fs-5">El clima no es solo “el tiempo”. Es un <strong>sistema complejo</strong> donde <strong>energía, materia y momentum</strong> fluyen entre cinco grandes esferas. Todo está conectado.</p>
+<h3 class="text-center display-4 neon-title">Los 5 Componentes del Sistema Climático</h3>
+<p class="fs-5">
+    El clima terrestre no es un fenómeno aislado: es un <strong>súper-sistema complejo</strong> donde energía, agua, gases, hielo, roca y vida interactúan de manera continua. 
+    Las cinco esferas —atmósfera, hidrosfera, criosfera, litosfera y biosfera— forman la maquinaria que 
+    <strong>regula la temperatura, los vientos, las lluvias, el nivel del mar y todas las condiciones que hacen posible la vida.</strong>
+</p>
 
-<!-- SVG ANIMADO ESPECTACULAR DEL SISTEMA CLIMÁTICO -->
+<!-- SVG REFORZADO: SISTEMA CLIMÁTICO CYBERPUNK -->
 <div class="svg-diagram">
     <svg viewBox="0 0 1000 720" xmlns="http://www.w3.org/2000/svg" aria-labelledby="svg-title svg-desc">
-        <title id="svg-title">Sistema Climático Completo – Cyberpunk Edition</title>
-        <desc id="svg-desc">Los 5 componentes y sus interacciones con efectos neón y animaciones.</desc>
-        <rect width="1000" height="720" fill="#000"/>
+        <title id="svg-title">Sistema Climático Completo – Cyberpunk Ultra Edition</title>
+        <desc id="svg-desc">Representación visual del sistema climático global, con interacciones energéticas entre atmósfera, hidrosfera, criosfera, litosfera y biosfera.</desc>
 
+        <!-- FONDO -->
+        <rect width="1000" height="720" fill="#000" />
+
+        <!-- DEFINICIONES DE EFECTOS -->
         <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="10" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
+            <!-- Glow cian -->
+            <filter id="glow">
+                <feGaussianBlur stdDeviation="10" result="blur"/>
+                <feFlood flood-color="#00ffff"/>
+                <feComposite in2="blur" operator="in"/>
                 <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
-            <filter id="glow-magenta"><feGaussianBlur stdDeviation="12" result="blur"/>
-                <feFlood flood-color="#ff00ff"/><feComposite in2="blur" operator="in"/>
+
+            <!-- Glow magenta -->
+            <filter id="glow-magenta">
+                <feGaussianBlur stdDeviation="12" result="blur"/>
+                <feFlood flood-color="#ff00ff"/>
+                <feComposite in2="blur" operator="in"/>
                 <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
+
+            <!-- Flechas -->
             <marker id="arrow" markerWidth="16" markerHeight="16" refX="14" refY="8" orient="auto">
                 <path d="M0,0 L14,8 L0,16 Z" fill="#00ffff"/>
             </marker>
         </defs>
 
-        <!-- Título épico -->
+        <!-- TÍTULO -->
         <text x="500" y="70" fill="#ff00ff" font-size="56" font-weight="bold" text-anchor="middle" filter="url(#glow-magenta)">
             SISTEMA CLIMÁTICO TERRESTRE
         </text>
 
-        <!-- 1. ATMÓSFERA -->
-        <rect x="400" y="100" width="200" height="110" rx="30" fill="#1e90ff" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <text x="500" y="150" fill="#fff" font-size="32" font-weight="bold" text-anchor="middle" filter="url(#glow)">ATMÓSFERA</text>
-        <text x="500" y="190" fill="#00ffff" font-size="20" text-anchor="middle">78% N₂ │ 21% O₂ │ 0.04% CO₂</text>
+        <!-- ATMÓSFERA -->
+        <rect x="400" y="100" width="200" height="110" rx="30"
+              fill="#1e90ff" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <text x="500" y="150" fill="#ffffff" font-size="32" font-weight="bold" 
+              text-anchor="middle" filter="url(#glow)">ATMÓSFERA</text>
+        <text x="500" y="190" fill="#00ffff" font-size="20" text-anchor="middle">
+            78% N₂ │ 21% O₂ │ 0.04% CO₂
+        </text>
 
-        <!-- 2. HIDROSFERA -->
-        <rect x="100" y="280" width="200" height="110" rx="30" fill="#0066cc" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <text x="200" y="330" fill="#fff" font-size="32" font-weight="bold" text-anchor="middle">HIDROSFERA</text>
-        <text x="200" y="370" fill="#00ffff" font-size="20" text-anchor="middle">1.386×10⁹ km³</text>
+        <!-- HIDROSFERA -->
+        <rect x="100" y="280" width="200" height="110" rx="30"
+              fill="#0066cc" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <text x="200" y="330" fill="#ffffff" font-size="32" font-weight="bold" text-anchor="middle">
+            HIDROSFERA
+        </text>
+        <text x="200" y="370" fill="#00ffff" font-size="20" text-anchor="middle">
+            1.386×10⁹ km³
+        </text>
 
-        <!-- 3. CRIOSFERA -->
-        <rect x="700" y="280" width="200" height="110" rx="30" fill="#e0f7fa" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <text x="800" y="330" fill="#000" font-size="32" font-weight="bold" text-anchor="middle">CRIOSFERA</text>
-        <text x="800" y="370" fill="#00ffff" font-size="20" text-anchor="middle">Albedo ≈ 0.8</text>
+        <!-- CRIOSFERA -->
+        <rect x="700" y="280" width="200" height="110" rx="30"
+              fill="#e0f7fa" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <text x="800" y="330" fill="#000" font-size="32" font-weight="bold" text-anchor="middle">
+            CRIOSFERA
+        </text>
+        <text x="800" y="370" fill="#00ffff" font-size="20" text-anchor="middle">
+            Albedo ≈ 0.8
+        </text>
 
-        <!-- 4. LITOSFERA -->
-        <rect x="200" y="500" width="200" height="110" rx="30" fill="#8B4513" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <text x="300" y="550" fill="#fff" font-size="32" font-weight="bold" text-anchor="middle">LITOSFERA</text>
-        <text x="300" y="590" fill="#00ffff" font-size="20" text-anchor="middle">10⁶ GtC</text>
+        <!-- LITOSFERA -->
+        <rect x="200" y="500" width="200" height="110" rx="30"
+              fill="#8B4513" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <text x="300" y="550" fill="#ffffff" font-size="32" font-weight="bold" text-anchor="middle">
+            LITOSFERA
+        </text>
+        <text x="300" y="590" fill="#00ffff" font-size="20" text-anchor="middle">
+            10⁶ GtC
+        </text>
 
-        <!-- 5. BIOSFERA -->
-        <rect x="600" y="500" width="200" height="110" rx="30" fill="#228B22" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <text x="700" y="550" fill="#fff" font-size="32" font-weight="bold" text-anchor="middle">BIOSFERA</text>
-        <text x="700" y="590" fill="#00ffff" font-size="20" text-anchor="middle">550 GtC</text>
+        <!-- BIOSFERA -->
+        <rect x="600" y="500" width="200" height="110" rx="30"
+              fill="#228B22" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <text x="700" y="550" fill="#ffffff" font-size="32" font-weight="bold" text-anchor="middle">
+            BIOSFERA
+        </text>
+        <text x="700" y="590" fill="#00ffff" font-size="20" text-anchor="middle">
+            550 GtC
+        </text>
 
-        <!-- Flechas animadas de interacción -->
-        <path d="M500 210 L500 270" stroke="#00ffff" stroke-width="6" marker-end="url(#arrow)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="50" to="0" dur="4s" repeatCount="indefinite"/>
+        <!-- Flechas de interacción -->
+        <path d="M500 210 L500 270" stroke="#00ffff" stroke-width="6"
+              marker-end="url(#arrow)" filter="url(#glow)">
+            <animate attributeName="stroke-dashoffset" from="60" to="0" dur="4s" repeatCount="indefinite"/>
         </path>
-        <path d="M300 390 L400 490" stroke="#00ffff" stroke-width="6" marker-end="url(#arrow)" filter="url(#glow)"/>
-        <path d="M800 390 L700 490" stroke="#00ffff" stroke-width="6" marker-end="url(#arrow nanoflashing"/>
-        <path d="M200 390 L300 500" stroke="#00ffff" stroke-width="6" marker-end="url(#arrow)" filter="url(#glow)"/>
-        <path d="M800 390 L700 500" stroke="#00ffff" stroke-width="6" marker-end="url(#arrow)" filter="url(#glow)"/>
 
-        <!-- Leyenda final -->
+        <path d="M300 390 L400 490" stroke="#00ffff" stroke-width="6"
+              marker-end="url(#arrow)" filter="url(#glow)"/>
+
+        <path d="M800 390 L700 500" stroke="#00ffff" stroke-width="6"
+              marker-end="url(#arrow)" filter="url(#glow)" />
+
+        <path d="M200 390 L300 500" stroke="#00ffff" stroke-width="6"
+              marker-end="url(#arrow)" filter="url(#glow)" />
+
+        <path d="M800 390 L700 500" stroke="#00ffff" stroke-width="6"
+              marker-end="url(#arrow)" filter="url(#glow)" />
+
+        <!-- Mensaje final -->
         <text x="500" y="680" fill="#00ffff" font-size="30" text-anchor="middle" filter="url(#glow)">
             Todo está conectado. Todo afecta a todo.
         </text>
     </svg>
-    <div class="caption">Interacciones dinámicas entre los 5 componentes del sistema climático. Estilo cyberpunk-neón 2025.</ EAST>
+
+    <div class="caption">
+        Interacciones dinámicas entre los 5 componentes del sistema climático. Edición cyberpunk-neón profesional.
+    </div>
 </div>
 
-<h4>1. Atmósfera – El escudo gaseoso</h4>
-<p>78 % N₂ │ 21 % O₂ │ 0.04 % CO₂ + vapor de agua</p>
-<div class="eq">$$ S(1 - \alpha) = \sigma T^{4} $$</div>
-<p class="text-center mt-3"><em>Balance energético planetario (ecuación de cuerpo negro)</em></p>
+<h4>1. Atmósfera – El escudo gaseoso del planeta</h4>
+<p>
+    Mezcla dinámica de gases que regula la temperatura, distribuye energía solar, genera vientos, transporta humedad y 
+    protege de radiación dañina. Su física se gobierna por el balance energético:
+</p>
+
+<div class="eq text-center">
+    $$ S(1 - \alpha) = \sigma T^{4} $$
+</div>
+<p class="text-center"><em>Ecuación fundamental del balance radiativo terrestre.</em></p>
 
 <h4>2. Hidrosfera – El gran regulador térmico</h4>
-<p>Volumen: <strong>1.386 × 10⁹ km³</strong> │ Capacidad calorífica: <strong>4186 J/kg·K</strong></p>
-<div class="ejemplo">El Niño/La Niña → alteran el clima global cada pocos años.</div>
+<p>
+    Los océanos almacenan más calor que toda la atmósfera gracias a su enorme capacidad calorífica
+    (<strong>4186 J/kg·K</strong>). Controlan lluvias, huracanes y oscilaciones climáticas como El Niño–La Niña.
+</p>
 
-<h4>3. Criosfera – El espejo del planeta</h4>
-<p>Albedo ≈ <strong>0.8</strong> → refleja 80 % de la radiación solar</p>
-<div class="ejemplo">Si se derrite Groenlandia → +7 metros al nivel del mar.</div>
+<h4>3. Criosfera – El espejo climatológico</h4>
+<p>
+    El hielo refleja hasta <strong>80% de la radiación solar</strong>, modulando la temperatura global. 
+    El derretimiento reduce el albedo → el planeta absorbe más energía → calentamiento acelerado.
+</p>
 
-<h4>4. Litosfera – El almacén de carbono eterno</h4>
-<p>Almacena <strong>~1 000 000 GtC</strong> en rocas y suelos</p>
+<h4>4. Litosfera – El archivo y almacén de carbono</h4>
+<p>
+    Contiene el mayor depósito de carbono del planeta (~1 000 000 GtC). Controla procesos geológicos, volcanismo 
+    y ciclos biogeoquímicos esenciales.
+</p>
 
-<h4>5. Biosfera – El pulmón vivo</h4>
-<p>Biomasa ≈ <strong>550 GtC</strong> │ Amazonía absorbe ~2 GtC/año</p>
+<h4>5. Biosfera – La red viva del planeta</h4>
+<p>
+    Organismos terrestres y marinos que absorben CO₂, liberan O₂, regulan nutrientes y modulan el clima global. 
+    Biomasa aproximada: <strong>550 GtC</strong>.
+</p>
 
 <h4 class="text-center mt-5">Interacciones Clave</h4>
+
 <table class="table text-center">
-    <thead><tr><th>Interacción</th><th>Efecto principal</th><th>Ejemplo real</th></tr></thead>
+    <thead>
+        <tr><th>Interacción</th><th>Efecto principal</th><th>Ejemplo real</th></tr>
+    </thead>
     <tbody>
-        <tr><td>Atmósfera ↔ Hidrosfera</td><td>Evaporación, huracanes</td><td>El Niño</td></tr>
+        <tr><td>Atmósfera ↔ Hidrosfera</td><td>Evaporación, tormentas</td><td>El Niño</td></tr>
         <tr><td>Hidrosfera ↔ Criosfera</td><td>Derretimiento</td><td>Subida del nivel del mar</td></tr>
-        <tr><td>Biosfera ↔ Atmósfera</td><td>CO₂ ⇆ O₂</td><td>Fotosíntesis/Respiración</td></tr>
+        <tr><td>Biosfera ↔ Atmósfera</td><td>CO₂ ⇆ O₂</td><td>Fotosíntesis / Respiración</td></tr>
         <tr><td>Litosfera ↔ Biosfera</td><td>Nutrientes</td><td>Suelos fértiles</td></tr>
         <tr><td>Criosfera ↔ Atmósfera</td><td>Feedback albedo-hielo</td><td>Amplificación ártica</td></tr>
     </tbody>
@@ -1391,6 +2027,7 @@ $lecciones[] = [
 </div>
 HTML
 ,
+
     'ejercicios' => [
         ['enunciado' => 'Nombra los 5 componentes del sistema climático', 'respuesta' => 'Atmósfera, Hidrosfera, Criosfera, Litosfera, Biosfera'],
         ['enunciado' => '¿Qué componente tiene el mayor volumen de agua?', 'respuesta' => 'Hidrosfera (océanos)'],
@@ -1401,9 +2038,9 @@ HTML
         ['enunciado' => '¿Cuánto carbono almacena aproximadamente la biosfera?', 'respuesta' => '550 GtC'],
         ['enunciado' => '¿Qué componente libera CO₂ en erupciones volcánicas?', 'respuesta' => 'Litosfera'],
         ['enunciado' => '¿Qué fenómeno altera el clima global cada 2-7 años?', 'respuesta' => 'El Niño / La Niña (hidrosfera-atmósfera)'],
-        ['enunciado' => '¿Qué pasa si desaparece la criosfera?', 'respuesta' => 'Sube el nivel del mar, se pierde albedo → más calentamiento'],
+        ['enunciado' => '¿Qué pasa si desaparece la criosfera?', 'respuesta' => 'Sube el nivel del mar y aumenta el calentamiento global'],
         ['enunciado' => 'Escribe la ecuación del balance energético terrestre', 'respuesta' => 'S(1 - α) = σT⁴'],
-        ['enunciado' => '¿Qué es un "sumidero de carbono"?', 'respuesta' => 'Sistema que absorbe más CO₂ del que libera (océanos, bosques, suelos)']
+        ['enunciado' => '¿Qué es un "sumidero de carbono"?', 'respuesta' => 'Sistema que absorbe más CO₂ del que libera']
     ],
 
     'quiz' => [
@@ -1412,31 +2049,30 @@ HTML
         ['pregunta' => '¿Qué componente tiene el albedo más alto?', 'opciones' => ['Océano', 'Bosque', 'Hielo', 'Desierto'], 'correcta' => 'Hielo'],
         ['pregunta' => 'Gas más abundante en la atmósfera', 'opciones' => ['Oxígeno', 'Nitrógeno', 'CO₂', 'Argón'], 'correcta' => 'Nitrógeno'],
         ['pregunta' => '¿Qué almacena más carbono a largo plazo?', 'opciones' => ['Atmósfera', 'Océanos', 'Litosfera', 'Biosfera'], 'correcta' => 'Litosfera'],
-        ['pregunta' => 'Feedback hielo-albedo es...', 'opciones' => ['Negativo (estabiliza)', 'Positivo (amplifica)', 'Neutro', 'Cíclico'], 'correcta' => 'Positivo (amplifica)'],
+        ['pregunta' => 'Feedback hielo-albedo es...', 'opciones' => ['Negativo', 'Positivo', 'Neutro', 'Cíclico'], 'correcta' => 'Positivo'],
         ['pregunta' => 'Albedo aproximado del hielo', 'opciones' => ['0.1', '0.3', '0.6', '0.8'], 'correcta' => '0.8'],
         ['pregunta' => 'Volumen total de la hidrosfera', 'opciones' => ['10⁶ km³', '10⁹ km³', '10¹² km³', '10¹⁵ km³'], 'correcta' => '10⁹ km³'],
         ['pregunta' => '¿Qué libera metano al derretirse?', 'opciones' => ['Océanos', 'Permafrost', 'Bosques', 'Volcanes'], 'correcta' => 'Permafrost'],
-        ['pregunta' => 'Ecuación del balance energético terrestre', 'opciones' => ['S = σT⁴', 'S(1-α) = σT⁴', 'S = cT', 'P = ρgh'], 'correcta' => 'S(1-α) = σT⁴'],
-        ['pregunta' => 'Capacidad calorífica específica del agua líquida', 'opciones' => ['1000 J/kg·K', '4186 J/kg·K', '2100 J/kg·K', '500 J/kg·K'], 'correcta' => '4186 J/kg·K'],
-        ['pregunta' => '¿Qué fenómeno es una interacción hidrosfera-atmósfera?', 'opciones' => ['Terremoto', 'El Niño', 'Erupción volcánica', 'Floración algal'], 'correcta' => 'El Niño'],
-        ['pregunta' => 'Si Groenlandia se derrite por completo, el nivel del mar sube...', 'opciones' => ['+1 m', '+3 m', '+7 m', '+20 m'], 'correcta' => '+7 m'],
-        ['pregunta' => '¿Qué componente almacena ~550 GtC?', 'opciones' => ['Atmósfera', 'Hidrosfera', 'Litosfera', 'Biosfera'], 'correcta' => 'Biosfera'],
-        ['pregunta' => '¿Qué es la circulación termohalina?', 'opciones' => ['Corriente superficial', 'Cinta transportadora oceánica', 'Viento', 'Evaporación'], 'correcta' => 'Cinta transportadora oceánica'],
-        ['pregunta' => '¿Qué es un "tipping point" climático?', 'opciones' => ['Punto máximo de calor', 'Punto de no retorno', 'Equilibrio estable', 'Ciclo normal'], 'correcta' => 'Punto de no retorno'],
-        ['pregunta' => 'GtC significa...', 'opciones' => ['Gigatones de CO₂', 'Gigatones de carbono', 'Grados Celsius', 'Gases totales'], 'correcta' => 'Gigatones de carbono'],
-        ['pregunta' => 'AMOC es la sigla de...', 'opciones' => ['Atlantic Meridional Overturning Circulation', 'Arctic Methane Ocean Cycle', 'Atmospheric Methane Observation Center', 'Antarctic Melting Observation Center'], 'correcta' => 'Atlantic Meridional Overturning Circulation'],
-        ['pregunta' => '¿Qué componente libera CO₂ naturalmente en grandes cantidades?', 'opciones' => ['Biosfera', 'Hidrosfera', 'Litosfera (volcanes)', 'Criosfera'], 'correcta' => 'Litosfera (volcanes)'],
-        ['pregunta' => '¿Qué es la amplificación ártica?', 'opciones' => ['El Ártico se enfría más', 'El Ártico se calienta más rápido', 'El ecuador se calienta más', 'No hay diferencia'], 'correcta' => 'El Ártico se calienta más rápido'],
-        ['pregunta' => '¿Qué porcentaje de la superficie terrestre cubre la criosfera actualmente?', 'opciones' => ['~1%', '~10%', '~30%', '~50%'], 'correcta' => '~10%'],
-        ['pregunta' => '¿Qué porcentaje del agua dulce está en glaciares y casquetes?', 'opciones' => ['~10%', '~30%', '~70%', '~90%'], 'correcta' => '~70%'],
-        ['pregunta' => '¿Qué componente regula el clima a corto plazo?', 'opciones' => ['Litosfera', 'Criosfera', 'Hidrosfera + Atmósfera', 'Biosfera'], 'correcta' => 'Hidrosfera + Atmósfera'],
-        ['pregunta' => '¿Qué gas de efecto invernadero libera el permafrost al derretirse?', 'opciones' => ['CO₂', 'Metano (CH₄)', 'Óxido nitroso', 'Vapor de agua'], 'correcta' => 'Metano (CH₄)'],
-        ['pregunta' => '¿Quién propuso los 5 componentes del sistema climático?', 'opciones' => ['IPCC', 'NASA', 'NOAA', 'Todos los anteriores'], 'correcta' => 'Todos los anteriores'],
-        ['pregunta' => '¿Qué interacción produce huracanes?', 'opciones' => ['Criosfera-Litosfera', 'Atmósfera-Hidrosfera', 'Biosfera-Litosfera', 'Hidrosfera-Criosfera'], 'correcta' => 'Atmósfera-Hidrosfera'],
-        ['pregunta' => '¿Qué almacena más calor a largo plazo?', 'opciones' => ['Atmósfera', 'Océanos', 'Suelos', 'Hielo'], 'correcta' => 'Océanos'],
-        ['pregunta' => '¿Qué es el "pulso de calor oceánico"?', 'opciones' => ['Aumento de temperatura del agua', 'Corriente rápida', 'Evaporación', 'Salinidad'], 'correcta' => 'Aumento de temperatura del agua'],
-        ['pregunta' => '¿Qué feedback es negativo?', 'opciones' => ['Hielo-albedo', 'Vapor de agua', 'Nubes bajas', 'Metano permafrost'], 'correcta' => 'Nubes bajas'],
-        ['pregunta' => 'El sistema climático es...', 'opciones' => ['Lineal', 'Caótico', 'Complejo y no lineal', 'Predecible al 100%'], 'correcta' => 'Complejo y no lineal']
+        ['pregunta' => 'Ecuación del balance energético terrestre', 'opciones' => ['S(1-α) = σT⁴', 'S = cT', 'P = ρgh', 'σT⁴ = α'], 'correcta' => 'S(1-α) = σT⁴'],
+        ['pregunta' => 'Capacidad calorífica del agua', 'opciones' => ['1000', '4186', '200', '900'], 'correcta' => '4186'],
+        ['pregunta' => 'Fenómeno hidrosfera-atmósfera', 'opciones' => ['El Niño', 'Terremotos', 'Dunas', 'Magnetismo'], 'correcta' => 'El Niño'],
+        ['pregunta' => 'Si Groenlandia se derrite, el nivel del mar sube...', 'opciones' => ['+1 m', '+3 m', '+7 m', '+20 m'], 'correcta' => '+7 m'],
+        ['pregunta' => 'Componente que almacena 550 GtC', 'opciones' => ['Atmósfera', 'Hidrosfera', 'Criosfera', 'Biosfera'], 'correcta' => 'Biosfera'],
+        ['pregunta' => 'Circulación termohalina es...', 'opciones' => ['Corriente atmosférica', 'Cinta oceánica global', 'Pluma volcánica', 'Viento polar'], 'correcta' => 'Cinta oceánica global'],
+        ['pregunta' => 'Un tipping point es...', 'opciones' => ['Un equilibrio', 'Punto de no retorno', 'Un enfriamiento', 'Un frente frío'], 'correcta' => 'Punto de no retorno'],
+        ['pregunta' => 'GtC significa...', 'opciones' => ['Gigatoneladas de carbono', 'Gradiente térmico', 'Gas total', 'Geotermia'], 'correcta' => 'Gigatoneladas de carbono'],
+        ['pregunta' => 'AMOC significa...', 'opciones' => ['Atlantic Meridional Overturning Circulation', 'Arctic Methane Ocean Cycle', 'Atmospheric Mixing Oscillation Current', 'Ninguna'], 'correcta' => 'Atlantic Meridional Overturning Circulation'],
+        ['pregunta' => 'Volcanes liberan...', 'opciones' => ['O₂', 'CO₂', 'N₂', 'H₂'], 'correcta' => 'CO₂'],
+        ['pregunta' => 'Amplificación ártica significa...', 'opciones' => ['El Ártico se enfría', 'El Ártico se calienta más rápido', 'No cambia', 'Oscila'], 'correcta' => 'El Ártico se calienta más rápido'],
+        ['pregunta' => '¿Cuánta agua dulce está en glaciares?', 'opciones' => ['~10%', '~30%', '~70%', '~90%'], 'correcta' => '~70%'],
+        ['pregunta' => 'Regulador climático de corto plazo', 'opciones' => ['Litosfera', 'Criosfera', 'Atmósfera + Hidrosfera', 'Biosfera'], 'correcta' => 'Atmósfera + Hidrosfera'],
+        ['pregunta' => 'Gas liberado por permafrost', 'opciones' => ['CO₂', 'CH₄', 'N₂O', 'He'], 'correcta' => 'CH₄'],
+        ['pregunta' => '¿Quién reconoce los 5 componentes?', 'opciones' => ['IPCC', 'NASA', 'NOAA', 'Todos'], 'correcta' => 'Todos'],
+        ['pregunta' => '¿Qué interacción causa huracanes?', 'opciones' => ['Criosfera-Litosfera', 'Atmósfera-Hidrosfera', 'Biosfera-Litosfera', 'Litosfera-Criosfera'], 'correcta' => 'Atmósfera-Hidrosfera'],
+        ['pregunta' => '¿Qué almacena más calor?', 'opciones' => ['Atmósfera', 'Océanos', 'Hielos', 'Suelos'], 'correcta' => 'Océanos'],
+        ['pregunta' => 'Pulso de calor oceánico es...', 'opciones' => ['Aumento de temperatura', 'Oleaje', 'Evaporación', 'Salinidad'], 'correcta' => 'Aumento de temperatura'],
+        ['pregunta' => 'Feedback negativo típico', 'opciones' => ['Hielo-albedo', 'Vapor de agua', 'Metano permafrost', 'Nubes bajas'], 'correcta' => 'Nubes bajas'],
+        ['pregunta' => 'El sistema climático es...', 'opciones' => ['Lineal', 'Caótico', 'Complejo no lineal', 'Perfectamente predecible'], 'correcta' => 'Complejo no lineal']
     ]
 ];
 /**
