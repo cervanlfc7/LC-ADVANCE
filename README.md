@@ -112,3 +112,9 @@ Referencias rápidas
 - Scripts cliente: [`assets/js/app.js`](assets/js/app.js)
 - Estilos: [`assets/css/style.css`](assets/css/style.css)
 - Esquema DB: [`sql/schema.sql`](sql/schema.sql)
+
+Novedades
+---------
+- Acceso invitado: ahora puedes entrar como invitado desde la landing (botón "Entrar como invitado"). 
+  - Modo invitado: lectura y pruebas locales permitidas; NO se guarda progreso ni puntos.
+  - Archivos relevantes: [guest_login.php](guest_login.php), [src/funciones.php](src/funciones.php), [leccion_detalle.php](leccion_detalle.php).

@@ -12,24 +12,32 @@ require_once 'config/config.php';
 // Asegúrate de que 'src/content.php' exista y contenga el array $lecciones
 require_once 'src/content.php'; 
 
-if (!isset($_SESSION['usuario_id'])) {
-    // Si no hay sesión, redirige al login
+// Reemplaza la restricción estricta por permitir modo invitado
+if (!isset($_SESSION['usuario_id']) && empty($_SESSION['usuario_es_invitado'])) {
     header('Location: login.php');
     exit;
 }
 
-$user_id = (int)$_SESSION['usuario_id'];
+// Cargar usuario real o construir usuario invitado
+if (!empty($_SESSION['usuario_es_invitado'])) {
+    $usuario = [
+        'id' => 0,
+        'nombre_usuario' => $_SESSION['usuario_nombre'] ?? 'Invitado',
+        'puntos' => $_SESSION['usuario_puntos'] ?? 0,
+        'nivel' => $_SESSION['usuario_nivel'] ?? 1,
+        'avatar' => 'default.png'
+    ];
+} else {
+    $user_id = (int)$_SESSION['usuario_id'];
+    $stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// === USUARIO ===
-$stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
-$stmt->execute([$user_id]);
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$usuario) {
-    // Si el usuario no existe (error grave), destruye la sesión y redirige
-    session_destroy();
-    header('Location: login.php');
-    exit;
+    if (!$usuario) {
+        session_destroy();
+        header('Location: login.php');
+        exit;
+    }
 }
 
 // === LÓGICA DE PROGRESO ===
@@ -61,14 +69,22 @@ foreach ($lecciones as $leccion) {
 
 // === PROGRESO DEL JUGADOR (Lecciones Completadas) ===
 $completadas = [];
-$stmt = $pdo->prepare("
-    SELECT slug 
-    FROM user_progress 
-    WHERE user_id = ? AND completed = 1
-");
-$stmt->execute([$user_id]);
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $completadas[] = $row['slug'];
+// Identificador del usuario en sesión (0 = Invitado)
+$user_id = (int)($usuario['id'] ?? 0);
+
+if ($user_id > 0) {
+    $stmt = $pdo->prepare("
+        SELECT slug 
+        FROM user_progress 
+        WHERE user_id = ? AND completed = 1
+    ");
+    $stmt->execute([$user_id]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $completadas[] = $row['slug'];
+    }
+} else {
+    // Invitado: no hay progreso guardado
+    $completadas = [];
 }
 ?>
 <!DOCTYPE html>

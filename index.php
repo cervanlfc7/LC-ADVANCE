@@ -51,6 +51,8 @@ $usuario_logueado = isset($_SESSION['usuario_id']);
             <p>Aprende programación de forma divertida con lecciones interactivas, cuestionarios y recompensas.</p>
             <p>Domina C#, Python, JavaScript, HTML/CSS y PHP en los 6 semestres del plan oficial DGETI.</p>
             <button class="btn btn-start" onclick="window.location='register.php'">¡Comienza a jugar!</button>
+            <!-- NUEVO: acceso rápido como invitado (no guarda progreso) -->
+            <button class="btn btn-guest" onclick="window.location='guest_login.php'">Entrar como invitado</button>
         </section>
     <?php else: ?>
         <section class="dashboard-preview">

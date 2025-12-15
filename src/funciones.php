@@ -1,20 +1,38 @@
 <?php
 session_start();
 require_once '../config/config.php';
-// Cargar las lecciones para poder evaluar correctamente las preguntas
 require_once __DIR__ . '/content.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['usuario_id'])) {
+// Permitir modo invitado (solo lectura)
+$is_guest = !empty($_SESSION['usuario_es_invitado']);
+if (!isset($_SESSION['usuario_id']) && !$is_guest) {
     echo json_encode(['ok' => false, 'error' => 'No autenticado']);
     exit;
 }
 
-$usuario_id = $_SESSION['usuario_id'];
+$usuario_id = $_SESSION['usuario_id'] ?? 0;
 $accion = $_POST['accion'] ?? '';
 
+// Bloquear acciones que intenten guardar estado cuando es invitado
+if ($is_guest && in_array($accion, ['completar', 'calificar_quiz'])) {
+    echo json_encode(['ok' => false, 'error' => 'Modo invitado: no está permitido guardar progreso.']);
+    exit;
+}
+
 if ($accion === 'obtener_estado') {
+    if ($is_guest) {
+        echo json_encode([
+            'ok' => true,
+            'puntos' => 0,
+            'nivel' => 1,
+            'progreso' => 0,
+            'badges' => []
+        ]);
+        exit;
+    }
+
     $stmt = $pdo->prepare("SELECT puntos, nivel FROM usuarios WHERE id = ?");
     $stmt->execute([$usuario_id]);
     $user = $stmt->fetch();

@@ -9,12 +9,13 @@ session_start();
 require_once 'config/config.php';
 require_once 'src/content.php'; 
 
-if (!isset($_SESSION['usuario_id'])) {
+// Reemplaza redirección estricta por permitir invitado
+if (!isset($_SESSION['usuario_id']) && empty($_SESSION['usuario_es_invitado'])) {
     header('Location: login.php');
     exit;
 }
 
-$user_id = $_SESSION['usuario_id'];
+$user_id = $_SESSION['usuario_id'] ?? null;
 $slug = $_GET['slug'] ?? '';
 $leccion = null;
 
@@ -137,10 +138,11 @@ function render_contenido($html_content) {
 </button>
 <script src="assets/js/app.js"></script> 
 <script>
-    // === TU JS 100% INTACTO ===
+    // === VARIABLES DEL CLIENTE ===
     const quizData = <?php echo json_encode($quiz_selected ?? []); ?>;
     const leccionSlug = '<?php echo $slug; ?>';
     const numPreguntas = Array.isArray(quizData) ? quizData.length : 0;
+    const isGuest = <?php echo json_encode(!empty($_SESSION['usuario_es_invitado'] ?? false)); ?>;
 
     // Debug mínimo en consola
     console.log('quizData', quizData);
@@ -264,7 +266,6 @@ function render_contenido($html_content) {
         }
         
         function handleQuizSubmit(event) {
-            // === TU CÓDIGO DE SUBMIT 100% INTACTO ===
             event.preventDefault();
             let respuestasUsuario = {};
             let allAnswered = true;
@@ -272,19 +273,39 @@ function render_contenido($html_content) {
             quizData.forEach((pregunta, index) => {
                 const preguntaId = `q${index}`;
                 const radioSeleccionado = document.querySelector(`input[name="${preguntaId}"]:checked`);
-                
                 if (!radioSeleccionado) {
                     allAnswered = false;
                     document.querySelector(`.quiz-question-card[data-index="${index}"]`).classList.add('not-answered');
                     return;
                 }
-                
                 document.querySelector(`.quiz-question-card[data-index="${index}"]`).classList.remove('not-answered');
-                respuestasUsuario[preguntaId] = decodeURIComponent(radioSeleccionado.value); 
+                respuestasUsuario[preguntaId] = decodeURIComponent(radioSeleccionado.value);
             });
 
             if (!allAnswered) {
-                displayMessage('⚠️ Debes responder todas las preguntas antes de enviar.', 'error');
+                displayMessage('Responde todas las preguntas antes de enviar.', 'error');
+                return;
+            }
+
+            // Si es invitado: califica localmente y muestra resultado (no intenta guardar)
+            if (isGuest) {
+                let correctas = 0;
+                quizData.forEach((p, i) => {
+                    const resp = respuestasUsuario[`q${i}`] || '';
+                    if (resp === p.correcta) correctas++;
+                });
+
+                const quizView = document.getElementById('quiz-view');
+                quizView.innerHTML = `
+                    <div class="result-box">
+                        <h4 class="result-title">Resultado (Modo Invitado)</h4>
+                        <p class="final-message">Obtuviste <strong>${correctas}/${numPreguntas}</strong>. Tu resultado NO fue guardado (modo Invitado).</p>
+                        <div class="result-actions">
+                            <a href="dashboard.php" class="btn btn-repeat">Volver al Dashboard</a>
+                            <button class="btn btn-play" onclick="location.reload()">Reintentar</button>
+                        </div>
+                    </div>
+                `;
                 return;
             }
 

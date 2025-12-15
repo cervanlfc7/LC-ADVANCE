@@ -707,11 +707,12 @@ $lecciones[] = [
 
 <div class="svg-diagram">
     <!-- Nuevo diagrama SVG retro–neón optimizado y documentado -->
-    <svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-        <rect width="400" height="300" fill="#000"/>
-        <text x="200" y="30" text-anchor="middle" fill="#00ffff" font-size="16" font-weight="bold">
+    <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" class="svg-responsive" role="img" aria-labelledby="svg-title-1 svg-desc-1" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="100%" height="100%" fill="#000"/>
+        <text id="svg-title-1" x="200" y="30" text-anchor="middle" fill="#00ffff" font-weight="bold">
             Analogía: Célula ≈ Cuerpo Humano
         </text>
+        <desc id="svg-desc-1">Relación funcional entre orgánulos y órganos humanos</desc>
 
         <!-- Membrana -->
         <ellipse cx="200" cy="150" rx="150" ry="90"
@@ -720,7 +721,7 @@ $lecciones[] = [
         <!-- Núcleo -->
         <circle cx="200" cy="150" r="40"
             fill="#ff00ff" stroke="#00e5ff" stroke-width="2" />
-        <text x="200" y="150" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">
+        <text x="200" y="150" text-anchor="middle" fill="#fff" font-weight="bold">
             NÚCLEO
         </text>
 
@@ -748,9 +749,9 @@ $lecciones[] = [
 <h3 class="section-title">V. Diagrama Piramidal de los Niveles de Organización</h3>
 
 <div class="svg-diagram">
-    <svg width="400" height="340" viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg">
-        <rect width="400" height="340" fill="#101520"/>
-
+    <svg viewBox="0 0 400 340" preserveAspectRatio="xMidYMid meet" class="svg-responsive" role="img" aria-labelledby="svg-title-2 svg-desc-2" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="100%" height="100%" fill="#101520"/>
+        <desc id="svg-desc-2">Pirámide de niveles de organización biológica</desc>
         <!-- Biosfera -->
         <rect x="50"  y="30"  width="300" height="32" fill="#d81b60"/>
         <text x="200" y="52" text-anchor="middle" fill="#fff" font-size="18">BIOSFERA</text>
@@ -985,16 +986,16 @@ es transferida de un nivel trófico al siguiente.
 <h3 class="section-title">IV. Diagrama Retro-Neón: Flujo de Energía</h3>
 
 <div class="svg-diagram">
-<svg width="420" height="300" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 420 300" preserveAspectRatio="xMidYMid meet" class="svg-responsive" role="img" aria-labelledby="svg-title svg-desc" xmlns="http://www.w3.org/2000/svg">
 
     <!-- Fondo -->
-    <rect width="420" height="300" fill="#000"/>
+    <rect x="0" y="0" width="100%" height="100%" fill="#000"/>
 
     <!-- Título -->
-    <text x="210" y="30" text-anchor="middle"
-          fill="#00e5ff" font-size="16" font-weight="bold">
+    <text id="svg-title" x="210" y="30" text-anchor="middle" fill="#00e5ff" font-weight="bold">
         FLUJO DE ENERGÍA EN UN ECOSISTEMA
     </text>
+    <desc id="svg-desc">Diagrama simplificado: Sol → Productores → Consumidores, con pérdida de energía en forma de calor</desc>
 
     <!-- Sol -->
     <circle cx="60" cy="140" r="30" fill="#ffeb3b" stroke="#fdd835" stroke-width="3"/>
@@ -1019,7 +1020,7 @@ es transferida de un nivel trófico al siguiente.
     <!-- Flecha calor -->
     <line x1="205" y1="160" x2="205" y2="220" stroke="#ff6f00" stroke-width="3"/>
     <polygon points="205,220 200,210 210,210" fill="#ff6f00"/>
-    <text x="215" y="195" fill="#ff6f00" font-size="12">Calor</text>
+    <text x="215" y="195" fill="#ff6f00">Calor</text>
 
 </svg>
 <p class="caption">La energía fluye en una sola dirección y se disipa como calor.</p>
@@ -2078,7 +2079,7 @@ HTML
 /**
  * MATERIA: ECOSISTEMAS
  * TEMA: Ciclo del Carbono – El flujo que mueve la vida y el clima
- * ESTILO: Cyberpunk-neón total, SVG animado ÉPICO, ecuaciones perfectas, 30 quiz nivel experto
+ * ESTILO: Cyberpunk-neón total, SVG ultra-estable 16:9, ecuaciones perfectas, 30 quiz nivel experto
  */
 
 $lecciones[] = [
@@ -2088,76 +2089,306 @@ $lecciones[] = [
 
     'contenido' => <<<'HTML'
 <h3 class="text-center display-4">Ciclo del Carbono: El Gran Flujo Planetario</h3>
-<p class="fs-5">El carbono se mueve sin parar entre 4 reservorios gigantes. En equilibrio natural estaba en balance… hasta que llegamos nosotros.</p>
+<p class="fs-5">El carbono circula entre cuatro reservorios gigantes. Durante millones de años estuvo en equilibrio… hasta la llegada de la civilización industrial.</p>
 
-<!-- SVG ANIMADO BRUTAL DEL CICLO DEL CARBONO -->
-<div class="svg-diagram">
-    <svg viewBox="0 0 1100 780" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1100" height="780" fill="#000"/>
-        <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="12" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <marker id="arrow" markerWidth="18" markerHeight="18" refX="16" refY="9" orient="auto">
-                <path d="M0,0 L16,9 L0,18 Z" fill="#00ffff"/>
-            </marker>
-        </defs>
+<!-- SVG CICLO DEL CARBONO - DISEÑO CLARO Y ORGANIZADO -->
+<div class="svg-diagram" >
+<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" class="svg-responsive" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block; background: #0a0a1a;">
 
-        <!-- Título neón -->
-        <text x="550" y="80" fill="#ff00ff" font-size="60" font-weight="bold" text-anchor="middle" filter="url(#glow)">CICLO DEL CARBONO</text>
+    <defs>
+        <!-- Filtros de neón sutiles -->
+        <filter id="glow-blue">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feFlood flood-color="#00aaff" flood-opacity="0.8"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        
+        <filter id="glow-green">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feFlood flood-color="#00ff88" flood-opacity="0.8"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        
+        <filter id="glow-orange">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feFlood flood-color="#ffaa00" flood-opacity="0.8"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        
+        <filter id="glow-red">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feFlood flood-color="#ff3366" flood-opacity="0.8"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
 
-        <!-- ATMÓSFERA -->
-        <rect x="450" y="120" width="200" height="110" rx="35" fill="#1e90ff" stroke="#00ffff" stroke-width="10" filter="url(#glow)"/>
-        <text x="550" y="175" fill="#fff" font-size="36" text-anchor="middle" filter="url(#glow)">ATMÓSFERA</text>
-        <text x="550" y="215" fill="#00ffff" font-size="24" text-anchor="middle">~900 GtC │ 420 ppm</text>
+        <!-- Flechas -->
+        <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+            <polygon points="0,0 10,5 0,10" fill="#00aaff"/>
+        </marker>
+        
+        <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+            <polygon points="0,0 10,5 0,10" fill="#00ff88"/>
+        </marker>
+        
+        <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+            <polygon points="0,0 10,5 0,10" fill="#ff3366"/>
+        </marker>
+        
+        <!-- Gradientes -->
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#001122"/>
+            <stop offset="100%" stop-color="#003355"/>
+        </linearGradient>
+    </defs>
 
-        <!-- BIOSFERA TERRESTRE -->
-        <rect x="120" y="320" width="220" height="130" rx="35" fill="#228B22" stroke="#00ff00" stroke-width="10" filter="url(#glow)"/>
-        <text x="230" y="380" fill="#fff" font-size="34" text-anchor="middle">BIOSFERA</text>
-        <text x="230" y="420" fill="#00ff00" font-size="22" text-anchor="middle">~550 GtC</text>
+    <!-- Fondo -->
+    <rect width="1600" height="900" fill="#0a0a1a"/>
 
-        <!-- HIDROSFERA -->
-        <rect x="760" y="320" width="220" height="130" rx="35" fill="#0066cc" stroke="#00ffff" stroke-width="10" filter="url(#glow)"/>
-        <text x="870" y="380" fill="#fff" font-size="34" text-anchor="middle">HIDROSFERA</text>
-        <text x="870" y="420" fill="#00ffff" font-size="22" text-anchor="middle">~38 000 GtC</text>
-
-        <!-- LITOSFERA -->
-        <rect x="450" y="560" width="200" height="110" rx="35" fill="#8B4513" stroke="#ff9900" stroke-width="10" filter="url(#glow)"/>
-        <text x="550" y="615" fill="#fff" font-size="36" text-anchor="middle">LITOSFERA</text>
-        <text x="550" y="655" fill="#ff9900" font-size="22" text-anchor="middle">~60 000 000 GtC</text>
-
-        <!-- FLECHAS ANIMADAS GIGANTES -->
-        <!-- Fotosíntesis -->
-        <path d="M550 230 L550 310 L340 340" stroke="#00ff00" stroke-width="10" marker-end="url(#arrow)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="200" to="0" dur="4s" repeatCount="indefinite"/>
-        </path>
-        <text x="460" y="280" fill="#00ff00" font-size="26" filter="url(#glow)">Fotosíntesis ≈120 GtC/año</text>
-
-        <!-- Respiración -->
-        <path d="M230 320 L230 250 L550 230" stroke="#ff3300" stroke-width="10" marker-end="url(#arrow)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="200" to="0" dur="4s" repeatCount="indefinite"/>
-        </path>
-        <text x="360" y="260" fill="#ff3300" font-size="26" filter="url(#glow)">Respiración ≈120 GtC/año</text>
-
-        <!-- Intercambio océano-atmósfera -->
-        <path d="M550 230 L760 340" stroke="#00ccff" stroke-width="10" marker-end="url(#arrow)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3s" repeatCount="indefinite"/>
-        </path>
-        <text x="660" y="260" fill="#00ccff" font-size="26" filter="url(#glow)">Intercambio ≈90 GtC/año</text>
-
-        <!-- Combustión fósiles + deforestación -->
-        <path d="M550 560 L550 230" stroke="#ff1744" stroke-width="12" marker-end="url(#arrow)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="5s" repeatCount="indefinite"/>
-        </path>
-        <text x="600" y="400" fill="#ff1744" font-size="30" filter="url(#glow)">+11.5 GtC/año (humanos)</text>
-
-        <!-- Leyenda final -->
-        <text x="550" y="740" fill="#00ffff" font-size="32" text-anchor="middle" filter="url(#glow)">
-            El ciclo estaba en equilibrio… hasta que empezamos a quemar el pasado.
+    <!-- TÍTULO PRINCIPAL -->
+    <g>
+        <rect x="500" y="30" width="600" height="80" rx="15" fill="#001133" stroke="#00aaff" stroke-width="3"/>
+        <text x="800" y="85" fill="#ffffff" font-size="52" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle" letter-spacing="2">
+            CICLO DEL CARBONO
         </text>
-    </svg>
-    <div class="caption">Flujos del ciclo del carbono (GtC/año) – Estilo cyberpunk-neón 2025</div>
+    </g>
+
+    <!-- ========== ESQUEMA DE 4 CUADRANTES ========== -->
+
+    <!-- ATMÓSFERA - Cuadrante superior izquierdo -->
+    <g transform="translate(200, 150)">
+        <!-- Caja principal -->
+        <rect width="360" height="180" rx="20" fill="#112244" stroke="#00aaff" stroke-width="4" filter="url(#glow-blue)"/>
+        
+        <!-- Título -->
+        <text x="180" y="60" fill="#00aaff" font-size="36" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            ATMÓSFERA
+        </text>
+        
+        <!-- Datos -->
+        <text x="180" y="105" fill="#ffffff" font-size="28" font-family="Arial, sans-serif" text-anchor="middle">
+            ~900 GtC
+        </text>
+        <text x="180" y="140" fill="#88ccff" font-size="24" font-family="Arial, sans-serif" text-anchor="middle">
+            420 ppm CO₂
+        </text>
+    </g>
+
+    <!-- BIOSFERA - Cuadrante superior derecho -->
+    <g transform="translate(1040, 150)">
+        <rect width="360" height="180" rx="20" fill="#113322" stroke="#00ff88" stroke-width="4" filter="url(#glow-green)"/>
+        
+        <text x="180" y="60" fill="#00ff88" font-size="36" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            BIOSFERA
+        </text>
+        
+        <text x="180" y="105" fill="#ffffff" font-size="28" font-family="Arial, sans-serif" text-anchor="middle">
+            ~550 GtC
+        </text>
+        <text x="180" y="140" fill="#88ffcc" font-size="22" font-family="Arial, sans-serif" text-anchor="middle">
+            Plantas, animales, suelo
+        </text>
+    </g>
+
+    <!-- HIDROSFERA - Cuadrante inferior izquierdo -->
+    <g transform="translate(200, 450)">
+        <rect width="360" height="180" rx="20" fill="#112244" stroke="#00aaff" stroke-width="4" filter="url(#glow-blue)"/>
+        
+        <text x="180" y="60" fill="#00aaff" font-size="36" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            HIDROSFERA
+        </text>
+        
+        <text x="180" y="105" fill="#ffffff" font-size="28" font-family="Arial, sans-serif" text-anchor="middle">
+            ~38,000 GtC
+        </text>
+        <text x="180" y="140" fill="#88ccff" font-size="22" font-family="Arial, sans-serif" text-anchor="middle">
+            Océanos, mares, ríos
+        </text>
+    </g>
+
+    <!-- LITOSFERA - Cuadrante inferior derecho -->
+    <g transform="translate(1040, 450)">
+        <rect width="360" height="180" rx="20" fill="#332211" stroke="#ffaa00" stroke-width="4" filter="url(#glow-orange)"/>
+        
+        <text x="180" y="60" fill="#ffaa00" font-size="36" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            LITOSFERA
+        </text>
+        
+        <text x="180" y="105" fill="#ffffff" font-size="28" font-family="Arial, sans-serif" text-anchor="middle">
+            ~60M GtC
+        </text>
+        <text x="180" y="140" fill="#ffcc88" font-size="22" font-family="Arial, sans-serif" text-anchor="middle">
+            Rocas, combustibles fósiles
+        </text>
+    </g>
+
+    <!-- ========== FLUJOS PRINCIPALES ========== -->
+
+    <!-- 1. FOTOSÍNTESIS (Atmósfera → Biosfera) -->
+    <g>
+        <!-- Flecha -->
+        <path d="M380 240 L380 180 L500 180 L500 240" 
+              stroke="#00ff88" stroke-width="8" fill="none" 
+              marker-end="url(#arrow-green)" stroke-linecap="round"/>
+        
+        <!-- Etiqueta -->
+        <rect x="430" y="150" width="140" height="40" rx="8" fill="#113322" opacity="0.9"/>
+        <text x="500" y="175" fill="#00ff88" font-size="20" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            Fotosíntesis
+        </text>
+        <text x="500" y="200" fill="#88ffcc" font-size="18" font-family="Arial, sans-serif" text-anchor="middle">
+            120 GtC/año
+        </text>
+    </g>
+
+    <!-- 2. RESPIRACIÓN (Biosfera → Atmósfera) -->
+    <g>
+        <!-- Flecha -->
+        <path d="M1220 240 L1220 180 L1100 180 L1100 240" 
+              stroke="#ff3366" stroke-width="8" fill="none" 
+              marker-end="url(#arrow-red)" stroke-linecap="round"/>
+        
+        <!-- Etiqueta -->
+        <rect x="1060" y="150" width="140" height="40" rx="8" fill="#331122" opacity="0.9"/>
+        <text x="1130" y="175" fill="#ff3366" font-size="20" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            Respiración
+        </text>
+        <text x="1130" y="200" fill="#ff99bb" font-size="18" font-family="Arial, sans-serif" text-anchor="middle">
+            120 GtC/año
+        </text>
+    </g>
+
+    <!-- 3. INTERCAMBIO OCÉANO-ATMOSFERA -->
+    <g>
+        <!-- Flecha vertical -->
+        <path d="M380 540 L380 480 L500 480 L500 540" 
+              stroke="#00aaff" stroke-width="8" fill="none" 
+              marker-end="url(#arrow-blue)" stroke-linecap="round"/>
+        
+        <!-- Etiqueta -->
+        <rect x="430" y="450" width="140" height="40" rx="8" fill="#112244" opacity="0.9"/>
+        <text x="500" y="475" fill="#00aaff" font-size="20" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            Intercambio
+        </text>
+        <text x="500" y="500" fill="#88ccff" font-size="18" font-family="Arial, sans-serif" text-anchor="middle">
+            90 GtC/año
+        </text>
+    </g>
+
+    <!-- 4. EMISIONES HUMANAS (Litosfera → Atmósfera) -->
+    <g>
+        <!-- Flecha diagonal -->
+        <path d="M1220 540 L1220 480 L1100 480 L1100 240" 
+              stroke="#ff3366" stroke-width="10" fill="none" 
+              marker-end="url(#arrow-red)" stroke-linecap="round"
+              stroke-dasharray="20,10">
+            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="2s" repeatCount="indefinite"/>
+        </path>
+        
+        <!-- Etiqueta destacada -->
+        <g transform="translate(1150, 380)">
+            <rect width="200" height="50" rx="10" fill="#331122" opacity="0.9" stroke="#ff3366" stroke-width="2"/>
+            <text x="100" y="30" fill="#ff3366" font-size="22" font-weight="bold" font-family="Arial, sans-serif"
+                  text-anchor="middle">
+                +11.5 GtC/año
+            </text>
+            <text x="100" y="50" fill="#ff99bb" font-size="18" font-family="Arial, sans-serif" text-anchor="middle">
+                (emisiones humanas)
+            </text>
+        </g>
+    </g>
+
+    <!-- 5. SEDIMENTACIÓN (Hidrosfera → Litosfera) -->
+    <g>
+        <!-- Flecha -->
+        <path d="M380 540 L500 540 L500 630 L1220 630" 
+              stroke="#00aaff" stroke-width="6" fill="none" 
+              marker-end="url(#arrow-blue)" stroke-linecap="round"
+              opacity="0.7"/>
+        
+        <!-- Etiqueta -->
+        <rect x="800" y="600" width="120" height="35" rx="6" fill="#112244" opacity="0.9"/>
+        <text x="860" y="625" fill="#88ccff" font-size="18" font-family="Arial, sans-serif" text-anchor="middle">
+            Sedimentación
+        </text>
+    </g>
+
+    <!-- ========== ZONA CENTRAL ========== -->
+    <!-- Círculo central que conecta todo -->
+    <g>
+        <circle cx="800" cy="360" r="80" fill="#001133" stroke="#00aaff" stroke-width="4" opacity="0.8"/>
+        <text x="800" y="350" fill="#00aaff" font-size="24" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            FLUJOS
+        </text>
+        <text x="800" y="380" fill="#88ccff" font-size="20" font-family="Arial, sans-serif" text-anchor="middle">
+            ANUALES
+        </text>
+    </g>
+
+    <!-- CONEXIONES AL CENTRO -->
+    <g opacity="0.6">
+        <!-- Atmósfera → Centro -->
+        <line x1="560" y1="240" x2="720" y2="360" stroke="#00aaff" stroke-width="3" stroke-dasharray="5,5"/>
+        <!-- Biosfera → Centro -->
+        <line x1="1040" y1="240" x2="880" y2="360" stroke="#00ff88" stroke-width="3" stroke-dasharray="5,5"/>
+        <!-- Hidrosfera → Centro -->
+        <line x1="560" y1="540" x2="720" y2="440" stroke="#00aaff" stroke-width="3" stroke-dasharray="5,5"/>
+        <!-- Litosfera → Centro -->
+        <line x1="1040" y1="540" x2="880" y2="440" stroke="#ffaa00" stroke-width="3" stroke-dasharray="5,5"/>
+    </g>
+
+    <!-- ========== LEYENDA INFERIOR ========== -->
+    <g transform="translate(0, 750)">
+        <!-- Fondo -->
+        <rect x="200" y="0" width="1200" height="100" rx="15" fill="#001133" opacity="0.9" stroke="#00aaff" stroke-width="2"/>
+        
+        <!-- Texto principal -->
+        <text x="800" y="40" fill="#ffffff" font-size="28" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            El ciclo del carbono estaba en equilibrio...
+        </text>
+        
+        <!-- Texto secundario -->
+        <text x="800" y="75" fill="#ff3366" font-size="26" font-weight="bold" font-family="Arial, sans-serif"
+              text-anchor="middle">
+            hasta que empezamos a quemar el pasado.
+        </text>
+    </g>
+
+    <!-- Información técnica -->
+    <text x="800" y="880" fill="#666688" font-size="18" font-family="Arial, sans-serif" text-anchor="middle">
+        GtC = Gigatoneladas de Carbono | Datos aproximados | Visualización educativa
+    </text>
+
+</svg>
+
+<div class="caption" style="text-align: center; color: #88aaff; font-family: Arial, sans-serif; margin-top: 15px; padding: 10px;">
+    Diagrama del ciclo global del carbono mostrando reservorios principales y flujos anuales
+</div>
 </div>
 
 <h4 class="mt-5">1. Reservorios de Carbono (2025)</h4>
@@ -2166,8 +2397,8 @@ $lecciones[] = [
     <tbody>
         <tr><td>Atmósfera</td><td>~900 GtC</td><td>~5 años</td></tr>
         <tr><td>Biosfera terrestre</td><td>~550 GtC</td><td>10–100 años</td></tr>
-        <tr><td>Océanos (total)</td><td>~38 000 GtC</td><td>~1 000 años (profundo)</td></tr>
-        <tr><td>Litosfera (rocas + fósiles)</td><td>~60 000 000 GtC</td><td>Millones de años</td></tr>
+        <tr><td>Océanos</td><td>~38 000 GtC</td><td>~1 000 años</td></tr>
+        <tr><td>Litosfera</td><td>~60 000 000 GtC</td><td>Millones de años</td></tr>
     </tbody>
 </table>
 
@@ -2189,73 +2420,74 @@ $lecciones[] = [
     <tr><td>Respiración terrestre</td><td>≈120</td></tr>
     <tr><td>Intercambio océano-atmósfera</td><td>≈90</td></tr>
     <tr><td>Absorción neta oceánica</td><td>≈2.5</td></tr>
-    <tr class="table-danger"><td>Emisiones humanas (fósiles + deforestación)</td><td>≈11.5</td></tr>
+    <tr class="table-danger"><td>Emisiones humanas</td><td>≈11.5</td></tr>
 </table>
 
-<h4 class="mt-5 text-danger">4. Impacto Humano → Desequilibrio Total</h4>
-<p class="fs-4">Concentración actual de CO₂: <strong>~420 ppm (2025)</strong> → la más alta en 3 millones de años</p>
-<div class="ejemplo">
-    Desde la Revolución Industrial hemos aumentado el CO₂ atmosférico en <strong>más del 50 %</strong>.
-</div>
+<h4 class="text-danger mt-5">4. Impacto Humano: Ruptura del Equilibrio</h4>
+<p class="fs-4">CO₂ actual: <strong>~420 ppm (2025)</strong> — el nivel más alto en 3 millones de años.</p>
+<div class="ejemplo">La actividad humana aumentó el CO₂ atmosférico en más del <strong>50 %</strong>.</div>
 
 <div class="visual">
     <img src="assets/img/nasa_carbono.gif" alt="Curva de Keeling">
-    <p><em>Curva de Keeling: el latido anual del planeta + la tendencia humana. Fuente: NASA</em></p>
+    <p><em>Curva de Keeling – NASA.</em></p>
 </div>
 HTML
 ,
     'ejercicios' => [
         ['enunciado' => 'Escribe la ecuación de la fotosíntesis', 'respuesta' => '\\ce{6CO2 + 6H2O -> C6H12O6 + 6O2}'],
-        ['enunciado' => '¿Cuál es el reservorio más grande de carbono?', 'respuesta' => 'Litosfera (rocas sedimentarias y combustibles fósiles)'],
-        ['enunciado' => '¿Cuánto carbono hay aproximadamente en la atmósfera?', 'respuesta' => '~900 GtC'],
-        ['enunciado' => '¿Cuánto carbono absorbe la fotosíntesis terrestre al año?', 'respuesta' => '~120 GtC/año'],
-        ['enunciado' => '¿Cuánto emiten los humanos al año (fósiles + deforestación)?', 'respuesta' => '~11.5 GtC/año'],
-        ['enunciado' => '¿Qué son los océanos para el carbono atmosférico?', 'respuesta' => 'El mayor sumidero activo (~2.5 GtC/año neto)'],
-        ['enunciado' => '¿Qué es un "sumidero de carbono"?', 'respuesta' => 'Sistema que absorbe más carbono del que libera'],
-        ['enunciado' => '¿Qué le pasa al ciclo del carbono con la deforestación?', 'respuesta' => 'Se reduce la fotosíntesis y se libera carbono almacenado'],
-        ['enunciado' => '¿Qué es la acidificación oceánica?', 'respuesta' => 'CO₂ + H₂O → H₂CO₃ → baja el pH del océano'],
-        ['enunciado' => '¿Qué es la "bomba biológica" del océano?', 'respuesta' => 'Fitoplancton fija CO₂ → muere → se hunde → carbono al fondo marino'],
-        ['enunciado' => '¿Qué es el efecto "greening" observado por satélite?', 'respuesta' => 'Aumento de vegetación por mayor CO₂ (fertilización)'],
-        ['enunciado' => '¿Qué es el carbono azul?', 'respuesta' => 'Carbono almacenado en manglares, marismas y praderas marinas']
+        ['enunciado' => '¿Cuál es el reservorio más grande de carbono?', 'respuesta' => 'Litosfera'],
+        ['enunciado' => '¿Cuánto carbono hay en la atmósfera?', 'respuesta' => '~900 GtC'],
+        ['enunciado' => '¿Cuánto fija la fotosíntesis terrestre por año?', 'respuesta' => '~120 GtC/año'],
+        ['enunciado' => '¿Cuánto emiten los humanos al año?', 'respuesta' => '~11.5 GtC/año'],
+        ['enunciado' => '¿Qué son los océanos en el ciclo del carbono?', 'respuesta' => 'El mayor sumidero activo (~2.5 GtC/año neto)'],
+        ['enunciado' => 'Define sumidero de carbono', 'respuesta' => 'Absorbe más carbono del que libera'],
+        ['enunciado' => '¿Qué efecto tiene la deforestación?', 'respuesta' => 'Reduce fotosíntesis y libera carbono almacenado'],
+        ['enunciado' => '¿Qué es acidificación oceánica?', 'respuesta' => 'CO₂ se disuelve → forma ácido carbónico → baja pH'],
+        ['enunciado' => '¿Qué es la bomba biológica marina?', 'respuesta' => 'Fitoplancton fija CO₂ → se hunde → carbono al fondo'],
+        ['enunciado' => '¿Qué es el “greening” terrestre?', 'respuesta' => 'Aumento de vegetación por fertilización por CO₂'],
+        ['enunciado' => '¿Qué es carbono azul?', 'respuesta' => 'Carbono en manglares, marismas y praderas marinas']
     ],
 
     'quiz' => [
         ['pregunta' => '¿Cuál es el reservorio MÁS grande de carbono?', 'opciones' => ['Atmósfera', 'Océanos', 'Biosfera', 'Litosfera'], 'correcta' => 'Litosfera'],
         ['pregunta' => 'Proceso que absorbe CO₂ atmosférico', 'opciones' => ['Respiración', 'Fotosíntesis', 'Combustión', 'Evaporación'], 'correcta' => 'Fotosíntesis'],
         ['pregunta' => 'Flujo anual de fotosíntesis terrestre', 'opciones' => ['10 GtC', '120 GtC', '1 000 GtC', '12 000 GtC'], 'correcta' => '120 GtC'],
-        ['pregunta' => 'Emisiones humanas actuales (2025)', 'opciones' => ['1 GtC/año', '11.5 GtC/año', '50 GtC/año', '100 GtC/año'], 'correcta' => '11.5 GtC/año'],
-        ['pregunta' => 'Concentración actual de CO₂ (2025)', 'opciones' => ['280 ppm', '350 ppm', '420 ppm', '500 ppm'], 'correcta' => '420 ppm'],
-        ['pregunta' => 'Absorción neta anual de los océanos', 'opciones' => ['0.5 GtC', '2.5 GtC', '10 GtC', '25 GtC'], 'correcta' => '2.5 GtC'],
-        ['pregunta' => 'Tiempo de residencia del carbono en océano profundo', 'opciones' => ['10 años', '100 años', '1 000 años', '10 000 años'], 'correcta' => '1 000 años'],
-        ['pregunta' => 'Ecuación de la fotosíntesis', 'opciones' => ['\\ce{CO2 -> C6H12O6}', '\\ce{6CO2 + 6H2O -> C6H12O6 + 6O2}', '\\ce{C6H12O6 -> 6CO2 + 6H2O}', 'Ninguna'], 'correcta' => '\\ce{6CO2 + 6H2O -> C6H12O6 + 6O2}'],
-        ['pregunta' => '¿Qué es la acidificación oceánica?', 'opciones' => ['Más sal', 'Menos O₂', 'Baja el pH por CO₂', 'Sube la temperatura'], 'correcta' => 'Baja el pH por CO₂'],
-        ['pregunta' => '¿Qué es la "bomba biológica"?', 'opciones' => ['Fitoplancton hunde carbono', 'Explosión algal', 'Corriente oceánica', 'Volcán submarino'], 'correcta' => 'Fitoplancton hunde carbono'],
-        ['pregunta' => '¿Qué es el "carbono azul"?', 'opciones' => ['En manglares y marismas', 'En la atmósfera', 'En combustibles fósiles', 'En nubes'], 'correcta' => 'En manglares y mar�ismas'],
-        ['pregunta' => '¿Qué observa la curva de Keeling?', 'opciones' => ['Temperatura', 'CO₂ creciente + oscilación estacional', 'O₂', 'Lluvia'], 'correcta' => 'CO₂ creciente + oscilación estacional'],
-        ['pregunta' => '¿Qué causa el "greening" terrestre?', 'opciones' => ['Menos CO₂', 'Fertilización por CO₂', 'Más lluvia', 'Menos luz'], 'correcta' => 'Fertilización por CO₂'],
-        ['pregunta' => '¿Qué libera el permafrost al derretirse?', 'opciones' => ['CO₂', 'Metano (CH₄)', 'Oxígeno', 'Nitrógeno'], 'correcta' => 'Metano (CH₄)'],
-        ['pregunta' => '¿Qué mide GtC?', 'opciones' => ['Gigatones de CO₂', 'Gigatones de carbono', 'Grados Celsius', 'Gases totales'], 'correcta' => 'Gigatones de carbono'],
-        ['pregunta' => '¿Qué es un "sumidero de carbono"?', 'opciones' => ['Emite carbono', 'Absorbe más del que emite', 'No hace nada', 'Solo plantas'], 'correcta' => 'Absorbe más del que emite'],
-        ['pregunta' => '¿Qué porcentaje del carbono total está en la litosfera?', 'opciones' => ['<1%', '10%', '50%', '>99%'], 'correcta' => '>99%'],
-        ['pregunta' => '¿Cuánto aumentó el CO₂ desde 1750?', 'opciones' => ['+10%', '+30%', '+50%', '+100%'], 'correcta' => '+50%'],
-        ['pregunta' => '¿Qué ecosistemas costeros son los mayores sumideros por área?', 'opciones' => ['Playas', 'Manglares y marismas', 'Corales', 'Arrecifes'], 'correcta' => 'Manglares y marismas'],
-        ['pregunta' => '¿Qué ley explica la solubilidad del CO₂ en océano?', 'opciones' => ['Ley de Boyle', 'Ley de Henry', 'Ley de Dalton', 'Ley de Fick'], 'correcta' => 'Ley de Henry'],
-        ['pregunta' => '¿Qué porcentaje del CO₂ antropogénico absorben océanos?', 'opciones' => ['~10%', '~25%', '~40%', '~60%'], 'correcta' => '~25%'],
-        ['pregunta' => '¿Qué es el "carbono negro" (black carbon)?', 'opciones' => ['Hollín', 'CO₂', 'Metano', 'Carbonatos'], 'correcta' => 'Hollín'],
-        ['pregunta' => '¿Qué feedback positivo importante hay en el Ártico?', 'opciones' => ['Más hielo', 'Permafrost libera CH₄', 'Menos CO₂', 'Enfriamiento'], 'correcta' => 'Permafrost libera CH₄'],
-        ['pregunta' => '¿En qué reservorio está el 95% del carbono móvil?', 'opciones' => ['Atmósfera', 'Océanos', 'Biosfera', 'Suelos'], 'correcta' => 'Océanos'],
-        ['pregunta' => '¿Qué es el "DOC"?', 'opciones' => ['Carbono orgánico disuelto', 'Dióxido de carbono', 'Carbono muerto', 'Carbono fósil'], 'correcta' => 'Carbono orgánico disuelto'],
-        ['pregunta' => '¿Qué porcentaje del carbono terrestre está en suelos?', 'opciones' => ['~20%', '~50%', '~75%', '~90%'], 'correcta' => '~75%'],
-        ['pregunta' => '¿Qué proceso natural igualaba fotosíntesis y respiración antes de 1750?', 'opciones' => ['Combustión', 'Balance natural', 'Volcanes', 'Erosión'], 'correcta' => 'Balance natural'],
-        ['pregunta' => '¿Qué mide la "fracción aerotransportada"?', 'opciones' => ['% de nuestras emisiones que queda en atmósfera', 'Aviones', 'CO₂ total', 'Metano'], 'correcta' => '% de nuestras emisiones que queda en atmósfera'],
-        ['pregunta' => '¿Cuánto tiempo tarda el exceso de CO₂ en desaparecer?', 'opciones' => ['10 años', '100 años', '1 000 años', 'Cientos de miles de años'], 'correcta' => 'Cientos de miles de años'],
+        ['pregunta' => 'Emisiones humanas actuales', 'opciones' => ['1 GtC', '11.5 GtC', '50 GtC', '100 GtC'], 'correcta' => '11.5 GtC'],
+        ['pregunta' => 'CO₂ atmosférico actual', 'opciones' => ['280 ppm', '350 ppm', '420 ppm', '500 ppm'], 'correcta' => '420 ppm'],
+        ['pregunta' => 'Absorción oceánica neta', 'opciones' => ['0.5 GtC', '2.5 GtC', '10 GtC', '25 GtC'], 'correcta' => '2.5 GtC'],
+        ['pregunta' => 'Tiempo de residencia en océano profundo', 'opciones' => ['10 años', '100 años', '1 000 años', '10 000 años'], 'correcta' => '1 000 años'],
+        ['pregunta' => 'Ecuación de fotosíntesis', 'opciones' => ['\\ce{CO2 -> C6H12O6}', '\\ce{6CO2 + 6H2O -> C6H12O6 + 6O2}', '\\ce{C6H12O6 -> 6CO2}', 'Ninguna'], 'correcta' => '\\ce{6CO2 + 6H2O -> C6H12O6 + 6O2}'],
+        ['pregunta' => '¿Qué es acidificación oceánica?', 'opciones' => ['Más sal', 'Baja pH por CO₂', 'Menos O₂', 'Sube temperatura'], 'correcta' => 'Baja pH por CO₂'],
+        ['pregunta' => '¿Qué es la bomba biológica?', 'opciones' => ['Fitoplancton hunde carbono', 'Corriente oceánica', 'Explosión algal', 'Volcán'], 'correcta' => 'Fitoplancton hunde carbono'],
+        ['pregunta' => '¿Qué es carbono azul?', 'opciones' => ['Manglares/marismas', 'Atmósfera', 'Fósiles', 'Nubes'], 'correcta' => 'Manglares/marismas'],
+        ['pregunta' => '¿Qué muestra la curva de Keeling?', 'opciones' => ['Temperatura', 'CO₂ creciente + ciclo estacional', 'Ozono', 'Vientos'], 'correcta' => 'CO₂ creciente + ciclo estacional'],
+        ['pregunta' => 'Causa del greening', 'opciones' => ['Menos CO₂', 'Fertilización por CO₂', 'Más lluvia', 'Menos luz'], 'correcta' => 'Fertilización por CO₂'],
+        ['pregunta' => '¿Qué libera el permafrost?', 'opciones' => ['CO₂', 'Metano (CH₄)', 'O₂', 'N₂'], 'correcta' => 'Metano (CH₄)'],
+        ['pregunta' => 'GtC significa...', 'opciones' => ['Gigatones CO₂', 'Gigatones de carbono', 'Grados Celsius', 'Gases totales'], 'correcta' => 'Gigatones de carbono'],
+        ['pregunta' => '¿Qué es un sumidero?', 'opciones' => ['Emite', 'Absorbe más del que emite', 'Neutral', 'Solo plantas'], 'correcta' => 'Absorbe más del que emite'],
+        ['pregunta' => 'Porcentaje del carbono en la litosfera', 'opciones' => ['<1%', '10%', '50%', '>99%'], 'correcta' => '>99%'],
+        ['pregunta' => 'Aumento de CO₂ desde 1750', 'opciones' => ['+10%', '+30%', '+50%', '+100%'], 'correcta' => '+50%'],
+        ['pregunta' => 'Sumidero costero más potente', 'opciones' => ['Playas', 'Manglares/marismas', 'Corales', 'Algas'], 'correcta' => 'Manglares/marismas'],
+        ['pregunta' => 'Ley que rige solubilidad del CO₂', 'opciones' => ['Boyle', 'Henry', 'Dalton', 'Fick'], 'correcta' => 'Henry'],
+        ['pregunta' => 'CO₂ antropogénico absorbido por océanos', 'opciones' => ['~10%', '~25%', '~40%', '~60%'], 'correcta' => '~25%'],
+        ['pregunta' => 'Carbono negro es...', 'opciones' => ['Hollín', 'CO₂', 'Metano', 'Carbonatos'], 'correcta' => 'Hollín'],
+        ['pregunta' => 'Feedback ártico positivo', 'opciones' => ['Más hielo', 'Permafrost libera CH₄', 'Menos CO₂', 'Enfriamiento'], 'correcta' => 'Permafrost libera CH₄'],
+        ['pregunta' => '95% del carbono móvil está en...', 'opciones' => ['Atmósfera', 'Océanos', 'Biosfera', 'Suelos'], 'correcta' => 'Océanos'],
+        ['pregunta' => 'DOC significa...', 'opciones' => ['Carbono orgánico disuelto', 'Dióxido de carbono', 'Carbono muerto', 'Carbono fósil'], 'correcta' => 'Carbono orgánico disuelto'],
+        ['pregunta' => 'Carbono terrestre en suelos', 'opciones' => ['~20%', '~50%', '~75%', '~90%'], 'correcta' => '~75%'],
+        ['pregunta' => 'Balance natural antes de 1750', 'opciones' => ['Combustión', 'Balance natural fotosíntesis-respiración', 'Volcanes', 'Erosión'], 'correcta' => 'Balance natural fotosíntesis-respiración'],
+        ['pregunta' => '¿Qué es la fracción aerotransportada?', 'opciones' => ['% de emisiones que queda en atmósfera', 'Vuelos', 'CO₂ total', 'Metano'], 'correcta' => '% de emisiones que queda en atmósfera'],
+        ['pregunta' => 'Tiempo para que desaparezca el exceso de CO₂', 'opciones' => ['10 años', '100 años', '1 000 años', 'Cientos de miles de años'], 'correcta' => 'Cientos de miles de años'],
         ['pregunta' => 'El ciclo del carbono es...', 'opciones' => ['Lineal', 'Cerrado', 'Abierto', 'Imposible de alterar'], 'correcta' => 'Cerrado']
     ]
 ];
 /**
+ * ============================================================
  * MATERIA: ECOSISTEMAS
- * TEMA: Ley de Liebig – El tablón más corto manda
- * ESTILO: Cyberpunk-neón total, SVG animado BRUTAL, ecuaciones perfectas, 30 quiz nivel experto
+ * TEMA: Ley de Liebig – El factor limitante que controla la vida
+ * NIVEL: Plataforma educativa premium (tipo Duolingo/Khan)
+ * ESTILO: Profesional, cyberpunk-neón sobrio, SVG estable 16:9
+ * ============================================================
  */
 
 $lecciones[] = [
@@ -2265,98 +2497,169 @@ $lecciones[] = [
 
     'contenido' => <<<'HTML'
 
+<!-- ========================================================= -->
+<!-- INTRODUCCIÓN -->
+<!-- ========================================================= -->
+
 <h3 class="text-center display-4">Ley de Liebig (1840)</h3>
-<p class="fs-4 text-center">“El rendimiento está determinado por el recurso esencial más escaso”</p>
+<p class="fs-4 text-center">
+    En ecología, <strong>no gana quien tiene más</strong>, sino quien <strong>no carece de lo esencial</strong>.
+</p>
 
-<!-- SVG ANIMADO ÉPICO DEL BARRIL DE LIEBIG -->
+<p class="fs-5 text-center">
+    La Ley del Mínimo, formulada por Justus von Liebig, explica por qué el crecimiento de un organismo,
+    una población o un ecosistema completo está limitado por un solo factor crítico.
+</p>
+
+<!-- ========================================================= -->
+<!-- SVG PRINCIPAL -->
+<!-- ========================================================= -->
+
 <div class="svg-diagram">
-    <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1200" height="800" fill="#000"/>
-        <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="14" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-red"><feGaussianBlur stdDeviation="16" result="blur"/>
-                <feFlood flood-color="#ff1744"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-        </defs>
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+    <rect width="1600" height="900" fill="#000"/>
 
-        <!-- Título neón -->
-        <text x="600" y="90" fill="#ff00ff" font-size="70" font-weight="bold" text-anchor="middle" filter="url(#glow)">BARRIL DE LIEBIG</text>
+    <defs>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feFlood flood-color="#00ffff"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <filter id="glow-red">
+            <feGaussianBlur stdDeviation="10" result="blur"/>
+            <feFlood flood-color="#ff1744"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
 
-        <!-- Barril gigante estilo cyberpunk -->
-        <ellipse cx="600" cy="200" rx="300" ry="80" fill="#2c1810" stroke="#00ffff" stroke-width="12" filter="url(#glow)"/>
-        <ellipse cx="600" cy="680" rx="300" ry="80" fill="#2c1810" stroke="#00ffff" stroke-width="12" filter="url(#glow)"/>
-        <rect x="300" y="200" width="600" height="480" fill="none" stroke="#00ffff" stroke-width="12" filter="url(#glow)"/>
+    <text x="800" y="90" text-anchor="middle" font-size="70" font-weight="bold" fill="#ff00ff" filter="url(#glow)">
+        BARRIL DE LIEBIG
+    </text>
 
-        <!-- Tablones (factores) con alturas diferentes -->
-        <rect x="350" y="250" width="80" height="400" fill="#00e676" filter="url(#glow)"/>
-        <rect x="450" y="300" width="80" height="350" fill="#00e676" filter="url(#glow)"/>
-        <rect x="550" y="220" width="80" height="430" fill="#00e676" filter="url(#glow)"/>
-        <rect x="650" y="280" width="80" height="370" fill="#00e676" filter="url(#glow)"/>
-        <rect x="750" y="320" width="80" height="330" fill="#ff1744" filter="url(#glow-red)"/> <!-- EL MÁS CORTO -->
+    <!-- Barril -->
+    <ellipse cx="800" cy="210" rx="430" ry="85" fill="#1b1b1b" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+    <ellipse cx="800" cy="720" rx="430" ry="85" fill="#1b1b1b" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+    <rect x="370" y="210" width="860" height="510" fill="none" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
 
-        <!-- Etiquetas neón -->
-        <text x="390" y="240" fill="#000" font-size="28" text-anchor="middle" filter="url(#glow)">N</text>
-        <text x="490" y="290" fill="#000" font-size="28" text-anchor="middle" filter="url(#glow)">P</text>
-        <text x="590" y="210" fill="#000" font-size="28" text-anchor="middle" filter="url(#glow)">K</text>
-        <text x="690" y="270" fill="#000" font-size="28" text-anchor="middle" filter="url(#glow)">H₂O</text>
-        <text x="790" y="310" fill="#fff" font-size="36" font-weight="bold" text-anchor="middle" filter="url(#glow-red)">Fe ← LIMITANTE</text>
+    <!-- Tablones -->
+    <rect x="460" y="260" width="90" height="440" fill="#00e676" filter="url(#glow)"/>
+    <rect x="590" y="320" width="90" height="380" fill="#00e676" filter="url(#glow)"/>
+    <rect x="720" y="240" width="90" height="460" fill="#00e676" filter="url(#glow)"/>
+    <rect x="850" y="300" width="90" height="400" fill="#00e676" filter="url(#glow)"/>
+    <rect x="980" y="360" width="90" height="340" fill="#ff1744" filter="url(#glow-red)"/>
 
-        <!-- Agua que sube solo hasta el tablón más corto -->
-        <rect id="water" x="310" y="650" width="580" height="0" fill="#1e90ff" opacity="0.8" filter="url(#glow)">
-            <animate attributeName="height" from="0" to="330" dur="4s" repeatCount="indefinite" fill="freeze"/>
-            <animate attributeName="y" from="650" to="320" dur="4s" repeatCount="indefinite" fill="freeze"/>
-        </rect>
+    <!-- Etiquetas -->
+    <text x="505" y="245" text-anchor="middle" font-size="26" fill="#000" filter="url(#glow)">N</text>
+    <text x="635" y="305" text-anchor="middle" font-size="26" fill="#000" filter="url(#glow)">P</text>
+    <text x="765" y="225" text-anchor="middle" font-size="26" fill="#000" filter="url(#glow)">K</text>
+    <text x="895" y="285" text-anchor="middle" font-size="26" fill="#000" filter="url(#glow)">H₂O</text>
+    <text x="1025" y="345" text-anchor="middle" font-size="32" font-weight="bold" fill="#fff" filter="url(#glow-red)">
+        Fe (LIMITANTE)
+    </text>
 
-        <!-- Texto dentro del agua -->
-        <text x="600" y="500" fill="#00ffff" font-size="56" font-weight="bold" text-anchor="middle" filter="url(#glow)">
-            PRODUCTIVIDAD MÁXIMA
-        </text>
+    <!-- Agua -->
+    <rect x="385" y="700" width="830" height="0" fill="#1e90ff" opacity="0.85" filter="url(#glow)">
+        <animate attributeName="height" from="0" to="340" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="y" from="700" to="360" dur="4s" repeatCount="indefinite"/>
+    </rect>
 
-        <!-- Leyenda final -->
-        <text x="600" y="750" fill="#00ffff" font-size="36" text-anchor="middle" filter="url(#glow)">
-            El tablón más corto decide todo.
-        </text>
-    </svg>
-    <div class="caption">Animación cyberpunk del Barril de Liebig – El factor limitante en acción</div>
+    <text x="800" y="520" text-anchor="middle" font-size="54" font-weight="bold" fill="#00ffff" filter="url(#glow)">
+        PRODUCTIVIDAD MÁXIMA
+    </text>
+
+    <text x="800" y="860" text-anchor="middle" font-size="34" fill="#00ffff" filter="url(#glow)">
+        El sistema solo rinde hasta donde llega su factor más escaso.
+    </text>
+</svg>
+
+<div class="caption">
+    Representación conceptual del Barril de Liebig: añadir más recursos no sirve si el factor limitante no se corrige.
+</div>
 </div>
 
-<h4 class="mt-5">1. Principio Fundamental (1840)</h4>
-<div class="eq">$$ P = k \cdot \min(f_1, f_2, f_3, \dots, f_n) $$</div>
-<p class="text-center mt-3 fs-5"><em>P = productividad real │ k = constante │ min() = el factor más escaso</em></p>
+<!-- ========================================================= -->
+<!-- FUNDAMENTO TEÓRICO -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">1. Principio Fundamental</h4>
+
+<p class="fs-5">
+    La Ley de Liebig establece que la productividad de un sistema biológico no depende del total de recursos,
+    sino del recurso esencial que se encuentra en menor disponibilidad relativa.
+</p>
+
+<div class="eq">
+$$ P = k \cdot \min(f_1, f_2, f_3, \dots, f_n) $$
+</div>
+
+<p class="text-center fs-5">
+    <em>P = productividad real · k = eficiencia biológica · min() = factor limitante</em>
+</p>
+
+<!-- ========================================================= -->
+<!-- INTERPRETACIÓN MODERNA -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">2. Interpretación Moderna</h4>
+
+<ul class="fs-5">
+    <li>No todos los factores se pueden compensar entre sí.</li>
+    <li>Eliminar el factor limitante produce un aumento inmediato… hasta que aparece otro.</li>
+    <li>Los sistemas reales suelen tener <strong>limitación secuencial</strong>.</li>
+</ul>
 
 <div class="ejemplo">
-    <p class="fs-4">Ejemplo clásico: tienes todo el nitrógeno y potasio del mundo… pero falta <strong>fósforo</strong> → tu cultivo crece como si no tuvieras nada.</p>
+    En agricultura, añadir nitrógeno deja de aumentar el rendimiento cuando el fósforo se vuelve el nuevo límite.
 </div>
 
-<h4 class="mt-5">2. Factores Limitantes Más Comunes</h4>
-<table class="table text-center fs-5">
-    <tr><th>Factor</th><th>Ecosistema típico</th><th>Limitante habitual</th></tr>
-    <tr><td>Nitrógeno (N)</td><td>Praderas, cultivos</td><td>Más común en tierra</td></tr>
-    <tr><td>Fósforo (P)</td><td>Lagos, selvas tropicales</td><td>Más común en agua dulce</td></tr>
-    <tr><td>Hierro (Fe)</td><td>Océano abierto (HNLC)</td><td>Limitante en 30 % del océano</td></tr>
-    <tr><td>Agua</td><td>Desiertos, zonas áridas</td><td>Obvio</td></tr>
-    <tr><td>Luz</td><td>Sotobosque, fondo marino</td><td>Energía inicial</td></tr>
-    <tr><td>Temperatura</td><td>Tundra, alta montaña</td><td>Enzimas no funcionan</td></tr>
-</table>
+<!-- ========================================================= -->
+<!-- LEY DE SHELFORD -->
+<!-- ========================================================= -->
 
-<h4 class="mt-5 text-warning">3. Ley de Shelford (1913) – El complemento</h4>
-<p class="fs-4 text-center">“El exceso también mata”</p>
+<h4 class="mt-5 text-warning">3. Ley de Shelford (1913): el complemento</h4>
+
+<p class="fs-4 text-center">
+    No solo el mínimo limita: el exceso también puede ser letal.
+</p>
+
 <div class="visual">
     <img src="assets/img/ley-tolerancia.jpg" alt="Curva de tolerancia de Shelford" class="rounded">
-    <p><em>Curva de tolerancia: entre el mínimo (Liebig) y el máximo (Shelford) está la vida</em></p>
+    <p><em>La vida existe dentro de un rango óptimo entre el mínimo y el máximo.</em></p>
 </div>
 
-<h4 class="mt-5">4. Aplicaciones Prácticas Brutales</h4>
+<!-- ========================================================= -->
+<!-- ERRORES COMUNES -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">4. Errores Comunes</h4>
+
 <ul class="fs-5">
-    <li>Agricultura → fertilizantes NPK balanceados</li>
-    <li>Eutrofización → el P es el “gatillo” en lagos</li>
-    <li>Geoingeniería oceánica → añadir hierro = bloom masivo de fitoplancton</li>
-    <li>Restauración ecológica → primero identifica el factor limitante real</li>
+    <li>Creer que todos los recursos se suman.</li>
+    <li>Suponer que un factor puede compensar completamente a otro.</li>
+    <li>Ignorar que el factor limitante puede cambiar en el tiempo.</li>
 </ul>
+
+<!-- ========================================================= -->
+<!-- APLICACIONES -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">5. Aplicaciones Reales</h4>
+
+<ul class="fs-5">
+    <li><strong>Agricultura:</strong> fertilización balanceada (NPK).</li>
+    <li><strong>Ecología acuática:</strong> control del fósforo en lagos.</li>
+    <li><strong>Océanos:</strong> hierro como regulador del fitoplancton.</li>
+    <li><strong>Restauración ecológica:</strong> identificar el cuello de botella real.</li>
+</ul>
+
 HTML
 ,
     'ejercicios' => [
@@ -2413,9 +2716,12 @@ HTML
     ]
 ];
 /**
+ * ============================================================
  * MATERIA: ECOSISTEMAS
  * TEMA: Ley de Shelford – Ley de la Tolerancia (1913)
- * ESTILO: Cyberpunk-neón total, SVG animado ÉPICO, 30 quiz nivel experto
+ * NIVEL: Plataforma educativa premium (tipo Duolingo/Khan)
+ * ESTILO: Profesional, cyberpunk-neón sobrio, SVG estable 16:9
+ * ============================================================
  */
 
 $lecciones[] = [
@@ -2425,115 +2731,198 @@ $lecciones[] = [
 
     'contenido' => <<<'HTML'
 
+<!-- ========================================================= -->
+<!-- INTRODUCCIÓN -->
+<!-- ========================================================= -->
+
 <h3 class="text-center display-4">Ley de Shelford (1913)</h3>
-<p class="fs-4 text-center">“La vida solo existe dentro de un rango limitado de cada factor ambiental”</p>
+<p class="fs-4 text-center">
+    En la naturaleza, <strong>no basta con sobrevivir</strong>: hay que hacerlo dentro de límites precisos.
+</p>
 
-<!-- SVG ANIMADO ÉPICO DE LA CURVA DE TOLERANCIA -->
+<p class="fs-5 text-center">
+    La Ley de la Tolerancia, propuesta por Victor E. Shelford, establece que cada especie
+    solo puede existir dentro de un <strong>rango específico</strong> de condiciones ambientales.
+    Fuera de ese rango, el estrés aumenta… y la vida colapsa.
+</p>
+
+<!-- ========================================================= -->
+<!-- SVG PRINCIPAL -->
+<!-- ========================================================= -->
+
 <div class="svg-diagram">
-    <svg viewBox="0 0 1300 850" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1300" height="850" fill="#000"/>
-        <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="16" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-red"><feGaussianBlur stdDeviation="18" result="blur"/>
-                <feFlood flood-color="#ff1744"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <linearGradient id="grad-optimo" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#00e676"/>
-                <stop offset="100%" stop-color="#1de9b6"/>
-            </linearGradient>
-        </defs>
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+    <rect width="1600" height="900" fill="#000"/>
 
-        <!-- Título neón gigante -->
-        <text x="650" y="100" fill="#ff00ff" font-size="80" font-weight="bold" text-anchor="middle" filter="url(#glow)">LEY DE SHELFORD</text>
+    <defs>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feFlood flood-color="#00ffff"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
 
-        <!-- Ejes -->
-        <line x1="150" y1="700" x2="1150" y2="700" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
-        <line x1="150" y1="700" x2="150" y2="150" stroke="#00ffff" stroke-width="8" filter="url(#glow)"/>
+        <filter id="glow-red">
+            <feGaussianBlur stdDeviation="10" result="blur"/>
+            <feFlood flood-color="#ff1744"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
 
-        <!-- Etiquetas ejes -->
-        <text x="650" y="780" fill="#00ffff" font-size="36" text-anchor="middle" filter="url(#glow)">Factor ambiental (ej. Temperatura °C)</text>
-        <text x="80" y="425" fill="#00ffff" font-size="36" text-anchor="middle" transform="rotate(-90,80,425)" filter="url(#glow)">Densidad poblacional</text>
+        <linearGradient id="grad-optimo" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00e676"/>
+            <stop offset="100%" stop-color="#1de9b6"/>
+        </linearGradient>
+    </defs>
 
-        <!-- Zonas de fondo -->
-        <rect x="150" y="150" width="200" height="550" fill="#ff1744" opacity="0.25" filter="url(#glow-red)"/>
-        <rect x="350" y="150" width="150" height="550" fill="#ff5722" opacity="0.35"/>
-        <rect x="500" y="150" width="300" height="550" fill="#00e676" opacity="0.4" filter="url(#glow)"/>
-        <rect x="800" y="150" width="150" height="550" fill="#ff5722" opacity="0.35"/>
-        <rect x="950" y="150" width="200" height="550" fill="#ff1744" opacity="0.25" filter="url(#glow-red)"/>
+    <!-- Título -->
+    <text x="800" y="90" text-anchor="middle" font-size="70" font-weight="bold" fill="#ff00ff" filter="url(#glow)">
+        LEY DE SHELFORD
+    </text>
 
-        <!-- Curva de campana animada -->
-        <path id="curve" d="M150 700 Q450 600 650 250 Q850 600 1150 700" fill="none" stroke="url(#grad-optimo)" stroke-width="18" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="2000" to="0" dur="6s" repeatCount="indefinite"/>
-        </path>
+    <!-- Ejes -->
+    <line x1="200" y1="750" x2="1400" y2="750" stroke="#00ffff" stroke-width="6" filter="url(#glow)"/>
+    <line x1="200" y1="750" x2="200" y2="150" stroke="#00ffff" stroke-width="6" filter="url(#glow)"/>
 
-        <!-- Etiquetas de zonas -->
-        <text x="250" y="200" fill="#ff1744" font-size="48" font-weight="bold" text-anchor="middle" filter="url(#glow-red)">LETAL</text>
-        <text x="425" y="200" fill="#ff5722" font-size="42" text-anchor="middle" filter="url(#glow)">ESTRÉS</text>
-        <text x="650" y="200" fill="#00e676" font-size="70" font-weight="bold" text-anchor="middle" filter="url(#glow)">ÓPTIMO</text>
-        <text x="875" y="200" fill="#ff5722" font-size="42" text-anchor="middle" filter="url(#glow)">ESTRÉS</text>
-        <text x="1050" y="200" fill="#ff1744" font-size="48" font-weight="bold" text-anchor="middle" filter="url(#glow-red)">LETAL</text>
+    <!-- Etiquetas -->
+    <text x="800" y="840" text-anchor="middle" font-size="34" fill="#00ffff" filter="url(#glow)">
+        Factor ambiental (ej. temperatura)
+    </text>
 
-        <!-- Marcas de temperatura -->
-        <text x="250" y="740" fill="#fff" font-size="32" text-anchor="middle">0°C</text>
-        <text x="425" y="740" fill="#fff" font-size="32" text-anchor="middle">15°C</text>
-        <text x="650" y="740" fill="#fff" font-size="40" text-anchor="middle">25°C</text>
-        <text x="875" y="740" fill="#fff" font-size="32" text-anchor="middle">35°C</text>
-        <text x="1050" y="740" fill="#fff" font-size="32" text-anchor="middle">45°C</text>
+    <text x="90" y="450" text-anchor="middle" font-size="34" fill="#00ffff"
+          transform="rotate(-90,90,450)" filter="url(#glow)">
+        Rendimiento biológico
+    </text>
 
-        <!-- Leyenda final -->
-        <text x="650" y="820" fill="#00ffff" font-size="40" text-anchor="middle" filter="url(#glow)">
-            Fuera del rango → estrés → muerte
-        </text>
-    </svg>
-    <div class="caption">Curva de Tolerancia de Shelford – Cyberpunk Edition 2025</div>
+    <!-- Zonas -->
+    <rect x="200" y="150" width="260" height="600" fill="#ff1744" opacity="0.22"/>
+    <rect x="460" y="150" width="220" height="600" fill="#ff9800" opacity="0.30"/>
+    <rect x="680" y="150" width="360" height="600" fill="#00e676" opacity="0.35"/>
+    <rect x="1040" y="150" width="220" height="600" fill="#ff9800" opacity="0.30"/>
+    <rect x="1260" y="150" width="140" height="600" fill="#ff1744" opacity="0.22"/>
+
+    <!-- Curva -->
+    <path d="M200 750 Q600 600 800 260 Q1000 600 1400 750"
+          fill="none" stroke="url(#grad-optimo)" stroke-width="14" filter="url(#glow)">
+        <animate attributeName="stroke-dashoffset" from="2000" to="0" dur="6s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- Etiquetas de zonas -->
+    <text x="330" y="220" font-size="42" fill="#ff1744" font-weight="bold" text-anchor="middle" filter="url(#glow-red)">
+        LETAL
+    </text>
+    <text x="570" y="220" font-size="38" fill="#ff9800" text-anchor="middle" filter="url(#glow)">
+        ESTRÉS
+    </text>
+    <text x="860" y="220" font-size="56" fill="#00e676" font-weight="bold" text-anchor="middle" filter="url(#glow)">
+        ÓPTIMO
+    </text>
+    <text x="1150" y="220" font-size="38" fill="#ff9800" text-anchor="middle" filter="url(#glow)">
+        ESTRÉS
+    </text>
+    <text x="1330" y="220" font-size="42" fill="#ff1744" font-weight="bold" text-anchor="middle" filter="url(#glow-red)">
+        LETAL
+    </text>
+
+    <!-- Leyenda -->
+    <text x="800" y="880" text-anchor="middle" font-size="32" fill="#00ffff" filter="url(#glow)">
+        Fuera del rango de tolerancia → estrés → colapso → muerte
+    </text>
+</svg>
+
+<div class="caption">
+    Curva de tolerancia de Shelford: la vida prospera solo dentro de límites ambientales específicos.
+</div>
 </div>
 
-<h4 class="mt-5">1. Las 5 Zonas de Tolerancia</h4>
+<!-- ========================================================= -->
+<!-- FUNDAMENTO -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">1. Principio Fundamental</h4>
+
+<p class="fs-5">
+    Cada organismo posee un rango mínimo y máximo de tolerancia para cada factor ambiental.
+    Dentro de ese rango, existe una zona óptima donde la supervivencia, el crecimiento y la reproducción
+    alcanzan su máximo.
+</p>
+
+<div class="eq">
+$$ Rendimiento = f(F) \quad \text{solo si} \quad F_{min} < F < F_{max} $$
+</div>
+
+<!-- ========================================================= -->
+<!-- ZONAS DE TOLERANCIA -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">2. Zonas de Tolerancia</h4>
+
 <table class="table text-center fs-5">
-    <tr><th>Zona</th><th>Efecto fisiológico</th><th>Ejemplo (temperatura humana)</th></tr>
-    <tr><td>Letal mínima</td><td>Muerte por congelación</td><td>&lt; 0°C</td></tr>
-    <tr><td>Estrés mínimo</td><td>Metabolismo lento, inmunidad baja</td><td>0–15°C</td></tr>
-    <tr class="table-success"><td>ÓPTIMO</td><td>Máxima reproducción y supervivencia</td><td>20–28°C</td></tr>
-    <tr><td>Estrés máximo</td><td>Deshidratación, golpe de calor</td><td>35–40°C</td></tr>
-    <tr><td>Letal máxima</td><td>Desnaturalización de proteínas</td><td>&gt; 44°C</td></tr>
+    <tr><th>Zona</th><th>Estado biológico</th><th>Consecuencia</th></tr>
+    <tr><td>Letal mínima</td><td>Fallo fisiológico</td><td>Muerte</td></tr>
+    <tr><td>Estrés mínimo</td><td>Metabolismo reducido</td><td>Baja supervivencia</td></tr>
+    <tr class="table-success"><td>ÓPTIMO</td><td>Máxima eficiencia</td><td>Alta reproducción</td></tr>
+    <tr><td>Estrés máximo</td><td>Daño celular</td><td>Colapso progresivo</td></tr>
+    <tr><td>Letal máxima</td><td>Desnaturalización</td><td>Muerte</td></tr>
 </table>
 
 <div class="ejemplo">
-    <p class="fs-4">Los corales blanquean cuando la temperatura supera los 30–31°C → estrés → expulsan zooxantelas → muerte si persiste.</p>
+    Los corales entran en estrés térmico por encima de 30–31 °C; si el evento persiste,
+    pierden sus algas simbióticas y mueren.
 </div>
 
-<h4 class="mt-5">2. Factores Ambientales Más Críticos</h4>
-<ul class="fs-4">
-    <li>Temperatura → enzimas</li>
-    <li>pH → absorción de nutrientes</li>
-    <li>Salinidad → osmorregulación</li>
-    <li>Oxígeno disuelto → respiración</li>
-    <li>Luz → fotosíntesis y ritmos biológicos</li>
-</ul>
+<!-- ========================================================= -->
+<!-- RELACIÓN CON LIEBIG -->
+<!-- ========================================================= -->
 
 <h4 class="mt-5 text-warning">3. Shelford vs Liebig</h4>
-<div class="row text-center">
-    <div class="col-md-6">
-        <p class="fs-4 text-danger">Liebig (1840)</p>
-        <p>“Solo importa el mínimo”</p>
-    </div>
-    <div class="col-md-6">
-        <p class="fs-4 text-success">Shelford (1913)</p>
-        <p>“El mínimo Y el máximo importan”</p>
-    </div>
+
+<p class="fs-5">
+    Ambas leyes describen límites, pero desde perspectivas distintas:
+</p>
+
+<ul class="fs-5">
+    <li><strong>Liebig:</strong> el crecimiento está limitado por el factor más escaso.</li>
+    <li><strong>Shelford:</strong> el crecimiento está limitado por mínimos y máximos.</li>
+</ul>
+
+<div class="ejemplo">
+    Juntas explican por qué una especie puede desaparecer incluso cuando los recursos son abundantes.
 </div>
 
-<h4 class="mt-5">4. Aplicaciones Brutales</h4>
-<ul class="fs-4">
-    <li>Distribución de especies y biomas</li>
-    <li>Éxito de especies invasoras → eurioicas (amplio rango)</li>
-    <li>Cambio climático → migración o extinción</li>
-    <li>Acuicultura y agricultura de precisión</li>
+<!-- ========================================================= -->
+<!-- FACTORES CRÍTICOS -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">4. Factores Ambientales Clave</h4>
+
+<ul class="fs-5">
+    <li>Temperatura → cinética enzimática</li>
+    <li>pH → disponibilidad de nutrientes</li>
+    <li>Salinidad → balance osmótico</li>
+    <li>Oxígeno → respiración celular</li>
+    <li>Luz → fotosíntesis y ritmos circadianos</li>
 </ul>
+
+<!-- ========================================================= -->
+<!-- APLICACIONES -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">5. Aplicaciones Reales</h4>
+
+<ul class="fs-5">
+    <li>Distribución geográfica de especies</li>
+    <li>Éxito de especies invasoras (eurioicas)</li>
+    <li>Cambio climático → migración, estrés o extinción</li>
+    <li>Agricultura y acuicultura de precisión</li>
+</ul>
+
 HTML
 ,
     'ejercicios' => [
@@ -2590,9 +2979,12 @@ HTML
     ]
 ];
 /**
+ * ============================================================
  * MATERIA: ECOSISTEMAS
  * TEMA: Factores Ambientales – Abióticos + Bióticos + Conceptos Clave
- * ESTILO: Cyberpunk-neón total, SVG animado ÉPICO, 30 quiz nivel experto
+ * NIVEL: Plataforma educativa premium
+ * ESTILO: Cyberpunk-neón sobrio, SVG épico y legible
+ * ============================================================
  */
 
 $lecciones[] = [
@@ -2602,128 +2994,175 @@ $lecciones[] = [
 
     'contenido' => <<<'HTML'
 
+<!-- ========================================================= -->
+<!-- INTRODUCCIÓN -->
+<!-- ========================================================= -->
+
 <h3 class="text-center display-4">Factores Ambientales</h3>
-<p class="fs-4 text-center">Todo lo que influye en los organismos: lo vivo y lo no vivo</p>
+<p class="fs-4 text-center">
+    Ningún organismo vive aislado. Todo lo que lo rodea —lo vivo y lo no vivo—
+    determina si prospera… o desaparece.
+</p>
 
-<!-- SVG ANIMADO ÉPICO: MATRIZ DE FACTORES -->
+<p class="fs-5 text-center">
+    Los factores ambientales explican por qué una especie existe en un lugar,
+    en un momento específico, y no en otro.
+</p>
+
+<!-- ========================================================= -->
+<!-- SVG PRINCIPAL -->
+<!-- ========================================================= -->
+
 <div class="svg-diagram">
-    <svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1400" height="900" fill="#000"/>
-        <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="18" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-red"><feGaussianBlur stdDeviation="20" result="blur"/>
-                <feFlood flood-color="#ff1744"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-        </defs>
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+    <rect width="1600" height="900" fill="#000"/>
 
-        <!-- Título neón -->
-        <text x="700" y="100" fill="#ff00ff" font-size="90" font-weight="bold" text-anchor="middle" filter="url(#glow)">FACTORES AMBIENTALES</text>
+    <defs>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="10" result="blur"/>
+            <feFlood flood-color="#00ffff"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
 
-        <!-- Nodo central: ORGANISMO -->
-        <circle cx="700" cy="450" r="120" fill="#1de9b6" stroke="#00e676" stroke-width="15" filter="url(#glow)"/>
-        <text x="700" y="440" fill="#000" font-size="48" font-weight="bold" text-anchor="middle">ORGANISMO</text>
+        <filter id="glow-red">
+            <feGaussianBlur stdDeviation="12" result="blur"/>
+            <feFlood flood-color="#ff1744"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
 
-        <!-- ABIÓTICOS (izquierda) -->
-        <rect x="80" y="180" width="300" height="500" rx="50" fill="#0d47a1" stroke="#00ffff" stroke-width="12" opacity="0.8" filter="url(#glow)"/>
-        <text x="230" y="250" fill="#00ffff" font-size="50" font-weight="bold" text-anchor="middle" filter="url(#glow)">ABIÓTICOS</text>
-        <text x="230" y="320" fill="#fff" font-size="32" text-anchor="middle">Temperatura</text>
-        <text x="230" y="380" fill="#fff" font-size="32" text-anchor="middle">Luz (PAR)</text>
-        <text x="230" y="440" fill="#fff" font-size="32" text-anchor="middle">Agua</text>
-        <text x="230" y="500" fill="#fff" font-size="32" text-anchor="middle">pH / Nutrientes</text>
-        <text x="230" y="560" fill="#fff" font-size="32" text-anchor="middle">Oxígeno</text>
+        <marker id="arrow-cyan" markerWidth="36" markerHeight="36" refX="32" refY="18" orient="auto">
+            <path d="M0,0 L36,18 L0,36 Z" fill="#00ffff"/>
+        </marker>
 
-        <!-- BIÓTICOS (derecha) -->
-        <rect x="1020" y="180" width="300" height="500" rx="50" fill="#880e4f" stroke="#ff1744" stroke-width="12" opacity="0.8" filter="url(#glow-red)"/>
-        <text x="1170" y="250" fill="#ff1744" font-size="50" font-weight="bold" text-anchor="middle" filter="url(#glow-red)">BIÓTICOS</text>
-        <text x="1170" y="320" fill="#fff" font-size="32" text-anchor="middle">Competencia</text>
-        <text x="1170" y="380" fill="#fff" font-size="32" text-anchor="middle">Depredación</text>
-        <text x="1170" y="440" fill="#fff" font-size="32" text-anchor="middle">Mutualismo</text>
-        <text x="1170" y="500" fill="#fff" font-size="32" text-anchor="middle">Parasitismo</text>
-        <text x="1170" y="560" fill="#fff" font-size="32" text-anchor="middle">Comensalismo</text>
+        <marker id="arrow-red" markerWidth="36" markerHeight="36" refX="32" refY="18" orient="auto">
+            <path d="M0,0 L36,18 L0,36 Z" fill="#ff1744"/>
+        </marker>
+    </defs>
 
-        <!-- Flechas animadas desde ambos lados -->
-        <path d="M380 300 L580 430" stroke="#00ffff" stroke-width="14" marker-end="url(#arrow-cyan)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="3s" repeatCount="indefinite"/>
-        </path>
-        <path d="M380 450 L580 450" stroke="#00ffff" stroke-width="14" marker-end="url(#arrow-cyan)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="3s" repeatCount="indefinite"/>
-        </path>
-        <path d="M380 600 L580 470" stroke="#00ffff" stroke-width="14" marker-end="url(#arrow-cyan)" filter="url(#glow)">
-            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="3s" repeatCount="indefinite"/>
-        </path>
+    <!-- Título -->
+    <text x="800" y="95" fill="#ff00ff" font-size="88" font-weight="bold"
+          text-anchor="middle" filter="url(#glow)">
+        FACTORES AMBIENTALES
+    </text>
 
-        <path d="M1020 300 L820 430" stroke="#ff1744" stroke-width="14" marker-end="url(#arrow-red)" filter="url(#glow-red)">
-            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="3s" repeatCount="indefinite"/>
-        </path>
-        <path d="M1020 450 L820 450" stroke="#ff1744" stroke-width="14" marker-end="url(#arrow-red)" filter="url(#glow-red)">
-            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="3s" repeatCount="indefinite"/>
-        </path>
-        <path d="M1020 600 L820 470" stroke="#ff1744" stroke-width="14" marker-end="url(#arrow-red)" filter="url(#glow-red)">
-            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="3s" repeatCount="indefinite"/>
-        </path>
+    <!-- Nodo central -->
+    <circle cx="800" cy="460" r="150" fill="#1de9b6"
+            stroke="#00e676" stroke-width="18" filter="url(#glow)"/>
+    <text x="800" y="450" fill="#000" font-size="52"
+          font-weight="bold" text-anchor="middle">
+        ORGANISMO
+    </text>
+    <text x="800" y="500" fill="#000" font-size="34"
+          text-anchor="middle">
+        Supervivencia • Crecimiento • Reproducción
+    </text>
 
-        <defs>
-            <marker id="arrow-cyan" markerWidth="30" markerHeight="30" refX="28" refY="15" orient="auto">
-                <path d="M0,0 L30,15 L0,30 Z" fill="#00ffff"/>
-            </marker>
-            <marker id="arrow-red" markerWidth="30" markerHeight="30" refX="28" refY="15" orient="auto">
-                <path d="M0,0 L30,15 L0,30 Z" fill="#ff1744"/>
-            </marker>
-        </defs>
+    <!-- ABIÓTICOS -->
+    <rect x="100" y="190" width="360" height="520" rx="50"
+          fill="#0d47a1" stroke="#00ffff" stroke-width="14"
+          opacity="0.85" filter="url(#glow)"/>
 
-        <!-- Leyenda final -->
-        <text x="700" y="840" fill="#00ffff" font-size="44" text-anchor="middle" filter="url(#glow)">
-            Abióticos + Bióticos = Distribución, Abundancia y Supervivencia
-        </text>
-    </svg>
-    <div class="caption">Matriz cyberpunk de Factores Ambientales – Todo influye en todo</div>
+    <text x="280" y="260" fill="#00ffff" font-size="56"
+          font-weight="bold" text-anchor="middle" filter="url(#glow)">
+        ABIÓTICOS
+    </text>
+
+    <text x="280" y="330" fill="#ffffff" font-size="38" text-anchor="middle">Temperatura</text>
+    <text x="280" y="390" fill="#ffffff" font-size="38" text-anchor="middle">Luz (PAR)</text>
+    <text x="280" y="450" fill="#ffffff" font-size="38" text-anchor="middle">Agua</text>
+    <text x="280" y="510" fill="#ffffff" font-size="38" text-anchor="middle">pH</text>
+    <text x="280" y="570" fill="#ffffff" font-size="38" text-anchor="middle">Nutrientes</text>
+    <text x="280" y="630" fill="#ffffff" font-size="38" text-anchor="middle">Oxígeno</text>
+
+    <!-- BIÓTICOS -->
+    <rect x="1140" y="190" width="360" height="520" rx="50"
+          fill="#880e4f" stroke="#ff1744" stroke-width="14"
+          opacity="0.85" filter="url(#glow-red)"/>
+
+    <text x="1320" y="260" fill="#ff1744" font-size="56"
+          font-weight="bold" text-anchor="middle" filter="url(#glow-red)">
+        BIÓTICOS
+    </text>
+
+    <text x="1320" y="330" fill="#ffffff" font-size="38" text-anchor="middle">Competencia</text>
+    <text x="1320" y="390" fill="#ffffff" font-size="38" text-anchor="middle">Depredación</text>
+    <text x="1320" y="450" fill="#ffffff" font-size="38" text-anchor="middle">Mutualismo</text>
+    <text x="1320" y="510" fill="#ffffff" font-size="38" text-anchor="middle">Parasitismo</text>
+    <text x="1320" y="570" fill="#ffffff" font-size="38" text-anchor="middle">Comensalismo</text>
+
+    <!-- Flechas -->
+    <path d="M460 350 L650 450" stroke="#00ffff" stroke-width="16"
+          marker-end="url(#arrow-cyan)" filter="url(#glow)"/>
+    <path d="M460 550 L650 480" stroke="#00ffff" stroke-width="16"
+          marker-end="url(#arrow-cyan)" filter="url(#glow)"/>
+
+    <path d="M1140 350 L950 450" stroke="#ff1744" stroke-width="16"
+          marker-end="url(#arrow-red)" filter="url(#glow-red)"/>
+    <path d="M1140 550 L950 480" stroke="#ff1744" stroke-width="16"
+          marker-end="url(#arrow-red)" filter="url(#glow-red)"/>
+
+    <!-- Leyenda -->
+    <text x="800" y="860" fill="#00ffff" font-size="42"
+          text-anchor="middle" filter="url(#glow)">
+        Factores abióticos + bióticos = distribución, abundancia y supervivencia
+    </text>
+</svg>
+
+<div class="caption">
+    Matriz de factores ambientales: ningún factor actúa solo.
+</div>
 </div>
 
-<h4 class="mt-5">1. Factores Abióticos (No vivos)</h4>
+<!-- ========================================================= -->
+<!-- DESARROLLO -->
+<!-- ========================================================= -->
+
+<h4 class="mt-5">1. Factores Abióticos</h4>
+<p class="fs-5">
+    Son los componentes físicos y químicos del ambiente. Definen
+    los límites fisiológicos de las especies.
+</p>
+
 <table class="table text-center fs-5">
-    <tr><th>Factor</th><th>Rango típico</th><th>Efecto clave</th></tr>
-    <tr><td>Temperatura</td><td>-50 a +50°C</td><td>Velocidad enzimática (Q₁₀)</td></tr>
-    <tr><td>Luz (PAR)</td><td>400–700 nm</td><td>Fotosíntesis</td></tr>
-    <tr><td>Agua</td><td>0–100 % humedad</td><td>Hidratación celular</td></tr>
-    <tr><td>pH</td><td>0–14</td><td>Disponibilidad de iones</td></tr>
-    <tr><td>Nutrientes</td><td>N, P, K, Fe…</td><td>Crecimiento (Liebig)</td></tr>
-    <tr><td>Oxígeno</td><td>0–21 % atm / 0–14 mg/L agua</td><td>Respiración aeróbica</td></tr>
+    <tr><th>Factor</th><th>Efecto principal</th></tr>
+    <tr><td>Temperatura</td><td>Velocidad enzimática (Q₁₀)</td></tr>
+    <tr><td>Luz</td><td>Fotosíntesis y ritmos biológicos</td></tr>
+    <tr><td>Agua</td><td>Balance hídrico</td></tr>
+    <tr><td>pH</td><td>Disponibilidad de nutrientes</td></tr>
+    <tr><td>Oxígeno</td><td>Respiración celular</td></tr>
 </table>
 
-<h4 class="mt-5">2. Factores Bióticos (Vivos)</h4>
+<h4 class="mt-5">2. Factores Bióticos</h4>
+<p class="fs-5">
+    Son las interacciones entre organismos que regulan el tamaño,
+    la estructura y la dinámica de las poblaciones.
+</p>
+
 <table class="table text-center fs-5">
-    <tr><th>Interacción</th><th>Signo</th><th>Ejemplo</th></tr>
-    <tr><td>Competencia</td><td>- / -</td><td>Árboles por luz</td></tr>
-    <tr><td>Depredación</td><td>+ / -</td><td>Lobo → ciervo</td></tr>
-    <tr><td>Mutualismo</td><td>+ / +</td><td>Micorrizas ↔ planta</td></tr>
-    <tr><td>Comensalismo</td><td>+ / 0</td><td>Rémora → tiburón</td></tr>
-    <tr><td>Parasitismo</td><td>+ / -</td><td>Garrapata → mamífero</td></tr>
+    <tr><th>Interacción</th><th>Efecto</th><th>Ejemplo</th></tr>
+    <tr><td>Competencia</td><td>- / -</td><td>Plantas por luz</td></tr>
+    <tr><td>Depredación</td><td>+ / -</td><td>León → cebra</td></tr>
+    <tr><td>Mutualismo</td><td>+ / +</td><td>Micorrizas</td></tr>
+    <tr><td>Parasitismo</td><td>+ / -</td><td>Garrapata</td></tr>
+    <tr><td>Comensalismo</td><td>+ / 0</td><td>Rémora</td></tr>
 </table>
 
-<h4 class="mt-5 text-warning">3. Conceptos Clave</h4>
-<div class="row text-center fs-4">
-    <div class="col-md-4">
-        <p class="text-danger">Liebig (1840)</p>
-        <div class="eq">$$ P = k \cdot \min(f_1,f_2,\dots) $$</div>
-    </div>
-    <div class="col-md-4">
-        <p class="text-success">Shelford (1913)</p>
-        <p>Rango: mínimo → óptimo → máximo</p>
-    </div>
-    <div class="col-md-4">
-        <p class="text-info">Hutchinson (1957)</p>
-        <p>Nicho = hipervolumen n-dimensional</p>
-    </div>
-</div>
-
-<h4 class="mt-5">4. Interacción Real = Nunca un solo factor</h4>
+<h4 class="mt-5 text-warning">3. Idea Clave</h4>
 <div class="ejemplo">
-    <p class="fs-4">En un bosque tropical: la luz limita en el sotobosque aunque haya agua y nutrientes de sobra.</p>
+    <p class="fs-4">
+        En la naturaleza, <strong>nunca actúa un solo factor</strong>.
+        La vida es el resultado de múltiples límites funcionando al mismo tiempo.
+    </p>
 </div>
+
 HTML
 ,
     'ejercicios' => [
@@ -2782,7 +3221,9 @@ HTML
 /**
  * MATERIA: ECOSISTEMAS
  * TEMA: Biomas Terrestres y Acuáticos – La Gran División Ecológica del Planeta
- * ESTILO: Cyberpunk-neón total, SVG ANIMADO ÉPICO Y 100 % LEGIBLE
+ * NIVEL: MASTER (visual + conceptual + aplicado)
+ * ESTILO: Cyberpunk-neón total, SVG ANIMADO ÉPICO, 100 % LEGIBLE
+ * OBJETIVO: Superar Duolingo (claridad, narrativa, visuales, ciencia real)
  */
 
 $lecciones[] = [
@@ -2791,103 +3232,134 @@ $lecciones[] = [
     'titulo'  => 'Biomas del Planeta: Las Grandes Regiones Ecológicas',
 
     'contenido' => <<<'HTML'
+
 <h3 class="text-center display-4">BIOMAS DEL PLANETA</h3>
-<p class="fs-4 text-center">Las grandes regiones ecológicas definidas por clima + vegetación + fauna</p>
+<p class="fs-4 text-center">
+Un <strong>bioma</strong> es una gran región ecológica definida por el 
+<strong>clima</strong>, la <strong>vegetación dominante</strong> y las 
+<strong>adaptaciones de su fauna</strong>.
+</p>
+
+<div class="alert alert-info fs-5 text-center">
+🌍 <strong>Idea clave:</strong> si conoces la temperatura y la precipitación,
+puedes predecir el bioma con alta precisión.
+</div>
 
 <!-- SVG ANIMADO ÉPICO, LIMPIO Y 100 % LEGIBLE -->
 <div class="svg-diagram">
-    <svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1400" height="900" fill="#000"/>
+<svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+<rect width="1400" height="900" fill="#000"/>
 
-        <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="20" result="blur"/>
-                <feFlood flood-color="#00ffff"/><feComposite in2="blur" operator="in"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-        </defs>
+<defs>
+    <filter id="glow">
+        <feGaussianBlur stdDeviation="18" result="blur"/>
+        <feFlood flood-color="#00ffff"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+    </filter>
+</defs>
 
-        <!-- Título neón gigante -->
-        <text x="700" y="100" fill="#ff00ff" font-size="90" font-weight="bold" text-anchor="middle" filter="url(#glow)">BIOMAS TERRESTRES</text>
+<!-- TÍTULO -->
+<text x="700" y="95" text-anchor="middle"
+      fill="#ff00ff" font-size="96" font-weight="900"
+      filter="url(#glow)">
+BIOMAS TERRESTRES
+</text>
 
-        <!-- 7 Biomas principales con colores oficiales y etiquetas claras -->
-        <!-- 1. Tundra -->
-        <rect x="100" y="180" width="280" height="140" rx="30" fill="#e3f2fd" stroke="#bbdefb" stroke-width="8" filter="url(#glow)"/>
-        <text x="240" y="240" fill="#0d47a1" font-size="42" font-weight="bold" text-anchor="middle">TUNDRA</text>
-        <text x="240" y="290" fill="#bbdefb" font-size="28" text-anchor="middle">-30 a 5 °C │ &lt;250 mm</text>
+<!-- FILA SUPERIOR -->
+<rect id="tundra" x="80" y="160" width="280" height="150" rx="28"
+      fill="#e3f2fd" stroke="#90caf9" stroke-width="8" filter="url(#glow)"/>
+<text x="220" y="230" text-anchor="middle" font-size="46" font-weight="800" fill="#0d47a1">TUNDRA</text>
+<text x="220" y="280" text-anchor="middle" font-size="32" fill="#0d47a1">❄ −30 a 5 °C</text>
 
-        <!-- 2. Taiga / Bosque Boreal -->
-        <rect x="420" y="180" width="300" height="140" rx="30" fill="#1b5e20" stroke="#4caf50" stroke-width="8" filter="url(#glow)"/>
-        <text x="570" y="240" fill="#c8e6c9" font-size="42" font-weight="bold" text-anchor="middle">TAIGA</text>
-        <text x="570" y="290" fill="#a5d6a7" font-size="28" text-anchor="middle">-40 a 15 °C │ Coníferas</text>
+<rect id="taiga" x="400" y="160" width="300" height="150" rx="28"
+      fill="#1b5e20" stroke="#66bb6a" stroke-width="8" filter="url(#glow)"/>
+<text x="550" y="230" text-anchor="middle" font-size="46" font-weight="800" fill="#c8e6c9">TAIGA</text>
+<text x="550" y="280" text-anchor="middle" font-size="32" fill="#a5d6a7">Coníferas dominantes</text>
 
-        <!-- 3. Bosque Templado -->
-        <-->
-        <rect x="760" y="180" width="540" height="140" rx="30" fill="#33691e" stroke="#8bc34a" stroke-width="8" filter="url(#glow)"/>
-        <text x="1030" y="240" fill="#dcffdc" font-size="42" font-weight="bold" text-anchor="middle">BOSQUE TEMPLADO</text>
-        <text x="1030" y="290" fill="#c8e6c9" font-size="26" text-anchor="middle">Caducifolios │ 750-1500 mm</text>
+<rect id="templado" x="740" y="160" width="560" height="150" rx="28"
+      fill="#33691e" stroke="#9ccc65" stroke-width="8" filter="url(#glow)"/>
+<text x="1020" y="230" text-anchor="middle" font-size="46" font-weight="800" fill="#e8f5e9">BOSQUE TEMPLADO</text>
+<text x="1020" y="280" text-anchor="middle" font-size="30" fill="#c5e1a5">Caducifolios · 750–1500 mm</text>
 
-        <!-- 4. Selva Tropical -->
-        <rect x="100" y="380" width="380" height="160" rx="30" fill="#1b5e20" stroke="#00e676" stroke-width="10" filter="url(#glow)"/>
-        <text x="290" y="450" fill="#b9f6ca" font-size="48" font-weight="bold" text-anchor="middle">SELVA TROPICAL</text>
-        <text x="290" y="510" fill="#69f0ae" font-size="32" text-anchor="middle">>2000 mm │ +100 000 spp.</text>
+<!-- FILA MEDIA -->
+<rect id="selva" x="80" y="360" width="420" height="180" rx="30"
+      fill="#004d40" stroke="#00e676" stroke-width="10" filter="url(#glow)"/>
+<text x="290" y="440" text-anchor="middle" font-size="52" font-weight="900" fill="#b9f6ca">SELVA TROPICAL</text>
+<text x="290" y="500" text-anchor="middle" font-size="34" fill="#69f0ae">🌧 &gt;2000 mm · Máxima biodiversidad</text>
 
-        <!-- 5. Sabana -->
-        <rect x="520" y="380" width="300" height="160" rx="30" fill="#f9a825" stroke="#ffeb3b" stroke-width="8" filter="url(#glow)"/>
-        <text x="670" y="450" fill="#212121" font-size="44" font-weight="bold" text-anchor="middle">SABANA</text>
-        <text x="670" y="510" fill="#ffca28" font-size="28" text-anchor="middle">Pastos + acacias │ 20-30 °C</text>
+<rect id="sabana" x="520" y="360" width="320" height="180" rx="30"
+      fill="#f9a825" stroke="#ffeb3b" stroke-width="8" filter="url(#glow)"/>
+<text x="680" y="440" text-anchor="middle" font-size="46" font-weight="900" fill="#212121">SABANA</text>
+<text x="680" y="500" text-anchor="middle" font-size="32" fill="#212121">Pastos + árboles dispersos</text>
 
-        <!-- 6. Pradera Templada -->
-        <rect x="860" y="380" width="440" height="160" rx="30" fill="#827717" stroke="#cddc39" stroke-width="8" filter="url(#glow)"/>
-        <text x="1080" y="450" fill="#f0f4c3" font-size="44" font-weight="bold" text-anchor="middle">PRADERA</text>
-        <text x="1080" y="510" fill="#dce775" font-size="28" text-anchor="middle">Gramíneas │ 250-750 mm</text>
+<rect id="pradera" x="880" y="360" width="420" height="180" rx="30"
+      fill="#827717" stroke="#cddc39" stroke-width="8" filter="url(#glow)"/>
+<text x="1090" y="440" text-anchor="middle" font-size="46" font-weight="900" fill="#f0f4c3">PRADERA</text>
+<text x="1090" y="500" text-anchor="middle" font-size="32" fill="#e6ee9c">Gramíneas · Suelos fértiles</text>
 
-        <!-- 7. Desierto -->
-        <rect x="300" y="580" width="800" height="160" rx="30" fill="#ff8f00" stroke="#ffc107" stroke-width="10" filter="url(#glow)"/>
-        <text x="700" y="650" fill="#212121" font-size="52" font-weight="bold" text-anchor="middle">DESIERTO</text>
-        <text x="700" y="710" fill="#ffca28" font-size="34" text-anchor="middle">&lt;250 mm │ Cactus y suculentas</text>
+<!-- FILA INFERIOR -->
+<rect id="desierto" x="280" y="590" width="840" height="180" rx="32"
+      fill="#ff8f00" stroke="#ffc107" stroke-width="10" filter="url(#glow)"/>
+<text x="700" y="670" text-anchor="middle" font-size="56" font-weight="900" fill="#212121">DESIERTO</text>
+<text x="700" y="730" text-anchor="middle" font-size="36" fill="#212121">&lt;250 mm · Adaptaciones extremas</text>
 
-        <!-- Animación de aparición secuencial -->
-        <animate href="#tundra" attributeName="opacity" from="0" to="1" dur="1s" begin="0.5s" fill="freeze"/>
-        <animate href="#taiga" attributeName="opacity" from="0" to="1" dur="1s" begin="1.2s" fill="freeze"/>
-        <animate href="#templado" attributeName="opacity" from="0" to="1" dur="1s" begin="1.9s" fill="freeze"/>
-        <animate href="#selva" attributeName="opacity" from="0" to="1" dur="1s" begin="2.6s" fill="freeze"/>
-        <animate href="#sabana" attributeName="opacity" from="0" to="1" dur="1s" begin="3.3s" fill="freeze"/>
-        <animate href="#pradera" attributeName="opacity" from="0" to="1" dur="1s" begin="4s" fill="freeze"/>
-        <animate href="#desierto" attributeName="opacity" from="0" to="1" dur="1s" begin="4.7s" fill="freeze"/>
+<!-- LEYENDA -->
+<text x="700" y="860" text-anchor="middle"
+      fill="#00ffff" font-size="48" font-weight="700"
+      filter="url(#glow)">
+Temperatura + Precipitación → BIOMA
+</text>
+</svg>
 
-        <!-- Leyenda final -->
-        <text x="700" y="840" fill="#00ffff" font-size="46" text-anchor="middle" filter="url(#glow)">
-            Clima + Vegetación = Bioma
-        </text>
-    </svg>
-    <div class="caption">Mapa animado cyberpunk de los 7 grandes biomas terrestres – 100 % legible y épico</div>
+<div class="caption">
+Mapa conceptual de los grandes biomas terrestres — ordenado, legible y científico
+</div>
 </div>
 
-<h4 class="mt-5">1. Biomas Terrestres – Tabla Resumen</h4>
+<h4 class="mt-5">1. ¿Qué define un bioma?</h4>
+<ul class="fs-4">
+<li><strong>Temperatura media anual</strong> → metabolismo y enzimas</li>
+<li><strong>Precipitación anual</strong> → disponibilidad de agua</li>
+<li><strong>Vegetación dominante</strong> → estructura del ecosistema</li>
+<li><strong>Fauna adaptada</strong> → selección natural</li>
+</ul>
+
+<h4 class="mt-5">2. Biomas Terrestres – Tabla Resumen</h4>
 <table class="table text-center fs-5">
-    <tr><th>Bioma</th><th>Temperatura</th><th>Precipitación</th><th>Vegetación dominante</th><th>Ejemplo animal</th></tr>
-    <tr><td>Tundra</td><td>-30 a 5°C</td><td>&lt;250 mm</td><td>Musgos, líquenes</td><td>Reno, lemming</td></tr>
-    <tr><td>Taiga (boreal)</td><td>-40 a 15°C</td><td>300–800 mm</td><td>Coníferas</td><td>Alce, lince</td></tr>
-    <tr><td>Bosque templado</td><td>0 a 20°C</td><td>750–1500 mm</td><td>Caducifolios</td><td>Ciervo, oso pardo</td></tr>
-    <tr><td>Selva tropical</td><td>20–30°C</td><td>&gt;2000 mm</td><td>Dosel + epífitas</td><td>Jaguar, tucán</td></tr>
-    <tr><td>Sabana</td><td>20–30°C</td><td>500–1500 mm</td><td>Pastos + acacias</td><td>León, cebra</td></tr>
-    <tr><td>Pradera templada</td><td>-10 a 30°C</td><td>250–750 mm</td><td>Gramíneas altas</td><td>Bisonte, coyote</td></tr>
-    <tr><td>Desierto</td><td>20–40°C</td><td>&lt;250 mm</td><td>Cactus, suculentas</td><td>Camello, escorpión</td></tr>
+<tr><th>Bioma</th><th>Clima</th><th>Vegetación</th><th>Adaptación clave</th></tr>
+<tr><td>Tundra</td><td>Muy frío</td><td>Musgos, líquenes</td><td>Crecimiento rápido</td></tr>
+<tr><td>Taiga</td><td>Frío</td><td>Coníferas</td><td>Hojas aciculares</td></tr>
+<tr><td>Bosque templado</td><td>Moderado</td><td>Caducifolios</td><td>Caída de hojas</td></tr>
+<tr><td>Selva tropical</td><td>Cálido-húmedo</td><td>Dosel estratificado</td><td>Competencia por luz</td></tr>
+<tr><td>Sabana</td><td>Estacional</td><td>Pastos</td><td>Resistencia al fuego</td></tr>
+<tr><td>Pradera</td><td>Seco-templado</td><td>Gramíneas</td><td>Raíces profundas</td></tr>
+<tr><td>Desierto</td><td>Árido</td><td>Suculentas</td><td>Ahorro extremo de agua</td></tr>
 </table>
 
-<h4 class="mt-5">2. Biomas Acuáticos Principales</h4>
+<h4 class="mt-5 text-warning">3. Biomas Acuáticos (productividad real)</h4>
+<p class="fs-4 text-center">
+Aunque cubren el <strong>71 % del planeta</strong>, su productividad depende
+de nutrientes y luz.
+</p>
+
 <table class="table text-center fs-5">
-    <tr><th>Bioma</th><th>Tipo</th><th>Productividad</th><th>Ejemplo</th></tr>
-    <tr><td>Lagos y lagunas</td><td>Dulce</td><td>Media-alta</td><td>Baikal, Titicaca</td></tr>
-    <tr><td>Ríos y corrientes</td><td>Dulce</td><td>Alta en oxígeno</td><td>Amazonas, Nilo</td></tr>
-    <tr><td>Humedales</td><td>Dulce</td><td>MUY ALTA</td><td>Everglades, Pantanal</td></tr>
-    <tr><td>Océano abierto</td><td>Marino</td><td>Baja (excepto upwelling)</td><td>Pacífico</td></tr>
-    <tr><td>Arrecifes coralinos</td><td>Marino</td><td>ALTA + biodiversidad</td><td>Gran Barrera</td></tr>
-    <tr><td>Estuarios</td><td>Transición</td><td>ALTA (nutrientes)</td><td>Delta del Amazonas</td></tr>
+<tr><th>Bioma</th><th>Tipo</th><th>Productividad</th><th>Clave ecológica</th></tr>
+<tr><td>Humedales</td><td>Dulce</td><td>MUY ALTA</td><td>Filtran nutrientes</td></tr>
+<tr><td>Arrecifes</td><td>Marino</td><td>ALTA</td><td>Simbiosis coral–alga</td></tr>
+<tr><td>Océano abierto</td><td>Marino</td><td>Baja</td><td>Limitado por nutrientes</td></tr>
+<tr><td>Estuarios</td><td>Mixto</td><td>ALTA</td><td>Guarderías naturales</td></tr>
 </table>
 
-<h4 class="mt-5 text-warning">3. Los Dos Factores que lo Deciden Todo</h4>
-<p class="fs-4 text-center"><strong>Temperatura media anual + Precipitación anual</strong> → Esquema de Whittaker (1975ª edición)</p>
+<div class="alert alert-success fs-4 text-center mt-5">
+🌱 <strong>Conclusión final:</strong><br>
+Los biomas no dependen de especies individuales, sino de
+<strong>patrones climáticos globales</strong>.
+</div>
+
 HTML
 ,
     'ejercicios' => [
@@ -2945,169 +3417,213 @@ HTML
 ];
 // ========================================
 // MATERIA: ECOSISTEMAS
-// SUBTEMA: Redes Tróficas (Complejidad, Flujo, Estabilidad)
-// VERSIÓN FINAL: CORREGIDA, SEGURA, CON MATHJAX, SVG ANIMADO, 12 EJERCICIOS, 30 QUIZ
+// SUBTEMA: Redes Tróficas – Complejidad, Flujo y Estabilidad
+// NIVEL: AVANZADO / MASTER
+// ESTILO: Cyberpunk-neón total, SVG ANIMADO LEGIBLE, CIENCIA REAL
+// OBJETIVO: Comprender cómo fluye la energía y por qué la complejidad da estabilidad
 // ========================================
+
 $lecciones[] = [
     'materia' => 'Ecosistemas',
-    'slug' => 'redes-troficas',
-    'titulo' => 'Redes Tróficas: El Tejido Energético de los Ecosistemas',
-    'contenido' => '
-        <h3>¿Qué son las Redes Tróficas?</h3>
-        <p>Las <strong>redes tróficas</strong> son <strong>mapas complejos</strong> de <strong>interacciones alimentarias</strong> en un ecosistema. A diferencia de las <strong>cadenas alimentarias lineales</strong>, incluyen:</p>
-        <ul>
-            <li><strong>Múltiples conexiones</strong></li>
-            <li><strong>Omnívoros</strong></li>
-            <li><strong>Bucles tróficos</strong></li>
-            <li><strong>Descomponedores</strong></li>
-        </ul>
-        <p>Representan el <strong>flujo de energía</strong> y <strong>ciclo de materia</strong> con realismo.</p>
+    'slug'    => 'redes-troficas',
+    'titulo'  => 'Redes Tróficas: El Tejido Energético de los Ecosistemas',
 
-        <hr style="border:1px dashed #00ff00;">
+    'contenido' => <<<'HTML'
 
-        <h4>1. Niveles Tróficos</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Nivel</th><th>Ejemplo</th><th>Energía disponible</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Productores</td><td>Plantas, fitoplancton</td><td>100%</td></tr>
-                <tr><td>Consumidores primarios</td><td>Herbívoros</td><td>~10%</td></tr>
-                <tr><td>Consumidores secundarios</td><td>Carnívoros</td><td>~1%</td></tr>
-                <tr><td>Consumidores terciarios</td><td>Superpredadores</td><td>~0.1%</td></tr>
-                <tr><td>Descomponedores</td><td>Hongos, bacterias</td><td>Reciclan</td></tr>
-            </tbody>
-        </table>
+<h3 class="text-center display-4">REDES TRÓFICAS</h3>
+<p class="fs-4 text-center">
+Las <strong>redes tróficas</strong> describen cómo fluye la 
+<strong>energía</strong> y se recicla la <strong>materia</strong> 
+entre los organismos de un ecosistema.
+</p>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> <strong>Árbol → oruga → pájaro → halcón</strong> + <strong>oruga → ratón → zorro</strong> = red trófica.</p>
-        </div>
+<div class="alert alert-info fs-5 text-center">
+🌐 <strong>Idea central:</strong> la naturaleza no funciona en líneas rectas,
+sino como <strong>redes complejas</strong>.
+</div>
 
-        <div class="visual">
-            <img src="assets/img/red-trofica.webp" alt="Red trófica bosque templado">
-            <p><em>Red trófica en bosque templado. Fuente: Britannica.</em></p>
-        </div>
+<hr class="my-5">
 
-        <hr style="border:1px dashed #00ff00;">
+<h4>1. De cadenas a redes tróficas</h4>
+<p class="fs-4">
+Una <strong>cadena alimentaria</strong> es una simplificación:
+</p>
 
-        <h4>2. Ley del 10% (Lindeman)</h4>
-        <p>Solo ~10% de la energía pasa de un nivel trófico al siguiente.</p>
-        <p>\\[ E_{n+1} = 0.1 \\times E_n \\]</p>
+<p class="fs-4 text-center">
+🌱 Planta → 🐛 Herbívoro → 🐦 Carnívoro → 🦅 Superpredador
+</p>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> 10,000 kJ de plantas → 1,000 kJ herbívoros → 100 kJ carnívoros → 10 kJ superpredador.</p>
-        </div>
+<p class="fs-4">
+En la realidad, los organismos:
+</p>
+<ul class="fs-4">
+<li>Comen <strong>más de una especie</strong></li>
+<li>Pueden ocupar <strong>varios niveles tróficos</strong></li>
+<li>Están conectados por <strong>múltiples rutas</strong></li>
+</ul>
 
-        <hr style="border:1px dashed #00ff00;">
+<div class="ejemplo fs-4">
+<strong>Ejemplo real:</strong><br>
+Árbol → oruga → ave → halcón<br>
+Árbol → oruga → ratón → zorro<br>
+Árbol → semillas → ratón → lechuza
+</div>
 
-        <h4>3. Cadena vs Red Trófica</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Característica</th><th>Cadena</th><th>Red</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Estructura</td><td>Lineal</td><td>Compleja, interconectada</td></tr>
-                <tr><td>Realismo</td><td>Bajo</td><td>Alto</td></tr>
-                <tr><td>Estabilidad</td><td>Frágil</td><td>Resiliente</td></tr>
-            </tbody>
-        </table>
+<div class="visual">
+<img src="assets/img/red-trofica.webp" alt="Red trófica bosque templado">
+<p><em>Red trófica real: múltiples caminos energéticos.</em></p>
+</div>
 
-        <div class="visual">
-            <img src="assets/img/trofica.multiples.webp" alt="Red trófica completa">
-            <p><em>Red trófica con múltiples caminos. Fuente: GeeksforGeeks.</em></p>
-        </div>
+<hr class="my-5">
 
-        <hr style="border:1px dashed #00ff00;">
+<h4>2. Niveles tróficos y eficiencia energética</h4>
 
-        <h4>4. Índices de Complejidad</h4>
-        <ul>
-            <li><strong>Conectancia:</strong> \\( C = \\frac{L}{S^2} \\)</li>
-            <li><strong>Especies (S)</strong>, <strong>Enlaces (L)</strong></li>
-            <li><strong>Omnívoros:</strong> Comen &gt;1 nivel</li>
-            <li><strong>Bucles:</strong> A → B → C → A</li>
-        </ul>
+<table class="table text-center fs-5">
+<tr><th>Nivel</th><th>Organismos</th><th>Energía disponible</th></tr>
+<tr><td>Productores</td><td>Plantas, fitoplancton</td><td>100 %</td></tr>
+<tr><td>Consumidores primarios</td><td>Herbívoros</td><td>≈ 10 %</td></tr>
+<tr><td>Consumidores secundarios</td><td>Carnívoros</td><td>≈ 1 %</td></tr>
+<tr><td>Consumidores terciarios</td><td>Superpredadores</td><td>≈ 0.1 %</td></tr>
+<tr><td>Descomponedores</td><td>Hongos, bacterias</td><td>Reciclan materia</td></tr>
+</table>
 
-        <div class="visual">
-            <img src="assets/img/red-trofica-rios.png" alt="Red trófica río">
-            <p><em>Red trófica en río con bucles. Fuente: ResearchGate.</em></p>
-        </div>
+<h4 class="mt-4">🔢 Ley del 10 % (Lindeman, 1942)</h4>
+<p class="fs-4 text-center">
+Solo una fracción de la energía pasa al siguiente nivel:
+</p>
 
-        <hr style="border:1px dashed #00ff00;">
+<div class="eq">
+$$ E_{n+1} = 0.1 \cdot E_n $$
+</div>
 
-        <h4>5. Estabilidad y Resiliencia</h4>
-        <p>Redes complejas son más <strong>estables</strong> ante perturbaciones.</p>
-        <p><strong>Ejemplo:</strong> Si desaparece un herbívoro, otro lo reemplaza.</p>
+<div class="ejemplo fs-4">
+Si los productores capturan <strong>10 000 kJ</strong> →<br>
+Herbívoros: 1 000 kJ → Carnívoros: 100 kJ → Superpredador: 10 kJ
+</div>
 
-        <div class="visual">
-            <img src="assets/img/complejidad-estabilidad.png" alt="Estabilidad red trófica">
-            <p><em>Complejidad vs estabilidad. Fuente: Science of the Total Environment.</em></p>
-        </div>
+<hr class="my-5">
 
-        <div class="visual">
-            <img src="assets/img/red-trofica-global.png" alt="Red trófica global">
-            <p><em>Red trófica global. Fuente: Nature.</em></p>
-        </div>
+<h4>3. Redes tróficas = estabilidad</h4>
+<p class="fs-4">
+Las redes complejas son más <strong>resilientes</strong> que las cadenas simples:
+</p>
 
-        <div class="visual">
-            <img src="assets/img/topologico.png" alt="Análisis de redes">
-            <p><em>Análisis topológico de redes tróficas. Fuente: PNAS.</em></p>
-        </div>
+<ul class="fs-4">
+<li>Si una especie desaparece, otra puede ocupar su rol</li>
+<li>La energía encuentra <strong>rutas alternativas</strong></li>
+<li>Disminuye el riesgo de colapso total</li>
+</ul>
 
-        <hr style="border:1px dashed #00ff00;">
+<div class="visual">
+<img src="assets/img/complejidad-estabilidad.png" alt="Complejidad y estabilidad">
+<p><em>Mayor complejidad → mayor estabilidad ecológica.</em></p>
+</div>
 
-        <h4>6. SVG Animado: Red Trófica Dinámica</h4>
-        <div class="svg-diagram">
-            <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
-                <!-- Niveles -->
-                <rect x="300" y="350" width="100" height="80" fill="#228B22" rx="15"/> <!-- Productores -->
-                <text x="350" y="390" fill="white" font-size="14" text-anchor="middle">Productores</text>
+<hr class="my-5">
 
-                <rect x="150" y="230" width="100" height="80" fill="#FFD700" rx="15"/> <!-- Primarios -->
-                <text x="200" y="270" fill="black" font-size="12" text-anchor="middle">Herbívoros</text>
+<h4>4. Métricas de complejidad ecológica</h4>
+<ul class="fs-4">
+<li><strong>Riqueza de especies (S)</strong></li>
+<li><strong>Número de enlaces (L)</strong></li>
+<li><strong>Conectancia:</strong></li>
+</ul>
 
-                <rect x="450" y="230" width="100" height="80" fill="#FF4500" rx="15"/> <!-- Secundarios -->
-                <text x="500" y="270" fill="white" font-size="12" text-anchor="middle">Carnívoros</text>
+<div class="eq">
+$$ C = \frac{L}{S^2} $$
+</div>
 
-                <rect x="300" y="100" width="100" height="80" fill="#DC143C" rx="15"/> <!-- Terciarios -->
-                <text x="350" y="140" fill="white" font-size="12" text-anchor="middle">Superpredador</text>
+<p class="fs-4">
+A mayor conectancia → mayor amortiguación frente a perturbaciones.
+</p>
 
-                <!-- Descomponedores -->
-                <circle cx="350" cy="450" r="40" fill="#8B4513"/>
-                <text x="350" y="455" fill="white" font-size="10" text-anchor="middle">Descomponedores</text>
+<div class="visual">
+<img src="assets/img/topologico.png" alt="Topología de redes">
+<p><em>Análisis topológico de redes tróficas.</em></p>
+</div>
 
-                <!-- Flechas con energía -->
-                <defs>
-                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#00ff00"/>
-                    </marker>
-                </defs>
+<hr class="my-5">
 
-                <!-- Flujos -->
-                <path d="M350 350 L200 310" stroke="#00ff00" stroke-width="4" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="50" to="0" dur="2s" repeatCount="indefinite"/>
-                </path>
-                <path d="M350 350 L500 310" stroke="#00ff00" stroke-width="4" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="50" to="0" dur="2.5s" repeatCount="indefinite"/>
-                </path>
-                <path d="M200 230 L350 180" stroke="#ffcc00" stroke-width="3" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="40" to="0" dur="1.8s" repeatCount="indefinite"/>
-                </path>
-                <path d="M500 230 L350 180" stroke="#ffcc00" stroke-width="3" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="40" to="0" dur="2.2s" repeatCount="indefinite"/>
-                </path>
-                <path d="M350 450 Q300 400 250 310" stroke="#8B4513" stroke-width="3" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="60" to="0" dur="3s" repeatCount="indefinite"/>
-                </path>
-                <path d="M350 450 Q400 400 450 310" stroke="#8B4513" stroke-width="3" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="60" to="0" dur="3.5s" repeatCount="indefinite"/>
-                </path>
+<h4>5. Cascadas tróficas</h4>
+<p class="fs-4">
+Un cambio en un nivel puede propagarse a todo el sistema:
+</p>
 
-                <!-- Título -->
-                <text x="350" y="50" fill="#ffcc00" font-size="20" text-anchor="middle" font-family="Arial">Red Trófica</text>
-            </svg>
-            <p><em>SVG Animado: Flujo de energía desde productores hasta descomponedores.</em></p>
-        </div>
-    ',
+<div class="ejemplo fs-4">
+Eliminar superpredadores →<br>
+↑ herbívoros → ↓ vegetación → erosión → colapso del ecosistema
+</div>
+
+<div class="visual">
+<img src="assets/img/red-trofica-global.png" alt="Red trófica global">
+<p><em>Las redes tróficas operan a escala planetaria.</em></p>
+</div>
+
+<hr class="my-5">
+
+<h4>6. SVG Animado – Red Trófica Dinámica</h4>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="600" fill="#000"/>
+
+<defs>
+<filter id="glow">
+<feGaussianBlur stdDeviation="12" result="b"/>
+<feFlood flood-color="#00ffff"/>
+<feComposite in2="b" operator="in"/>
+<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+</filter>
+
+<marker id="arrow" markerWidth="24" markerHeight="24" refX="20" refY="12" orient="auto">
+<path d="M0,0 L24,12 L0,24 Z" fill="#00ff00"/>
+</marker>
+</defs>
+
+<!-- PRODUCTORES -->
+<rect x="360" y="430" width="180" height="90" rx="20" fill="#2e7d32" filter="url(#glow)"/>
+<text x="450" y="485" font-size="32" text-anchor="middle" fill="#e8f5e9">PRODUCTORES</text>
+
+<!-- HERBÍVOROS -->
+<rect x="160" y="290" width="200" height="90" rx="20" fill="#fbc02d" filter="url(#glow)"/>
+<text x="260" y="345" font-size="30" text-anchor="middle" fill="#212121">HERBÍVOROS</text>
+
+<rect x="540" y="290" width="200" height="90" rx="20" fill="#fbc02d" filter="url(#glow)"/>
+<text x="640" y="345" font-size="30" text-anchor="middle" fill="#212121">OMNÍVOROS</text>
+
+<!-- DEPREDADORES -->
+<rect x="360" y="150" width="180" height="90" rx="20" fill="#c62828" filter="url(#glow)"/>
+<text x="450" y="205" font-size="30" text-anchor="middle" fill="#ffebee">DEPREDADOR</text>
+
+<!-- DESCOMPONEDORES -->
+<circle cx="450" cy="550" r="45" fill="#6d4c41" filter="url(#glow)"/>
+<text x="450" y="558" font-size="22" text-anchor="middle" fill="#efebe9">DESCOMP.</text>
+
+<!-- FLUJOS -->
+<path d="M450 430 L260 380" stroke="#00ff00" stroke-width="6" marker-end="url(#arrow)"/>
+<path d="M450 430 L640 380" stroke="#00ff00" stroke-width="6" marker-end="url(#arrow)"/>
+<path d="M260 290 L450 240" stroke="#ffcc00" stroke-width="5" marker-end="url(#arrow)"/>
+<path d="M640 290 L450 240" stroke="#ffcc00" stroke-width="5" marker-end="url(#arrow)"/>
+<path d="M450 550 Q300 450 260 380" stroke="#8d6e63" stroke-width="5" marker-end="url(#arrow)"/>
+<path d="M450 550 Q600 450 640 380" stroke="#8d6e63" stroke-width="5" marker-end="url(#arrow)"/>
+
+<text x="450" y="70" font-size="42" fill="#00ffff" text-anchor="middle" filter="url(#glow)">
+RED TRÓFICA DINÁMICA
+</text>
+</svg>
+
+<p class="text-center fs-5">
+<em>Flujo de energía, reciclaje de materia y múltiples rutas.</em>
+</p>
+</div>
+
+<div class="alert alert-success fs-4 text-center mt-5">
+🔑 <strong>Conclusión final:</strong><br>
+La estabilidad de un ecosistema no depende de una sola especie,
+sino de la <strong>complejidad de su red trófica</strong>.
+</div>
+
+HTML
+,
     'ejercicios' => [
         // === BÁSICOS ===
         ['enunciado' => '¿Qué es una red trófica?', 'respuesta' => 'Interconexión de cadenas alimentarias'],
@@ -3169,179 +3685,251 @@ $lecciones[] = [
 ];
 // ========================================
 // MATERIA: ECOSISTEMAS
-// SUBTEMA: Relaciones Ecológicas (Simbiosis, Depredación, Competencia)
-// VERSIÓN FINAL: CORREGIDA, SEGURA, CON MATHJAX, SVG ANIMADO, 12 EJERCICIOS, 30 QUIZ
+// SUBTEMA: Relaciones Ecológicas – Simbiosis, Depredación y Competencia
+// NIVEL: AVANZADO / MASTER
+// ESTILO: Profesional, visual, interactivo, ciencia real
+// OBJETIVO: Comprender cómo las interacciones moldean comunidades y evolución
 // ========================================
+
 $lecciones[] = [
     'materia' => 'Ecosistemas',
-    'slug' => 'relaciones-ecosistemas',
-    'titulo' => 'Relaciones Ecológicas: El Tejido Vivo de los Ecosistemas',
-    'contenido' => '
-        <h3>Relaciones Ecológicas</h3>
-        <p>Las <strong>interacciones bióticas</strong> entre organismos determinan:</p>
-        <ul>
-            <li><strong>Estructura</strong> de comunidades</li>
-            <li><strong>Flujo de energía</strong></li>
-            <li><strong>Estabilidad</strong> del ecosistema</li>
-        </ul>
-        <p>Se clasifican por <strong>efecto neto</strong> en cada especie: <code>+</code>, <code>-</code>, <code>0</code>.</p>
+    'slug'    => 'relaciones-ecosistemas',
+    'titulo'  => 'Relaciones Ecológicas: El Tejido Vivo de los Ecosistemas',
 
-        <hr style="border:1px dashed #00ff00;">
+    'contenido' => <<<'HTML'
 
-        <h4>1. Tipos de Interacciones</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Interacción</th><th>Notación</th><th>Ejemplo</th><th>Efecto</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>Mutualismo</strong></td><td>+/+</td><td>Abeja ↔ Flor</td><td>Obligatorio o facultativo</td></tr>
-                <tr><td><strong>Comensalismo</strong></td><td>+/0</td><td>Rémora ↔ Tiburón</td><td>Neutral para uno</td></tr>
-                <tr><td><strong>Parasitismo</strong></td><td>+/-</td><td>Pulga ↔ Perro</td><td>Daño al huésped</td></tr>
-                <tr><td><strong>Depredación</strong></td><td>+/-</td><td>León ↔ Cebra</td><td>Muerte del presunto</td></tr>
-                <tr><td><strong>Competencia</strong></td><td>-/-</td><td>Árboles ↔ Luz</td><td>Exclusión competitiva</td></tr>
-                <tr><td><strong>Amensalismo</strong></td><td>-/0</td><td>Penicilina ↔ Bacteria</td><td>Inhibición</td></tr>
-            </tbody>
-        </table>
+<h3 class="text-center display-4">RELACIONES ECOLÓGICAS</h3>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> <strong>Mutualismo</strong>: Micorrizas (+ nutrientes al árbol, + azúcares al hongo).</p>
-        </div>
+<p class="fs-4 text-center">
+Los ecosistemas no son solo conjuntos de especies, sino
+<strong>redes dinámicas de interacciones</strong> que determinan
+quién sobrevive, quién prospera y cómo evoluciona la vida.
+</p>
 
-        <div class="visual">
-            <img src="assets/img/ecological-relationships-graphic_orig.png" alt="Relaciones ecológicas - Amoeba Sisters">
-            <p><em>Diagrama completo de interacciones. Fuente: Amoeba Sisters.</em></p>
-        </div>
+<div class="alert alert-info fs-5 text-center">
+🔗 <strong>Idea clave:</strong> Cada interacción deja una huella en la estructura,
+estabilidad y diversidad del ecosistema.
+</div>
 
-        <hr style="border:1px dashed #00ff00;">
+<hr class="my-5">
 
-        <h4>2. Simbiosis: Vida en Común</h4>
-        <ul>
-            <li><strong>Endosimbiosis:</strong> Un organismo vive dentro del otro</li>
-            <li><strong>Ectosimbiosis:</strong> En superficie</li>
-            <li><strong>Obligatoria:</strong> Sin el otro, muere</li>
-            <li><strong>Facultativa:</strong> Puede sobrevivir solo</li>
-        </ul>
+<h4>1. Interacciones bióticas: el lenguaje + / − / 0</h4>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> <strong>Clownfish ↔ Anémona</strong>: Pez protegido, anémona alimentada.</p>
-        </div>
+<p class="fs-4">
+Las relaciones ecológicas se clasifican según el
+<strong>efecto neto</strong> que producen en cada especie:
+</p>
 
-        <div class="visual">
-            <img src="assets/img/relaciones.jpg" alt="Dibujo animado de relaciones">
-            <p><em>Simbiosis, depredación, competencia. Fuente: YouTube.</em></p>
-        </div>
+<ul class="fs-4">
+<li><strong>+</strong> → beneficio</li>
+<li><strong>−</strong> → perjuicio</li>
+<li><strong>0</strong> → efecto neutro</li>
+</ul>
 
-        <hr style="border:1px dashed #00ff00;">
+<table class="table text-center fs-5 mt-4">
+<tr>
+<th>Interacción</th><th>Notación</th><th>Ejemplo</th><th>Consecuencia ecológica</th>
+</tr>
+<tr>
+<td><strong>Mutualismo</strong></td><td>+/+</td><td>Abeja ↔ Flor</td><td>Aumenta eficiencia biológica</td>
+</tr>
+<tr>
+<td><strong>Comensalismo</strong></td><td>+/0</td><td>Rémora ↔ Tiburón</td><td>Beneficio unilateral</td>
+</tr>
+<tr>
+<td><strong>Parasitismo</strong></td><td>+/-</td><td>Pulga ↔ Perro</td><td>Daño sin muerte inmediata</td>
+</tr>
+<tr>
+<td><strong>Depredación</strong></td><td>+/-</td><td>León ↔ Cebra</td><td>Transferencia directa de energía</td>
+</tr>
+<tr>
+<td><strong>Competencia</strong></td><td>-/-</td><td>Árboles ↔ Luz</td><td>Limitación de recursos</td>
+</tr>
+<tr>
+<td><strong>Amensalismo</strong></td><td>-/0</td><td>Penicilina ↔ Bacteria</td><td>Inhibición química</td>
+</tr>
+</table>
 
-        <h4>3. Depredación y Cascadas Tróficas</h4>
-        <p>Eliminación de un depredador → explosión de presas → colapso de plantas.</p>
-        <p><strong>Ejemplo:</strong> Lobos en Yellowstone → menos ciervos → más sauces → más castores.</p>
+<div class="ejemplo fs-4">
+<strong>Ejemplo clásico:</strong><br>
+<strong>Micorrizas</strong> → el hongo mejora la absorción de nutrientes (+)  
+y la planta le transfiere azúcares (+).
+</div>
 
-        <div class="visual">
-            <img src="assets/img/trofica-artico.png" alt="Red trófica ártica">
-            <p><em>Cascada trófica en océano ártico. Fuente: Study.com.</em></p>
-        </div>
+<div class="visual">
+<img src="assets/img/ecological-relationships-graphic_orig.png" alt="Relaciones ecológicas">
+<p><em>Resumen visual de interacciones bióticas.</em></p>
+</div>
 
-        <hr style="border:1px dashed #00ff00;">
+<hr class="my-5">
 
-        <h4>4. Competencia: Lucha por Recursos</h4>
-        <ul>
-            <li><strong>Intraespecífica:</strong> Misma especie</li>
-            <li><strong>Interespecífica:</strong> Diferentes especies</li>
-            <li><strong>Principio de Exclusión (Gause):</strong> Dos especies no pueden ocupar el mismo nicho</li>
-        </ul>
+<h4>2. Simbiosis: vida íntimamente conectada</h4>
 
-        <div class="visual">
-            <img src="assets/img/gause.png" alt="Principio de Gause">
-            <p><em>Competencia → exclusión. Fuente: Wikipedia.</em></p>
-        </div>
+<p class="fs-4">
+La <strong>simbiosis</strong> ocurre cuando dos especies mantienen
+una relación estrecha y prolongada en el tiempo.
+</p>
 
-        <div class="visual">
-            <img src="assets/img/competencia-arrecifes.png" alt="Competencia en arrecifes">
-            <p><em>Competencia por espacio en corales. Fuente: Frontiers.</em></p>
-        </div>
+<ul class="fs-4">
+<li><strong>Endosimbiosis:</strong> un organismo vive dentro del otro</li>
+<li><strong>Ectosimbiosis:</strong> vive sobre la superficie</li>
+<li><strong>Obligatoria:</strong> sin la relación, no sobrevive</li>
+<li><strong>Facultativa:</strong> la relación es ventajosa, pero no indispensable</li>
+</ul>
 
-        <div class="visual">
-            <img src="assets/img/interacciones-multiples.png" alt="Interacciones múltiples">
-            <p><em>Red de interacciones bióticas. Fuente: Science of the Total Environment.</em></p>
-        </div>
+<div class="ejemplo fs-4">
+<strong>Ejemplo icónico:</strong><br>
+<strong>Pez payaso ↔ Anémona</strong><br>
+El pez obtiene protección; la anémona recibe limpieza y nutrientes.
+</div>
 
-        <hr style="border:1px dashed #00ff00;">
+<div class="visual">
+<img src="assets/img/relaciones.jpg" alt="Relaciones ecológicas animadas">
+<p><em>Mutualismo, depredación y competencia.</em></p>
+</div>
 
-        <h4>5. Coevolución</h4>
-        <p>Especies evolucionan juntas por presión mutua.</p>
-        <p><strong>Ejemplo:</strong> Flores con tubo largo ↔ polillas con lengua larga.</p>
+<hr class="my-5">
 
-        <hr style="border:1px dashed #00ff00;">
+<h4>3. Depredación y cascadas ecológicas</h4>
 
-        <h4>6. SVG Animado: Red de Interacciones</h4>
-        <div class="svg-diagram">
-            <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
-                <!-- Especies -->
-                <circle cx="150" cy="200" r="50" fill="#90EE90" stroke="#228B22" stroke-width="3"/>
-                <text x="150" y="205" fill="#000" font-size="14" text-anchor="middle">Planta</text>
+<p class="fs-4">
+La depredación regula poblaciones y mantiene el equilibrio del ecosistema.
+Cuando se elimina un depredador, se produce una <strong>cascada trófica</strong>.
+</p>
 
-                <circle cx="350" cy="100" r="50" fill="#FFD700" stroke="#DAA520" stroke-width="3"/>
-                <text x="350" y="105" fill="#000" font-size="14" text-anchor="middle">Abeja</text>
+<div class="ejemplo fs-4">
+<strong>Yellowstone:</strong><br>
+Reintroducción de lobos → ↓ ciervos → ↑ vegetación → ↑ castores → ríos más estables
+</div>
 
-                <circle cx="550" cy="200" r="50" fill="#87CEEB" stroke="#4682B4" stroke-width="3"/>
-                <text x="550" y="205" fill="#000" font-size="14" text-anchor="middle">Pájaro</text>
+<div class="visual">
+<img src="assets/img/trofica-artico.png" alt="Cascada trófica">
+<p><em>Efectos indirectos de la depredación.</em></p>
+</div>
 
-                <circle cx="350" cy="300" r="50" fill="#FF6347" stroke="#DC143C" stroke-width="3"/>
-                <text x="350" y="305" fill="#FFF" font-size="14" text-anchor="middle">Pulga</text>
+<hr class="my-5">
 
-                <circle cx="150" cy="350" r="50" fill="#DDA0DD" stroke="#8B008B" stroke-width="3"/>
-                <text x="150" y="355" fill="#000" font-size="12" text-anchor="middle">Perro</text>
+<h4>4. Competencia: recursos limitados</h4>
 
-                <!-- Conexiones -->
-                <defs>
-                    <marker id="arrow-plus" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#00ff00"/>
-                    </marker>
-                    <marker id="arrow-minus" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#ff0000"/>
-                    </marker>
-                    <marker id="arrow-zero" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#888"/>
-                    </marker>
-                </defs>
+<p class="fs-4">
+Cuando los recursos son escasos, los organismos compiten.
+</p>
 
-                <!-- Mutualismo (+/+) -->
-                <path d="M200 200 Q250 150 300 100" stroke="#00ff00" stroke-width="4" marker-end="url(#arrow-plus)">
-                    <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite"/>
-                </path>
-                <path d="M300 100 Q250 150 200 200" stroke="#00ff00" stroke-width="4" marker-end="url(#arrow-plus)">
-                    <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2.2s" repeatCount="indefinite"/>
-                </path>
-                <text x="250" y="140" fill="#00ff00" font-size="12" text-anchor="middle">+/+</text>
+<ul class="fs-4">
+<li><strong>Intraespecífica:</strong> entre individuos de la misma especie</li>
+<li><strong>Interespecífica:</strong> entre especies diferentes</li>
+<li><strong>Principio de Gause:</strong> dos especies no pueden ocupar
+el mismo nicho de forma indefinida</li>
+</ul>
 
-                <!-- Comensalismo (+/0) -->
-                <path d="M200 200 Q300 150 500 200" stroke="#888" stroke-width="3" marker-end="url(#arrow-zero)">
-                    <animate attributeName="stroke-dashoffset" from="80" to="0" dur="2.5s" repeatCount="indefinite"/>
-                </path>
-                <text x="350" y="160" fill="#888" font-size="12" text-anchor="middle">+/0</text>
+<div class="visual">
+<img src="assets/img/gause.png" alt="Principio de exclusión competitiva">
+<p><em>Exclusión competitiva.</em></p>
+</div>
 
-                <!-- Parasitismo (+/-) -->
-                <path d="M200 350 Q250 325 300 300" stroke="#ff0000" stroke-width="4" marker-end="url(#arrow-minus)">
-                    <animate attributeName="stroke-dashoffset" from="60" to="0" dur="1.8s" repeatCount="indefinite"/>
-                </path>
-                <text x="250" y="310" fill="#ff0000" font-size="12" text-anchor="middle">+/-</text>
+<div class="visual">
+<img src="assets/img/competencia-arrecifes.png" alt="Competencia arrecifes">
+<p><em>Competencia por espacio y luz.</em></p>
+</div>
 
-                <!-- Depredación (+/-) -->
-                <path d="M150 250 Q250 150 350 130" stroke="#ff0000" stroke-width="4" marker-end="url(#arrow-minus)">
-                    <animate attributeName="stroke-dashoffset" from="90" to="0" dur="3s" repeatCount="indefinite"/>
-                </path>
+<div class="visual">
+<img src="assets/img/interacciones-multiples.png" alt="Interacciones múltiples">
+<p><em>Red de interacciones simultáneas.</em></p>
+</div>
 
-                <!-- Competencia (-/-) -->
-                <path d="M150 250 Q250 280 350 300" stroke="#ff00ff" stroke-width="3" stroke-dasharray="5,5"/>
-                <text x="250" y="270" fill="#ff00ff" font-size="12" text-anchor="middle">-/-</text>
+<hr class="my-5">
 
-                <!-- Título -->
-                <text x="350" y="50" fill="#ffcc00" font-size="20" text-anchor="middle" font-family="Arial">Relaciones Ecológicas</text>
-            </svg>
-            <p><em>SVG Animado: Interacciones con efectos positivos, negativos y neutros.</em></p>
-        </div>
-    ',
+<h4>5. Coevolución: carreras evolutivas</h4>
+
+<p class="fs-4">
+Las especies influyen mutuamente en su evolución.
+</p>
+
+<div class="ejemplo fs-4">
+<strong>Flores con tubos largos ↔ Polillas con lenguas largas</strong><br>
+Cada adaptación impulsa a la otra.
+</div>
+
+<hr class="my-5">
+
+<h4>6. SVG Animado – Red de Relaciones Ecológicas</h4>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="600" fill="#000"/>
+
+<defs>
+<filter id="glow">
+<feGaussianBlur stdDeviation="10" result="b"/>
+<feFlood flood-color="#00ffff"/>
+<feComposite in2="b" operator="in"/>
+<feMerge>
+<feMergeNode/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+
+<marker id="arrowPlus" markerWidth="20" markerHeight="20" refX="16" refY="10" orient="auto">
+<path d="M0,0 L20,10 L0,20 Z" fill="#00ff00"/>
+</marker>
+
+<marker id="arrowMinus" markerWidth="20" markerHeight="20" refX="16" refY="10" orient="auto">
+<path d="M0,0 L20,10 L0,20 Z" fill="#ff0044"/>
+</marker>
+
+<marker id="arrowZero" markerWidth="20" markerHeight="20" refX="16" refY="10" orient="auto">
+<path d="M0,0 L20,10 L0,20 Z" fill="#aaaaaa"/>
+</marker>
+</defs>
+
+<!-- ESPECIES -->
+<circle cx="200" cy="260" r="60" fill="#4caf50" filter="url(#glow)"/>
+<text x="200" y="268" font-size="28" text-anchor="middle" fill="#fff">PLANTA</text>
+
+<circle cx="450" cy="120" r="60" fill="#ffeb3b" filter="url(#glow)"/>
+<text x="450" y="128" font-size="28" text-anchor="middle" fill="#000">ABEJA</text>
+
+<circle cx="700" cy="260" r="60" fill="#03a9f4" filter="url(#glow)"/>
+<text x="700" y="268" font-size="28" text-anchor="middle" fill="#fff">AVE</text>
+
+<circle cx="450" cy="420" r="60" fill="#e53935" filter="url(#glow)"/>
+<text x="450" y="428" font-size="26" text-anchor="middle" fill="#fff">PARÁSITO</text>
+
+<circle cx="200" cy="460" r="60" fill="#9c27b0" filter="url(#glow)"/>
+<text x="200" y="468" font-size="26" text-anchor="middle" fill="#fff">HOSPEDADOR</text>
+
+<!-- INTERACCIONES -->
+<path d="M260 230 Q350 170 390 150" stroke="#00ff00" stroke-width="6" marker-end="url(#arrowPlus)"/>
+<path d="M390 150 Q300 200 260 230" stroke="#00ff00" stroke-width="6" marker-end="url(#arrowPlus)"/>
+<text x="325" y="185" font-size="24" fill="#00ff00">+/+</text>
+
+<path d="M260 260 Q450 260 640 260" stroke="#aaaaaa" stroke-width="5" marker-end="url(#arrowZero)"/>
+<text x="450" y="245" font-size="22" fill="#aaaaaa">+/0</text>
+
+<path d="M260 450 Q350 430 390 420" stroke="#ff0044" stroke-width="6" marker-end="url(#arrowMinus)"/>
+<text x="320" y="420" font-size="24" fill="#ff0044">+/-</text>
+
+<path d="M200 320 Q350 350 450 360" stroke="#ff00ff" stroke-width="5" stroke-dasharray="10,10"/>
+<text x="330" y="350" font-size="22" fill="#ff00ff">-/-</text>
+
+<text x="450" y="60" font-size="42" fill="#00ffff" text-anchor="middle" filter="url(#glow)">
+RED DE INTERACCIONES
+</text>
+</svg>
+
+<p class="text-center fs-5">
+<em>Relaciones positivas, negativas y neutras interactuando simultáneamente.</em>
+</p>
+</div>
+
+<div class="alert alert-success fs-4 text-center mt-5">
+🔑 <strong>Conclusión final:</strong><br>
+Las relaciones ecológicas determinan la
+<strong>estructura, estabilidad y evolución</strong> de los ecosistemas.
+</div>
+
+HTML
+,
     'ejercicios' => [
         // === BÁSICOS ===
         ['enunciado' => 'Clasifica: Tiburón y rémora', 'respuesta' => 'Comensalismo (+/0)'],
@@ -3403,172 +3991,265 @@ $lecciones[] = [
 ];
 // ========================================
 // MATERIA: ECOSISTEMAS
-// SUBTEMA: Homeostasis (Organismos y Ecosistemas)
-// VERSIÓN FINAL: CORREGIDA, SEGURA, CON MATHJAX, SVG ANIMADO, 12 EJERCICIOS, 30 QUIZ
+// SUBTEMA: Homeostasis – Organismos, Ecosistemas y Biosfera
+// NIVEL: AVANZADO / MASTER
+// ESTILO: Profesional, visual, científico, interactivo
+// OBJETIVO: Comprender el equilibrio dinámico de la vida
 // ========================================
+
 $lecciones[] = [
     'materia' => 'Ecosistemas',
-    'slug' => 'homeostasis',
-    'titulo' => 'Homeostasis: El Equilibrio Dinámico de la Vida',
-    'contenido' => '
-        <h3>¿Qué es la Homeostasis?</h3>
-        <p>La <strong>homeostasis</strong> es el <strong>mantenimiento activo del equilibrio interno</strong> frente a cambios externos. Funciona mediante:</p>
-        <ul>
-            <li><strong>Retroalimentación negativa</strong>: Reduce desviaciones</li>
-            <li><strong>Retroalimentación positiva</strong>: Amplifica (raro, inestable)</li>
-            <li><strong>Sensores → Control → Efectores</strong></li>
-        </ul>
-        <p>Aplica a <strong>organismos</strong> y <strong>ecosistemas</strong>.</p>
+    'slug'    => 'homeostasis',
+    'titulo'  => 'Homeostasis: El Equilibrio Dinámico de la Vida',
 
-        <hr style="border:1px dashed #00ff00;">
+    'contenido' => <<<'HTML'
 
-        <h4>1. Homeostasis en Organismos</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Variable</th><th>Valor Óptimo</th><th>Mecanismo</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Temperatura</td><td>37°C (humanos)</td><td>Sudor, escalofríos</td></tr>
-                <tr><td>pH sanguíneo</td><td>7.35–7.45</td><td>Buffer, respiración</td></tr>
-                <tr><td>Glucosa</td><td>70–110 mg/dL</td><td>Insulina, glucagón</td></tr>
-                <tr><td>Osmolaridad</td><td>~300 mOsm/L</td><td>ADH, riñones</td></tr>
-            </tbody>
-        </table>
+<h3 class="text-center display-4">HOMEOSTASIS</h3>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> Sudas → enfrías → temperatura vuelve a 37°C.</p>
-        </div>
+<p class="fs-4 text-center">
+La vida no existe en equilibrio estático.  
+Sobrevive gracias a un <strong>equilibrio dinámico</strong> capaz de
+ajustarse constantemente frente al cambio.
+</p>
 
-        <div class="visual">
-            <img src="assets/img/retroali_negativa.webp" alt="Homeostasis humana">
-            <p><em>Ciclo de retroalimentación negativa. Fuente: GeeksforGeeks.</em></p>
-        </div>
+<div class="alert alert-info fs-5 text-center">
+⚙️ <strong>Homeostasis:</strong> mantenimiento activo de variables internas
+dentro de rangos compatibles con la vida.
+</div>
 
-        <hr style="border:1px dashed #00ff00;">
+<hr class="my-5">
 
-        <h4>2. Homeostasis en Ecosistemas</h4>
-        <p>Mantiene:</p>
-        <ul>
-            <li><strong>Concentración de nutrientes</strong></li>
-            <li><strong>Poblaciones</strong></li>
-            <li><strong>Flujo de energía</strong></li>
-        </ul>
+<h4>1. Los pilares de la homeostasis</h4>
 
-        <table class="table">
-            <thead>
-                <tr><th>Mecanismo</th><th>Ejemplo</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Depredador-presa</td><td>Linces → liebres</td></tr>
-                <tr><td>Ciclo de nutrientes</td><td>Descomponedores → N, P</td></tr>
-                <tr><td>Competencia</td><td>Exclusión → nichos</td></tr>
-                <tr><td>Sucesión</td><td>Restauración post-incendio</td></tr>
-            </tbody>
-        </table>
+<p class="fs-4">
+Todo sistema homeostático —desde una célula hasta un ecosistema—
+funciona mediante tres componentes básicos:
+</p>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> Aumento de algas → más peces → más garzas → algas disminuyen → equilibrio.</p>
-        </div>
+<ul class="fs-4">
+<li><strong>Sensores:</strong> detectan cambios (temperatura, pH, nutrientes)</li>
+<li><strong>Centro de control:</strong> compara con el valor óptimo</li>
+<li><strong>Efectores:</strong> corrigen la desviación</li>
+</ul>
 
-        <div class="visual">
-            <img src="assets/img/retroali_eco.webp" alt="Homeostasis ecosistémica">
-            <p><em>Retroalimentación en ecosistemas. Fuente: Quizlet.</em></p>
-        </div>
+<p class="fs-4">
+El mecanismo dominante es la <strong>retroalimentación negativa</strong>,
+que reduce las desviaciones y restaura el equilibrio.
+</p>
 
-        <hr style="border:1px dashed #00ff00;">
+<div class="alert alert-warning fs-5">
+⚠️ La <strong>retroalimentación positiva</strong> amplifica los cambios y,
+aunque es útil en procesos breves, puede conducir a inestabilidad.
+</div>
 
-        <h4>3. Retroalimentación Negativa vs Positiva</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Tipo</th><th>Efecto</th><th>Ejemplo</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Negativa</td><td>Restaura</td><td>Depredación</td></tr>
-                <tr><td>Positiva</td><td>Amplifica</td><td>Eutrofización</td></tr>
-            </tbody>
-        </table>
+<hr class="my-5">
 
-        <p>Modelo simple:</p>
-        <p>\\[ \\frac{dP}{dt} = rP \\left(1 - \\frac{P}{K}\\right) - cDP \\]</p>
+<h4>2. Homeostasis en organismos</h4>
 
-        <div class="visual">
-            <img src="/assets/img/equilibrio_dinamico.png" alt="Homeostasis ecosistema">
-            <p><em>Equilibrio dinámico. Fuente: Eco-intelligent.</em></p>
-        </div>
+<p class="fs-4">
+Los organismos regulan variables fisiológicas críticas.
+Un fallo homeostático implica enfermedad o muerte.
+</p>
 
-        <hr style="border:1px dashed #00ff00;">
+<table class="table text-center fs-5 mt-4">
+<tr>
+<th>Variable</th><th>Valor óptimo</th><th>Mecanismo regulador</th>
+</tr>
+<tr>
+<td>Temperatura corporal</td><td>≈ 37 °C</td><td>Sudoración / escalofríos</td>
+</tr>
+<tr>
+<td>pH sanguíneo</td><td>7.35 – 7.45</td><td>Sistemas buffer + respiración</td>
+</tr>
+<tr>
+<td>Glucosa</td><td>70 – 110 mg/dL</td><td>Insulina / glucagón</td>
+</tr>
+<tr>
+<td>Osmolaridad</td><td>≈ 300 mOsm/L</td><td>ADH y riñones</td>
+</tr>
+</table>
 
-        <h4>4. Resiliencia y Umbral</h4>
-        <ul>
-            <li><strong>Resiliencia:</strong> Capacidad de volver al equilibrio</li>
-            <li><strong>Umbral (tipping point):</strong> Punto sin retorno</li>
-        </ul>
+<div class="ejemplo fs-4">
+<strong>Ejemplo clásico:</strong><br>
+Aumenta la temperatura → sudoración → pérdida de calor →
+temperatura vuelve al rango óptimo.
+</div>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> Acidificación → corales mueren → no recuperación.</p>
-        </div>
+<div class="visual">
+<img src="assets/img/retroali_negativa.webp" alt="Homeostasis fisiológica">
+<p><em>Ciclo de retroalimentación negativa en humanos.</em></p>
+</div>
 
-        <div class="visual">
-            <img src="assets/img/Resiliencia_colapso.png" alt="Umbral ecosistémico">
-            <p><em>Resiliencia vs colapso. Fuente: Science of the Total Environment.</em></p>
-        </div>
+<hr class="my-5">
 
-        <div class="visual">
-            <img src="assets/img/retroalimentacion-biosfera.png" alt="Retroalimentación global">
-            <p><em>Retroalimentación en biosfera. Fuente: Nature.</em></p>
-        </div>
+<h4>3. Homeostasis en ecosistemas</h4>
 
-        <div class="visual">
-            <img src="assets/img/resiliencia-paisajes.png" alt="Resiliencia">
-            <p><em>Resiliencia en paisajes. Fuente: Landscape Ecology.</em></p>
-        </div>
+<p class="fs-4">
+Los ecosistemas también se autorregulan, manteniendo:
+</p>
 
-        <hr style="border:1px dashed #00ff00;">
+<ul class="fs-4">
+<li>Concentración de nutrientes</li>
+<li>Tamaño de poblaciones</li>
+<li>Flujo de energía</li>
+</ul>
 
-        <h4>5. SVG Animado: Ciclo de Homeostasis</h4>
-        <div class="svg-diagram">
-            <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
-                <!-- Centro: Equilibrio -->
-                <circle cx="350" cy="250" r="80" fill="#87CEEB" stroke="#4682B4" stroke-width="4"/>
-                <text x="350" y="245" fill="#000" font-size="18" text-anchor="middle">EQUILIBRIO</text>
+<table class="table text-center fs-5 mt-4">
+<tr>
+<th>Mecanismo</th><th>Función</th><th>Ejemplo</th>
+</tr>
+<tr>
+<td>Depredador–presa</td><td>Regula poblaciones</td><td>Lince ↔ liebre</td>
+</tr>
+<tr>
+<td>Ciclo de nutrientes</td><td>Reciclaje de materia</td><td>Descomponedores → N, P</td>
+</tr>
+<tr>
+<td>Competencia</td><td>Distribución de nichos</td><td>Plantas por luz</td>
+</tr>
+<tr>
+<td>Sucesión ecológica</td><td>Restauración</td><td>Bosque post-incendio</td>
+</tr>
+</table>
 
-                <!-- Perturbación -->
-                <circle cx="150" cy="150" r="50" fill="#FF6347" opacity="0.7"/>
-                <text x="150" y="155" fill="white" font-size="12" text-anchor="middle">+ Nutrientes</text>
+<div class="ejemplo fs-4">
+<strong>Ejemplo ecosistémico:</strong><br>
+↑ algas → ↑ peces → ↑ aves → ↓ algas → retorno al equilibrio
+</div>
 
-                <!-- Respuesta -->
-                <circle cx="550" cy="150" r="50" fill="#32CD32" opacity="0.7"/>
-                <text x="550" y="155" fill="white" font-size="12" text-anchor="middle">- Algas</text>
+<div class="visual">
+<img src="assets/img/retroali_eco.webp" alt="Homeostasis ecosistémica">
+<p><em>Retroalimentación negativa en ecosistemas.</em></p>
+</div>
 
-                <!-- Flechas animadas -->
-                <defs>
-                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#00ff00"/>
-                    </marker>
-                </defs>
+<hr class="my-5">
 
-                <!-- Perturbación → Desequilibrio -->
-                <path d="M200 150 Q250 200 300 220" stroke="#ff0000" stroke-width="5" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite"/>
-                </path>
-                <text x="250" y="190" fill="#ff0000" font-size="12" text-anchor="middle">Aumento algas</text>
+<h4>4. Retroalimentación negativa vs positiva</h4>
 
-                <!-- Respuesta → Equilibrio -->
-                <path d="M400 220 Q450 200 500 150" stroke="#00ff00" stroke-width="5" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2.5s" repeatCount="indefinite"/>
-                </path>
-                <text x="450" y="190" fill="#00ff00" font-size="12" text-anchor="middle">Peces comen</text>
+<table class="table text-center fs-5">
+<tr>
+<th>Tipo</th><th>Efecto</th><th>Resultado</th><th>Ejemplo</th>
+</tr>
+<tr>
+<td>Negativa</td><td>Contrarresta cambios</td><td>Estabilidad</td><td>Depredación</td>
+</tr>
+<tr>
+<td>Positiva</td><td>Amplifica cambios</td><td>Colapso</td><td>Eutrofización</td>
+</tr>
+</table>
 
-                <!-- Ciclo completo -->
-                <path d="M150 200 Q150 300 350 320 Q550 300 550 200" stroke="#888" stroke-width="3" stroke-dasharray="5,5"/>
-                <text x="350" y="340" fill="#888" font-size="14" text-anchor="middle">Retroalimentación Negativa</text>
+<p class="fs-4">
+Modelo poblacional simplificado con regulación:
+</p>
 
-                <!-- Título -->
-                <text x="350" y="50" fill="#ffcc00" font-size="20" text-anchor="middle" font-family="Arial">Homeostasis Ecosistémica</text>
-            </svg>
-            <p><em>SVG Animado: Perturbación → Desequilibrio → Respuesta → Equilibrio.</em></p>
-        </div>
-    ',
+<p class="fs-4 text-center">
+\frac{dP}{dt} = rP \left(1 - \frac{P}{K}\right) - cDP
+</p>
+
+<p class="fs-4">
+Este modelo combina crecimiento logístico con control por depredación.
+</p>
+
+<div class="visual">
+<img src="assets/img/equilibrio_dinamico.png" alt="Equilibrio dinámico">
+<p><em>Equilibrio dinámico poblacional.</em></p>
+</div>
+
+<hr class="my-5">
+
+<h4>5. Resiliencia y umbrales críticos</h4>
+
+<ul class="fs-4">
+<li><strong>Resiliencia:</strong> capacidad de recuperar el equilibrio</li>
+<li><strong>Umbral (tipping point):</strong> punto sin retorno</li>
+</ul>
+
+<div class="ejemplo fs-4">
+<strong>Ejemplo:</strong><br>
+Acidificación oceánica → muerte de corales →
+pérdida del arrecife → colapso del ecosistema
+</div>
+
+<div class="visual">
+<img src="assets/img/Resiliencia_colapso.png" alt="Resiliencia y colapso">
+<p><em>Estados alternativos y puntos críticos.</em></p>
+</div>
+
+<div class="visual">
+<img src="assets/img/retroalimentacion-biosfera.png" alt="Retroalimentación biosfera">
+<p><em>Procesos homeostáticos a escala planetaria.</em></p>
+</div>
+
+<div class="visual">
+<img src="assets/img/resiliencia-paisajes.png" alt="Resiliencia paisajes">
+<p><em>Resiliencia ecológica en paisajes reales.</em></p>
+</div>
+
+<hr class="my-5">
+
+<h4>6. SVG Animado – Ciclo de Homeostasis Ecosistémica</h4>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="600" fill="#000"/>
+
+<defs>
+<filter id="glow">
+<feGaussianBlur stdDeviation="12" result="b"/>
+<feFlood flood-color="#00ffff"/>
+<feComposite in2="b" operator="in"/>
+<feMerge>
+<feMergeNode/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+
+<marker id="arrow" markerWidth="20" markerHeight="20" refX="16" refY="10" orient="auto">
+<path d="M0,0 L20,10 L0,20 Z" fill="#00ff00"/>
+</marker>
+</defs>
+
+<!-- EQUILIBRIO -->
+<circle cx="450" cy="300" r="110" fill="#03a9f4" filter="url(#glow)"/>
+<text x="450" y="295" font-size="32" text-anchor="middle" fill="#000">EQUILIBRIO</text>
+
+<!-- PERTURBACIÓN -->
+<circle cx="180" cy="180" r="70" fill="#e53935" opacity="0.8"/>
+<text x="180" y="185" font-size="22" text-anchor="middle" fill="#fff">↑ Nutrientes</text>
+
+<!-- RESPUESTA -->
+<circle cx="720" cy="180" r="70" fill="#43a047" opacity="0.8"/>
+<text x="720" y="185" font-size="22" text-anchor="middle" fill="#fff">↑ Consumidores</text>
+
+<!-- FLUJOS -->
+<path d="M250 210 Q350 260 380 280" stroke="#ff0044" stroke-width="7" marker-end="url(#arrow)"/>
+<path d="M520 280 Q600 250 650 210" stroke="#00ff00" stroke-width="7" marker-end="url(#arrow)"/>
+
+<path d="M180 260 Q180 420 450 440 Q720 420 720 260"
+stroke="#aaaaaa" stroke-width="5" stroke-dasharray="10,10"/>
+
+<text x="450" y="480" font-size="26" text-anchor="middle" fill="#aaaaaa">
+Retroalimentación Negativa
+</text>
+
+<text x="450" y="80" font-size="42" text-anchor="middle" fill="#00ffff" filter="url(#glow)">
+HOMEOSTASIS ECOSISTÉMICA
+</text>
+</svg>
+
+<p class="text-center fs-5">
+<em>Perturbación → respuesta → retorno al equilibrio.</em>
+</p>
+</div>
+
+<div class="alert alert-success fs-4 text-center mt-5">
+🔑 <strong>Conclusión:</strong><br>
+La homeostasis permite que la vida persista en un planeta cambiante.
+Cuando los límites se superan, el equilibrio se pierde.
+</div>
+
+HTML
+,
     'ejercicios' => [
         // === BÁSICOS ===
         ['enunciado' => 'Define homeostasis', 'respuesta' => 'Mantenimiento del equilibrio interno'],
@@ -3631,166 +4312,240 @@ $lecciones[] = [
 // ========================================
 // MATERIA: ECOSISTEMAS
 // SUBTEMA: Producción Primaria y Transferencia de Energía
-// VERSIÓN FINAL: CORREGIDA, SEGURA, CON MATHJAX, SVG ANIMADO, 12 EJERCICIOS, 30 QUIZ
+// NIVEL: AVANZADO / MASTER
+// ESTILO: Científico, visual, interactivo, legible
 // ========================================
+
 $lecciones[] = [
     'materia' => 'Ecosistemas',
-    'slug' => 'produccion-primaria-transferencia-energia',
-    'titulo' => 'Producción Primaria y Transferencia de Energía en Ecosistemas',
-    'contenido' => '
-        <h3>Producción Primaria: El Motor Energético</h3>
-        <p>La <strong>producción primaria</strong> es la <strong>síntesis de materia orgánica</strong> por <strong>autótrofos</strong> usando energía solar (fotosíntesis) o química (quimiosíntesis).</p>
-        <p><strong>Unidades:</strong> g C/m²/año, kJ/m²/año, o kcal/m²/día</p>
+    'slug'    => 'produccion-primaria-transferencia-energia',
+    'titulo'  => 'Producción Primaria y Transferencia de Energía en Ecosistemas',
 
-        <hr style="border:1px dashed #00ff00;">
+    'contenido' => <<<'HTML'
 
-        <h4>1. Tipos de Producción</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Tipo</th><th>Definición</th><th>Fórmula</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>GPP</strong> (Gross Primary Production)</td><td>Energía total captada</td><td>\\(\\text{GPP} = \\text{Fotosíntesis bruta}\\)</td></tr>
-                <tr><td><strong>NPP</strong> (Net Primary Production)</td><td>Energía disponible para consumidores</td><td>\\(\\text{NPP} = \\text{GPP} - R_a\\)</td></tr>
-                <tr><td><strong>R_a</strong></td><td>Respiración autótrofa</td><td>~50% GPP</td></tr>
-            </tbody>
-        </table>
+<h3 class="text-center display-4">PRODUCCIÓN PRIMARIA Y ENERGÍA</h3>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> Selva: GPP = 3000 g C/m²/año → NPP = 1500 g C/m²/año</p>
-        </div>
+<p class="fs-4 text-center">
+La energía <strong>no se recicla</strong> en los ecosistemas.  
+<strong>Fluye en una sola dirección</strong>: del Sol → productores → consumidores → calor.
+</p>
 
-        <div class="visual">
-            <img src="assets/img/flujo-energetico.png" alt="Flujo de energía - Khan Academy">
-            <p><em>Diagrama de flujo energético. Fuente: Khan Academy.</em></p>
-        </div>
+<div class="alert alert-success fs-5 text-center">
+☀️ <strong>Producción primaria</strong> = base energética de toda la biosfera
+</div>
 
-        <hr style="border:1px dashed #00ff00;">
+<hr class="my-5">
 
-        <h4>2. Transferencia de Energía: Ley del 10%</h4>
-        <p>Solo <strong>~10%</strong> de la energía se transfiere entre niveles tróficos. El 90% se pierde como:</p>
-        <ul>
-            <li><strong>Calor</strong> (2ª Ley Termodinámica)</li>
-            <li><strong>Metabolismo</strong></li>
-            <li><strong>Materia no digerida</strong></li>
-        </ul>
+<h4>1. Producción primaria: el motor del ecosistema</h4>
 
-        <p><strong>Eficiencia trófica:</strong> \\( E = \\frac{P_{n+1}}{P_n} \\approx 0.1 \\)</p>
+<p class="fs-4">
+La <strong>producción primaria</strong> es la síntesis de <strong>materia orgánica</strong>
+a partir de CO₂ por organismos <strong>autótrofos</strong> mediante:
+</p>
 
-        <div class="ejemplo">
-            <p><strong>Ejemplo:</strong> 10,000 kJ plantas → 1,000 kJ herbívoros → 100 kJ carnívoros → 10 kJ superpredador</p>
-        </div>
+<ul class="fs-4">
+<li><strong>Fotosíntesis</strong> (plantas, algas, cianobacterias)</li>
+<li><strong>Quimiosíntesis</strong> (bacterias de fuentes hidrotermales)</li>
+</ul>
 
-        <div class="visual">
-            <img src="assets/img/Ecological_Pyramid.png" alt="Pirámide ecológica">
-            <p><em>Pirámide de energía. Fuente: Wikipedia.</em></p>
-        </div>
+<p class="fs-4">
+Se expresa como energía o carbono fijado por unidad de área y tiempo:
+</p>
 
-        <hr style="border:1px dashed #00ff00;">
+<p class="fs-4 text-center">
+<strong>g C / m² / año</strong> · <strong>kJ / m² / año</strong>
+</p>
 
-        <h4>3. Pirámides Ecológicas</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Tipo</th><th>Forma</th><th>Ejemplo</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Energía</td><td>Siempre decreciente</td><td>10,000 → 1,000 → 100</td></tr>
-                <tr><td>Biomasa</td><td>Generalmente decreciente</td><td>Excepto océano invertida</td></tr>
-                <tr><td>Números</td><td>Puede invertirse</td><td>1 árbol → 1000 insectos</td></tr>
-            </tbody>
-        </table>
+<hr class="my-5">
 
-        <div class="visual">
-            <img src="assets/img/energy-flow-in-an-ecosystem.jpg" alt="Flujo energía National Geographic">
-            <p><em>Flujo de energía en ecosistema. Fuente: National Geographic.</em></p>
-        </div>
+<h4>2. GPP, NPP y respiración</h4>
 
-        <hr style="border:1px dashed #00ff00;">
+<table class="table text-center fs-5">
+<tr>
+<th>Concepto</th><th>Significado</th><th>Expresión</th>
+</tr>
+<tr>
+<td><strong>GPP</strong></td>
+<td>Energía total captada</td>
+<td>Fotosíntesis bruta</td>
+</tr>
+<tr>
+<td><strong>Rₐ</strong></td>
+<td>Energía usada por productores</td>
+<td>Respiración</td>
+</tr>
+<tr class="table-success">
+<td><strong>NPP</strong></td>
+<td>Energía disponible para la red trófica</td>
+<td>\\( \\text{NPP} = \\text{GPP} - R_a \\)</td>
+</tr>
+</table>
 
-        <h4>4. NPP por Bioma (g C/m²/año)</h4>
-        <table class="table">
-            <thead>
-                <tr><th>Bioma</th><th>NPP</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Selva tropical</td><td>1000–3500</td></tr>
-                <tr><td>Bosque templado</td><td>600–2500</td></tr>
-                <tr><td>Pradera</td><td>200–1500</td></tr>
-                <tr><td>Desierto</td><td>&lt; 200</td></tr>
-                <tr><td>Tundra</td><td>&lt; 140</td></tr>
-                <tr><td>Océano abierto</td><td>100–400</td></tr>
-            </tbody>
-        </table>
+<div class="ejemplo fs-4">
+<strong>Ejemplo real:</strong><br>
+Selva tropical → GPP ≈ 3000 g C/m²/año → NPP ≈ 1500 g C/m²/año
+</div>
 
-        <div class="visual">
-            <img src="assets/img/npp-satelite.png" alt="NPP global NASA">
-            <p><em>NPP global desde satélite. Fuente: NASA Earth Observatory.</em></p>
-        </div>
+<div class="visual">
+<img src="assets/img/flujo-energetico.png" alt="Flujo energético">
+<p><em>La energía entra por los productores. Fuente: Khan Academy.</em></p>
+</div>
 
-        <div class="visual">
-            <img src="assets/img/mapa-global-npp.png" alt="NPP satelital">
-            <p><em>Mapa global de NPP. Fuente: MDPI.</em></p>
-        </div>
+<hr class="my-5">
 
-        <div class="visual">
-            <img src="assets/img/eficiencia-bioma.png" alt="Eficiencia energética">
-            <p><em>Eficiencia trófica por bioma. Fuente: Science of the Total Environment.</em></p>
-        </div>
+<h4>3. Transferencia de energía y Ley del 10 %</h4>
 
-        <hr style="border:1px dashed #00ff00;">
+<p class="fs-4">
+Solo una fracción de la energía pasa de un nivel trófico al siguiente.
+</p>
 
-        <h4>5. SVG Animado: Transferencia de Energía</h4>
-        <div class="svg-diagram">
-            <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
-                <!-- Niveles -->
-                <rect x="50" y="350" width="600" height="100" fill="#228B22" rx="20"/> <!-- Productores -->
-                <text x="350" y="400" fill="white" font-size="18" text-anchor="middle">Productores (100%)</text>
+<div class="alert alert-warning fs-5">
+⚠️ Regla general: <strong>≈ 10 %</strong> se transfiere · <strong>≈ 90 %</strong> se pierde
+</div>
 
-                <rect x="150" y="230" width="400" height="80" fill="#FFD700" rx="15"/> <!-- Primarios -->
-                <text x="350" y="270" fill="black" font-size="16" text-anchor="middle">Herbívoros (10%)</text>
+<p class="fs-4">
+La pérdida ocurre por:
+</p>
 
-                <rect x="250" y="130" width="200" height="60" fill="#FF6347" rx="10"/> <!-- Secundarios -->
-                <text x="350" y="160" fill="white" font-size="14" text-anchor="middle">Carnívoros (1%)</text>
+<ul class="fs-4">
+<li>🔥 Calor (2ª Ley de la Termodinámica)</li>
+<li>🫁 Respiración</li>
+<li>💩 Materia no digerida</li>
+</ul>
 
-                <rect x="300" y="50" width="100" height="40" fill="#DC143C" rx="8"/> <!-- Terciarios -->
-                <text x="350" y="75" fill="white" font-size="12" text-anchor="middle">0.1%</text>
+<p class="fs-4 text-center">
+<strong>Eficiencia trófica:</strong><br>
+\\[
+E = \\frac{P_{n+1}}{P_n} \\approx 0.1
+\\]
+</p>
 
-                <!-- Flujo energético -->
-                <defs>
-                    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L10,3 z" fill="#00ff00"/>
-                    </marker>
-                </defs>
+<div class="ejemplo fs-4">
+<strong>Ejemplo numérico:</strong><br>
+10 000 kJ (plantas) → 1 000 kJ (herbívoros) → 100 kJ (carnívoros) → 10 kJ (ápice)
+</div>
 
-                <!-- 100% → 10% -->
-                <path d="M350 350 L350 310" stroke="#00ff00" stroke-width="30" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite"/>
-                </path>
-                <text x="320" y="330" fill="#00ff00" font-size="14">1000 kJ</text>
+<div class="visual">
+<img src="assets/img/Ecological_Pyramid.png" alt="Pirámide energética">
+<p><em>Pirámide de energía: siempre decreciente.</em></p>
+</div>
 
-                <!-- 10% → 1% -->
-                <path d="M350 230 L350 190" stroke="#ffcc00" stroke-width="20" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="80" to="0" dur="2.2s" repeatCount="indefinite"/>
-                </path>
-                <text x="320" y="210" fill="#ffcc00" font-size="12">100 kJ</text>
+<hr class="my-5">
 
-                <!-- 1% → 0.1% -->
-                <path d="M350 130 L350 100" stroke="#ff4500" stroke-width="12" marker-end="url(#arrow)">
-                    <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.5s" repeatCount="indefinite"/>
-                </path>
-                <text x="320" y="115" fill="#ff4500" font-size="10">10 kJ</text>
+<h4>4. Pirámides ecológicas</h4>
 
-                <!-- Calor perdido -->
-                <text x="100" y="300" fill="#ff0000" font-size="12">90% Calor</text>
-                <text x="200" y="200" fill="#ff0000" font-size="12">90% Calor</text>
-                <text x="300" y="100" fill="#ff0000" font-size="12">90% Calor</text>
+<table class="table text-center fs-5">
+<tr>
+<th>Tipo</th><th>Característica</th><th>Observación clave</th>
+</tr>
+<tr>
+<td>Energía</td>
+<td>Siempre decreciente</td>
+<td>Nunca se invierte</td>
+</tr>
+<tr>
+<td>Biomasa</td>
+<td>Generalmente decreciente</td>
+<td>Océanos pueden invertirse</td>
+</tr>
+<tr>
+<td>Números</td>
+<td>Muy variable</td>
+<td>1 árbol → miles de insectos</td>
+</tr>
+</table>
 
-                <!-- Título -->
-                <text x="350" y="30" fill="#ffcc00" font-size="22" text-anchor="middle" font-family="Arial">Transferencia de Energía</text>
-            </svg>
-            <p><em>SVG Animado: Ley del 10% en acción.</em></p>
-        </div>
-    ',
+<div class="visual">
+<img src="assets/img/energy-flow-in-an-ecosystem.jpg" alt="Flujo de energía">
+<p><em>La energía fluye, la materia se recicla.</em></p>
+</div>
+
+<hr class="my-5">
+
+<h4>5. NPP por bioma (g C / m² / año)</h4>
+
+<table class="table text-center fs-5">
+<tr><th>Bioma</th><th>NPP</th></tr>
+<tr><td>Selva tropical</td><td>1000 – 3500</td></tr>
+<tr><td>Bosque templado</td><td>600 – 2500</td></tr>
+<tr><td>Pradera</td><td>200 – 1500</td></tr>
+<tr><td>Desierto</td><td>&lt; 200</td></tr>
+<tr><td>Tundra</td><td>&lt; 140</td></tr>
+<tr><td>Océano abierto</td><td>100 – 400</td></tr>
+</table>
+
+<div class="visual">
+<img src="assets/img/npp-satelite.png" alt="NPP global">
+<p><em>Productividad primaria global (NASA).</em></p>
+</div>
+
+<hr class="my-5">
+
+<h4>6. SVG Animado – Transferencia de Energía (MAX LEGIBILIDAD)</h4>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="600" fill="#000"/>
+
+<defs>
+<filter id="glow">
+<feGaussianBlur stdDeviation="10" result="b"/>
+<feFlood flood-color="#00ffff"/>
+<feComposite in2="b" operator="in"/>
+<feMerge>
+<feMergeNode/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+
+<marker id="arrow" markerWidth="20" markerHeight="20" refX="16" refY="10" orient="auto">
+<path d="M0,0 L20,10 L0,20 Z" fill="#00ff00"/>
+</marker>
+</defs>
+
+<!-- PRODUCTORES -->
+<rect x="150" y="420" width="600" height="110" rx="25" fill="#2e7d32" filter="url(#glow)"/>
+<text x="450" y="485" fill="#fff" font-size="40" text-anchor="middle">PRODUCTORES · 100%</text>
+
+<!-- HERBÍVOROS -->
+<rect x="250" y="300" width="400" height="90" rx="20" fill="#fbc02d"/>
+<text x="450" y="355" fill="#000" font-size="34" text-anchor="middle">HERBÍVOROS · 10%</text>
+
+<!-- CARNÍVOROS -->
+<rect x="330" y="200" width="240" height="70" rx="18" fill="#ef6c00"/>
+<text x="450" y="245" fill="#fff" font-size="28" text-anchor="middle">CARNÍVOROS · 1%</text>
+
+<!-- ÁPICE -->
+<rect x="380" y="120" width="140" height="55" rx="14" fill="#c62828"/>
+<text x="450" y="155" fill="#fff" font-size="22" text-anchor="middle">0.1%</text>
+
+<!-- FLECHAS -->
+<path d="M450 420 L450 390" stroke="#00ff00" stroke-width="26" marker-end="url(#arrow)"/>
+<path d="M450 300 L450 270" stroke="#ffeb3b" stroke-width="18" marker-end="url(#arrow)"/>
+<path d="M450 200 L450 175" stroke="#ff7043" stroke-width="12" marker-end="url(#arrow)"/>
+
+<text x="120" y="360" fill="#ff4444" font-size="24">90% calor</text>
+<text x="120" y="260" fill="#ff4444" font-size="24">90% calor</text>
+<text x="120" y="170" fill="#ff4444" font-size="24">90% calor</text>
+
+<text x="450" y="60" fill="#00ffff" font-size="44" text-anchor="middle" filter="url(#glow)">
+TRANSFERENCIA DE ENERGÍA
+</text>
+</svg>
+
+<p class="text-center fs-5">
+<em>La energía se degrada en cada transferencia.</em>
+</p>
+</div>
+
+<div class="alert alert-info fs-4 text-center mt-5">
+🔑 <strong>Idea clave final:</strong><br>
+La baja eficiencia energética limita la longitud de las cadenas tróficas
+y determina cuántos depredadores pueden existir.
+</div>
+
+HTML
+,
     'ejercicios' => [
         // === BÁSICOS ===
         ['enunciado' => '¿Qué es GPP?', 'respuesta' => 'Producción primaria bruta'],

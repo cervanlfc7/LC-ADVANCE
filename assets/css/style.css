@@ -154,6 +154,18 @@ h4 {
     color: #000;
 }
 
+/* Botón para acceso como invitado */
+.btn-guest {
+    background: #333;
+    border-color: #777;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+.btn-guest:hover {
+    background: #555;
+    color: #fff;
+}
+
 .btn-dashboard {
     background: #338833;
     border-color: #00ff00;
@@ -9686,4 +9698,672 @@ img,
 .ejemplo h4 {
     color: #00ff00;
     margin-top: 0;
+}
+
+/* ================================================================
+   ESTILO ESTÁNDAR PARA SVG - style.css
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   1. CONTENEDORES PRINCIPALES
+   ---------------------------------------------------------------- */
+
+/* Contenedor principal para SVG */
+.svg-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #0a0a1a 0%, #111125 100%);
+    border: 3px solid #00aaff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 170, 255, 0.2),
+                inset 0 0 20px rgba(0, 170, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Borde decorativo superior */
+.svg-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff00ff, #00aaff, #00ff88);
+    z-index: 1;
+}
+
+/* ----------------------------------------------------------------
+   2. TÍTULOS Y ENCABEZADOS
+   ---------------------------------------------------------------- */
+
+/* Título del diagrama SVG */
+.svg-title {
+    text-align: center;
+    color: #ffffff;
+    font-family: 'Arial', 'Segoe UI', sans-serif;
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0 0 25px 0;
+    padding: 15px;
+    background: rgba(0, 34, 102, 0.7);
+    border-radius: 10px;
+    border-left: 5px solid #00aaff;
+    border-right: 5px solid #00ff88;
+    text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+    letter-spacing: 1px;
+}
+
+/* Subtítulo para SVG */
+.svg-subtitle {
+    text-align: center;
+    color: #88ccff;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    margin: -15px 0 20px 0;
+    padding: 0 20px;
+    font-style: italic;
+}
+
+/* ----------------------------------------------------------------
+   3. CONTENEDORES SVG
+   ---------------------------------------------------------------- */
+
+/* Contenedor del SVG */
+.svg-wrapper {
+    width: 100%;
+    height: auto;
+    min-height: 500px;
+    position: relative;
+    background: #0a0a15;
+    border-radius: 10px;
+    padding: 15px;
+    overflow: visible;
+}
+
+/* El elemento SVG en sí */
+.svg-wrapper svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 500px;
+    max-height: 700px;
+    margin: 0 auto;
+    background: transparent;
+    border-radius: 8px;
+    overflow: visible;
+}
+
+/* SVG sin borde (para algunos casos) */
+.svg-no-border svg {
+    border: none;
+    box-shadow: none;
+}
+
+/* ----------------------------------------------------------------
+   4. LEYENDAS Y CAPTIONS
+   ---------------------------------------------------------------- */
+
+/* Leyenda/pie de imagen */
+.svg-caption {
+    text-align: center;
+    color: #88aaff;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    margin-top: 20px;
+    padding: 10px;
+    background: rgba(0, 34, 102, 0.3);
+    border-radius: 5px;
+    border-top: 1px solid #00aaff;
+}
+
+/* Fuente de datos */
+.svg-source {
+    text-align: right;
+    color: #666688;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+    padding-right: 10px;
+    font-style: italic;
+}
+
+/* ----------------------------------------------------------------
+   5. VERSIONES ALTERNATIVAS
+   ---------------------------------------------------------------- */
+
+/* SVG pequeño (para sidebars) */
+.svg-small .svg-container {
+    max-width: 500px;
+    padding: 15px;
+}
+
+.svg-small .svg-wrapper {
+    min-height: 300px;
+}
+
+.svg-small .svg-wrapper svg {
+    min-height: 300px;
+    max-height: 400px;
+}
+
+.svg-small .svg-title {
+    font-size: 20px;
+    padding: 10px;
+}
+
+/* SVG grande (full width) */
+.svg-large .svg-container {
+    max-width: 1200px;
+    padding: 25px;
+}
+
+.svg-large .svg-wrapper {
+    min-height: 600px;
+}
+
+.svg-large .svg-wrapper svg {
+    min-height: 600px;
+    max-height: 800px;
+}
+
+.svg-large .svg-title {
+    font-size: 32px;
+}
+
+/* SVG simple (sin efectos) */
+.svg-simple .svg-container {
+    background: #111122;
+    border: 2px solid #444466;
+    box-shadow: none;
+}
+
+.svg-simple .svg-container::before {
+    display: none;
+}
+
+.svg-simple .svg-title {
+    background: #222244;
+    border-left: 3px solid #666688;
+    border-right: 3px solid #666688;
+}
+
+/* ----------------------------------------------------------------
+   6. RESPONSIVE DESIGN
+   ---------------------------------------------------------------- */
+
+/* Tablets */
+@media (max-width: 1200px) {
+    .svg-container {
+        max-width: 95%;
+        padding: 15px;
+    }
+    
+    .svg-title {
+        font-size: 24px;
+    }
+    
+    .svg-wrapper {
+        min-height: 450px;
+    }
+    
+    .svg-wrapper svg {
+        min-height: 450px;
+        max-height: 600px;
+    }
+}
+
+/* Tablets pequeñas */
+@media (max-width: 768px) {
+    .svg-container {
+        max-width: 100%;
+        margin: 20px auto;
+        padding: 10px;
+        border-radius: 10px;
+    }
+    
+    .svg-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding: 10px;
+    }
+    
+    .svg-subtitle {
+        font-size: 16px;
+        margin: -10px 0 15px 0;
+    }
+    
+    .svg-wrapper {
+        min-height: 400px;
+        padding: 10px;
+    }
+    
+    .svg-wrapper svg {
+        min-height: 400px;
+        max-height: 500px;
+    }
+    
+    .svg-caption {
+        font-size: 14px;
+        margin-top: 15px;
+        padding: 8px;
+    }
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+    .svg-container {
+        padding: 8px;
+        border-width: 2px;
+    }
+    
+    .svg-title {
+        font-size: 18px;
+        padding: 8px;
+        border-left-width: 3px;
+        border-right-width: 3px;
+    }
+    
+    .svg-subtitle {
+        font-size: 14px;
+    }
+    
+    .svg-wrapper {
+        min-height: 300px;
+        padding: 8px;
+    }
+    
+    .svg-wrapper svg {
+        min-height: 300px;
+        max-height: 400px;
+    }
+    
+    .svg-caption {
+        font-size: 13px;
+        padding: 6px;
+    }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 360px) {
+    .svg-wrapper {
+        min-height: 250px;
+    }
+    
+    .svg-wrapper svg {
+        min-height: 250px;
+        max-height: 350px;
+    }
+    
+    .svg-title {
+        font-size: 16px;
+    }
+}
+
+/* ----------------------------------------------------------------
+   7. ANIMACIONES SUTILES (opcional)
+   ---------------------------------------------------------------- */
+
+/* Pulsación sutil para elementos importantes */
+.svg-highlight {
+    animation: svg-highlight-pulse 2s infinite;
+}
+
+@keyframes svg-highlight-pulse {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+}
+
+/* Flotación para elementos */
+.svg-float {
+    animation: svg-float 3s ease-in-out infinite;
+}
+
+@keyframes svg-float {
+    0%, 100% { 
+        transform: translateY(0); 
+    }
+    50% { 
+        transform: translateY(-5px); 
+    }
+}
+
+/* Fade in para carga */
+.svg-fade-in {
+    animation: svg-fade-in 0.5s ease-out;
+}
+
+@keyframes svg-fade-in {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* ----------------------------------------------------------------
+   8. ESTILOS PARA ESTADOS ESPECIALES
+   ---------------------------------------------------------------- */
+
+/* SVG en modo impresión */
+@media print {
+    .svg-container {
+        border: 1px solid #000;
+        box-shadow: none;
+        background: #ffffff !important;
+        max-width: 100%;
+        break-inside: avoid;
+    }
+    
+    .svg-title {
+        color: #000000 !important;
+        background: #f0f0f0 !important;
+        text-shadow: none !important;
+        border-left: 3px solid #000 !important;
+        border-right: 3px solid #000 !important;
+    }
+    
+    .svg-wrapper {
+        background: #ffffff !important;
+    }
+    
+    .svg-caption {
+        color: #000000 !important;
+        background: #f8f8f8 !important;
+        border-top: 1px solid #000 !important;
+    }
+}
+
+/* Modo oscuro del sistema */
+@media (prefers-color-scheme: dark) {
+    .svg-simple .svg-container {
+        background: #222233;
+        border-color: #555577;
+    }
+    
+    .svg-simple .svg-title {
+        background: #333344;
+        border-color: #666688;
+    }
+}
+
+/* Alta contraste */
+@media (prefers-contrast: high) {
+    .svg-container {
+        border-color: #0000ff !important;
+        background: #000000 !important;
+    }
+    
+    .svg-title {
+        color: #ffffff !important;
+        background: #000080 !important;
+        border-color: #ffff00 !important;
+    }
+    
+    .svg-caption {
+        color: #ffff00 !important;
+        background: #000000 !important;
+        border-color: #ffff00 !important;
+    }
+}
+
+/* Reduce movimiento */
+@media (prefers-reduced-motion: reduce) {
+    .svg-highlight,
+    .svg-float,
+    .svg-fade-in {
+        animation: none !important;
+    }
+}
+
+/* ----------------------------------------------------------------
+   9. CLASES DE UTILIDAD
+   ---------------------------------------------------------------- */
+
+/* Centrado */
+.svg-center {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+}
+
+/* Sin márgenes */
+.svg-no-margin {
+    margin: 0 !important;
+}
+
+/* Sin padding */
+.svg-no-padding {
+    padding: 0 !important;
+}
+
+/* Borde destacado */
+.svg-border-highlight {
+    border-color: #ff00ff !important;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5) !important;
+}
+
+/* Fondo transparente */
+.svg-transparent-bg .svg-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.svg-transparent-bg .svg-container::before {
+    display: none !important;
+}
+
+/* ----------------------------------------------------------------
+   10. COMPATIBILIDAD CON SVG EXISTENTES
+   ---------------------------------------------------------------- */
+
+/* Para SVG que ya tienen estilos propios */
+.svg-wrapper svg[style*="width"] {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* Asegurar que los SVG sean visibles */
+.svg-wrapper svg:not([width]) {
+    width: 100%;
+}
+
+.svg-wrapper svg:not([height]) {
+    height: auto;
+}
+
+/* Mejorar renderizado */
+.svg-wrapper svg {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    shape-rendering: geometricPrecision;
+}
+
+/* ==========================================================
+   SVG: MEJORA DE TAMAÑO, LEGIBILIDAD Y ESPACIADO (Corrección)
+   ========================================================== */
+.svg-diagram, .svg-wrapper, .svg-container, #html5-svg-container {
+    max-width: 1200px !important;
+    margin: 18px auto !important;
+}
+
+.svg-diagram svg,
+.svg-wrapper svg,
+.svg-container svg,
+#html5-svg {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 520px !important;
+    max-height: 900px !important;
+    display: block !important;
+    overflow: visible !important;
+    image-rendering: crisp-edges !important;
+    shape-rendering: geometricPrecision !important;
+}
+
+/* Forzar texto legible dentro de los SVG */
+.svg-diagram svg text,
+.svg-diagram svg tspan,
+.svg-wrapper svg text {
+    font-size: 100px !important;
+    font-family: 'VT323', monospace, Arial, sans-serif !important;
+    paint-order: stroke fill !important;
+    stroke: rgba(0,0,0,0.9) !important;
+    stroke-width: 1px !important;
+    fill-opacity: 1 !important;
+    shape-rendering: geometricPrecision !important;
+    white-space: pre-wrap !important;
+}
+
+/* Evitar clipping/empalmes y permitir overflow visible */
+.svg-diagram svg g,
+.svg-diagram svg * {
+    overflow: visible !important;
+    pointer-events: auto;
+}
+
+/* Ajustes móviles: mantener altura y aumentar fuente relativa */
+@media (max-width: 768px) {
+    .svg-diagram svg { min-height: 640px !important; max-height: 1400px !important; }
+    .svg-diagram svg text { font-size: clamp(12px, 2.4vw, 16px) !important; }
+}
+
+/* Clase específica para SVGs que queramos forzar responsividad */
+.svg-responsive {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 420px !important;
+    max-height: 1000px !important;
+    display: block !important;
+}
+
+/* Ajustes finos: forzar texto aún más legible si el SVG es pequeño */
+.svg-diagram .svg-responsive text,
+.svg-diagram .svg-responsive tspan {
+    font-size: clamp(14px, 1.6vw + 0.2rem, 22px) !important;
+}
+
+/* ==============================
+   PARCHE: FORZAR TAMAÑO LEGIBLE EN SVG
+   Pegar al final de style.css
+   ============================== */
+
+/* Contenedores (asegurar espacio suficiente) */
+.svg-diagram, .svg-wrapper, .svg-container, #html5-svg-container {
+  max-width: 1200px !important;
+  margin: 18px auto !important;
+  padding: 12px !important;
+}
+
+/* Asegurar que el SVG escale bien y deje overflow visible para etiquetas/flechas */
+.svg-diagram svg,
+.svg-wrapper svg,
+.svg-container svg,
+#html5-svg {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 520px !important;
+  max-height: 1200px !important;
+  display: block !important;
+  overflow: visible !important;
+  image-rendering: optimizeQuality !important;
+  shape-rendering: geometricPrecision !important;
+}
+
+/* Regla universal para texto dentro de SVG: tamaño legible, contraste y nitidez.
+   clamp(min, preferred, max) mantiene responsividad. */
+.svg-diagram svg text,
+.svg-diagram svg tspan,
+.svg-wrapper svg text,
+.svg-container svg text,
+#html5-svg text {
+  font-family: 'VT323', 'Press Start 2P', "Segoe UI", Roboto, Arial, sans-serif !important;
+  font-weight: 700 !important;
+  fill-opacity: 1 !important;
+  paint-order: stroke fill !important;
+  stroke: rgba(0,0,0,0.95) !important;
+  stroke-width: 2px !important;
+  shape-rendering: geometricPrecision !important;
+  text-rendering: geometricPrecision !important;
+  /* tamaño base responsivo: nunca menos de 16px, escala con la pantalla, hasta 48px */
+  font-size: clamp(16px, 2.6vw + 10px, 48px) !important;
+  line-height: 1 !important;
+  dominant-baseline: central !important;
+}
+
+/* Títulos/labels grandes dentro del SVG (si quieres que sean más grandes) */
+.svg-diagram svg text.title,
+.svg-diagram svg text[data-role="title"],
+.svg-diagram svg text[role="title"],
+.svg-title {
+  font-size: clamp(28px, 4.4vw + 14px, 96px) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Etiquetas importantes / leyendas internas */
+.svg-diagram svg .label,
+.svg-diagram svg .label-large text,
+.svg-diagram .label-large text {
+  font-size: clamp(20px, 3.2vw + 12px, 56px) !important;
+  font-weight: 800 !important;
+}
+
+/* Evitar reglas conflictivas muy pequeñas (ej.: .svg-small) que puedan forzar tamaños minúsculos */
+.svg-small svg text,
+.svg-small svg tspan {
+  font-size: clamp(14px, 2.2vw + 6px, 20px) !important;
+}
+
+/* Forzar overflow visible en todos los grupos para que nada se corte */
+.svg-diagram svg g,
+.svg-diagram svg * {
+  overflow: visible !important;
+}
+
+/* Adaptación móvil: subir un poco la fuente relativa para pantallas estrechas */
+@media (max-width: 768px) {
+  .svg-diagram svg { min-height: 640px !important; max-height: 1400px !important; }
+  .svg-diagram svg text,
+  .svg-wrapper svg text {
+    font-size: clamp(14px, 3.2vw + 8px, 34px) !important;
+  }
+  .svg-diagram svg text.title { font-size: clamp(22px, 5.0vw + 8px, 56px) !important; }
+}
+
+/* Modo impresión (garantizar visibilidad) */
+@media print {
+  .svg-diagram svg text,
+  .svg-wrapper svg text {
+    stroke-width: 1px !important;
+    font-size: 20px !important;
+    fill: #000 !important;
+  }
+}
+.svg-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    margin: 4rem auto;
+}
+
+.svg-wrapper svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+svg text {
+    font-family: Arial, Helvetica, sans-serif;
 }
