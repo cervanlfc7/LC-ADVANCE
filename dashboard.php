@@ -296,6 +296,71 @@ if ($user_id > 0) {
             localStorage.removeItem('needsUpdate');
         }
     });
+
+    // === RESTAURAR SCROLL Y RESALTAR LECCIÓN AL VOLVER ===
+document.addEventListener('DOMContentLoaded', function () {
+  function handleLesson(slug) {
+    if (!slug) return false;
+    const id = 'leccion-' + slug;
+    const el = document.getElementById(id);
+    if (!el) return false;
+
+    const saved = sessionStorage.getItem('scrollPos_leccion_' + slug);
+    setTimeout(() => {
+      if (saved !== null) {
+        window.scrollTo({ top: parseInt(saved, 10), behavior: 'smooth' });
+        sessionStorage.removeItem('scrollPos_leccion_' + slug);
+      } else {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      el.classList.add('highlight-return');
+      setTimeout(() => el.classList.remove('highlight-return'), 3000);
+    }, 200);
+
+    sessionStorage.removeItem('last_leccion_slug');
+    return true;
+  }
+
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#leccion-')) {
+    handleLesson(decodeURIComponent(hash.replace('#leccion-','')));
+  } else {
+    const last = sessionStorage.getItem('last_leccion_slug');
+    if (last) handleLesson(last);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  function handleLesson(slug) {
+    if (!slug) return false;
+    const id = 'leccion-' + slug;
+    const el = document.getElementById(id);
+    if (!el) return false;
+
+    const saved = sessionStorage.getItem('scrollPos_leccion_' + slug);
+    setTimeout(() => {
+      if (saved !== null) {
+        window.scrollTo({ top: parseInt(saved, 10), behavior: 'smooth' });
+        sessionStorage.removeItem('scrollPos_leccion_' + slug);
+      } else {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      el.classList.add('highlight-return');
+      setTimeout(() => el.classList.remove('highlight-return'), 3000);
+    }, 200);
+
+    sessionStorage.removeItem('last_leccion_slug');
+    return true;
+  }
+
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#leccion-')) {
+    handleLesson(decodeURIComponent(hash.replace('#leccion-','')));
+  } else {
+    const last = sessionStorage.getItem('last_leccion_slug');
+    if (last) handleLesson(last);
+  }
+});
 </script>
 
 </body>
