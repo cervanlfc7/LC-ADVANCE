@@ -1,0 +1,142 @@
+-- =====================================================
+-- BASE DE DATOS: dialogos
+-- ACTUALIZACIÓN COMPLETA 07-12-2025
+-- 9 maestros existentes + 1 nuevo (Armando) = 10 maestros
+-- 10 preguntas por maestro = 90 preguntas nuevas (ID 11 → 100)
+-- =====================================================
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+-- 1. AGREGAR NUEVO MAESTRO: Armando (Historia)
+INSERT INTO `idsmaestros` (`PersonajeC`, `IDPersonajeC`) VALUES
+('Armando', '1Ar');
+
+-- 2. NUEVAS PREGUNTAS (90 en total)
+INSERT INTO `preguntas` (`IDPregunta`, `IDPersonajeC`, `Pregunta`, `TipoPreguntaC`, `Opcion1`, `Opcion2`, `Opcion3`, `RespuestaCorrecta`) VALUES
+
+-- ====== 1. ESPINDOLA - Pensamiento Matemático III (Derivadas) ======
+(11, '1Es', 'La derivada de una función f(x) representa:', 'Continua', 'A) El área bajo la curva', 'B) La tasa de cambio instantánea', 'C) El volumen de revolución', 2),
+(12, '1Es', 'La regla de la potencia establece que:', 'Continua', 'A) d/dx[x^n] = x^{n-1}', 'B) d/dx[x^n] = n x^{n-1}', 'C) d/dx[x^n] = n x^n', 2),
+(13, '1Es', 'La derivada de una constante es:', 'Continua', 'A) La misma constante', 'B) 1', 'C) 0', 3),
+(14, '1Es', 'Geométricamente, f\'(a) es la pendiente de:', 'Continua', 'A) La recta secante', 'B) La recta tangente en x = a', 'C) La curva en x = a', 2),
+(15, '1Es', 'El dominio de cualquier función polinómica es:', 'Continua', 'A) Solo números positivos', 'B) Todos los reales excepto cero', 'C) Todos los números reales', 3),
+(16, '1Es', 'Si f\'(x) > 0 en un intervalo, la función es:', 'Continua', 'A) Decreciente', 'B) Constante', 'C) Creciente', 3),
+(17, '1Es', 'La regla del producto dice que (fg)\' =', 'Continua', 'A) f\'g\'', 'B) f\'g + fg\'', 'C) fg\' - f\'g', 2),
+(18, '1Es', 'En física, la derivada de la posición respecto al tiempo es:', 'Continua', 'A) Aceleración', 'B) Velocidad', 'C) Fuerza', 2),
+(19, '1Es', 'La derivada de f(x) = 5x^4 - 3x^2 + 7 es:', 'Continua', 'A) 20x^3 - 6x', 'B) 20x^3 + 6x', 'C) 5x^3 - 3x', 1),
+(20, '1Es', 'Si f\'(c) = 0, entonces en x = c puede haber:', 'Continua', 'A) Máximo, mínimo o punto de inflexión', 'B) Siempre un máximo', 'C) Siempre un mínimo', 1),
+
+-- ====== 2. MIGUEL MÁRQUEZ - Temas Selectos de Matemáticas I y II ======
+(21, '1Le', 'Un número primo es aquel que:', 'Continua', 'A) Es divisible solo por 1 y por sí mismo', 'B) Tiene exactamente 3 divisores', 'C) Es siempre impar', 1),
+(22, '1Le', 'La conjetura de Goldbach dice que todo entero par mayor que 2:', 'Continua', 'A) Es suma de dos primos', 'B) Es impar', 'C) Es potencia de 2', 1),
+(23, '1Le', 'En una progresión aritmética, la diferencia entre términos consecutivos es:', 'Continua', 'A) Variable', 'B) Constante', 'C) Cero', 2),
+(24, '1Le', 'La sucesión de Fibonacci comienza:', 'Continua', 'A) 0, 1, 1, 2, 3, 5...', 'B) 1, 1, 2, 3, 5...', 'C) Ambas son válidas', 3),
+(25, '1Le', 'El número áureo φ vale aproximadamente:', 'Continua', 'A) 1.414', 'B) 1.618', 'C) 2.718', 2),
+(26, '1Le', 'En teoría de números, un número perfecto es igual a:', 'Continua', 'A) La suma de sus divisores propios', 'B) La suma de todos sus divisores', 'C) Su doble', 1),
+(27, '1Le', 'El teorema fundamental del álgebra dice que todo polinomio de grado n tiene:', 'Continua', 'A) n raíces reales', 'B) n raíces complejas (contando multiplicidad)', 'C) Al menos una raíz real', 2),
+(28, '1Le', 'El logaritmo natural se denota:', 'Continua', 'A) log x', 'B) ln x', 'C) lg x', 2),
+(29, '1Le', 'La función seno es periódica con periodo:', 'Continua', 'A) π', 'B) 2π', 'C) 4π', 2),
+(30, '1Le', 'En criptografía moderna se usa mucho la factorización de números:', 'Continua', 'A) Primos', 'B) Compuestos grandes', 'C) Perfectos', 2),
+
+-- ====== 3. HERSON - Física y Química ======
+(31, '1He', 'La primera ley de Newton se conoce como ley de:', 'Continua', 'A) La acción-reacción', 'B) La inercia', 'C) La gravitación', 2),
+(32, '1He', 'La unidad de fuerza en el SI es:', 'Continua', 'A) Joule', 'B) Newton', 'C) Watt', 2),
+(33, '1He', 'La energía cinética se calcula como:', 'Continua', 'A) mv', 'B) ½ mv²', 'C) mgh', 2),
+(34, '1He', 'En química, el número de Avogadro es aproximadamente:', 'Continua', 'A) 6.022 × 10²³', 'B) 3.14 × 10⁸', 'C) 9.8 m/s²', 1),
+(35, '1He', 'El pH de una solución neutra es:', 'Continua', 'A) 0', 'B) 7', 'C) 14', 2),
+(36, '1He', 'La ley de Boyle dice que a T constante:', 'Continua', 'A) P ∝ V', 'B) P ∝ 1/V', 'C) V ∝ T', 2),
+(37, '1He', 'El elemento con mayor electronegatividad es:', 'Continua', 'A) Oxígeno', 'B) Flúor', 'C) Hidrógeno', 2),
+(38, '1He', 'La velocidad de la luz en el vacío es:', 'Continua', 'A) 3 × 10⁸ m/s', 'B) 3 × 10⁶ m/s', 'C) 340 m/s', 1),
+(39, '1He', 'En una reacción nuclear, la masa:', 'Continua', 'A) Se conserva exactamente', 'B) Se convierte parcialmente en energía', 'C) Aumenta', 2),
+(40, '1He', 'El principio de Arquímedes se aplica a:', 'Continua', 'A) Flotación de cuerpos', 'B) Caída libre', 'C) Movimiento circular', 1),
+
+-- ====== 4. CAROLINA - Ecosistemas ======
+(41, '1Ca', 'Los productores en una cadena trófica son:', 'Continua', 'A) Los carnívoros', 'B) Los organismos fotosintéticos', 'C) Los descomponedores', 2),
+(42, '1Ca', 'Un bioma caracterizado por menos de 25 cm de lluvia al año es:', 'Continua', 'A) Taiga', 'B) Desierto', 'C) Selva tropical', 2),
+(43, '1Ca', 'La sucesión ecológica que comienza en roca desnuda es:', 'Continua', 'A) Secundaria', 'B) Primaria', 'C) Climática', 2),
+(44, '1Ca', 'El efecto invernadero es causado principalmente por:', 'Continua', 'A) Ozono', 'B) CO₂ y metano', 'C) Oxígeno', 2),
+(45, '1Ca', 'La capa de ozono se encuentra en la:', 'Continua', 'A) Troposfera', 'B) Estratosfera', 'C) Mesosfera', 2),
+(46, '1Ca', 'Un ejemplo de relación mutualista es:', 'Continua', 'A) Depredador-presa', 'B) Liquen (alga + hongo)', 'C) Parásito-hospedador', 2),
+(47, '1Ca', 'La biodiversidad es mayor en:', 'Continua', 'A) Polos', 'B) Zonas templadas', 'C) Trópicos', 3),
+(48, '1Ca', 'Los detritívoros son importantes porque:', 'Continua', 'A) Producen oxígeno', 'B) Reciclan materia orgánica', 'C) Fijan nitrógeno', 2),
+(49, '1Ca', 'El calentamiento global provoca:', 'Continua', 'A) Disminución del nivel del mar', 'B) Fusión de glaciares', 'C) Más lluvias en desiertos', 2),
+(50, '1Ca', 'Un ecosistema con alta resiliencia:', 'Continua', 'A) Se recupera lento tras perturbación', 'B) Se recupera rápido', 'C) Nunca se recupera', 2),
+
+-- ====== 5. ENRIQUE - Inglés B1 Conversacional ======
+(51, '1Go', 'How do you start a casual conversation?', 'Dialogo', 'A) Goodbye', 'B) Hi! How are you?', 'C) Thank you', 2),
+(52, '1Go', 'After someone says "I\'m fine", you usually say:', 'Dialogo', 'A) Bye', 'B) And you?', 'C) No', 2),
+(53, '1Go', 'To show interest you can say:', 'Dialogo', 'A) I don\'t care', 'B) Really? That\'s cool!', 'C) Whatever', 2),
+(54, '1Go', 'A polite way to end a conversation is:', 'Dialogo', 'A) I hate you', 'B) See you later!', 'C) Shut up', 2),
+(55, '1Go', 'If you didn\'t understand, you say:', 'Dialogo', 'A) What?', 'B) Can you repeat, please?', 'C) Never mind', 2),
+(56, '1Go', 'To ask about hobbies you say:', 'Dialogo', 'A) What do you do for fun?', 'B) How much money do you have?', 'C) Where do you live?', 1),
+(57, '1Go', 'A good filler in English is:', 'Dialogo', 'A) Well...', 'B) Never', 'C) Always no', 1),
+(58, '1Go', 'To react to good news you say:', 'Dialogo', 'A) That\'s terrible', 'B) Congratulations!', 'C) I don\'t care', 2),
+(59, '1Go', 'The best way to improve speaking is:', 'Dialogo', 'A) Only reading', 'B) Talking every day', 'C) Never speaking', 2),
+(60, '1Go', 'At B1 level you can:', 'Dialogo', 'A) Only say hello', 'B) Have real conversations', 'C) Speak perfectly', 2),
+
+-- ====== 6. MANUEL - Programación (general, sin SQL ni Python) ======
+(61, '1Ma', 'En pseudocódigo, ¿cómo se representa una condición?', 'Continua', 'A) SI ... ENTONCES ... FIN SI', 'B) PARA ... HACER ... FIN PARA', 'C) MIENTRAS ... HACER', 1),
+(62, '1Ma', 'Un algoritmo debe tener:', 'Continua', 'A) Entrada, proceso y salida', 'B) Solo entrada', 'C) Infinidad de pasos', 1),
+(63, '1Ma', 'En diagramas de flujo, el rombo representa:', 'Continua', 'A) Decisión', 'B) Proceso', 'C) Entrada/Salida', 1),
+(64, '1Ma', 'La estructura SECUENCIAL ejecuta instrucciones:', 'Continua', 'A) Una tras otra', 'B) Solo si se cumple condición', 'C) Repetidas veces', 1),
+(65, '1Ma', '¿Cuál NO es un tipo de dato básico?', 'Continua', 'A) Entero', 'B) Cadena', 'C) Arreglo', 3),
+(66, '1Ma', 'El bucle WHILE se ejecuta mientras:', 'Continua', 'A) La condición sea falsa', 'B) La condición sea verdadera', 'C) Siempre', 2),
+(67, '1Ma', 'Una variable es:', 'Continua', 'A) Un espacio en memoria con nombre', 'B) Un valor fijo', 'C) Una función', 1),
+(68, '1Ma', 'En programación estructurada se evita:', 'Continua', 'A) GOTO', 'B) IF', 'C) FOR', 1),
+(69, '1Ma', 'Un subprograma también se conoce como:', 'Continua', 'A) Función o procedimiento', 'B) Variable global', 'C) Ciclo infinito', 1),
+(70, '1Ma', 'La modularidad permite:', 'Continua', 'A) Dividir el programa en partes más manejables', 'B) Hacer todo en un solo bloque', 'C) Eliminar variables', 1),
+
+-- ====== 7. M. MEZA - SQL ======
+(71, '1Me', '¿Cuál es el comando para seleccionar todos los datos de una tabla?', 'Continua', 'A) INSERT INTO', 'B) SELECT * FROM', 'C) UPDATE', 2),
+(72, '1Me', 'Para filtrar resultados se usa:', 'Continua', 'A) ORDER BY', 'B) WHERE', 'C) GROUP BY', 2),
+(73, '1Me', 'El comando para agregar datos es:', 'Continua', 'A) SELECT', 'B) INSERT INTO', 'C) DELETE', 2),
+(74, '1Me', 'Para ordenar resultados ascendentemente:', 'Continua', 'A) ORDER BY columna DESC', 'B) ORDER BY columna ASC', 'C) SORT BY', 2),
+(75, '1Me', '¿Qué hace INNER JOIN?', 'Continua', 'A) Todos los registros', 'B) Solo los que coinciden en ambas tablas', 'C) Solo los de la tabla izquierda', 2),
+(76, '1Me', 'Para eliminar datos se usa:', 'Continua', 'A) DROP', 'B) DELETE FROM', 'C) TRUNCATE', 2),
+(77, '1Me', 'COUNT(*) devuelve:', 'Continua', 'A) El número de filas', 'B) La suma de una columna', 'C) El promedio', 1),
+(78, '1Me', 'La cláusula HAVING se usa con:', 'Continua', 'A) WHERE', 'B) GROUP BY', 'C) ORDER BY', 2),
+(79, '1Me', 'PRIMARY KEY significa:', 'Continua', 'A) Valor único y no nulo', 'B) Valor que puede repetirse', 'C) Valor opcional', 1),
+(80, '1Me', 'Para crear una tabla se usa:', 'Continua', 'A) CREATE TABLE', 'B) MAKE TABLE', 'C) NEW TABLE', 1),
+
+-- ====== 8. CUCO - Ciencias Sociales ======
+(81, '1Cu', 'El bienestar social busca principalmente:', 'Continua', 'A) Competencia individual', 'B) Satisfacción equilibrada de necesidades colectivas e individuales', 'C) Acumulación de riqueza', 2),
+(82, '1Cu', 'Una norma jurídica es obligatoria porque:', 'Continua', 'A) La gente quiere cumplirla', 'B) Está respaldada por el Estado', 'C) Es tradición', 2),
+(83, '1Cu', 'El Estado moderno requiere:', 'Continua', 'A) Población, territorio y soberanía', 'B) Solo territorio', 'C) Varios gobiernos', 1),
+(84, '1Cu', 'La participación política se da mediante:', 'Continua', 'A) El voto y la opinión pública', 'B) Solo el pago de impuestos', 'C) La educación', 1),
+(85, '1Cu', 'Las normas sociales regulan:', 'Continua', 'A) Solo el comportamiento económico', 'B) La convivencia en sociedad', 'C) Solo castigos', 2),
+(86, '1Cu', 'El poder político se ejerce a través de:', 'Continua', 'A) Instituciones y leyes', 'B) Solo la fuerza', 'C) La religión', 1),
+(87, '1Cu', 'La soberanía significa que el Estado:', 'Continua', 'A) Depende de otro país', 'B) No reconoce autoridad superior', 'C) No tiene territorio', 2),
+(88, '1Cu', 'La democracia permite:', 'Continua', 'A) Que una persona decida todo', 'B) Participación ciudadana', 'C) Solo votación cada 10 años', 2),
+(89, '1Cu', 'Los derechos humanos son:', 'Continua', 'A) Universales e inalienables', 'B) Solo para ciudadanos', 'C) Cambiables por ley', 1),
+(90, '1Cu', 'El contrato social es una idea de:', 'Continua', 'A) Marx', 'B) Rousseau', 'C) Platón', 2),
+
+-- ====== 9. R. PADILLA - Ciencias Sociales (complementario) ======
+(91, '1Pa', 'La Constitución es la norma:', 'Continua', 'A) Más baja en jerarquía', 'B) Suprema del Estado', 'C) Solo para jueces', 2),
+(92, '1Pa', 'El principio de separación de poderes es de:', 'Continua', 'A) Montesquieu', 'B) Hobbes', 'C) Locke', 1),
+(93, '1Pa', 'La igualdad ante la ley significa:', 'Continua', 'A) Todos tienen los mismos bienes', 'B) Nadie está por encima de la ley', 'C) Solo igualdad económica', 2),
+(94, '1Pa', 'Un régimen autoritario se caracteriza por:', 'Continua', 'A) Libertad de expresión total', 'B) Concentración del poder', 'C) Elecciones libres', 2),
+(95, '1Pa', 'La globalización afecta principalmente:', 'Continua', 'A) Solo la economía', 'B) Economía, cultura y política', 'C) Solo el clima', 2),
+(96, '1Pa', 'La ciudadanía implica:', 'Continua', 'A) Derechos y obligaciones', 'B) Solo derechos', 'C) Solo obligaciones', 1),
+(97, '1Pa', 'El Estado de derecho significa que:', 'Continua', 'A) El gobernante está por encima de la ley', 'B) Todos están sujetos a la ley', 'C) No hay leyes', 2),
+(98, '1Pa', 'La justicia social busca:', 'Continua', 'A) Reducir desigualdades', 'B) Aumentar diferencias', 'C) Solo castigar delitos', 1),
+(99, '1Pa', 'La ONU se creó en:', 'Continua', 'A) 1919', 'B) 1945', 'C) 1989', 2),
+(100, '1Pa', 'La dignidad humana es la base de:', 'Continua', 'A) Los derechos humanos', 'B) Las leyes económicas', 'C) Las tradiciones', 1),
+
+-- ====== 10. ARMANDO - Historia ======
+(101, '1Ar', 'La Revolución Mexicana inició en:', 'Dialogo', 'A) 1910', 'B) 1821', 'C) 1857', 1),
+(102, '1Ar', 'El primer presidente de México independiente fue:', 'Dialogo', 'A) Hidalgo', 'B) Guadalupe Victoria', 'C) Juárez', 2),
+(103, '1Ar', 'La Independencia de México se consumó en:', 'Dialogo', 'A) 1810', 'B) 1821', 'C) 1836', 2),
+(104, '1Ar', 'Las Leyes de Reforma fueron promulgadas por:', 'Dialogo', 'A) Santa Anna', 'B) Benito Juárez', 'C) Porfirio Díaz', 2),
+(105, '1Ar', 'El Porfiriato duró aproximadamente:', 'Dialogo', 'A) 10 años', 'B) 35 años', 'C) 70 años', 2),
+(106, '1Ar', 'El Plan de Ayala fue redactado por:', 'Dialogo', 'A) Madero', 'B) Zapata', 'C) Villa', 2),
+(107, '1Ar', 'La Constitución de 1917 es considerada:', 'Dialogo', 'A) La primera constitución mexicana', 'B) La más avanzada socialmente de su época', 'C) Copia de la de EE.UU.', 2),
+(108, '1Ar', 'El asesinato de Francisco I. Madero ocurrió en:', 'Dialogo', 'A) La Decena Trágica', 'B) El Plan de San Luis', 'C) La Batalla de Celaya', 1),
+(109, '1Ar', 'El Tratado de Guadalupe Hidalgo fue en:', 'Dialogo', 'A) 1821', 'B) 1848', 'C) 1917', 2),
+(110, '1Ar', '¿Quién gritó el Grito de Dolores en 1810?', 'Dialogo', 'A) Morelos', 'B) Miguel Hidalgo', 'C) Iturbide', 2);
+
+-- Actualizar AUTO_INCREMENT para que siga en 111
+ALTER TABLE `preguntas` MODIFY `IDPregunta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+
+COMMIT;
