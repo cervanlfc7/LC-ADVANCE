@@ -4,6 +4,8 @@
 // Con "Volver al Dashboard" que regresa a la posición exacta de la lección
 // ==========================================
 
+// Hola luis sexo
+
 session_start();
 require_once 'config/config.php';
 require_once 'src/content.php';
@@ -80,7 +82,7 @@ function render_contenido($html_content) {
 <body>
 
 <header class="header">
-    <h1>LC-ADVANCE <span style="color: #00ff00;">// ACCESS: ONLINE</span></h1>
+    <h1>LC-ADVANCE <span style="color: #ff001eff;">// ACCESS: ONLINE</span></h1>
     <nav>
         <a href="dashboard.php" class="btn btn-dashboard">⬅️ Dashboard</a>
         <a href="ranking.php" class="btn btn-dashboard">🏆 Ranking</a>
