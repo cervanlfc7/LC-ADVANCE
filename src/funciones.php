@@ -28,7 +28,8 @@ if ($accion === 'obtener_estado') {
             'puntos' => 0,
             'nivel' => 1,
             'progreso' => 0,
-            'badges' => []
+            'badges' => [],
+            'ranking' => [] // aseguremos que siempre exista `ranking` (evita errores en el cliente)
         ]);
         exit;
     }

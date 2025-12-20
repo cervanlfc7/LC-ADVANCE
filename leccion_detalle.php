@@ -136,9 +136,12 @@ function render_contenido($html_content) {
                     <?php echo $completed ? '✅ REPETIR QUIZ' : '🧠 INICIAR QUIZ'; ?>
                 </button>
                 <!-- BOTÓN QUE VUELVE A LA POSICIÓN EXACTA EN DASHBOARD -->
-                <a href="dashboard.php#leccion-<?php echo htmlspecialchars($slug); ?>" 
-                   class="btn btn-small" 
-                   id="back-to-dashboard-btn">
+                <?php
+                // Determinar materia de retorno (preferir ?materia= si existe)
+                $materia_return = isset($_GET['materia']) ? trim($_GET['materia']) : ($leccion['materia'] ?? '');
+                ?>
+                <a href="dashboard.php<?php echo $materia_return ? '?materia=' . urlencode($materia_return) : ''; ?>#leccion-<?php echo htmlspecialchars($slug); ?>" 
+                   class="btn btn-small" id="back-to-dashboard-btn">
                    Volver al Dashboard
                 </a>
                 <button id="scrollToTopBtn" class="btn btn-small" title="Ir arriba">▲</button>

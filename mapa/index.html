@@ -83,7 +83,7 @@
     </button>
 
     <!-- REGRESAR AL MENU -->
-    <button onclick="window.location.href='http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/LC-ADVANCE/index.php'">
+    <button onclick="window.location.href='../index.php'">
       ☗ REGRESAR AL MENU
     </button>
   </div>
@@ -103,13 +103,110 @@
     font-family: 'Press Start 2P', monospace; /* estilo retro 8-bit */
     font-size: 12px;
     z-index: 9999;                /* se superpone a todo */
+    pointer-events: none;         /* evitar clicks por defecto */
   }
+
+  /* prompt estilo app */
+  .interaction-prompt {
+    pointer-events: auto;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background: rgba(0,0,0,0.85);
+    color:#fff;
+    padding:8px 12px;
+    border-radius:10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  }
+  .prompt-key {
+    background: #00ffff;
+    color:#000;
+    font-weight:700;
+    padding:6px 8px;
+    border-radius:6px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+  }
+  .prompt-text { font-size: 14px; }
 </style>
   <canvas id="game" width="512" height="512"></canvas>
 
   <script type="module">
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d", { alpha: false });
+// Única zona de estado global
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d", { alpha: false });
+
+const world = {
+  map: null,
+  tilesets: [],
+  cameraX: 0,
+  cameraY: 0,
+  player: { x: 0, y: 0, speed: 2, currentSprite: null }
+};
+
+// Teclado (declarado una sola vez)
+const KEYS = new Set();
+window.addEventListener("keydown", (e) => KEYS.add(e.key.toLowerCase()));
+window.addEventListener("keyup", (e) => KEYS.delete(e.key.toLowerCase()));
+
+// Utilidades básicas de colisión
+function intersectsRect(a, b) {
+  return !(a.x + a.width <= b.x ||
+           a.x >= b.x + b.width ||
+           a.y + a.height <= b.y ||
+           a.y >= b.y + b.height);
+}
+
+// Polígonos: point-in-polygon + helpers
+function pointInPolygon(x, y, points) {
+  if (!Array.isArray(points) || points.length === 0) return false;
+  let inside = false;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const xi = points[i].x, yi = points[i].y;
+    const xj = points[j].x, yj = points[j].y;
+    const intersect = ((yi > y) !== (yj > y)) &&
+      (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+// Normalizar objetos Tiled (tile-objects, puntos, polígonos)
+function normalizeObject(obj, map, tilesets) {
+  if (!obj) return null;
+  const copy = Object.assign({}, obj);
+  // Mantener properties, name
+  copy.properties = obj.properties || copy.properties;
+  // Ajustar tile-objects (gid) porque Tiled pone y en base del tile
+  if (copy.gid) {
+    const info = getTileInfo(copy.gid, tilesets);
+    const tileW = info?.ts?.tilewidth || map.tilewidth || 32;
+    const tileH = info?.ts?.tileheight || map.tileheight || tileW;
+    copy.y = (obj.y || 0) - tileH;
+    copy.width = copy.width || tileW;
+    copy.height = copy.height || tileH;
+  } else {
+    if (!copy.width && !copy.height) { copy.width = 8; copy.height = 8; }
+  }
+  if (Array.isArray(copy.polygon) && copy.polygon.length) {
+    copy.points = copy.polygon.map(p => ({ x: (copy.x || 0) + p.x, y: (copy.y || 0) + p.y }));
+  } else if (Array.isArray(copy.points) && copy.points.length) {
+    copy.points = copy.points.map(p => ({ x: (copy.x || 0) + p.x, y: (copy.y || 0) + p.y }));
+  }
+  copy.x = copy.x || 0;
+  copy.y = (typeof copy.y === 'number') ? copy.y : 0;
+  return copy;
+}
+
+// Sprite jugador
+const playerSprites = { left: new Image(), right: new Image(), up: new Image(), down: new Image() };
+playerSprites.left.src = "./C_L.gif";
+playerSprites.right.src = "./C_R.gif";
+playerSprites.up.src = "./C_U.gif";
+playerSprites.down.src = "./C_D.gif";
+world.player.currentSprite = playerSprites.down;
+const ZOOM = 1.5;
+const DEBUG = false;
 
     async function loadJSON(path) {
       const res = await fetch(path, { cache: "no-store" });
@@ -134,13 +231,19 @@ function resolveTileset(ts) {
   const source = ts.source;
   if (!source || source.startsWith(":/")) return null;
 
-  // Extraer solo el nombre del archivo
   const filename = source.split("/").pop();
+  const tsxPath = `./tilesets/${filename}`;
 
-  return loadText(`./tilesets/${filename}`)
+  return loadText(tsxPath)
     .then(text => {
       const tileset = parseTSX(text, ts.firstgid);
-      tileset.image.src = `./tilesets/${tileset.source}`;
+      // Resuelve la imagen relativa al TSX usando una base absoluta correcta
+      const baseUrl = new URL(tsxPath, window.location.href);
+      if (!tileset.source) {
+        console.warn('Tileset TSX sin <image source>:', tsxPath);
+        return tileset;
+      }
+      tileset.image.src = new URL(tileset.source, baseUrl).href;
       return tileset;
     })
     .catch(err => {
@@ -272,436 +375,502 @@ function renderTileLayer(ctx, map, tilesets, layer, cameraX = 0, cameraY = 0) {
   }
 }
 
-    const world = {
-      map: null,
-      tilesets: [],
-      cameraX: 0,
-      cameraY: 0,
-      player: { x: 0, y: 0, speed: 2 }
-    };
 
-    const KEYS = new Set();
-    window.addEventListener("keydown", (e) => KEYS.add(e.key.toLowerCase()));
-    window.addEventListener("keyup", (e) => KEYS.delete(e.key.toLowerCase()));
 
-    function intersectsRect(a, b) {
-  return !(a.x + a.width <= b.x ||
-           a.x >= b.x + b.width ||
-           a.y + a.height <= b.y ||
-           a.y >= b.y + b.height);
+    
+
+function orient(a, b, c) {
+  return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
-const playerSprites = {
-  left: new Image(),
-  right: new Image(),
-  up: new Image(),
-  down: new Image()
+function onSegment(a, b, c) {
+  return Math.min(a.x, b.x) <= c.x && c.x <= Math.max(a.x, b.x) &&
+         Math.min(a.y, b.y) <= c.y && c.y <= Math.max(a.y, b.y);
+}
+function segIntersect(a, b, c, d) {
+  const o1 = orient(a, b, c);
+  const o2 = orient(a, b, d);
+  const o3 = orient(c, d, a);
+  const o4 = orient(c, d, b);
+  if (o1 === 0 && onSegment(a, b, c)) return true;
+  if (o2 === 0 && onSegment(a, b, d)) return true;
+  if (o3 === 0 && onSegment(c, d, a)) return true;
+  if (o4 === 0 && onSegment(c, d, b)) return true;
+  return (o1 > 0) !== (o2 > 0) && (o3 > 0) !== (o4 > 0);
+}
+
+function intersectsPolygon(rect, polyOrObj) {
+  const points = Array.isArray(polyOrObj) ? polyOrObj : (polyOrObj && polyOrObj.points) || polyOrObj && polyOrObj.polygon;
+  if (!Array.isArray(points) || points.length === 0) return false;
+
+  // 1) Si algún punto del polígono está dentro del rectángulo
+  for (const p of points) {
+    if (p.x >= rect.x && p.x <= rect.x + rect.width && p.y >= rect.y && p.y <= rect.y + rect.height) {
+      return true;
+    }
+  }
+
+  // 2) Si alguna esquina del rectángulo está dentro del polígono
+  const corners = [
+    { x: rect.x, y: rect.y },
+    { x: rect.x + rect.width, y: rect.y },
+    { x: rect.x, y: rect.y + rect.height },
+    { x: rect.x + rect.width, y: rect.y + rect.height }
+  ];
+  if (corners.some(c => pointInPolygon(c.x, c.y, points))) return true;
+
+  // 3) Si alguna arista del polígono intersecta alguna arista del rectángulo
+  const rectEdges = [
+    [{ x: rect.x, y: rect.y }, { x: rect.x + rect.width, y: rect.y }],
+    [{ x: rect.x + rect.width, y: rect.y }, { x: rect.x + rect.width, y: rect.y + rect.height }],
+    [{ x: rect.x + rect.width, y: rect.y + rect.height }, { x: rect.x, y: rect.y + rect.height }],
+    [{ x: rect.x, y: rect.y + rect.height }, { x: rect.x, y: rect.y }]
+  ];
+
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % points.length];
+    for (const [c, d] of rectEdges) {
+      if (segIntersect(a, b, c, d)) return true;
+    }
+  }
+
+  return false;
+}
+
+
+// Añadir catálogo legacy (ids -> profesor) para compatibilidad con Mapa original
+const zonasProfesores = {
+    130: "Miguel",
+    132: "Enrique",
+    135: "Espindola",
+    137: "Manuel",
+    138: "Meza",
+    140: "Herson",
+    141: "Carolina",
+    142: "Refugio & Padilla"
 };
 
-playerSprites.left.src = "./C_L.gif";
-playerSprites.right.src = "./C_R.gif";
-playerSprites.up.src = "./C_U.gif";
-playerSprites.down.src = "./C_D.gif";
+// Click directo en prompt también ejecuta interacción
+document.addEventListener('click', (ev) => {
+  const target = ev.target.closest && ev.target.closest('.interaction-prompt');
+  if (target) {
+    const inter = world.interaccionActual || getInteraccionActual();
+    if (inter) ejecutarInteraccion(inter);
+  }
+}, { passive: true });
 
-// Sprite por defecto
-world.player.currentSprite = playerSprites.down;
-function getInteraccionActual() {
-  const px = world.player.x;
-  const py = world.player.y;
-
-  for (const obj of world.interacciones || []) {
-    const ox = obj.x;
-    const oy = obj.y;
-    const ow = obj.width;
-    const oh = obj.height;
-
-    if (px >= ox && px <= ox + ow && py >= oy && py <= oy + oh) {
-      // 👇 aquí asignamos nombre usando el catálogo
-      const nombreProfesor = zonasProfesores[obj.id] || "Desconocido";
-      return { ...obj, nombreProfesor };
+/* ===== Interacción: utilidades y funciones únicas (reemplazar duplicados existentes) ===== */
+function getProp(obj, name) {
+  if (!obj) return null;
+  if (obj[name] !== undefined) return obj[name];
+  const names = [name, name.toLowerCase(), 'profesor','Profesor','maestro','Maestro','nombreProfesor','nombre','teacher'];
+  if (Array.isArray(obj.properties)) {
+    for (const p of obj.properties) {
+      if (names.includes(p.name) || names.includes(String(p.name))) return (p.value !== undefined ? p.value : p);
+    }
+  } else if (obj.properties && typeof obj.properties === 'object') {
+    for (const n of names) {
+      if (obj.properties[n] !== undefined) return obj.properties[n].value ?? obj.properties[n];
     }
   }
   return null;
 }
 
-function ejecutarInteraccion(obj) {
-  window.location.href = "http://localhost/LC-ADVANCE/Examen/sistemC.php?accion=" + encodeURIComponent(obj.name);
-}
+// identificarProfesor — implementación unificada
+function identificarProfesor(obj) {
+  if (!obj) return null;
+  // legacy id map
+  if (typeof obj.id !== 'undefined' && zonasProfesores[obj.id]) return zonasProfesores[obj.id];
 
+  const candidates = [
+    obj.nombreProfesor,
+    obj.profesor,
+    getProp(obj, 'profesor'),
+    getProp(obj, 'maestro'),
+    getProp(obj, 'nombreProfesor'),
+    obj.name
+  ];
 
-
-function handleInput() {
-  let dx = 0, dy = 0;
-
-  // Movimiento
-  if (KEYS.has("arrowleft") || KEYS.has("a")) {
-    dx -= world.player.speed;
-    world.player.currentSprite = playerSprites.left;
-  }
-  if (KEYS.has("arrowright") || KEYS.has("d")) {
-    dx += world.player.speed;
-    world.player.currentSprite = playerSprites.right;
-  }
-  if (KEYS.has("arrowup") || KEYS.has("w")) {
-    dy -= world.player.speed;
-    world.player.currentSprite = playerSprites.up;
-  }
-  if (KEYS.has("arrowdown") || KEYS.has("s")) {
-    dy += world.player.speed;
-    world.player.currentSprite = playerSprites.down;
-  }
-
-  // Rectángulo de prueba para colisiones
-  const nextRect = {
-    x: world.player.x + dx,
-    y: world.player.y + dy,
-    width: 6,
-    height: 6
-  };
-  
-  const blocked = (world.collisions || []).some(c => {
-    if (c.type === "rect") return intersectsRect(nextRect, c);
-    if (c.type === "polygon") return intersectsPolygon(nextRect, c);
-    return false;
-  });
-
-  // Aplicar movimiento si no está bloqueado
-  if (!blocked) {
-    world.player.x += dx;
-    world.player.y += dy;
-  }
-
-  // Actualizar cámara
-  world.cameraX = world.player.x - canvas.width / 2;
-  world.cameraY = world.player.y - canvas.height / 2;
-
-  // ===============================
-  // Interacción con tecla E
-  // ===============================
-  if (KEYS.has("e")) {
-  const interaccion = getInteraccionActual();
-  if (interaccion) {
-    //alert("Esto es solo una beta, los exámenes estarán disponibles después.");
-    const select = document.getElementById("materia-select");
-    if (select && select.value) {
-      window.location.href = "http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/LC-ADVANCE/dashboard.php?materia=" + select.value;
-    }
-    KEYS.delete("e");
-  }
-}
-
-
-  // ===============================
-  // Menú de pausa con tecla ESC
-  // ===============================
-  if (KEYS.has("escape")) {
-    const pauseMenu = document.getElementById("pauseMenu");
-    if (pauseMenu) {
-      // Alternar visibilidad
-      pauseMenu.style.display = (pauseMenu.style.display === "block") ? "none" : "block";
-    }
-    KEYS.delete("escape"); // evitar repetición
-  }
-
-  world.interaccionActual = getInteraccionActual();
-}
-
-document.addEventListener("keydown", (event) => {
-  if (event.key.toLowerCase() === "e") {
-    if (world.interaccionActual?.nombreProfesor) {
-      fetch("http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/mapa/updateDB.php", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    maestro: world.interaccionActual.nombreProfesor
-  })
-})
-.then(res => res.json())
-.then(data => {
-  console.log("Respuesta del servidor:", data);
-});
+  for (const cand of candidates) {
+    if (cand && String(cand).trim()) {
+      const s = String(cand).trim();
+      const m = s.match(/([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(\s&\s?[A-ZÁÉÍÓÚÑa-záéíóúñ]+)?(\s[A-ZÁÉÍÓÚÑa-záéíóúñ]+)*)$/);
+      return (m ? m[0] : s);
     }
   }
-});
-
-let DEBUG = false; // activa modo debug visual (colisiones en pantalla)
-
-function isAbovePlayer(layer) {
-  // Si la capa tiene propiedad "abovePlayer" en Tiled, úsala
-  if (layer.properties && Array.isArray(layer.properties)) {
-    const p = layer.properties.find(pr => pr.name === "abovePlayer");
-    if (p) return !!p.value;
-  }
-  // Fallback: capas por nombre que sabes que van arriba
-  const overNames = new Set(["Edificios 2", "Techo", "Arboles", "Over", "Roof"]);
-  return overNames.has(layer.name);
+  return null;
 }
 
-function render() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+/**
+ * getInteraccionActual — única función: detecta interacciones (rect/polígono), devuelve
+ * el objeto enriquecido con { nombreProfesor, materia } o null. Elige el más cercano.
+ */
+function getInteraccionActual() {
+  try {
+    const foot = { x: world.player.x - 6, y: world.player.y + 6, width: 12, height: 12 };
+    let best = null, bestDist2 = Infinity;
+    const centroidOf = (o) => {
+      if (Array.isArray(o.points) && o.points.length) {
+        let sx = 0, sy = 0;
+        for (const p of o.points) { sx += p.x; sy += p.y; }
+        return { x: sx / o.points.length, y: sy / o.points.length };
+      }
+      return { x: (o.x || 0) + (o.width || 0)/2, y: (o.y || 0) + (o.height || 0)/2 };
+    };
 
-  // Buscar índice de la capa "Edificios2"
-  const idx = world.map.layers.findIndex(l => l.name === "Edificios2");
+    for (const obj of (world.interacciones || [])) {
+      if (!obj) continue;
+      let intersects = false;
+      if (Array.isArray(obj.points) && obj.points.length) {
+        const corners = [
+          { x: foot.x, y: foot.y },
+          { x: foot.x + foot.width, y: foot.y },
+          { x: foot.x, y: foot.y + foot.height },
+          { x: foot.x + foot.width, y: foot.y + foot.height }
+        ];
+        if (corners.some(c => pointInPolygon(c.x, c.y, obj.points))) intersects = true;
+      } else {
+        const rect = { x: obj.x || 0, y: obj.y || 0, width: obj.width || 0, height: obj.height || 0 };
+        if (intersectsRect(foot, rect)) intersects = true;
+      }
+      if (!intersects) continue;
 
-  if (idx === -1) {
-    console.warn("⚠️ No se encontró la capa 'Edificios2'");
-    // Render normal si no se encuentra
-    for (const layer of world.map.layers) {
-      if (layer.type === "tilelayer") {
-        renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
+      const c = centroidOf(obj);
+      const dx = c.x - world.player.x, dy = c.y - world.player.y;
+      const dist2 = dx*dx + dy*dy;
+      if (dist2 < bestDist2) {
+        bestDist2 = dist2;
+        const nombreProfesor = identificarProfesor(obj) || null;
+        const materia = getProp(obj, 'materia') || getProp(obj, 'asignatura') || null;
+        best = Object.assign({}, obj, { nombreProfesor, materia });
       }
     }
-    drawPlayer(ctx);
-    return;
+    return best;
+  } catch (err) {
+    console.warn("getInteraccionActual fallo:", err);
+    return null;
   }
+}
 
-  // 1. Capas antes de "Edificios2"
-  for (let i = 0; i < idx; i++) {
-    const layer = world.map.layers[i];
-    if (layer.type === "tilelayer") {
-      renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
-    }
-  }
+// Escape para prompts (única implementación)
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]);
+}
 
-  // 2. Dibujar jugador
-  drawPlayer(ctx);
-  // Mostrar texto de interacción si hay una activa
-if (world.interaccionActual) {
-    document.getElementById("mensajeE").textContent =
-      `Presiona "E" para hablar con ${world.interaccionActual.nombreProfesor}`;
+// Actualiza el prompt (sin botón) — clic/tap y E llaman a la misma acción
+function updateInteractionUI() {
+  const el = document.getElementById('mensajeE');
+  if (!el) return;
+  const inter = world.interaccionActual || null;
+  if (inter) {
+    const nombre = inter.nombreProfesor || identificarProfesor(inter) || 'Profesor';
+    const materia = inter.materia || getProp(inter, 'materia') || '';
+    el.innerHTML = `
+      <div class="interaction-prompt" role="status" aria-live="polite" data-materia="${escapeHtml(materia)}">
+        <span class="prompt-key">E</span>
+        <span class="prompt-text">Habla con <strong>${escapeHtml(nombre)}</strong>${materia ? ' — ' + escapeHtml(materia) : ''}</span>
+      </div>
+    `;
   } else {
-    document.getElementById("mensajeE").textContent = "";
-  }
-
-
-  // 3. "Edificios2" y capas siguientes
-  for (let i = idx; i < world.map.layers.length; i++) {
-    const layer = world.map.layers[i];
-    if (layer.type === "tilelayer") {
-      renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
-    }
-  }
-}
-const zonasProfesores = {
-  130: "Miguel",
-  132: "Enrique",
-  135: "Espindola",
-  137: "Manuel",
-  138: "Meza",
-  140: "Herson",
-  141: "Carolina",
-  142: "Refugio & Padilla"
-};
-
-
-function identificarProfesor(obj) {
-  for (const zona of zonasProfesores) {
-    const dentroX = obj.x === zona.x && obj.width === zona.w;
-    const dentroY = obj.y === zona.y && obj.height === zona.h;
-    if (dentroX && dentroY) {
-      return zona.nombre;
-    }
-  }
-  return "Desconocido";
-}
-
-function drawPlayer(ctx) {
-  const spriteW = 15;
-  const spriteH = 25;
-
-  // 1. Dibujar sprite centrado
-  ctx.drawImage(
-  world.player.currentSprite,
-  world.player.x - world.cameraX - spriteW / 2,
-  world.player.y - world.cameraY - spriteH / 2 - 7, // 👈 sube el sprite 5 píxeles
-  spriteW,
-  spriteH
-);
-
-
-  // 2. Dibujar colisión en los pies (solo debug)
-  if (DEBUG) {
-  const hitboxW = 15; // ancho del hitbox
-  const hitboxH = 4;  // alto del hitbox
-
-  ctx.fillStyle = "lime";
-  ctx.fillRect(
-    world.player.x - world.cameraX - hitboxW / 2,
-    world.player.y - world.cameraY + spriteH / 2 - hitboxH,
-    hitboxW,
-    hitboxH
-  );
-}
-
-}
-
-
-function renderLayer(ctx, layer) {
-  if (layer.type === "tilelayer") {
-    renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
-  } else if (layer.type === "imagelayer") {
-    // Si usas Image Layers en Tiled
-    const img = getImageForLayer(layer);
-    if (img) {
-      ctx.drawImage(
-        img,
-        (layer.offsetx || 0) - world.cameraX,
-        (layer.offsety || 0) - world.cameraY
-      );
-    }
-  } else if (layer.type === "objectgroup") {
-    // Normalmente no se dibuja, salvo debug
-    if (DEBUG) drawObjectLayer(ctx, layer);
+    el.innerHTML = '';
   }
 }
 
-function getImageForLayer(layer) {
-  // Implementa si usas image layers (mapear por nombre o propiedad 'source')
-  // Ejemplo si guardas el path en propiedades:
-  const p = layer.properties?.find(pr => pr.name === "source");
-  if (!p) return null;
-  // Caché simple:
-  world._imageCache = world._imageCache || {};
-  if (!world._imageCache[p.value]) {
-    const im = new Image();
-    im.src = p.value;
-    world._imageCache[p.value] = im;
+// Click / touch en el prompt inicia la interacción
+document.addEventListener('click', (ev) => {
+  const target = ev.target.closest && ev.target.closest('.interaction-prompt');
+  if (target) {
+    const inter = world.interaccionActual || getInteraccionActual();
+    if (inter) ejecutarInteraccion(inter);
   }
-  return world._imageCache[p.value];
-}
+}, { passive: true });
 
-function drawObjectLayer(ctx, layer) {
-  ctx.strokeStyle = "#ffa500";
-  (layer.objects || []).forEach(o => {
-    if (o.width && o.height) {
-      ctx.strokeRect(
-        o.x - world.cameraX,
-        o.y - world.cameraY,
-        o.width,
-        o.height
-      );
-    }
+// Ejecutar interacción: siempre envía a updateDB y redirige (guarda posición antes)
+function ejecutarInteraccion(obj) {
+  if (!obj) return;
+  const profesorRaw = obj.nombreProfesor || identificarProfesor(obj) || '';
+  const profesor = String(profesorRaw).trim();
+  let materia = obj.materia || getProp(obj, 'materia') || getProp(obj, 'asignatura') || null;
+  if (materia) materia = String(materia).trim();
+
+  console.debug("ejecutarInteraccion ->", { profesor, materia, obj });
+
+  // Guardar posición para restaurar al volver al mapa
+  if (typeof savePlayerPos === 'function') try { savePlayerPos(); } catch(e){}
+
+  fetch('./updateDB.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ maestro: profesor || profesorRaw, materia: materia || null })
+  })
+  .then(res => res.json().then(j => console.debug('updateDB response', j)).catch(()=>{}))
+  .catch(err => console.warn('updateDB failed:', err))
+  .finally(() => {
+    const param = materia ? `materia=${encodeURIComponent(materia)}` : `profesor=${encodeURIComponent(profesor || profesorRaw || '')}`;
+    window.location.href = `../dashboard.php?${param}`;
   });
 }
 
 
+// --- loop: definida solo si no existe (evita duplicados) ---
+if (typeof loop === 'undefined') {
+  window.loop = function() {
+    handleInput();
+    render();
+    requestAnimationFrame(loop);
+  };
+}
 
-function pointInPolygon(px, py, polygon) {
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].x, yi = polygon[i].y;
-    const xj = polygon[j].x, yj = polygon[j].y;
+// --- Nuevo: función de render principal (debe existir antes de iniciar el loop) ---
+function render() {
+  // limpiar y preparar
+  ctx.save();
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const intersect = ((yi > py) !== (yj > py)) &&
-                      (px < (xj - xi) * (py - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
+  // aplicar zoom
+  ctx.save();
+  ctx.scale(ZOOM, ZOOM);
+
+  const map = world.map;
+  if (map) {
+    // Dibujar capas
+    for (const layer of map.layers || []) {
+      if (layer.type === "tilelayer") {
+        renderTileLayer(ctx, map, world.tilesets, layer, world.cameraX, world.cameraY);
+      }
+    }
   }
-  return inside;
+
+  // === Dibujar jugador (siempre visible) ===
+  try { drawPlayer(ctx); } catch (e) { console.warn("drawPlayer fallo:", e); }
+
+  // Dibujar overlays de interacciones SOLO si estamos en modo DEBUG
+  if (DEBUG) {
+    ctx.globalAlpha = 0.9;
+    ctx.strokeStyle = "#00ff66";
+    ctx.lineWidth = 1;
+    for (const obj of world.interacciones || []) {
+      if (!obj) continue;
+      if (obj.points && obj.points.length) {
+        ctx.beginPath();
+        ctx.moveTo(obj.points[0].x - world.cameraX, obj.points[0].y - world.cameraY);
+        for (let i = 1; i < obj.points.length; i++) {
+          ctx.lineTo(obj.points[i].x - world.cameraX, obj.points[i].y - world.cameraY);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      } else {
+        ctx.strokeRect(obj.x - world.cameraX, obj.y - world.cameraY, obj.width || 8, obj.height || 8);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.restore(); // restore scale
+  ctx.restore();
 }
 
-function intersectsPolygon(rect, poly) {
-  // Chequea si alguna esquina del rectángulo está dentro del polígono
-  const corners = [
-    {x: rect.x, y: rect.y},
-    {x: rect.x + rect.width, y: rect.y},
-    {x: rect.x, y: rect.y + rect.height},
-    {x: rect.x + rect.width, y: rect.y + rect.height}
-  ];
-  return corners.some(c => pointInPolygon(c.x, c.y, poly.points));
+// DIBUJAR JUGADOR (centrado en cámara y compatible con ZOOM)
+function drawPlayer(ctx) {
+    const sprite = world.player.currentSprite;
+    if (!sprite) return;
+    // Coordenadas relativas a la cámara (ya dentro del contexto escalado)
+    const px = world.player.x - world.cameraX - (sprite.width || 32) / 2;
+    const py = world.player.y - world.cameraY - (sprite.height || 32) + 8; // ajustar pies
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(sprite, px, py, sprite.width || 32, sprite.height || 32);
 }
 
+// Comprueba si un rect se superpone con alguna interacción (polígono o rect)
+function rectOverlapsAnyInteraction(rect) {
+  for (const obj of (world.interacciones || [])) {
+    if (!obj) continue;
+    if (obj.points && obj.points.length) {
+      if (intersectsPolygon(rect, obj)) return true;
+      continue;
+    }
+    const ox = obj.x || 0, oy = obj.y || 0, ow = obj.width || 0, oh = obj.height || 0;
+    if (!(rect.x + rect.width <= ox || rect.x >= ox + ow || rect.y + rect.height <= oy || rect.y >= oy + oh)) {
+      return true;
+    }
+  }
+  return false;
+}
 
-    function loop() { handleInput(); render(); requestAnimationFrame(loop); }
+// `identificarProfesor` ya está definida arriba; usar esa única implementación.
 
-    async function init() {
+// `updateInteractionUI` ya está definida arriba; usar esa única implementación.
+
+// Manejo de entrada y movimiento del jugador
+function handleInput() {
   try {
-    // Cargar mapa original
-    const map = await loadJSON("./Mapa.json");
+    let dx = 0, dy = 0;
+    if (KEYS.has("arrowleft") || KEYS.has("a")) { dx -= world.player.speed; world.player.currentSprite = playerSprites.left; }
+    if (KEYS.has("arrowright") || KEYS.has("d")) { dx += world.player.speed; world.player.currentSprite = playerSprites.right; }
+    if (KEYS.has("arrowup") || KEYS.has("w")) { dy -= world.player.speed; world.player.currentSprite = playerSprites.up; }
+    if (KEYS.has("arrowdown") || KEYS.has("s")) { dy += world.player.speed; world.player.currentSprite = playerSprites.down; }
 
-    // Resolver tilesets, ignorando automap
+    const nextRect = { x: world.player.x + dx, y: world.player.y + dy, width: 6, height: 6 };
+
+    // Comprueba colisiones; si la colisión está solapada por una interacción la ignoramos para permitir entrar
+    const blocked = (world.collisions || []).some(c => {
+      if (c.type === 'rect') {
+        if (intersectsRect(nextRect, c)) {
+          return !rectOverlapsAnyInteraction(nextRect);
+        }
+      } else if (c.type === 'polygon') {
+        if (intersectsPolygon(nextRect, c)) {
+          return !rectOverlapsAnyInteraction(nextRect);
+        }
+      } else {
+        if (intersectsRect(nextRect, c) || (c.points && c.points.length && intersectsPolygon(nextRect, c))) {
+          return !rectOverlapsAnyInteraction(nextRect);
+        }
+      }
+      return false;
+    });
+
+    if (!blocked) {
+      world.player.x += dx;
+      world.player.y += dy;
+    }
+
+    // Actualizar cámara
+    world.cameraX = world.player.x - (canvas.width / (2 * ZOOM));
+    world.cameraY = world.player.y - (canvas.height / (2 * ZOOM));
+
+    // Actualizar interacción detectada y UI
+    world.interaccionActual = getInteraccionActual();
+    updateInteractionUI();
+
+    // Interacción con tecla E
+    if (KEYS.has("e")) {
+      const interaccion = world.interaccionActual || getInteraccionActual();
+      if (interaccion) {
+        ejecutarInteraccion(interaccion);
+      } else {
+        const select = document.getElementById("materia-select");
+        if (select && select.value) {
+          window.location.href = `../dashboard.php?materia=${encodeURIComponent(select.value)}`;
+        }
+      }
+      KEYS.delete("e");
+    }
+
+    // Pausa con ESC
+    if (KEYS.has("escape")) {
+      const pauseMenu = document.getElementById("pauseMenu");
+      if (pauseMenu) pauseMenu.style.display = (pauseMenu.style.display === "block") ? "none" : "block";
+      KEYS.delete("escape");
+    }
+
+  } catch (err) {
+    console.warn('handleInput fallo:', err);
+  }
+}
+
+// Guardar / restaurar posición del jugador para volver EXACTO al punto anterior
+function savePlayerPos() {
+    try {
+        const pos = { x: world.player.x, y: world.player.y };
+        localStorage.setItem('map.player_pos', JSON.stringify(pos));
+        console.debug('map: saved player pos', pos);
+    } catch(e) { console.warn('savePlayerPos fallo', e); }
+}
+
+function loadPlayerPos() {
+    try {
+        const raw = localStorage.getItem('map.player_pos');
+        if (!raw) return null;
+        const p = JSON.parse(raw);
+        if (typeof p.x === 'number' && typeof p.y === 'number') {
+            console.debug('map: restoring player pos', p);
+            return p;
+        }
+    } catch(e) { console.warn('loadPlayerPos fallo', e); }
+    return null;
+}
+
+// Llamar a savePlayerPos antes de redirigir/interactuar y en beforeunload
+window.addEventListener('beforeunload', savePlayerPos, { passive: true });
+
+// Dentro de init(), después de calcular spawn fallback, intentar restaurar posición:
+async function init() {
+  try {
+    // Intentar varios nombres de archivo para compatibilidad
+    const candidates = ["./Mapa.json","./Mapa-corregido.json","./Mapa..json","./Map.json"];
+    let map = null;
+    for (const p of candidates) {
+      try { map = await loadJSON(p); if (map) { console.log('Mapa cargado:', p); break; } } catch(e) { /* ignore */ }
+    }
+    if (!map) throw new Error('No se pudo encontrar ningún Mapa JSON (probados: ' + candidates.join(', ') + ')');
+
+    // Cargar y resolver tilesets (omitir los internos de Tiled)
     let tilesets = await Promise.all(
-      map.tilesets
-        .filter(ts => ts.source && !ts.source.startsWith(":/"))
-        .map(ts => resolveTileset(ts))
+      (map.tilesets || []).filter(ts => ts.source && !ts.source.startsWith(':/')).map(ts => resolveTileset(ts))
     );
-    tilesets = tilesets.filter(Boolean).sort((a, b) => a.firstgid - b.firstgid);
+    tilesets = tilesets.filter(Boolean).sort((a,b)=>a.firstgid-b.firstgid);
 
     world.map = map;
     world.tilesets = tilesets;
 
-    console.log("📦 Tilesets cargados:", tilesets.length);
+    // Posición inicial del jugador (primer chunk con offsets como en index_old)
+    const firstLayer = map.layers.find(l => l.type === 'tilelayer' && l.chunks && l.chunks.length);
+    if (firstLayer) {
+      const firstChunk = firstLayer.chunks[0];
+      const spawnOffsetY = 960;
+      const spawnOffsetX = 490;
+      const spawnX = (firstChunk.x + firstChunk.width / 2) * map.tilewidth + spawnOffsetX;
+      const spawnY = (firstChunk.y + firstChunk.height / 2) * map.tileheight + spawnOffsetY;
 
-    // Posición inicial del jugador
-    const firstLayer = map.layers.find(l => l.type === "tilelayer" && l.chunks?.length);
-if (firstLayer) {
-  const firstChunk = firstLayer.chunks[0];
-  world.player.x = (firstChunk.x + firstChunk.width / 2) * map.tilewidth;
-  // ↓ Ajuste: sumamos un offset para que aparezca más abajo
-  const spawnOffsetY = 960; // píxeles extra hacia abajo (ajusta a tu gusto)
-  world.player.y = (firstChunk.y + firstChunk.height / 2) * map.tileheight + spawnOffsetY;
-  const spawnOffsetX = 490; // píxeles extra hacia la derecha
-world.player.x = (firstChunk.x + firstChunk.width / 2) * map.tilewidth + spawnOffsetX;
+      // Intentar restaurar posición guardada (si existe) -> si no, usar spawn
+      const restored = loadPlayerPos();
+      world.player.x = restored ? restored.x : spawnX;
+      world.player.y = restored ? restored.y : spawnY;
+    }
 
-}
-
-
-    // --- Cargar colisiones desde la capa "Coliciones" ---
+    // Cargar colisiones
     function loadCollisions(map) {
-  const colLayer = map.layers.find(
-    l => l.name === "Coliciones" && l.type === "objectgroup"
-  );
-  if (!colLayer) return [];
-
-  return colLayer.objects
-    .filter(obj => obj.x !== undefined && obj.y !== undefined)
-    .map(obj => {
-      if (Array.isArray(obj.polygon) && obj.polygon.length > 0) {
-        // Polígono: ajustamos coordenadas absolutas y corregimos desfase vertical
-        return {
-          type: "polygon",
-          points: obj.polygon.map(p => ({
-            x: obj.x + p.x,
-            y: obj.y + p.y - (obj.height || 0)
-          }))
-        };
-      } else if (obj.width && obj.height) {
-        // Rectángulo: corregimos origen en esquina inferior
-        return {
-  type: "rect",
-  x: obj.x,
-  y: obj.y, // usar directamente la Y de Tiled
-  width: obj.width,
-  height: obj.height
-};
-
-      } else {
-        return null;
-      }
-    })
-    .filter(Boolean);
-}
-
+      const colLayer = map.layers.find(l => l.name === 'Coliciones' && l.type === 'objectgroup');
+      if (!colLayer) return [];
+      return colLayer.objects
+        .filter(obj => obj.x !== undefined && obj.y !== undefined)
+        .map(obj => {
+          if (Array.isArray(obj.polygon) && obj.polygon.length > 0) {
+            return { type: 'polygon', points: obj.polygon.map(p => ({ x: obj.x + p.x, y: obj.y + p.y - (obj.height || 0) })) };
+          } else if (obj.width && obj.height) {
+            return { type: 'rect', x: obj.x, y: obj.y, width: obj.width, height: obj.height };
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
 
     world.collisions = loadCollisions(map);
-    console.log("🟥 Colisiones cargadas:", world.collisions.length);
-    const interaccionesLayer = world.map.layers.find(l => l.name === "Interacciones");
+    console.log('Colisiones cargadas:', world.collisions.length);
 
-  // Guardar los objetos de esa capa en el mundo
-  world.interacciones = interaccionesLayer ? interaccionesLayer.objects : [];
+    // Interacciones: normalizar objetos para usar en detección
+    const interaccionesLayer = map.layers.find(l => l.name === 'Interacciones' && l.type === 'objectgroup');
+    world.interacciones = interaccionesLayer ? interaccionesLayer.objects.map(o => normalizeObject(o, map, tilesets)) : [];
+    console.log('Interacciones cargadas:', world.interacciones.length);
 
-  console.log("Interacciones cargadas:", world.interacciones.length);
+    // Ajustar cámara inicial
+    world.cameraX = world.player.x - (canvas.width / (2 * ZOOM));
+    world.cameraY = world.player.y - (canvas.height / (2 * ZOOM));
 
-    // Iniciar loop
+    // Arrancar el bucle
     loop();
   } catch (err) {
-    console.error("Error en init:", err);
-    ctx.fillStyle = "#ff3355";
-    ctx.font = "16px monospace";
-    ctx.fillText("Error al cargar mapa", 20, 20);
+    console.error('Error en init:', err);
+    ctx.fillStyle = '#ff3355';
+    ctx.font = '16px monospace';
+    ctx.fillText('Error al cargar mapa', 20, 20);
   }
-  
 }
 
-    init();
-  </script>
+init();
+</script>
 </body>
 </html>

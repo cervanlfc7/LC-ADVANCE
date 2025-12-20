@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>LC-ADVANCE.GAME</title>
+  <style>
+    html, body {
+      margin: 0;
+      background: #000;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas#game {
+      height: 100vh;
+      aspect-ratio: 1 / 1;
+      image-rendering: pixelated;
+      border: 2px solid #fff;
+      background: #838383;
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+#pauseMenu {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #111;
+  color: #0cc; /* azul más tenue */
+  padding: 30px;
+  border: 3px solid #0cc;
+  text-align: center;
+  z-index: 1000;
+  font-family: 'Press Start 2P', monospace;
+  box-shadow: 0 0 10px #0cc; /* menos brillo */
+}
+
+#pauseMenu h2 {
+  margin-bottom: 20px;
+  text-shadow: 0 0 3px #0cc, 0 0 6px #0cc; /* menos capas */
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-buttons button {
+  padding: 12px;
+  background: #222;
+  color: #f0f;
+  border: 2px solid #f0f;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  text-shadow: 0 0 3px #f0f; /* menos difuminado */
+  box-shadow: 0 0 8px #f0f;  /* menos brillo */
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.menu-buttons button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px #ff0; /* brillo más controlado */
+  color: #ff0;
+  border-color: #ff0;
+  text-shadow: 0 0 4px #ff0;
+}
+
+
+  </style>
+</head>
+<body>
+  
+  <div id="pauseMenu">
+  <h2>⏸ Juego en Pausa</h2>
+  <div class="menu-buttons">
+    <!-- CONTINUAR -->
+    <button onclick="document.getElementById('pauseMenu').style.display='none'">
+      ▶ CONTINUAR
+    </button>
+
+    <!-- REGRESAR AL MENU -->
+    <button onclick="window.location.href='http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/LC-ADVANCE/index.php'">
+      ☗ REGRESAR AL MENU
+    </button>
+  </div>
+</div>
+<!-- Cuadro fijo en la esquina superior derecha -->
+<div id="mensajeE"></div>
+
+<style>
+  #mensajeE {
+    position: fixed;              /* siempre visible en pantalla */
+    top: 20px;                    /* margen desde arriba */
+    right: 20px;                  /* margen desde la derecha */
+    background: rgba(0,0,0,0.7);  /* fondo oscuro semitransparente */
+    color: white;                 /* texto blanco */
+    padding: 10px 15px;           /* espacio interno */
+    border-radius: 6px;           /* esquinas redondeadas */
+    font-family: 'Press Start 2P', monospace; /* estilo retro 8-bit */
+    font-size: 12px;
+    z-index: 9999;                /* se superpone a todo */
+  }
+</style>
+  <canvas id="game" width="512" height="512"></canvas>
+
+  <script type="module">
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d", { alpha: false });
+
+    async function loadJSON(path) {
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error("No se pudo cargar " + path);
+      return await res.json();
+    }
+    async function loadText(path) {
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error("No se pudo cargar " + path);
+      return await res.text();
+    }
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("No se pudo cargar imagen: " + src));
+        img.src = src;
+      });
+    }
+
+function resolveTileset(ts) {
+  const source = ts.source;
+  if (!source || source.startsWith(":/")) return null;
+
+  // Extraer solo el nombre del archivo
+  const filename = source.split("/").pop();
+
+  return loadText(`./tilesets/${filename}`)
+    .then(text => {
+      const tileset = parseTSX(text, ts.firstgid);
+      tileset.image.src = `./tilesets/${tileset.source}`;
+      return tileset;
+    })
+    .catch(err => {
+      console.error(`❌ No se pudo cargar ${filename}`, err);
+      return null;
+    });
+}
+
+function parseTSX(text, firstgid) {
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, "application/xml");
+
+  const tileset = xml.querySelector("tileset");
+  const image = tileset.querySelector("image");
+
+  const tilecount = parseInt(tileset.getAttribute("tilecount"));
+  const columns = parseInt(tileset.getAttribute("columns"));
+  const tilewidth = parseInt(tileset.getAttribute("tilewidth"));
+  const tileheight = parseInt(tileset.getAttribute("tileheight"));
+  const source = image.getAttribute("source");
+
+  return {
+    firstgid,
+    lastgid: firstgid + tilecount - 1,
+    tilecount,
+    columns,
+    tilewidth,
+    tileheight,
+    image: new Image(),
+    source
+  };
+}
+
+
+function cleanGID(gid) {
+  const FLIP_MASK = 0xE0000000;
+  return gid & ~FLIP_MASK;
+}
+
+function getTileInfo(gid, tilesets) {
+  const rawGid = gid;
+  gid = cleanGID(gid);
+  if (!gid) return null;
+
+  // Busca por firstgid/lastgid del mapa original
+  let ts = null;
+  for (let i = tilesets.length - 1; i >= 0; i--) {
+    const t = tilesets[i];
+    if (gid >= t.firstgid && gid <= t.lastgid) { ts = t; break; }
+  }
+  if (!ts) return null;
+
+  const localId = gid - ts.firstgid;
+  const sx = (localId % ts.columns) * ts.tilewidth;
+  const sy = Math.floor(localId / ts.columns) * ts.tileheight;
+
+  return { ts, sx, sy, rawGid };
+}
+function renderTileLayer(ctx, map, tilesets, layer, cameraX = 0, cameraY = 0) {
+  const { tilewidth, tileheight } = map;
+  if (!layer.chunks || !Array.isArray(layer.chunks)) return;
+
+  for (const chunk of layer.chunks) {
+    const { data, width, height, x: chunkX, y: chunkY } = chunk;
+    const chunkPixelX = chunkX * tilewidth;
+    const chunkPixelY = chunkY * tileheight;
+    const chunkPixelW = width * tilewidth;
+    const chunkPixelH = height * tileheight;
+
+    // Culling de chunks
+    if (chunkPixelX + chunkPixelW < cameraX || chunkPixelY + chunkPixelH < cameraY ||
+        chunkPixelX > cameraX + canvas.width || chunkPixelY > cameraY + canvas.height) {
+      continue;
+    }
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        let gid = data[y * width + x];
+        if (!gid) continue;
+
+        const info = getTileInfo(gid, tilesets);
+        if (!info) continue;
+
+        const dx = (chunkX + x) * tilewidth - cameraX;
+        const dy = (chunkY + y) * tileheight - cameraY;
+
+        // Culling por tile
+        if (dx + tilewidth < 0 || dy + tileheight < 0 ||
+            dx > canvas.width || dy > canvas.height) {
+          continue;
+        }
+
+        // --- Flips y rotaciones de Tiled ---
+        const FLIP_H = 0x80000000;
+        const FLIP_V = 0x40000000;
+        const FLIP_D = 0x20000000;
+
+        const flipH = (info.rawGid & FLIP_H) !== 0;
+        const flipV = (info.rawGid & FLIP_V) !== 0;
+        const flipD = (info.rawGid & FLIP_D) !== 0;
+
+        ctx.save();
+        ctx.translate(dx + map.tilewidth / 2, dy + map.tileheight / 2);
+
+        let scaleX = 1, scaleY = 1, rotate = 0;
+        if (flipD) {
+          rotate = Math.PI / 2;
+          scaleX = flipV ? -1 : 1;
+          scaleY = flipH ? -1 : 1;
+        } else {
+          scaleX = flipH ? -1 : 1;
+          scaleY = flipV ? -1 : 1;
+        }
+
+        ctx.rotate(rotate);
+        ctx.scale(scaleX, scaleY);
+
+        ctx.drawImage(
+          info.ts.image,
+          info.sx, info.sy,
+          info.ts.tilewidth, info.ts.tileheight,
+          -map.tilewidth / 2, -map.tileheight / 2,
+          map.tilewidth, map.tileheight
+        );
+
+        ctx.restore();
+      }
+    }
+  }
+}
+
+    const world = {
+      map: null,
+      tilesets: [],
+      cameraX: 0,
+      cameraY: 0,
+      player: { x: 0, y: 0, speed: 2 }
+    };
+
+    const KEYS = new Set();
+    window.addEventListener("keydown", (e) => KEYS.add(e.key.toLowerCase()));
+    window.addEventListener("keyup", (e) => KEYS.delete(e.key.toLowerCase()));
+
+    function intersectsRect(a, b) {
+  return !(a.x + a.width <= b.x ||
+           a.x >= b.x + b.width ||
+           a.y + a.height <= b.y ||
+           a.y >= b.y + b.height);
+}
+const playerSprites = {
+  left: new Image(),
+  right: new Image(),
+  up: new Image(),
+  down: new Image()
+};
+
+playerSprites.left.src = "./C_L.gif";
+playerSprites.right.src = "./C_R.gif";
+playerSprites.up.src = "./C_U.gif";
+playerSprites.down.src = "./C_D.gif";
+
+// Sprite por defecto
+world.player.currentSprite = playerSprites.down;
+function getInteraccionActual() {
+  const px = world.player.x;
+  const py = world.player.y;
+
+  for (const obj of world.interacciones || []) {
+    const ox = obj.x;
+    const oy = obj.y;
+    const ow = obj.width;
+    const oh = obj.height;
+
+    if (px >= ox && px <= ox + ow && py >= oy && py <= oy + oh) {
+      // 👇 aquí asignamos nombre usando el catálogo
+      const nombreProfesor = zonasProfesores[obj.id] || "Desconocido";
+      return { ...obj, nombreProfesor };
+    }
+  }
+  return null;
+}
+
+function ejecutarInteraccion(obj) {
+  window.location.href = "http://localhost/LC-ADVANCE/Examen/sistemC.php?accion=" + encodeURIComponent(obj.name);
+}
+
+
+
+function handleInput() {
+  let dx = 0, dy = 0;
+
+  // Movimiento
+  if (KEYS.has("arrowleft") || KEYS.has("a")) {
+    dx -= world.player.speed;
+    world.player.currentSprite = playerSprites.left;
+  }
+  if (KEYS.has("arrowright") || KEYS.has("d")) {
+    dx += world.player.speed;
+    world.player.currentSprite = playerSprites.right;
+  }
+  if (KEYS.has("arrowup") || KEYS.has("w")) {
+    dy -= world.player.speed;
+    world.player.currentSprite = playerSprites.up;
+  }
+  if (KEYS.has("arrowdown") || KEYS.has("s")) {
+    dy += world.player.speed;
+    world.player.currentSprite = playerSprites.down;
+  }
+
+  // Rectángulo de prueba para colisiones
+  const nextRect = {
+    x: world.player.x + dx,
+    y: world.player.y + dy,
+    width: 6,
+    height: 6
+  };
+  
+  const blocked = (world.collisions || []).some(c => {
+    if (c.type === "rect") return intersectsRect(nextRect, c);
+    if (c.type === "polygon") return intersectsPolygon(nextRect, c);
+    return false;
+  });
+
+  // Aplicar movimiento si no está bloqueado
+  if (!blocked) {
+    world.player.x += dx;
+    world.player.y += dy;
+  }
+
+  // Actualizar cámara
+  world.cameraX = world.player.x - canvas.width / 2;
+  world.cameraY = world.player.y - canvas.height / 2;
+
+  // ===============================
+  // Interacción con tecla E
+  // ===============================
+  if (KEYS.has("e")) {
+  const interaccion = getInteraccionActual();
+  if (interaccion) {
+    //alert("Esto es solo una beta, los exámenes estarán disponibles después.");
+    const select = document.getElementById("materia-select");
+    if (select && select.value) {
+      window.location.href = "http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/LC-ADVANCE/dashboard.php?materia=" + select.value;
+    }
+    KEYS.delete("e");
+  }
+}
+
+
+  // ===============================
+  // Menú de pausa con tecla ESC
+  // ===============================
+  if (KEYS.has("escape")) {
+    const pauseMenu = document.getElementById("pauseMenu");
+    if (pauseMenu) {
+      // Alternar visibilidad
+      pauseMenu.style.display = (pauseMenu.style.display === "block") ? "none" : "block";
+    }
+    KEYS.delete("escape"); // evitar repetición
+  }
+
+  world.interaccionActual = getInteraccionActual();
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key.toLowerCase() === "e") {
+    if (world.interaccionActual?.nombreProfesor) {
+      fetch("http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/mapa/updateDB.php", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    maestro: world.interaccionActual.nombreProfesor
+  })
+})
+.then(res => res.json())
+.then(data => {
+  console.log("Respuesta del servidor:", data);
+});
+    }
+  }
+});
+
+let DEBUG = false; // activa modo debug visual (colisiones en pantalla)
+
+function isAbovePlayer(layer) {
+  // Si la capa tiene propiedad "abovePlayer" en Tiled, úsala
+  if (layer.properties && Array.isArray(layer.properties)) {
+    const p = layer.properties.find(pr => pr.name === "abovePlayer");
+    if (p) return !!p.value;
+  }
+  // Fallback: capas por nombre que sabes que van arriba
+  const overNames = new Set(["Edificios 2", "Techo", "Arboles", "Over", "Roof"]);
+  return overNames.has(layer.name);
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Buscar índice de la capa "Edificios2"
+  const idx = world.map.layers.findIndex(l => l.name === "Edificios2");
+
+  if (idx === -1) {
+    console.warn("⚠️ No se encontró la capa 'Edificios2'");
+    // Render normal si no se encuentra
+    for (const layer of world.map.layers) {
+      if (layer.type === "tilelayer") {
+        renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
+      }
+    }
+    drawPlayer(ctx);
+    return;
+  }
+
+  // 1. Capas antes de "Edificios2"
+  for (let i = 0; i < idx; i++) {
+    const layer = world.map.layers[i];
+    if (layer.type === "tilelayer") {
+      renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
+    }
+  }
+
+  // 2. Dibujar jugador
+  drawPlayer(ctx);
+  // Mostrar texto de interacción si hay una activa
+if (world.interaccionActual) {
+    document.getElementById("mensajeE").textContent =
+      `Presiona "E" para hablar con ${world.interaccionActual.nombreProfesor}`;
+  } else {
+    document.getElementById("mensajeE").textContent = "";
+  }
+
+
+  // 3. "Edificios2" y capas siguientes
+  for (let i = idx; i < world.map.layers.length; i++) {
+    const layer = world.map.layers[i];
+    if (layer.type === "tilelayer") {
+      renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
+    }
+  }
+}
+const zonasProfesores = {
+  130: "Miguel",
+  132: "Enrique",
+  135: "Espindola",
+  137: "Manuel",
+  138: "Meza",
+  140: "Herson",
+  141: "Carolina",
+  142: "Refugio & Padilla"
+};
+
+
+function identificarProfesor(obj) {
+  for (const zona of zonasProfesores) {
+    const dentroX = obj.x === zona.x && obj.width === zona.w;
+    const dentroY = obj.y === zona.y && obj.height === zona.h;
+    if (dentroX && dentroY) {
+      return zona.nombre;
+    }
+  }
+  return "Desconocido";
+}
+
+function drawPlayer(ctx) {
+  const spriteW = 15;
+  const spriteH = 25;
+
+  // 1. Dibujar sprite centrado
+  ctx.drawImage(
+  world.player.currentSprite,
+  world.player.x - world.cameraX - spriteW / 2,
+  world.player.y - world.cameraY - spriteH / 2 - 7, // 👈 sube el sprite 5 píxeles
+  spriteW,
+  spriteH
+);
+
+
+  // 2. Dibujar colisión en los pies (solo debug)
+  if (DEBUG) {
+  const hitboxW = 15; // ancho del hitbox
+  const hitboxH = 4;  // alto del hitbox
+
+  ctx.fillStyle = "lime";
+  ctx.fillRect(
+    world.player.x - world.cameraX - hitboxW / 2,
+    world.player.y - world.cameraY + spriteH / 2 - hitboxH,
+    hitboxW,
+    hitboxH
+  );
+}
+
+}
+
+
+function renderLayer(ctx, layer) {
+  if (layer.type === "tilelayer") {
+    renderTileLayer(ctx, world.map, world.tilesets, layer, world.cameraX, world.cameraY);
+  } else if (layer.type === "imagelayer") {
+    // Si usas Image Layers en Tiled
+    const img = getImageForLayer(layer);
+    if (img) {
+      ctx.drawImage(
+        img,
+        (layer.offsetx || 0) - world.cameraX,
+        (layer.offsety || 0) - world.cameraY
+      );
+    }
+  } else if (layer.type === "objectgroup") {
+    // Normalmente no se dibuja, salvo debug
+    if (DEBUG) drawObjectLayer(ctx, layer);
+  }
+}
+
+function getImageForLayer(layer) {
+  // Implementa si usas image layers (mapear por nombre o propiedad 'source')
+  // Ejemplo si guardas el path en propiedades:
+  const p = layer.properties?.find(pr => pr.name === "source");
+  if (!p) return null;
+  // Caché simple:
+  world._imageCache = world._imageCache || {};
+  if (!world._imageCache[p.value]) {
+    const im = new Image();
+    im.src = p.value;
+    world._imageCache[p.value] = im;
+  }
+  return world._imageCache[p.value];
+}
+
+function drawObjectLayer(ctx, layer) {
+  ctx.strokeStyle = "#ffa500";
+  (layer.objects || []).forEach(o => {
+    if (o.width && o.height) {
+      ctx.strokeRect(
+        o.x - world.cameraX,
+        o.y - world.cameraY,
+        o.width,
+        o.height
+      );
+    }
+  });
+}
+
+
+
+function pointInPolygon(px, py, polygon) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+
+    const intersect = ((yi > py) !== (yj > py)) &&
+                      (px < (xj - xi) * (py - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function intersectsPolygon(rect, poly) {
+  // Chequea si alguna esquina del rectángulo está dentro del polígono
+  const corners = [
+    {x: rect.x, y: rect.y},
+    {x: rect.x + rect.width, y: rect.y},
+    {x: rect.x, y: rect.y + rect.height},
+    {x: rect.x + rect.width, y: rect.y + rect.height}
+  ];
+  return corners.some(c => pointInPolygon(c.x, c.y, poly.points));
+}
+
+
+    function loop() { handleInput(); render(); requestAnimationFrame(loop); }
+
+    async function init() {
+  try {
+    // Cargar mapa original
+    const map = await loadJSON("./Mapa.json");
+
+    // Resolver tilesets, ignorando automap
+    let tilesets = await Promise.all(
+      map.tilesets
+        .filter(ts => ts.source && !ts.source.startsWith(":/"))
+        .map(ts => resolveTileset(ts))
+    );
+    tilesets = tilesets.filter(Boolean).sort((a, b) => a.firstgid - b.firstgid);
+
+    world.map = map;
+    world.tilesets = tilesets;
+
+    console.log("📦 Tilesets cargados:", tilesets.length);
+
+    // Posición inicial del jugador
+    const firstLayer = map.layers.find(l => l.type === "tilelayer" && l.chunks?.length);
+if (firstLayer) {
+  const firstChunk = firstLayer.chunks[0];
+  world.player.x = (firstChunk.x + firstChunk.width / 2) * map.tilewidth;
+  // ↓ Ajuste: sumamos un offset para que aparezca más abajo
+  const spawnOffsetY = 960; // píxeles extra hacia abajo (ajusta a tu gusto)
+  world.player.y = (firstChunk.y + firstChunk.height / 2) * map.tileheight + spawnOffsetY;
+  const spawnOffsetX = 490; // píxeles extra hacia la derecha
+world.player.x = (firstChunk.x + firstChunk.width / 2) * map.tilewidth + spawnOffsetX;
+
+}
+
+
+    // --- Cargar colisiones desde la capa "Coliciones" ---
+    function loadCollisions(map) {
+  const colLayer = map.layers.find(
+    l => l.name === "Coliciones" && l.type === "objectgroup"
+  );
+  if (!colLayer) return [];
+
+  return colLayer.objects
+    .filter(obj => obj.x !== undefined && obj.y !== undefined)
+    .map(obj => {
+      if (Array.isArray(obj.polygon) && obj.polygon.length > 0) {
+        // Polígono: ajustamos coordenadas absolutas y corregimos desfase vertical
+        return {
+          type: "polygon",
+          points: obj.polygon.map(p => ({
+            x: obj.x + p.x,
+            y: obj.y + p.y - (obj.height || 0)
+          }))
+        };
+      } else if (obj.width && obj.height) {
+        // Rectángulo: corregimos origen en esquina inferior
+        return {
+  type: "rect",
+  x: obj.x,
+  y: obj.y, // usar directamente la Y de Tiled
+  width: obj.width,
+  height: obj.height
+};
+
+      } else {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+
+    world.collisions = loadCollisions(map);
+    console.log("🟥 Colisiones cargadas:", world.collisions.length);
+    const interaccionesLayer = world.map.layers.find(l => l.name === "Interacciones");
+
+  // Guardar los objetos de esa capa en el mundo
+  world.interacciones = interaccionesLayer ? interaccionesLayer.objects : [];
+
+  console.log("Interacciones cargadas:", world.interacciones.length);
+
+    // Iniciar loop
+    loop();
+  } catch (err) {
+    console.error("Error en init:", err);
+    ctx.fillStyle = "#ff3355";
+    ctx.font = "16px monospace";
+    ctx.fillText("Error al cargar mapa", 20, 20);
+  }
+  
+}
+
+    init();
+  </script>
+</body>
+</html>

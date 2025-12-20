@@ -19,6 +19,6 @@ $_SESSION['usuario_es_invitado'] = true;
 // Aviso breve (opcional) — se puede leer en dashboard o en header
 $_SESSION['mensaje_guest'] = 'Has entrado como Invitado. El progreso NO se guardará.';
 
-// Redirigir al dashboard
-header('Location: dashboard.php');
+// Redirigir al mapa (invitado)
+header('Location: mapa/index.html');
 exit;

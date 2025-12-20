@@ -10,9 +10,9 @@ session_start();
 require_once 'config/config.php';
 require_once 'config/csrf.php';
 
-// Si ya hay sesión activa, redirige al panel
+// Si ya hay sesión activa, redirige al mapa en vez de dashboard
 if (isset($_SESSION['usuario_id'])) {
-    redirigir('dashboard.php');
+    redirigir('mapa/index.html');
 }
 
 $mensaje = '';
@@ -39,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['usuario_puntos'] = $usuario['puntos'];
             $_SESSION['usuario_nivel'] = $usuario['nivel'];
 
-            redirigir('dashboard.php');
+            // Redirige directamente al mapa del juego
+            redirigir('mapa/index.html');
         } else {
             $mensaje = '❌ Usuario o contraseña incorrectos.';
         }

@@ -10,8 +10,8 @@
 session_start();
 require_once 'config/config.php';
 
-// Si no hay sesión activa, redirige al login
-if (!isset($_SESSION['usuario_id'])) {
+// Si no hay sesión activa ni modo invitado, redirige al login
+if (!isset($_SESSION['usuario_id']) && empty($_SESSION['usuario_es_invitado'])) {
     redirigir('login.php');
 }
 
@@ -19,10 +19,21 @@ if (!isset($_SESSION['usuario_id'])) {
 $stmt = $pdo->query("SELECT nombre_usuario, puntos, nivel FROM usuarios ORDER BY puntos DESC LIMIT 10");
 $ranking = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Obtener información del jugador actual
-$stmt2 = $pdo->prepare("SELECT nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
-$stmt2->execute([$_SESSION['usuario_id']]);
-$usuarioActual = $stmt2->fetch();
+// Obtener información del jugador actual (soporta invitado)
+if (!empty($_SESSION['usuario_es_invitado'])) {
+    $usuarioActual = [
+        'nombre_usuario' => $_SESSION['usuario_nombre'] ?? 'Invitado',
+        'puntos' => $_SESSION['usuario_puntos'] ?? 0,
+        'nivel' => $_SESSION['usuario_nivel'] ?? 0
+    ];
+} else {
+    $stmt2 = $pdo->prepare("SELECT nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
+    $stmt2->execute([$_SESSION['usuario_id']]);
+    $usuarioActual = $stmt2->fetch();
+    if (!$usuarioActual || !is_array($usuarioActual)) {
+        $usuarioActual = ['nombre_usuario' => '—', 'puntos' => 0, 'nivel' => 0];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -64,10 +75,44 @@ $usuarioActual = $stmt2->fetch();
         <p>⭐ Puntos: <?php echo (int)$usuarioActual['puntos']; ?> | 🏆 Nivel: <?php echo (int)$usuarioActual['nivel']; ?></p>
     </div>
 
+    <?php
+        $return_link = 'dashboard.php';
+        // Preserve the current filter when returning from the ranking page
+        $params = [];
+        if (!empty($_GET['materia'])) {
+            $params['materia'] = $_GET['materia'];
+        } elseif (!empty($_GET['profesor'])) {
+            $params['profesor'] = $_GET['profesor'];
+        }
+        if (!empty($params)) {
+            $return_link .= '?' . http_build_query($params);
+        }
+    ?>
     <div class="menu">
-        <a href="dashboard.php" class="btn">⬅️ Volver al Panel</a>
+        <button id="back-btn" class="btn" type="button" data-fallback="<?php echo htmlspecialchars($return_link, ENT_QUOTES, 'UTF-8'); ?>">⬅️ Volver al Panel</button>
         <a href="logout.php" class="btn logout">🚪 Cerrar Sesión</a>
     </div>
+    <script>
+    (function(){
+      const btn = document.getElementById('back-btn');
+      if (!btn) return;
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        try {
+          const ref = document.referrer || '';
+          if (ref) {
+            try {
+              const u = new URL(ref, location.href);
+              const isSameOrigin = u.origin === location.origin;
+              const isDashboard = u.pathname.endsWith('/dashboard.php') || u.href.indexOf('/dashboard.php') !== -1;
+              if (isSameOrigin && isDashboard && window.history.length > 1) { history.back(); return; }
+            } catch(err){}
+          }
+        } catch(e){}
+        window.location.href = btn.dataset.fallback || '<?php echo addslashes($return_link); ?>';
+      }, { passive: true });
+    })();
+    </script>
 </div>
 
 </body>
