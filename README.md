@@ -30,11 +30,86 @@ Requisitos
 Instalación rápida
 ------------------
 1. Copia el proyecto dentro de la carpeta pública de tu servidor (ej.: `c:\xampp\htdocs\LC-ADVANCE`).
-2. Importa la base de datos:
-   mysql -u root -p < sql/schema.sql
-3. Configura conexión DB en [config/config.php](config/config.php).
+
+2. Importación de bases de datos (detallado) 🔧
+
+   Requisitos: MySQL / MariaDB en ejecución y un usuario con permisos para crear/crear tablas.
+
+   - Importar esquema principal (crea DB `cbtis168_study_game` y tablas principales):
+
+     - Desde línea de comandos (Windows con XAMPP):
+       ```
+       c:\xampp\mysql\bin\mysql.exe -u root -p < sql\schema.sql
+       ```
+     - O (si `mysql` está en PATH):
+       ```
+       mysql -u root -p < sql/schema.sql
+       ```
+
+   - Crear la base de datos del mapa/diálogos (`dialogos`) e importar tablas necesarias:
+
+     - Crear DB (si no existe):
+       ```
+       mysql -u root -p -e "CREATE DATABASE dialogos CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+       ```
+
+     - Importar los dumps del mapa/combate (orden recomendado):
+       ```
+       mysql -u root -p dialogos < sql/Sistema-combate/dialogosmapa.sql
+       mysql -u root -p dialogos < sql/Sistema-combate/dilogoscombate.sql
+       mysql -u root -p dialogos < sql/Sistema-combate/idsmaestros.sql
+       mysql -u root -p dialogos < sql/Sistema-combate/imgcombate.sql
+       mysql -u root -p dialogos < sql/Sistema-combate/preguntas.sql
+       mysql -u root -p dialogos < sql/Sistema-combate/preguntas-maestrp_nuevo.sql
+       ```
+
+     - Nota: algunos dumps pueden no contener la instrucción `CREATE DATABASE` ni `USE`; por eso es importante importar seleccionando la BD `dialogos` o ejecutando los comandos anteriores.
+
+     - Si prefieres phpMyAdmin: crea la BD `dialogos`, selecciónala y usa la opción "Importar" para cargar cada archivo SQL (asegúrate de seleccionar la BD destino antes de importar).
+
+   - Duplicados: hay copias de estos archivos en `Examen/Base de datos/`. Usa preferentemente los archivos en `sql/Sistema-combate/`.
+
+   - Si quieres usar otro nombre de BD: actualiza `config/config.php` (DB_NAME) y, si corresponde, la conexión en `mapa/updateDB.php`.
+
+3. Configura conexión DB en [config/config.php](config/config.php) (DB_HOST, DB_NAME, DB_USER, DB_PASS).
+
 4. Inicia Apache + MySQL (XAMPP) y abre:
-   http://localhost/LC-ADVANCE/index.php
+   - Modo mapa: http://localhost/LC-ADVANCE/mapa/index.html
+   - Landing: http://localhost/LC-ADVANCE/index.php
+
+Verificación rápida ✅
+- En consola mysql:
+  ```sql
+  USE cbtis168_study_game; SHOW TABLES; SELECT COUNT(*) FROM usuarios;
+  USE dialogos; SHOW TABLES; SELECT COUNT(*) FROM dialogosmapa;
+  ```
+
+Tablas faltantes / errores comunes ⚠️
+- Si recibes el error "Table 'dialogos.maestroact' doesn't exist": crea la tabla manualmente (ejemplo):
+  ```sql
+  CREATE TABLE maestroact (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    IDPersonajeC VARCHAR(100) NOT NULL,
+    Maestro_Actual VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  ```
+
+- Si aparece "Access denied" o problemas de credenciales:
+  ```sql
+  CREATE USER 'lcuser'@'localhost' IDENTIFIED BY 'tu_pass';
+  GRANT ALL PRIVILEGES ON cbtis168_study_game.* TO 'lcuser'@'localhost';
+  GRANT ALL PRIVILEGES ON dialogos.* TO 'lcuser'@'localhost';
+  FLUSH PRIVILEGES;
+  ```
+
+Consejos de debugging
+---------------------
+- Comprueba que `config/config.php` tiene los datos correctos.
+- Si `mapa/updateDB.php` no inserta nada, asegúrate de que la BD `dialogos` existe y que el usuario usado en `mysqli` tiene permisos, o modifica la conexión con tus credenciales.
+- Verifica que las tablas están en `InnoDB` y con `utf8mb4` para evitar errores de claves foráneas o codificación.
+- Revisa logs Apache/PHP (`php_error_log`, `xampp\apache\logs\error.log`) y la consola del navegador para errores de red al cargar `Mapa.json` / tilesets.
+
 
 Configuración importante
 -----------------------

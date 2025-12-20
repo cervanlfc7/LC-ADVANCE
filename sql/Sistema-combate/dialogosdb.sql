@@ -1,20 +1,127 @@
--- =====================================================
--- BASE DE DATOS: dialogos
--- ACTUALIZACIÓN COMPLETA 07-12-2025
--- 9 maestros existentes + 1 nuevo (Armando) = 10 maestros
--- 10 preguntas por maestro = 90 preguntas nuevas (ID 11 → 100)
--- =====================================================
+-- phpMyAdmin SQL Dump
+-- version 5.2.2
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 20-12-2025 a las 12:00:00 (actualizado)
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
--- 1. AGREGAR NUEVO MAESTRO: Armando (Historia)
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `dialogos`
+--
+
+--
+-- Estructura de tabla para la tabla `dialogosmapa`
+--
+CREATE TABLE `dialogosmapa` (
+  `IDPersonajeC` varchar(100) NOT NULL,
+  `IdDialogoM` varchar(100) NOT NULL,
+  `DialogoM` varchar(1000) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Estructura de tabla para la tabla `dilogoscombate`
+--
+CREATE TABLE `dilogoscombate` (
+  `IDPersonajeC` varchar(100) NOT NULL,
+  `IDDialogoC` varchar(100) NOT NULL,
+  `TipodialogoC` varchar(100) NOT NULL,
+  `DialogoC` varchar(1000) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Estructura de tabla para la tabla `idsmaestros`
+--
+CREATE TABLE `idsmaestros` (
+  `PersonajeC` varchar(100) NOT NULL,
+  `IDPersonajeC` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Estructura de tabla para la tabla `imgcombate`
+--
+CREATE TABLE `imgcombate` (
+  `IDPersonajeC` varchar(100) NOT NULL,
+  `IDImgC` varchar(100) NOT NULL,
+  `ImgC` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Estructura de tabla para la tabla `preguntas`
+--
+CREATE TABLE `preguntas` (
+  `IDPregunta` int(11) NOT NULL,
+  `IDPersonajeC` varchar(10) DEFAULT NULL,
+  `Pregunta` text NOT NULL,
+  `TipoPreguntaC` varchar(100) NOT NULL,
+  `Opcion1` varchar(255) NOT NULL,
+  `Opcion2` varchar(255) NOT NULL,
+  `Opcion3` varchar(255) NOT NULL,
+  `RespuestaCorrecta` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `dilogoscombate`
+--
+
+INSERT INTO `dilogoscombate` (`IDPersonajeC`, `IDDialogoC`, `TipodialogoC`, `DialogoC`) VALUES
+('1Cu', '1', 'Continuo', '¡Quiubo, compadre! ¿Cómo anda? Lo veo con los mjmmm en el piso, ¿qué trae?'),
+('1Cu', '2', 'Continuo', '¿El marranito que traían? ¡Jajajaja! No, compadre, no me digas que se peló…'),
+('1Cu', '3', 'Pregunta', 'Híjole, compadre… pues ojalá lo encuentres, porque esos animalitos luego son más listos que los alumnos, ¡ja! Pero bueno, ni modo, la vida sigue. Y hablando de cosas importantes… ¿ya te chutaste el examen que te dejé? Porque ese sí no se va a escapar como el cochino, ¿eh?'),
+('1Cu', '4', 'Pregunta', 'Falta poco compadre'),
+('1Cu', '5', 'Final', 'Ya acabaste? eso es todo compadre');
+
+--
+-- Volcado de datos para la tabla `idsmaestros`
+--
+
+INSERT INTO `idsmaestros` (`PersonajeC`, `IDPersonajeC`) VALUES
+('Espindola', '1Es'),
+('Miguel Márquez', '1Le'),
+('Herson', '1He'),
+('Carolina', '1Ca'),
+('Enrique', '1Go'),
+('Manuel', '1Ma'),
+('M. Meza', '1Me'),
+('Cuco', '1Cu'),
+('R. Padilla', '1Pa');
 INSERT INTO `idsmaestros` (`PersonajeC`, `IDPersonajeC`) VALUES
 ('Armando', '1Ar');
 
--- 2. NUEVAS PREGUNTAS (90 en total)
+--
+-- Volcado de datos para la tabla `imgcombate`
+--
+
+INSERT INTO `imgcombate` (`IDPersonajeC`, `IDImgC`, `ImgC`) VALUES
+('1Cu', '1', 'cucoidle'),
+('1Cu', '2', 'cucoatk1');
+
+--
+-- Volcado de datos para la tabla `preguntas`
+--
+
 INSERT INTO `preguntas` (`IDPregunta`, `IDPersonajeC`, `Pregunta`, `TipoPreguntaC`, `Opcion1`, `Opcion2`, `Opcion3`, `RespuestaCorrecta`) VALUES
+(1, '1Cu', '1. El bienestar social busca principalmente:', 'Continua', 'A) Que cada individuo compita por sus propios intereses', 'B) La satisfacción equilibrada de las necesidades colectivas e individuales', 'C) La acumulación de bienes materiales', 2),
+(2, '1Cu', '2. Una norma jurídica se diferencia de una norma social porque:', 'Continua', 'A) No requiere sanción alguna', 'B) Se cumple solo si la persona quiere', 'C) Es obligatoria y respaldada por el poder del Estado', 3),
+(3, '1Cu', '3. ¿Cuál de los siguientes elementos caracteriza al Estado moderno?', 'Continua', 'A) Población, territorio y soberanía', 'B) Multiplicidad de gobiernos', 'C) Falta de territorio definido', 1),
+(4, '1Cu', '4. Cuando un grupo social ejerce influencia sobre las decisiones públicas mediante el voto o la opinión, está participando en:', 'Continua', 'A) La organización productiva', 'B) Las relaciones de poder político', 'C) El sistema educativo', 2),
+(5, '1Cu', '5. Las normas sociales tienen como finalidad principal:5. Las normas sociales tienen como finalidad principal:', 'Dialogo', 'A) Proteger el patrimonio nacional', 'B) Regular la convivencia entre los miembros de una comunidad', 'C) Imponer sanciones económicas', 2),
+(6, '1Cu', '6. Según Henry Fayol, las etapas del proceso administrativo son:', 'Continua', 'A) Planeación, control, evaluación y sanción', 'B) Planeación, organización, dirección y control', 'C) Diagnóstico, planeación, operación y medición', 2),
+(7, '1Cu', '7. La eficiencia en la administración se refiere a:', 'Continua', 'A) Lograr las metas con el menor uso posible de recursos', 'B) Alcanzar los objetivos planeados sin importar los recursos usados', 'C) Cumplir con las normas jurídicas', 1),
+(8, '1Cu', '8. ¿Cuál es el principal aporte de Frederick W. Taylor a la administración?', 'Continua', 'A) El concepto de motivación laboral', 'B) La teoría de sistemas', 'C) La administración científica basada en el estudio del trabajo', 3),
+(9, '1Cu', '9. El valor instrumental de la administración significa que:', 'Continua', 'A) Es un medio para alcanzar los objetivos de una organización', 'B) Depende exclusivamente del capital financiero', 'C) Sirve solo en instituciones privadas', 1),
+(10, '1Cu', '10. En el análisis transaccional, los estados del yo se dividen en:', 'Dialogo', 'A) Emocional, racional y espiritual', 'B) Padre, Adulto y Niño', 'C) Moral, lógico y empático', 2),
 
 -- ====== 1. ESPINDOLA - Pensamiento Matemático III (Derivadas) ======
 (11, '1Es', 'La derivada de una función f(x) representa:', 'Continua', 'A) El área bajo la curva', 'B) La tasa de cambio instantánea', 'C) El volumen de revolución', 2),
@@ -76,7 +183,7 @@ INSERT INTO `preguntas` (`IDPregunta`, `IDPersonajeC`, `Pregunta`, `TipoPregunta
 (59, '1Go', 'The best way to improve speaking is:', 'Dialogo', 'A) Only reading', 'B) Talking every day', 'C) Never speaking', 2),
 (60, '1Go', 'At B1 level you can:', 'Dialogo', 'A) Only say hello', 'B) Have real conversations', 'C) Speak perfectly', 2),
 
--- ====== 6. MANUEL - Programación (general, sin SQL ni Python) ======
+-- ====== 6. MANUEL - Programación (general) ======
 (61, '1Ma', 'En pseudocódigo, ¿cómo se representa una condición?', 'Continua', 'A) SI ... ENTONCES ... FIN SI', 'B) PARA ... HACER ... FIN PARA', 'C) MIENTRAS ... HACER', 1),
 (62, '1Ma', 'Un algoritmo debe tener:', 'Continua', 'A) Entrada, proceso y salida', 'B) Solo entrada', 'C) Infinidad de pasos', 1),
 (63, '1Ma', 'En diagramas de flujo, el rombo representa:', 'Continua', 'A) Decisión', 'B) Proceso', 'C) Entrada/Salida', 1),
@@ -135,8 +242,27 @@ INSERT INTO `preguntas` (`IDPregunta`, `IDPersonajeC`, `Pregunta`, `TipoPregunta
 (108, '1Ar', 'El asesinato de Francisco I. Madero ocurrió en:', 'Dialogo', 'A) La Decena Trágica', 'B) El Plan de San Luis', 'C) La Batalla de Celaya', 1),
 (109, '1Ar', 'El Tratado de Guadalupe Hidalgo fue en:', 'Dialogo', 'A) 1821', 'B) 1848', 'C) 1917', 2),
 (110, '1Ar', '¿Quién gritó el Grito de Dolores en 1810?', 'Dialogo', 'A) Morelos', 'B) Miguel Hidalgo', 'C) Iturbide', 2);
+--
+-- Índices para tablas volcadas
+--
 
--- Actualizar AUTO_INCREMENT para que siga en 111
+--
+-- Indices de la tabla `preguntas`
+--
+ALTER TABLE `preguntas`
+  ADD PRIMARY KEY (`IDPregunta`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+ALTER TABLE `preguntas`
+  ADD PRIMARY KEY (`IDPregunta`);
+ALTER TABLE `preguntas`
+  MODIFY `IDPregunta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 ALTER TABLE `preguntas` MODIFY `IDPregunta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
-
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
