@@ -473,12 +473,25 @@ function avanzarDialogo() {
 }
 
 // 🔄 Inicio
-const primero = dialogos.find(d => d.id === dialogoActual);
-if (primero) {
-  mostrarDialogo(primero.texto, primero.tipo);
-} else {
-  contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
-}
+    const primero = dialogos.find(d => d.id === dialogoActual);
+    if (primero) {
+      mostrarDialogo(primero.texto, primero.tipo);
+    } else {
+      contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
+    }
+
+    // <--- AGREGAR AQUÍ EL NUEVO CÓDIGO --->
+    document.addEventListener('keydown', function(e) {
+      if (e.key === '0') {
+        e.preventDefault();
+        const nuevoID = prompt("Ingresa el IDPersonajeC del profesor (ej: 1Cu, 1Es, 1He...):");
+        
+        if (nuevoID && nuevoID.trim() !== '') {
+          window.location.href = `?personaje=${encodeURIComponent(nuevoID)}&dialogo=1&pregunta=0`;
+        }
+      }
+    });
+
 </script>
 
 
