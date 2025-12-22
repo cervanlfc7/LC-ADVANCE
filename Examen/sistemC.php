@@ -52,20 +52,12 @@ if ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Imágenes
-$sql = "SELECT ImgC FROM imgcombate WHERE IDPersonajeC = ?";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("s", $idPersonaje);
-$stmt->execute();
-$result = $stmt->get_result();
-$imgIdle = "cucoidle";
-$imgAtk = "cucoatk1";
-while ($row = $result->fetch_assoc()) {
-  $nombre = strtolower($row["ImgC"]);
-  if (str_ends_with($nombre, "idle")) $imgIdle = $nombre;
-  if (str_contains($nombre, "atk")) $imgAtk = $nombre;
-}
-$stmt->close();
+// Imagen del profesor (nueva lógica: 1Cu.png, 1Es.png, etc. en la misma carpeta)
+$imgProfesor = $idPersonaje . ".png"; // ej: 1Cu.png
+$imgPorDefecto = "default.png"; // si no existe el archivo, usa este (crea uno si quieres)
+
+// Ruta completa relativa desde la carpeta Examen
+$imgFinal = file_exists($imgProfesor) ? $imgProfesor : $imgPorDefecto;
 
 // Preguntas
 $sql = "SELECT * FROM preguntas WHERE IDPersonajeC = ? ORDER BY IDPregunta ASC";
@@ -89,8 +81,6 @@ $stmt->close();
 
 $conexion->close();
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="es">
@@ -119,7 +109,7 @@ $conexion->close();
 
     .imagen-personaje {
       position: absolute;
-      top: 80px;
+      top: 40px;
       left: 50%;
       transform: translateX(-50%);
       width: 350px;
@@ -166,50 +156,49 @@ $conexion->close();
     }
 
     #estadoMaestro {
-  position: absolute;
-  bottom: 100px;
-  left: 5%;
-  width: 90%;
-  height: 40px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: white;
-  text-transform: uppercase;
-  z-index: 2;
-}
+      position: absolute;
+      bottom: 100px;
+      left: 5%;
+      width: 90%;
+      height: 40px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: white;
+      text-transform: uppercase;
+      z-index: 2;
+    }
 
-.barra-vida {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+    .barra-vida {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-.etiqueta {
-  font-size: 10px;
-  color: white;
-  font-family: 'Press Start 2P', monospace;
-}
+    .etiqueta {
+      font-size: 10px;
+      color: white;
+      font-family: 'Press Start 2P', monospace;
+    }
 
-.vida-contenedor {
-  width: 120px;
-  height: 16px;
-  border: 2px solid white;
-  background-color: black;
-  position: relative;
-}
+    .vida-contenedor {
+      width: 120px;
+      height: 16px;
+      border: 2px solid white;
+      background-color: black;
+      position: relative;
+    }
 
-.vida-relleno {
-  height: 100%;
-  background-color: darkred;
-  width: 100%;
-  transition: width 0.3s ease;
-}
-
+    .vida-relleno {
+      height: 100%;
+      background-color: darkred;
+      width: 100%;
+      transition: width 0.3s ease;
+    }
 
     .botonera {
       position: absolute;
@@ -286,46 +275,36 @@ $conexion->close();
     }
 
     @keyframes aparecer {
-      0% {
-        transform: translate(-50%, 0%) scale(0.5);
-        opacity: 0;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-50%, -150%) scale(1);
-        opacity: 0;
-      }
+      0% { transform: translate(-50%, 0%) scale(0.5); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
     }
+
     @keyframes temblor {
-  0%   { transform: translateX(0); }
-  10%  { transform: translateX(-8px); }
-  20%  { transform: translateX(8px); }
-  30%  { transform: translateX(-10px); }
-  40%  { transform: translateX(10px); }
-  50%  { transform: translateX(-6px); }
-  60%  { transform: translateX(6px); }
-  70%  { transform: translateX(-4px); }
-  80%  { transform: translateX(4px); }
-  90%  { transform: translateX(-2px); }
-  100% { transform: translateX(0); }
-}
+      0% { transform: translateX(0); }
+      10% { transform: translateX(-8px); }
+      20% { transform: translateX(8px); }
+      30% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      50% { transform: translateX(-6px); }
+      60% { transform: translateX(6px); }
+      70% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+      90% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
 
-.temblando {
-  animation: temblor 0.5s ease;
-}
-
-
+    .temblando {
+      animation: temblor 0.5s ease;
+    }
+    
   </style>
 </head>
 <body>
   <div class="cuadro">
     <div class="imagen-personaje">
-  <img id="cucoidle" src="http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/Examen/imagenes/imgCuco/idleCu.png" alt="Cuco">
-</div>
-
+      <img id="imgProfesor" src="<?= htmlspecialchars($imgFinal) ?>" alt="Profesor <?= $nombreMaestro ?>">
+    </div>
 
     <!-- 🗨️ Cuadro de diálogo -->
     <div class="barra-estado">
@@ -333,20 +312,16 @@ $conexion->close();
     </div>
 
     <!-- 🟦 Cuadro de estado del maestro -->
-<!-- 🟦 Cuadro de estado del maestro -->
-<div id="estadoMaestro">
-  <span class="etiqueta"><?= $nombreMaestro ?></span>
-  <div class="barra-vida">
-    <span class="etiqueta">CALIF</span>
-    <div class="vida-contenedor">
-      <div id="vidaRelleno" class="vida-relleno"></div>
+    <div id="estadoMaestro">
+      <span class="etiqueta"><?= $nombreMaestro ?></span>
+      <div class="barra-vida">
+        <span class="etiqueta">CALIF</span>
+        <div class="vida-contenedor">
+          <div id="vidaRelleno" class="vida-relleno"></div>
+        </div>
+        <span id="calificacionTexto" class="etiqueta">10/10</span>
+      </div>
     </div>
-    <span id="calificacionTexto" class="etiqueta">10/10</span>
-  </div>
-</div>
-
-
-
 
     <!-- 🎮 Botonera -->
     <div class="botonera">
@@ -368,9 +343,7 @@ let preguntaActual = <?= $indicePregunta ?>;
 
 const contenedor = document.getElementById("dialogo");
 const btnExamen = document.getElementById("btnExamen");
-const imgCuco = document.getElementById("imgCuco");
-const imgIdle = "imagenes/imgCuco/<?= $imgIdle ?>.png";
-const imgAtk = "imagenes/imgCuco/<?= $imgAtk ?>.png";
+const imgProfesor = document.getElementById("imgProfesor");
 
 let vidaActual = 10;
 
@@ -473,29 +446,24 @@ function avanzarDialogo() {
 }
 
 // 🔄 Inicio
-    const primero = dialogos.find(d => d.id === dialogoActual);
-    if (primero) {
-      mostrarDialogo(primero.texto, primero.tipo);
-    } else {
-      contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
+const primero = dialogos.find(d => d.id === dialogoActual);
+if (primero) {
+  mostrarDialogo(primero.texto, primero.tipo);
+} else {
+  contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
+}
+
+// Ventana provisional para cambiar profesor con tecla "0"
+document.addEventListener('keydown', function(e) {
+  if (e.key === '0') {
+    e.preventDefault();
+    const nuevoID = prompt("Ingresa el IDPersonajeC del profesor (ej: 1Cu, 1Es, 1He...):");
+    
+    if (nuevoID && nuevoID.trim() !== '') {
+      window.location.href = `?personaje=${encodeURIComponent(nuevoID)}&dialogo=1&pregunta=0`;
     }
-
-    // <--- AGREGAR AQUÍ EL NUEVO CÓDIGO --->
-    document.addEventListener('keydown', function(e) {
-      if (e.key === '0') {
-        e.preventDefault();
-        const nuevoID = prompt("Ingresa el IDPersonajeC del profesor (ej: 1Cu, 1Es, 1He...):");
-        
-        if (nuevoID && nuevoID.trim() !== '') {
-          window.location.href = `?personaje=${encodeURIComponent(nuevoID)}&dialogo=1&pregunta=0`;
-        }
-      }
-    });
-
+  }
+});
 </script>
-
-
-
 </body>
 </html>
-
