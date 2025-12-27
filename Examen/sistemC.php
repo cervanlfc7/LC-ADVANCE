@@ -52,11 +52,9 @@ if ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Imagen del profesor (nueva lógica: 1Cu.png, 1Es.png, etc. en la misma carpeta)
-$imgProfesor = $idPersonaje . ".png"; // ej: 1Cu.png
-$imgPorDefecto = "default.png"; // si no existe el archivo, usa este (crea uno si quieres)
-
-// Ruta completa relativa desde la carpeta Examen
+// Imagen del profesor
+$imgProfesor = $idPersonaje . ".png";
+$imgPorDefecto = "default.png";
 $imgFinal = file_exists($imgProfesor) ? $imgProfesor : $imgPorDefecto;
 
 // Preguntas
@@ -109,7 +107,7 @@ $conexion->close();
 
     .imagen-personaje {
       position: absolute;
-      top: 40px;
+      top: 3px;
       left: 50%;
       transform: translateX(-50%);
       width: 350px;
@@ -149,10 +147,6 @@ $conexion->close();
       white-space: pre-wrap;
       overflow: hidden;
       z-index: 2;
-    }
-
-    .dialogo-texto {
-      width: 100%;
     }
 
     #estadoMaestro {
@@ -297,7 +291,6 @@ $conexion->close();
     .temblando {
       animation: temblor 0.5s ease;
     }
-    
   </style>
 </head>
 <body>
@@ -306,12 +299,10 @@ $conexion->close();
       <img id="imgProfesor" src="<?= htmlspecialchars($imgFinal) ?>" alt="Profesor <?= $nombreMaestro ?>">
     </div>
 
-    <!-- 🗨️ Cuadro de diálogo -->
     <div class="barra-estado">
       <div class="dialogo-texto" id="dialogo"></div>
     </div>
 
-    <!-- 🟦 Cuadro de estado del maestro -->
     <div id="estadoMaestro">
       <span class="etiqueta"><?= $nombreMaestro ?></span>
       <div class="barra-vida">
@@ -323,14 +314,13 @@ $conexion->close();
       </div>
     </div>
 
-    <!-- 🎮 Botonera -->
+    <!-- Botonera actualizada -->
     <div class="botonera">
       <button class="boton" id="btnExamen" disabled>SIGUIENTE</button>
-      <button class="boton">HUIR</button>
-      <button class="boton">RETAR AL PROFESOR</button>
+      <button class="boton" id="btnSalir">SALIR</button>
+      <button class="boton" id="btnReintentar" disabled>REINTENTAR EXAMEN</button>
     </div>
 
-    <!-- ✔️ Palomita -->
     <div id="palomita" class="palomita" style="display: none;">✔️</div>
   </div>
 
@@ -343,9 +333,21 @@ let preguntaActual = <?= $indicePregunta ?>;
 
 const contenedor = document.getElementById("dialogo");
 const btnExamen = document.getElementById("btnExamen");
-const imgProfesor = document.getElementById("imgProfesor");
+const btnSalir = document.getElementById("btnSalir");
+const btnReintentar = document.getElementById("btnReintentar");
 
 let vidaActual = 10;
+let reprobado = false; // Ahora también usaremos esta bandera para bloquear avances
+
+btnSalir.addEventListener("click", () => {
+  window.location.href = "http://localhost/LC-ADVANCE/LC-ADVANCE/index.php";
+});
+
+btnReintentar.addEventListener("click", () => {
+  if (!btnReintentar.disabled) {
+    window.location.href = `?personaje=<?= $idPersonaje ?>&dialogo=1&pregunta=0`;
+  }
+});
 
 function reducirVida() {
   vidaActual = Math.max(0, vidaActual - 1);
@@ -357,14 +359,26 @@ function reducirVida() {
   estado.classList.add("temblando");
   setTimeout(() => estado.classList.remove("temblando"), 500);
 
-  if (vidaActual <= 5) {
-    contenedor.innerHTML = `<div class="pregunta">❌ REPROBASTE EL EXAMEN</div>`;
+  if (vidaActual <= 5 && !reprobado) {
+    reprobado = true;
+    contenedor.innerHTML = `<div class="pregunta" style="font-size: 12px; color: red;">❌ REPROBASTE EL EXAMEN</div>`;
     btnExamen.disabled = true;
-    document.querySelectorAll(".opcion").forEach(btn => btn.disabled = true);
+    
+    // Deshabilitamos opciones si las hay visibles
+    document.querySelectorAll(".opcion").forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
+    });
+    
+    btnReintentar.disabled = false;
+    
+    // ¡Importante! Ya no avanzamos más ni mostramos más preguntas
   }
 }
 
 function mostrarDialogo(texto, tipo) {
+  if (reprobado) return; // Bloqueamos si ya reprobó
+
   let i = 0;
   contenedor.textContent = "";
   btnExamen.disabled = true;
@@ -394,6 +408,8 @@ function mostrarDialogo(texto, tipo) {
 }
 
 function mostrarPregunta(index) {
+  if (reprobado) return; // Bloqueamos si ya reprobó
+
   const actual = preguntas[index];
   if (!actual) {
     dialogoActual++;
@@ -413,28 +429,51 @@ function mostrarPregunta(index) {
   btnExamen.disabled = true;
 
   document.querySelectorAll(".opcion").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", function handler() {
+      // Removemos listeners para evitar clics múltiples
+      document.querySelectorAll(".opcion").forEach(b => b.removeEventListener("click", handler));
+
       const seleccion = parseInt(btn.getAttribute("data-opcion"));
+      
       if (seleccion === actual.RespuestaCorrecta) {
+        // ACIERTO
         document.getElementById("palomita").style.display = "block";
         setTimeout(() => {
           document.getElementById("palomita").style.display = "none";
-          preguntaActual++;
-          if (actual.TipoPreguntaC === "Dialogo") {
-            dialogoActual++;
-            avanzarDialogo();
-          } else {
-            mostrarPregunta(preguntaActual);
+          
+          if (!reprobado) { // Solo avanza si no ha reprobado aún
+            preguntaActual++;
+            if (actual.TipoPreguntaC === "Dialogo") {
+              dialogoActual++;
+              avanzarDialogo();
+            } else {
+              mostrarPregunta(preguntaActual);
+            }
           }
         }, 1000);
       } else {
+        // ERROR
         reducirVida();
+        
+        setTimeout(() => {
+          if (!reprobado) { // Solo avanza si no ha reprobado aún
+            preguntaActual++;
+            if (actual.TipoPreguntaC === "Dialogo") {
+              dialogoActual++;
+              avanzarDialogo();
+            } else {
+              mostrarPregunta(preguntaActual);
+            }
+          }
+        }, 800);
       }
     });
   });
 }
 
 function avanzarDialogo() {
+  if (reprobado) return; // Bloqueamos si ya reprobó
+
   const siguiente = dialogos.find(d => d.id === dialogoActual);
   if (!siguiente) {
     contenedor.textContent = "✅ COMBATE FINALIZADO";
@@ -445,7 +484,7 @@ function avanzarDialogo() {
   mostrarDialogo(siguiente.texto, siguiente.tipo);
 }
 
-// 🔄 Inicio
+// Inicio
 const primero = dialogos.find(d => d.id === dialogoActual);
 if (primero) {
   mostrarDialogo(primero.texto, primero.tipo);
@@ -453,17 +492,14 @@ if (primero) {
   contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
 }
 
-// Ventana provisional para cambiar profesor con tecla "0"
+// Tecla 0 para cambiar profesor
 document.addEventListener('keydown', function(e) {
   if (e.key === '0') {
     e.preventDefault();
     const nuevoID = prompt("Ingresa el IDPersonajeC del profesor (ej: 1Cu, 1Es, 1He...):");
-    
     if (nuevoID && nuevoID.trim() !== '') {
       window.location.href = `?personaje=${encodeURIComponent(nuevoID)}&dialogo=1&pregunta=0`;
     }
   }
 });
 </script>
-</body>
-</html>
