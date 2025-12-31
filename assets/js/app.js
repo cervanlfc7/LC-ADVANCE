@@ -89,11 +89,17 @@ if (loginBtn && authWrapper && usernameInput && passwordInput) {
         return usernameInput.value.trim() === '' || passwordInput.value.trim() === '';
     };
 
-    // 1. Efecto al poner el mouse (mouseenter)
-    loginBtn.addEventListener('mouseenter', function() {
+    // SOLO AL HACER CLIC (submit)
+    loginBtn.addEventListener('click', function(e) {
         if (camposVacios()) {
+            e.preventDefault();
+            
             // Añade la clase para disparar la animación de "cierre"
             authWrapper.classList.add('glitch-close');
+            
+            // Quita cualquier mensaje de error anterior
+            const oldError = authWrapper.querySelector('.temp-error');
+            if (oldError) oldError.remove();
             
             // Añade un mensaje temporal de "Error de Acceso"
             const errorMsg = document.createElement('div');
@@ -104,35 +110,153 @@ if (loginBtn && authWrapper && usernameInput && passwordInput) {
             // Hace que el botón parezca desactivado (solo visualmente)
             loginBtn.dataset.originalText = loginBtn.textContent;
             loginBtn.textContent = 'REINTENTAR...';
+            
+            // Auto-restaurar después de 2 segundos
+            setTimeout(() => {
+                if (authWrapper.classList.contains('glitch-close')) {
+                    authWrapper.classList.remove('glitch-close');
+                    
+                    const tempError = authWrapper.querySelector('.temp-error');
+                    if (tempError) {
+                        tempError.remove();
+                    }
+                    
+                    if (loginBtn.dataset.originalText) {
+                        loginBtn.textContent = loginBtn.dataset.originalText;
+                        delete loginBtn.dataset.originalText;
+                    }
+                }
+            }, 2000);
         }
     });
 
-    // 2. Restaurar al quitar el mouse (mouseleave)
-    loginBtn.addEventListener('mouseleave', function() {
-        if (authWrapper.classList.contains('glitch-close')) {
-            // Quita la clase para restaurar la visualización normal
-            authWrapper.classList.remove('glitch-close');
-            
-            // Quita el mensaje de error temporal
-            const tempError = authWrapper.querySelector('.temp-error');
-            if (tempError) {
-                tempError.remove();
+    /* ===============================
+       Dark mode toggle + persistencia
+       Uso: añadir un botón con clase `dark-toggle` para alternar
+     =============================== */
+    (function(){
+        const THEME_KEY = 'lc_advance_theme';
+        const root = document.documentElement || document.body;
+
+        function applyTheme(theme){
+            if(theme === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+        }
+
+        // Aplicar preferencia guardada; no forzar tema por defecto (se usará la configuración del sistema o del CSS base)
+        try{
+            const saved = localStorage.getItem(THEME_KEY);
+            if(saved){
+                applyTheme(saved);
+            } else {
+                // No se aplica tema automáticamente; el sitio usa estilos base por defecto
+                // Si necesitamos aplicar el recomendado por sistema: // if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
             }
-            
-            // Restaura el texto original del botón
-            if (loginBtn.dataset.originalText) {
-                loginBtn.textContent = loginBtn.dataset.originalText;
-                delete loginBtn.dataset.originalText;
+        } catch(e){/* ignored */}
+
+        // Exponer función global para alternar
+        window.toggleDarkMode = function(){
+            const isDark = document.documentElement.classList.toggle('dark');
+            try{ localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light'); } catch(e){/* ignored */}
+            return isDark;
+        };
+
+        // Delegación: botones con clase .dark-toggle alternan el tema
+        document.addEventListener('click', function(e){
+            const target = e.target.closest && e.target.closest('.dark-toggle');
+            if(target){
+                e.preventDefault();
+                window.toggleDarkMode();
             }
+        });
+    })();
+
+// ===== Global quiz delegation =====
+// Ensures .quiz-option and .quiz-reset work regardless of script execution order
+(function(){
+    function disableQuestionOptions(q, clickedBtn, isCorrect){
+        const options = q.querySelectorAll('.quiz-option');
+        options.forEach(o => {
+            o.disabled = true;
+            o.classList.add('disabled');
+            if(o.dataset.correct === 'true') o.classList.add('correct-selected');
+            if(o === clickedBtn && !isCorrect) o.classList.add('incorrect-selected');
+        });
+    }
+
+    document.addEventListener('click', function(e){
+        const btn = e.target.closest && e.target.closest('.quiz-option');
+        if(btn){
+            const q = btn.closest('.quiz-question');
+            const container = btn.closest('.quiz-container') || document;
+            const isCorrect = btn.dataset.correct === 'true';
+            const feedbackMsg = btn.dataset.feedback || (isCorrect ? '✅ Correcto' : '❌ Incorrecto');
+
+            if(q) disableQuestionOptions(q, btn, isCorrect);
+
+            // Show feedback (prefer container-local .quiz-feedback)
+            let feedbackDiv = container.querySelector('.quiz-feedback');
+            if(!feedbackDiv){
+                feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'quiz-feedback';
+                container.appendChild(feedbackDiv);
+            }
+
+            // Update possible quiz-specific score if present
+            if(container.querySelector('#pollutionQuizFeedback')){
+                window.pollutionQuizScore = (window.pollutionQuizScore || 0) + (isCorrect ? 1 : 0);
+                const answered = container.querySelectorAll('.quiz-option:disabled').length / (q ? q.querySelectorAll('.quiz-option').length : 1);
+                feedbackDiv.innerHTML = `<div class="${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">${feedbackMsg}</div><p>Progreso: ${answered}</p><p>Puntuación: ${window.pollutionQuizScore}</p>`;
+            } else {
+                feedbackDiv.innerHTML = `<div class="${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">${feedbackMsg}</div>`;
+            }
+
+            return;
+        }
+
+        const resetBtn = e.target.closest && e.target.closest('.quiz-reset');
+        if(resetBtn){
+            const container = resetBtn.closest('.quiz-container');
+            if(container){
+                container.querySelectorAll('.quiz-option').forEach(button => {
+                    button.disabled = false;
+                    button.classList.remove('disabled','correct-selected','incorrect-selected');
+                    button.style.backgroundColor = '';
+                    button.style.color = '';
+                });
+                const feedback = container.querySelector('.quiz-feedback');
+                if(feedback) feedback.innerHTML = '';
+                // reset any quiz-specific counters
+                if(window.pollutionQuizScore) window.pollutionQuizScore = 0;
+            }
+            return;
         }
     });
 
-    // 3. Evitar el envío si está la animación activa (doble seguridad visual)
-    loginBtn.addEventListener('click', function(e) {
-        if (authWrapper.classList.contains('glitch-close')) {
-            e.preventDefault();
-            // Opcional: Vibración o sonido de error
-            console.log("Acceso Bloqueado temporalmente.");
+    // keyboard support: Enter / Space activates focused quiz-option
+    document.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){
+            const active = document.activeElement;
+            if(active && active.classList && active.classList.contains('quiz-option')){
+                e.preventDefault();
+                active.click();
+            }
         }
     });
-}
+})();
+
+// Ensure quiz buttons are reset and visible on DOMContentLoaded (recovery step)
+document.addEventListener('DOMContentLoaded', function(){
+    try{
+        document.querySelectorAll('.quiz-option').forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('disabled','correct-selected','incorrect-selected');
+            btn.style.display = '';
+            btn.style.visibility = '';
+            if(btn.tagName === 'BUTTON') btn.type = 'button';
+        });
+        // remove empty feedback placeholders
+        document.querySelectorAll('.quiz-feedback').forEach(f => { if(!f.textContent.trim()) f.remove(); });
+    }catch(e){ /* no-op */ }
+});
+

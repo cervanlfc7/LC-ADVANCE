@@ -7,8 +7,9 @@
 // Descripción: Registro de nuevos usuarios
 // ==========================================
 
-session_start();
 require_once 'config/config.php';
+// Iniciamos sesión de forma segura y consistente
+iniciarSesionSegura();
 require_once 'config/csrf.php';
 
 // Si el usuario ya está logueado, redirigir

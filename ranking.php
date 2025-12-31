@@ -7,13 +7,8 @@
 // Descripción: Muestra el Top 10 de usuarios por puntos
 // ==========================================
 
-session_start();
 require_once 'config/config.php';
-
-// Si no hay sesión activa ni modo invitado, redirige al login
-if (!isset($_SESSION['usuario_id']) && empty($_SESSION['usuario_es_invitado'])) {
-    redirigir('login.php');
-}
+requireLogin(true); // permitir invitados
 
 // Obtener los 10 mejores jugadores
 $stmt = $pdo->query("SELECT nombre_usuario, puntos, nivel FROM usuarios ORDER BY puntos DESC LIMIT 10");

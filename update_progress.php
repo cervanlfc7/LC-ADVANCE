@@ -1,9 +1,11 @@
 <?php
-session_start();
 require_once 'config/config.php';
+requireLogin(true); // permite invitados pero la acción no
 
-if (!isset($_SESSION['usuario_id'])) {
-    die('No autorizado');
+// Evitar que invitados guarden progreso
+if (!empty($_SESSION['usuario_es_invitado'])) {
+    http_response_code(403);
+    die('No autorizado: modo invitado');
 }
 
 $user_id = $_SESSION['usuario_id'];

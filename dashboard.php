@@ -3,15 +3,14 @@
 // LC-ADVANCE - dashboard.php (FINAL ESTABLE)
 // ==========================================
 
-session_start();
 require_once 'config/config.php';
+requireLogin(true); // permite también invitados
 require_once 'src/content.php';
 
-// ------------------ AUTENTICACIÓN ------------------
-if (!isset($_SESSION['usuario_id']) && empty($_SESSION['usuario_es_invitado'])) {
-    header('Location: login.php');
-    exit;
-}
+// ------------------ AUTENTICACIÓN Y CONTEXTO DE MATERIA ------------------
+// Requerimos que el usuario tenga una materia seleccionada para ver el dashboard completo
+$filter_materia = requireMateriaContext();
+
 
 // ------------------ USUARIO ------------------
 if (!empty($_SESSION['usuario_es_invitado'])) {
@@ -152,6 +151,7 @@ if (empty($_SESSION['usuario_es_invitado'])) {
         <a href="index.php" class="btn btn-dashboard">🏠 Inicio</a>
         <a href="mapa/index.html" class="btn btn-dashboard">🎮 Ir al Mapa</a>
         <a href="<?php echo $ranking_href; ?>" class="btn btn-dashboard">🏆 Ranking</a>
+        <a href="#" id="goToLessonsBtn" class="btn btn-dashboard">📚 Ir a Lección</a>
         <a href="logout.php" class="btn btn-logout">🚪 SALIR</a>
     </nav>
 </header>
@@ -222,8 +222,12 @@ if (empty($_SESSION['usuario_es_invitado'])) {
                             <div class="leccion-list">
                                 <?php foreach ($temas as $tema): 
                                     $es_completada = in_array($tema['slug'], $completadas);
-                                    $leccion_href = 'leccion_detalle.php?slug=' . urlencode($tema['slug']);
-                                    if (!empty($filter_materia)) $leccion_href .= '&materia=' . urlencode($filter_materia);
+                                    // Siempre añadimos la materia al enlace de la lección para preservar el contexto al volver
+                                    $leccion_href = 'leccion_detalle.php?slug=' . urlencode($tema['slug']) . '&materia=' . urlencode($materia);
+                                    // Si el dashboard está filtrado por profesor (ej. ?profesor=Herson), pasar ese parámetro para preservar el filtro al volver
+                                    if (!empty($filter_profesor)) {
+                                        $leccion_href .= '&profesor=' . urlencode($filter_profesor);
+                                    }
                                 ?>
                                     <div class="leccion-item <?php echo $es_completada ? 'leccion-completed' : 'leccion-pending'; ?>">
                                         <span class="leccion-status">
@@ -232,10 +236,12 @@ if (empty($_SESSION['usuario_es_invitado'])) {
                                         <span class="leccion-name">
                                             <?php echo htmlspecialchars($tema['titulo']); ?>
                                         </span>
-                                        <a href="<?php echo $leccion_href; ?>" 
-                                            class="btn btn-small <?php echo $es_completada ? 'btn-repeat' : 'btn-play'; ?>">
-                                            <?php echo $es_completada ? 'REPETIR' : 'JUGAR'; ?>
-                                        </a>
+                                        <div class="leccion-actions">
+                                            <a href="<?php echo $leccion_href; ?>" 
+                                                class="btn btn-small <?php echo $es_completada ? 'btn-repeat' : 'btn-play'; ?>">
+                                                <?php echo $es_completada ? 'REPETIR' : 'JUGAR'; ?>
+                                            </a>
+                                        </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -246,6 +252,102 @@ if (empty($_SESSION['usuario_es_invitado'])) {
 
             </div>
 </div>
+
+<!-- Modal: Ir a Lección -->
+<div id="lessons-modal" class="lessons-modal" aria-hidden="true" role="dialog" aria-labelledby="lessons-modal-title">
+  <div class="modal-backdrop" id="lessons-backdrop"></div>
+  <div class="modal-content" role="document">
+    <button class="modal-close btn btn-guest" id="lessons-close">✖</button>
+    <h2 id="lessons-modal-title">📚 Ir a Lección</h2>
+    <div class="modal-controls">
+      <input type="search" id="lessons-search" placeholder="Buscar lección o materia..." aria-label="Buscar lección">
+    </div>
+    <div class="lessons-list" id="lessons-list" aria-live="polite"></div>
+  </div>
+</div>
+
+<script>
+  const ALL_LECCIONES = <?php echo json_encode($lecciones, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>;
+  const CURRENT_MATERIA = <?php echo json_encode($filter_materia); ?>;
+  const CURRENT_PROFESOR = <?php echo json_encode($filter_profesor); ?>;
+  const COMPLETED_SLUGS = <?php echo json_encode(array_values($completadas ?? []), JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>;
+  const PROFESOR_MAP = <?php echo json_encode($profesor_materia_map ?? [], JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>;
+
+  (function(){
+    function openModal(){ document.getElementById('lessons-modal').classList.add('open'); document.getElementById('lessons-modal').setAttribute('aria-hidden','false'); document.getElementById('lessons-search').focus(); }
+    function closeModal(){ document.getElementById('lessons-modal').classList.remove('open'); document.getElementById('lessons-modal').setAttribute('aria-hidden','true'); }
+    document.getElementById('goToLessonsBtn')?.addEventListener('click', function(e){ e.preventDefault(); openModal(); });
+
+    document.getElementById('lessons-close')?.addEventListener('click', closeModal);
+    document.getElementById('lessons-backdrop')?.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+
+    const listEl = document.getElementById('lessons-list');
+    const search = document.getElementById('lessons-search');
+
+    function norm(s){ return (s||'').toString().toLowerCase().trim(); }
+
+    function getAllowedMateriasFromProfesor(prof){
+      if(!prof) return null;
+      const nf = norm(prof);
+      for(const k in PROFESOR_MAP){
+        if(norm(k) === nf || norm(k).indexOf(nf)!==-1 || nf.indexOf(norm(k))!==-1){
+          return PROFESOR_MAP[k] || [];
+        }
+      }
+      return null;
+    }
+
+    function renderList(filterText=''){
+      const q = (filterText||'').toLowerCase().trim();
+      const currentMat = norm(CURRENT_MATERIA);
+      const currentProf = CURRENT_PROFESOR ? CURRENT_PROFESOR.toString() : null;
+      const allowedMateriasFromProf = getAllowedMateriasFromProfesor(currentProf);
+
+      const items = ALL_LECCIONES
+        .filter(l => {
+          const hay = (l.titulo || l.titulo_corto || '').toString().toLowerCase();
+          const mat = (l.materia || '').toString().toLowerCase();
+
+          // Si hay una materia activa, sólo mostrar lecciones de esa materia
+          if (currentMat && mat.indexOf(currentMat) === -1) return false;
+
+          // Si hay un profesor activo, limitar a las materias mapeadas a ese profesor
+          if (allowedMateriasFromProf && !allowedMateriasFromProf.some(am => mat.indexOf(am.toString().toLowerCase()) !== -1)) return false;
+
+          // Filtro de búsqueda (por título o materia)
+          return !q || hay.indexOf(q) !== -1 || mat.indexOf(q) !== -1;
+        })
+        .slice(0,250);
+
+      if(!items.length){ listEl.innerHTML = '<p class="text-muted">No se encontraron lecciones.</p>'; return; }
+
+      // Nota de filtro por materia o profesor si aplica
+      const headerParts = [];
+      if (CURRENT_MATERIA) headerParts.push(`Mostrando lecciones para: <strong>${escapeHtml(CURRENT_MATERIA)}</strong>`);
+      if (CURRENT_PROFESOR) headerParts.push(`Filtrado por profesor: <strong>${escapeHtml(CURRENT_PROFESOR)}</strong>`);
+      const header = headerParts.length ? `<div class="lessons-filter-note">${headerParts.join(' • ')}</div>` : '';
+
+      listEl.innerHTML = header + items.map(l=>{
+        const slugVal = l.slug || '';
+        const slug = encodeURIComponent(slugVal);
+        const isCompleted = COMPLETED_SLUGS.includes(slugVal);
+        const statusIcon = isCompleted ? '✅' : '▶️';
+        const materiaParam = CURRENT_MATERIA ? '&materia=' + encodeURIComponent(CURRENT_MATERIA) : '&materia=' + encodeURIComponent(l.materia || '');
+        const profesorParam = CURRENT_PROFESOR ? '&profesor=' + encodeURIComponent(CURRENT_PROFESOR) : '';
+        const href = 'leccion_detalle.php?slug=' + slug + materiaParam + profesorParam;
+        return `<a class="lesson-link" href="${href}"><span class="lesson-left"><span class="lesson-status" aria-hidden="true">${statusIcon}</span><strong>${escapeHtml(l.titulo || l.titulo_corto || l.slug)}</strong></span><span class="lesson-meta">${escapeHtml(l.materia || '')}</span></a>`;
+      }).join('');
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>\"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]; }); }
+
+    search.addEventListener('input', function(){ renderList(this.value); });
+
+    // Inicializar
+    renderList('');
+  })();
+</script>
 
 <button id="scrollToTopBtn" class="scroll-to-top-btn" title="Ir arriba">
     <span class="arrow-up">▲</span>
@@ -345,12 +447,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// Insertar en dashboard (script al final) para ocultar otras materias si hay ?materia=
+// Insertar en dashboard (script al final) para ocultar otras materias si hay ?materia= o ?profesor=
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const materia = params.get('materia');
+  const profesor = params.get('profesor');
+
+  // Manejo por `materia` (comportamiento existente)
   if (materia) {
-    document.querySelectorAll('.materia-section').forEach(sec => {
+    // Compatibilidad: algunas vistas usan `.materia-group` y otras `.materia-section`
+    document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
       const title = sec.querySelector('.materia-title')?.textContent || '';
       if (!title || title.toLowerCase().indexOf(materia.toLowerCase()) === -1) {
         sec.style.display = 'none';
@@ -359,6 +465,83 @@ document.addEventListener('DOMContentLoaded', () => {
         sec.style.display = 'block';
       }
     });
+
+    // Asegurar que los enlaces a lecciones mantengan el parámetro `materia`
+    document.querySelectorAll('.leccion-list a').forEach(a => {
+      try {
+        const url = new URL(a.href, window.location.origin);
+        if (!url.searchParams.get('materia')) {
+          url.searchParams.set('materia', materia);
+          a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
+        }
+      } catch(e){ /* no hacer nada si la URL es relativa o inválida */ }
+    });
+
+    // Si hay un hash a una lección, desplazar suavemente hacia ella después de filtrar
+    if (location.hash && location.hash.startsWith('#leccion-')) {
+      setTimeout(() => {
+        const target = document.getElementById(location.hash.replace('#',''));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          target.classList.add('highlight-return');
+          setTimeout(() => target.classList.remove('highlight-return'), 1800);
+        }
+      }, 200);
+    }
+
+    return; // ya no procesar `profesor` cuando hay `materia` explícita
+  }
+
+  // Manejo por `profesor` (nuevo): mostrar las materias mapeadas y asegurarse de propagar el parámetro a los enlaces
+  if (profesor) {
+    // Mapear profesor -> materias (mantener sincronizado con PHP `$profesor_materia_map`)
+    const profesorMateriaMap = {
+      'Miguel Marquez': ['Temas Selectos de Matemáticas I y II'],
+      'Enrique': ['Inglés'],
+      'Espindola': ['Pensamiento Matemático III'],
+      'Manuel': ['Programación'],
+      'Meza': ['Programación'],
+      'Herson': ['Física','Química'],
+      'Carolina': ['Ecosistemas'],
+      'Refugio & Padilla': ['Ciencias Sociales'],
+      'Armando': ['Historia']
+    };
+
+    // Buscar la clave del mapa de profesor ignorando mayúsculas y acentos
+    function normJs(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/&/g,'y').trim(); }
+    let profKey = Object.keys(profesorMateriaMap).find(k => {
+      return normJs(k).includes(normJs(profesor)) || normJs(profesor).includes(normJs(k));
+    });
+    const wanted = (profesorMateriaMap[profKey] || []).map(s => normJs(s));
+
+    document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
+      const title = sec.querySelector('.materia-title')?.textContent || '';
+      const keep = wanted.some(w => normJs(title).indexOf(w) !== -1);
+      if (!keep) sec.style.display = 'none'; else { sec.style.display = 'block'; sec.classList.add('materia-highlight'); }
+    });
+
+    // Asegurar que los enlaces a lecciones mantengan el parámetro `profesor`
+    document.querySelectorAll('.leccion-list a').forEach(a => {
+      try {
+        const url = new URL(a.href, window.location.origin);
+        if (!url.searchParams.get('profesor')) {
+          url.searchParams.set('profesor', profesor);
+          a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
+        }
+      } catch(e){ /* no hacer nada si la URL es relativa o inválida */ }
+    });
+
+    // Si hay #leccion, desplazar hacia la lección destacada
+    if (location.hash && location.hash.startsWith('#leccion-')) {
+      setTimeout(() => {
+        const target = document.getElementById(location.hash.replace('#',''));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          target.classList.add('highlight-return');
+          setTimeout(() => target.classList.remove('highlight-return'), 1800);
+        }
+      }, 200);
+    }
   }
 });
 
@@ -398,6 +581,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })();
     <?php endif; ?>
+
+    // ============================================
+    // SCROLL REVEAL ANIMATIONS
+    // Mostrar lecciones y grupos conforme hace scroll
+    // ============================================
+    (function() {
+        // Seleccionar todos los elementos que deben animarse
+        const elementsToAnimate = document.querySelectorAll('.leccion-item, .materia-group');
+        
+        // Configurar Intersection Observer
+        const observerOptions = {
+            threshold: 0.1,  // Activar cuando 10% del elemento es visible
+            rootMargin: '0px 0px -50px 0px'  // Empezar la animación 50px antes
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Agregar clase para activar animación
+                    entry.target.classList.add('visible');
+                    // Dejar de observar para mejorar rendimiento
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        // Observar cada elemento
+        elementsToAnimate.forEach(element => {
+            observer.observe(element);
+        });
+    })();
 });
 </script>
 

@@ -5,22 +5,16 @@
 // Autor: LC-TEAM
 // ==========================================
 
-session_start();
 require_once 'config/config.php';
+requireLogin(true); // permite invitados
 require_once 'src/content.php'; // Incluye el array $lecciones
 
-// Función auxiliar (asumo que está en config.php o es una función global)
-// Si no tienes esta función, reemplaza 'redirigir('login.php')' por 'header('Location: login.php'); exit;'
+// Función auxiliar (por compatibilidad si no existe)
 if (!function_exists('redirigir')) {
     function redirigir($url) {
         header('Location: ' . $url);
         exit;
     }
-}
-
-// 1. Verificar sesión activa
-if (!isset($_SESSION['usuario_id'])) {
-    redirigir('login.php');
 }
 
 // =================================================================================
@@ -71,7 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$puntosGanados, $_SESSION['usuario_id']]);
 
     $_SESSION['mensaje'] = "¡Ganaste $puntosGanados puntos! 🎉";
-    redirigir('dashboard.php');
+    $dashboardTarget = 'dashboard.php';
+    if (!empty($leccion['materia'])) $dashboardTarget .= '?materia=' . urlencode($leccion['materia']);
+    redirigir($dashboardTarget);
 }
 
 ?>
@@ -109,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" class="btn btn-submit">Enviar Respuestas</button>
     </form>
 
-    <p><a href="dashboard.php" class="btn btn-back">Volver al Dashboard</a></p>
+    <p><a href="dashboard.php<?php echo !empty($leccion['materia']) ? '?materia=' . urlencode($leccion['materia']) : ''; ?>" class="btn btn-back">Volver al Dashboard</a></p>
 </div>
 
 <script src="assets/js/scripts.js"></script> </body>

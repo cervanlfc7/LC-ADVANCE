@@ -5,8 +5,9 @@
 // Fecha: 07 Noviembre 2025
 // ==========================================
 
-session_start();
 require_once 'config/config.php';
+// Asegurar que la sesión se inicie con las políticas definidas
+iniciarSesionSegura();
 require_once 'config/csrf.php';
 
 // Verificar si el usuario está autenticado
@@ -23,7 +24,8 @@ $usuario_logueado = isset($_SESSION['usuario_id']);
     <!-- Fuente retro y Google Fonts para más variety -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
-    
+    <!-- Force dark theme for lesson pages early to avoid flash -->
+    <script>(function(){try{const KEY='lc_advance_theme'; const saved=localStorage.getItem(KEY); if(!saved && (location.pathname.indexOf('leccion_detalle.php')!==-1 || location.search.indexOf('slug=')!==-1)){ document.documentElement.classList.add('dark'); try{localStorage.setItem(KEY,'dark')}catch(e){} } }catch(e){} })();</script>
     <!-- Icono favicon retro -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
 
@@ -45,6 +47,39 @@ $usuario_logueado = isset($_SESSION['usuario_id']);
 </header>
 
 <main class="container">
+    <?php if (!empty($_GET['seleccionar_materia']) && (!empty($_GET['from']) && $_GET['from'] === 'dashboard')): 
+        require_once 'src/content.php';
+        $materias = [];
+        foreach ($lecciones as $l) $materias[] = $l['materia'] ?? 'Sin Materia';
+        $materias = array_values(array_unique($materias));
+    ?>
+    <!-- Modal select-materia -->
+    <div id="selectMateriaModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="selectMateriaTitle">
+      <div class="modal-card">
+        <button class="modal-close" aria-label="Cerrar">✖</button>
+        <h2 id="selectMateriaTitle">📚 Elige una materia para continuar</h2>
+        <p>Selecciona la materia que deseas estudiar hoy — esto configurará tu panel de estudio.</p>
+        <div class="materias-grid">
+          <?php foreach ($materias as $m): ?>
+            <a class="btn btn-primary btn-small" href="dashboard.php?materia=<?php echo urlencode($m); ?>"><?php echo htmlspecialchars($m); ?></a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const modal = document.getElementById('selectMateriaModal');
+      if (!modal) return;
+      // Auto-show the modal
+      modal.style.display = 'flex';
+      // Close handlers
+      modal.querySelector('.modal-close').addEventListener('click', ()=> modal.style.display = 'none');
+      modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display = 'none';});
+    });
+    </script>
+    <?php endif; ?>
+
     <?php if (!$usuario_logueado): ?>
         <section class="intro">
             <h2>💾 ¡Bienvenido al reto de Programación LC-ADVANCE!</h2>
