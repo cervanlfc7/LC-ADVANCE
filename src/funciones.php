@@ -1,6 +1,6 @@
 <?php
-session_start();
 require_once '../config/config.php';
+requireLogin(true); // permitir invitados, también aplica timeout
 require_once __DIR__ . '/content.php';
 
 header('Content-Type: application/json');
@@ -93,13 +93,22 @@ if ($accion === 'calificar_quiz') {
     }
     $score = 0;
     $numPreguntas = count($preguntas);
+    $details = [];
 
     foreach ($preguntas as $i => $pregunta) {
         $key = "q$i";
-        $respuestaUsuario = $_POST[$key] ?? '';
-        if (strcasecmp(trim($respuestaUsuario), trim($pregunta['correcta'])) === 0) {
+        $respuestaUsuario = isset($_POST[$key]) ? trim($_POST[$key]) : '';
+        $isCorrect = (strcasecmp($respuestaUsuario, trim($pregunta['correcta'])) === 0);
+        if ($isCorrect) {
             $score++;
         }
+        // devolver detalle por pregunta
+        $details[] = [
+            'pregunta' => $pregunta['pregunta'] ?? '',
+            'correcta' => $pregunta['correcta'] ?? '',
+            'respuesta' => $respuestaUsuario,
+            'acertada' => $isCorrect
+        ];
     }
 
     $xp_ganado = $score * 10;
@@ -121,7 +130,19 @@ if ($accion === 'calificar_quiz') {
         $pdo->prepare("UPDATE usuarios SET puntos = puntos + ? WHERE id = ?")
             ->execute([$xp_ganado, $usuario_id]);
 
-        echo json_encode(['ok' => true, 'score' => $score, 'xp_ganado' => $xp_ganado]);
+        // recuperar estado actualizado del usuario
+        $stmt = $pdo->prepare("SELECT puntos, nivel FROM usuarios WHERE id = ?");
+        $stmt->execute([$usuario_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'ok' => true,
+            'score' => $score,
+            'xp_ganado' => $xp_ganado,
+            'details' => $details,
+            'new_puntos' => $user['puntos'] ?? 0,
+            'new_nivel' => $user['nivel'] ?? 1
+        ]);
     } catch (Exception $e) {
         error_log("Error calificar_quiz: " . $e->getMessage());
         echo json_encode(['ok' => false, 'mensaje' => 'Error desconocido del servidor.']);

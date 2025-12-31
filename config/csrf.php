@@ -7,7 +7,9 @@
 // Descripción: Protección contra ataques CSRF
 // ==========================================
 
-if (session_status() === PHP_SESSION_NONE) {
+if (function_exists('iniciarSesionSegura')) {
+    iniciarSesionSegura();
+} elseif (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 

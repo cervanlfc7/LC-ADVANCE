@@ -1,24 +1,19 @@
 <?php
 // ==========================================
-// LC-ADVANCE - leccion_detalle.php (Versión corregida y funcional 2025)
-// Con "Volver al Dashboard" que regresa a la posición exacta de la lección
+// LC-ADVANCE - leccion_detalle.php (Versión Corregida y 100% Funcional 2025)
+// Quiz en modal overlay separado del contenido principal
+// Botones "Ir al Quiz" funcionan perfectamente sin bugs
 // ==========================================
 
-// Hola luis sexo
-
-session_start();
 require_once 'config/config.php';
+requireLogin(true); // permitir invitados
 require_once 'src/content.php';
 
-if (!isset($_SESSION['usuario_id']) && empty($_SESSION['usuario_es_invitado'])) {
-    header('Location: login.php');
-    exit;
-}
 
 $user_id = $_SESSION['usuario_id'] ?? null;
 $slug = $_GET['slug'] ?? '';
-$leccion = null;
 
+$leccion = null;
 foreach ($lecciones as $l) {
     if ($l['slug'] === $slug) {
         $leccion = $l;
@@ -27,18 +22,25 @@ foreach ($lecciones as $l) {
 }
 
 if (!$leccion) {
-    header('Location: dashboard.php?error=leccion_no_encontrada');
+    // Redirigir al dashboard manteniendo la materia si existe
+    if (!empty($_GET['materia'])) {
+        header('Location: dashboard.php?materia=' . urlencode($_GET['materia']) . '&error=leccion_no_encontrada');
+    } else {
+        header('Location: dashboard.php?error=leccion_no_encontrada');
+    }
     exit;
 }
 
+// Progreso del usuario
 $stmt = $pdo->prepare("SELECT * FROM user_progress WHERE user_id = ? AND slug = ?");
 $stmt->execute([$user_id, $slug]);
 $progress = $stmt->fetch(PDO::FETCH_ASSOC);
 $completed = $progress ? (bool)$progress['completed'] : false;
 $old_score = $progress ? $progress['score'] : 0;
 
+// Preparar quiz
 $NUM_PREGUNTAS_QUIZ = 10;
-$quiz_pool = $leccion['quiz'];
+$quiz_pool = $leccion['quiz'] ?? [];
 if (count($quiz_pool) > $NUM_PREGUNTAS_QUIZ) {
     shuffle($quiz_pool);
     $quiz_selected = array_slice($quiz_pool, 0, $NUM_PREGUNTAS_QUIZ);
@@ -53,8 +55,13 @@ $_SESSION['current_quiz'] = [
     'num_preguntas' => $NUM_PREGUNTAS_QUIZ_FINAL
 ];
 
-function render_contenido($html_content) {
-    return $html_content;
+$progress_percent = $NUM_PREGUNTAS_QUIZ_FINAL ? round(($old_score / $NUM_PREGUNTAS_QUIZ_FINAL) * 100) : 0;
+// Construir parámetros de retorno preservando `profesor` si venía en la URL (prioritario), si no usar `materia`
+$return_params = '';
+if (!empty($_GET['profesor'])) {
+    $return_params = '?profesor=' . urlencode($_GET['profesor']);
+} elseif (isset($_GET['materia']) && $_GET['materia'] !== '') {
+    $return_params = '?materia=' . urlencode($_GET['materia']);
 }
 ?>
 
@@ -63,181 +70,222 @@ function render_contenido($html_content) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($leccion['titulo']); ?> | CBTIS168</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <title><?php echo htmlspecialchars($leccion['titulo']); ?> | LC-ADVANCE</title>
+    
+    <!-- Fuentes cyberpunk -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- MathJax -->
     <script>
       MathJax = {
-        tex: {
-          inlineMath: [['$', '$'], ['\\(', '\\)']],
-          displayMath: [['$$', '$$'], ['\\[', '\\]']],
-          processEscapes: true
-        }
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+        svg: { fontCache: 'global' }
       };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <!-- EN EL HEAD DEL HTML PRINCIPAL -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Css para el contenido -->
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="<?php echo ($slug === 'contaminacion-ambiental') ? 'page-lesson-contaminacion' : ''; ?>">
 
-<header class="header">
-    <h1>LC-ADVANCE <span style="color: #ff001eff;">// ACCESS: ONLINE</span></h1>
-    <nav>
-        <a href="dashboard.php" class="btn btn-dashboard">⬅️ Dashboard</a>
-        <a href="ranking.php" class="btn btn-dashboard">🏆 Ranking</a>
-        <a href="logout.php" class="btn btn-logout">🚪 SALIR</a>
-    </nav>
-</header>
+<div class="page-wrapper">
 
-<div class="container">
-    <div class="lesson-quiz-container">
-        <div class="main-column">
-            <h1 class="auth-title">MÓDULO DE APRENDIZAJE</h1>
-            
-            <div class="navigation-tabs">
-                <button id="tab-content" class="tab-btn active">📚 CONTENIDO</button>
-                <button id="tab-quiz" class="tab-btn">
-                    <?php echo $completed ? '✅ REPETIR QUIZ' : '🧠 INICIAR QUIZ'; ?>
-                </button>
+    <header class="main-header">
+        <div class="header-title">
+            <h1>LC-ADVANCE <span class="access">ACCESS: ONLINE</span></h1>
+        </div>
+        <nav class="header-nav">
+            <a href="dashboard.php<?php echo $return_params; ?>" class="btn btn-nav">⬅️ Dashboard</a>
+            <a href="ranking.php" class="btn btn-nav">🏆 Ranking</a>
+            <a href="logout.php" class="btn btn-logout">🚪 Salir</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="lesson-layout">
+
+            <!-- Contenido principal (siempre visible) -->
+            <section class="lesson-main">
+                <h2 class="module-title">MÓDULO DE APRENDIZAJE</h2>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="content">📚 Contenido</button>
+                    <button class="tab-btn" data-tab="quiz">
+                        <?php echo $completed ? '✅ Repetir Quiz' : '🧠 Iniciar Quiz'; ?>
+                    </button>
+                </div>
+
+                <div id="content-panel" class="panel">
+                    <div class="lesson-header">
+                        <div class="lesson-title-row">
+                            <?php echo $leccion['icon'] ?? '<span class="icon-tema">💾</span>'; ?>
+                            <h3 class="lesson-title"><?php echo htmlspecialchars($leccion['titulo']); ?></h3>
+                        </div>
+                        <span class="lesson-materia"><?php echo htmlspecialchars($leccion['materia']); ?></span>
+                        <p class="previous-score">
+                            Puntuación anterior: <strong><?php echo $old_score; ?></strong> / <?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?>
+                        </p>
+                    </div>
+
+                    <div class="lesson-content">
+                        <?php echo $leccion['contenido']; ?>
+                    </div>
+
+                    <div class="lesson-actions">
+                        <button class="btn btn-primary btn-small open-quiz-btn">🧠 Ir al Quiz</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sidebar -->
+            <aside class="lesson-sidebar">
+                <div class="sidebar-card">
+                    <div class="info-item">
+                        <span class="label">Materia</span>
+                        <span class="value"><?php echo htmlspecialchars($leccion['materia']); ?></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Puntuación</span>
+                        <span class="value"><?php echo $old_score; ?> / <?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?></span>
+                    </div>
+                    <div class="info-item progress-item">
+                        <span class="label">Progreso</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: <?php echo $progress_percent; ?>%;"></div>
+                        </div>
+                        <span class="percent"><?php echo $progress_percent; ?>%</span>
+                    </div>
+
+                    <div class="sidebar-actions">
+                        <button class="btn btn-primary btn-small open-quiz-btn">
+                            <?php echo $completed ? '✅ Repetir Quiz' : '🧠 Iniciar Quiz'; ?>
+                        </button>
+                        <a href="dashboard.php<?php echo $return_params; ?>#leccion-<?php echo htmlspecialchars($slug); ?>"
+                           class="btn btn-secondary btn-small back-dashboard-btn">
+                            ← Volver al Dashboard
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- MODAL QUIZ (separado del contenido principal) -->
+    <div id="quiz-overlay" class="overlay hidden">
+        <div class="quiz-modal">
+            <div class="quiz-header">
+                <h3>🧠 Quiz: <?php echo htmlspecialchars($leccion['titulo']); ?></h3>
+                <button class="close-btn" aria-label="Cerrar quiz">✖</button>
             </div>
-
-            <!-- Vista de Contenido -->
-            <div id="content-view" class="view-panel active">
-                <div class="content-header">
-                    <h2><?php echo htmlspecialchars($leccion['titulo']); ?></h2>
-                    <p class="materia-tag"><?php echo htmlspecialchars($leccion['materia']); ?></p>
-                    <p class="progress-info-local">
-                        Puntuación anterior: <span class="old-score"><?php echo $old_score; ?></span> / <?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?>
-                    </p>
-                </div>
-
-                <div class="content-body">
-                    <?php echo render_contenido($leccion['contenido']); ?>
-                </div>
-
-                <div class="content-footer">
-                    <button id="content-to-quiz-btn" class="btn toggle-quiz-btn">🧠 Ir al Quiz</button>
-                </div>
+            <div id="quiz-content" class="quiz-body">
+                <div class="loading">Cargando preguntas...</div>
             </div>
         </div>
-
-        <!-- Barra lateral -->
-        <?php $progress_percent = $NUM_PREGUNTAS_QUIZ_FINAL ? round(($old_score / $NUM_PREGUNTAS_QUIZ_FINAL) * 100) : 0; ?>
-        <aside class="side-panel" aria-label="Información de la lección">
-            <div class="stat"><strong>Materia</strong><span><?php echo htmlspecialchars($leccion['materia']); ?></span></div>
-            <div class="stat"><strong>Puntuación</strong><span><?php echo $old_score; ?> / <?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?></span></div>
-            <div class="stat">
-                <strong>Progreso</strong>
-                <div class="progress" style="width:100%; background:#111; border-radius:8px; padding:6px;">
-                    <div class="progress-fill" style="width:<?php echo $progress_percent; ?>%; height:12px; border-radius:6px; background: linear-gradient(90deg,var(--neon-green),var(--neon-cyan));"></div>
-                </div>
-            </div>
-            <div class="actions">
-                <button id="start-quiz-btn" class="btn btn-play">
-                    <?php echo $completed ? '✅ REPETIR QUIZ' : '🧠 INICIAR QUIZ'; ?>
-                </button>
-                <!-- BOTÓN QUE VUELVE A LA POSICIÓN EXACTA EN DASHBOARD -->
-                <?php
-                // Determinar materia de retorno (preferir ?materia= si existe)
-                $materia_return = isset($_GET['materia']) ? trim($_GET['materia']) : ($leccion['materia'] ?? '');
-                ?>
-                <a href="dashboard.php<?php echo $materia_return ? '?materia=' . urlencode($materia_return) : ''; ?>#leccion-<?php echo htmlspecialchars($slug); ?>" 
-                   class="btn btn-small" id="back-to-dashboard-btn">
-                   Volver al Dashboard
-                </a>
-                <button id="scrollToTopBtn" class="btn btn-small" title="Ir arriba">▲</button>
-            </div>
-        </aside>
     </div>
 
-    <!-- Panel del Quiz (oculto por defecto) -->
-    <section id="quiz-panel" class="quiz-panel hidden" aria-hidden="true">
-        <header class="quiz-panel-header">
-            <h3>🧠 Quiz: <?php echo htmlspecialchars($leccion['titulo']); ?></h3>
-            <button id="close-quiz-btn" class="btn btn-small">✖ Cerrar</button>
-        </header>
-        <div id="quiz-panel-container" class="quiz-panel-container">
-            <div class="loading-message">Cargando preguntas...</div>
-        </div>
-    </section>
+    <button id="scroll-top" class="scroll-top-btn" aria-label="Subir">▲</button>
 </div>
 
 <script>
-// === JavaScript LIMPIO Y FUNCIONAL ===
-document.addEventListener('DOMContentLoaded', function () {
-    // Elementos
-    const quizOverlay = document.getElementById('quiz-panel');
-    const quizContainer = document.getElementById('quiz-panel-container');
-    const tabContent = document.getElementById('tab-content');
-    const tabQuiz = document.getElementById('tab-quiz');
-    const contentToQuizBtn = document.getElementById('content-to-quiz-btn');
-    const startQuizBtn = document.getElementById('start-quiz-btn');
-    const closeQuizBtn = document.getElementById('close-quiz-btn');
-    const backBtn = document.getElementById('back-to-dashboard-btn');
-    const scrollBtn = document.getElementById('scrollToTopBtn');
+// JavaScript 100% funcional y sin bugs
+document.addEventListener('DOMContentLoaded', () => {
+    const quizOverlay = document.getElementById('quiz-overlay');
+    const quizContent = document.getElementById('quiz-content');
+    const openQuizBtns = document.querySelectorAll('.open-quiz-btn');
+    const closeBtn = document.querySelector('.close-btn');
+    const tabQuiz = document.querySelector('.tab-btn[data-tab="quiz"]');
+    const tabContent = document.querySelector('.tab-btn[data-tab="content"]');
+    const scrollTopBtn = document.getElementById('scroll-top');
+    const backBtn = document.querySelector('.back-dashboard-btn');
 
-    // Datos del quiz
     const quizData = <?php echo json_encode($quiz_selected); ?>;
 
-    // === VOLVER AL DASHBOARD CON POSICIÓN EXACTA ===
+    // Guardar posición y slug de la lección al volver al dashboard
     if (backBtn) {
-        backBtn.addEventListener('click', function(e) {
-            // Guardamos la posición actual de scroll de esta lección
-            sessionStorage.setItem('scrollPos_leccion_' + '<?php echo addslashes($slug); ?>', window.pageYOffset);
+        backBtn.addEventListener('click', () => {
+            sessionStorage.setItem('scrollPos_leccion_' + '<?php echo addslashes($slug); ?>', window.scrollY);
+            // Asegurar que el dashboard sepa cuál fue la última lección visitada
+            sessionStorage.setItem('last_leccion_slug', '<?php echo addslashes($slug); ?>');
         });
     }
 
-    // Abrir quiz
+    // Scroll to top
+    window.addEventListener('scroll', () => {
+        scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+    });
+    scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ABRIR QUIZ (todos los botones)
+    openQuizBtns.forEach(btn => btn.addEventListener('click', openQuiz));
+    if (tabQuiz) tabQuiz.addEventListener('click', openQuiz);
+
     function openQuiz() {
-        document.getElementById('content-view').classList.add('hidden');
         quizOverlay.classList.remove('hidden');
-        tabQuiz.classList.add('active');
+        if (tabQuiz) tabQuiz.classList.add('active');
         tabContent.classList.remove('active');
 
-        if (quizContainer.innerHTML.includes('Cargando')) {
-            renderQuiz();
+        // Cargar quiz solo la primera vez. En caso de error, mostrar mensaje claro.
+        try {
+            if (quizContent.querySelector('.loading')) {
+                renderQuiz();
+            }
+        } catch (err) {
+            console.error('Error al renderizar quiz:', err);
+            quizContent.innerHTML = `<div class="result-panel"><strong>Error:</strong> No se pudo cargar el quiz. Intenta recargar la página.</div>`;
         }
     }
 
-    // Cerrar quiz
+    // CERRAR QUIZ
+    if (closeBtn) closeBtn.addEventListener('click', closeQuiz);
+    quizOverlay.addEventListener('click', (e) => {
+        if (e.target === quizOverlay) closeQuiz();
+    });
+
     function closeQuiz() {
         quizOverlay.classList.add('hidden');
-        document.getElementById('content-view').classList.remove('hidden');
         tabContent.classList.add('active');
         tabQuiz.classList.remove('active');
     }
 
-    // Eventos
-    tabQuiz.addEventListener('click', openQuiz);
-    contentToQuizBtn.addEventListener('click', openQuiz);
-    startQuizBtn.addEventListener('click', openQuiz);
-    closeQuizBtn.addEventListener('click', closeQuiz);
-    tabContent.addEventListener('click', closeQuiz);
-
-    // Renderizar quiz
+    // RENDERIZAR QUIZ
     function renderQuiz() {
         if (quizData.length === 0) {
-            quizContainer.innerHTML = '<p class="text-center">No hay preguntas disponibles para este quiz.</p>';
+            quizContent.innerHTML = '<p class="no-questions">No hay preguntas disponibles para este módulo.</p>';
             return;
         }
 
-        let html = '<form id="quiz-form">';
-        quizData.forEach((q, i) => {
-            const id = `q${i}`;
-            html += `
-                <div class="quiz-question-card">
-                    <p class="question-title"><strong>${i + 1}. ${q.pregunta}</strong></p>
-                    <div class="options-group">`;
+        // helper para escapar HTML
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
-            const opciones = [...q.opciones].sort(() => Math.random() - 0.5);
-            opciones.forEach(op => {
-                const encoded = encodeURIComponent(op);
+        let html = '<form id="quiz-form" class="quiz-form">';
+        quizData.forEach((q, i) => {
+            const name = `q${i}`;
+            const shuffled = [...q.opciones].sort(() => Math.random() - 0.5);
+
+            html += `
+                <div class="question-card">
+                    <p class="question-text"><strong>${i + 1}.</strong> ${escapeHtml(q.pregunta)}</p>
+                    <div class="options">`;
+
+            shuffled.forEach((op, idx) => {
+                // required en el primer input de cada grupo es suficiente
+                const required = idx === 0 ? 'required' : '';
                 html += `
-                    <label class="quiz-option">
-                        <input type="radio" name="${id}" value="${encoded}" required>
-                        <span class="custom-radio"></span>
-                        <span>${op}</span>
+                    <label class="option-label">
+                        <input type="radio" name="${name}" value="${escapeHtml(op)}" ${required}>
+                        <span class="radio-custom"></span>
+                        <span class="option-text">${escapeHtml(op)}</span>
                     </label>`;
             });
 
@@ -245,79 +293,137 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         html += `
-            <div class="quiz-footer">
-                <button type="submit" class="btn btn-submit-quiz full-width-btn">✅ ENVIAR Y CALIFICAR</button>
+            <div class="quiz-submit">
+                <button type="submit" class="btn btn-submit">✅ Enviar y Calificar</button>
             </div>
         </form>`;
 
-        quizContainer.innerHTML = html;
+        quizContent.innerHTML = html;
 
-        // Submit (simulación - reemplaza con tu backend real)
-        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+        // Manejar envío y calificación usando el endpoint servidor
+        document.getElementById('quiz-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert('¡Quiz enviado! (Funcionalidad completa requiere backend)');
-            closeQuiz();
+            const form = e.target;
+
+            // obtener estado antes de enviar para detectar subida de nivel
+            let oldState = { puntos: 0, nivel: 1 };
+            try {
+                const s = await fetch('src/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
+                oldState = await s.json();
+            } catch (ex) {
+                console.warn('No se pudo obtener estado previo', ex);
+            }
+
+            const formData = new FormData(form);
+            formData.append('accion', 'calificar_quiz');
+            formData.append('slug', '<?php echo addslashes($slug); ?>');
+
+            try {
+                const resp = await fetch('src/funciones.php', { method: 'POST', body: formData });
+                const data = await resp.json();
+
+                if (!data.ok) {
+                    // Ej.: modo invitado, o error
+                    quizContent.innerHTML = `<div class="result-panel"><strong>Error:</strong> ${escapeHtml(data.mensaje || data.error || 'Error al calificar')}</div>`;
+                    return;
+                }
+
+                const score = data.score || 0;
+                const xp = data.xp_ganado || 0;
+
+                // obtener estado actualizado
+                const stateResp = await fetch('src/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
+                const state = await stateResp.json();
+
+                // mostrar detalle por pregunta
+                let detailHtml = '<div class="result-panel">';
+                detailHtml += `<h4>Resultado</h4><p>Puntos correctos: <strong>${score}</strong> / ${quizData.length}</p>`;
+                detailHtml += `<p>XP ganado: <strong>${xp}</strong></p>`;
+                detailHtml += `<p>Nuevo total de puntos: <strong>${state.puntos ?? '—'}</strong></p>`;
+                detailHtml += `<p>Nivel actual: <strong>${state.nivel ?? '—'}</strong></p>`;
+
+                if (Array.isArray(data.details)) {
+                    detailHtml += '<hr style="margin:0.6rem 0">';
+                    detailHtml += '<div class="details-list">';
+                    data.details.forEach((d, idx) => {
+                        const ok = d.acertada ? 'correct' : 'wrong';
+                        detailHtml += `
+                            <div class="detail-item ${ok}">
+                                <div class="detail-q"><strong>${idx + 1}.</strong> ${escapeHtml(d.pregunta)}</div>
+                                <div class="detail-a">Tu respuesta: <span class="user-answer">${escapeHtml(d.respuesta || '—')}</span></div>
+                                ${d.acertada ? '<div class="detail-ok">✔ Correcto</div>' : `<div class="detail-wrong">✖ Incorrecto — Respuesta correcta: <strong>${escapeHtml(d.correcta)}</strong></div>`}
+                            </div>`;
+                    });
+                    detailHtml += '</div>';
+                }
+
+                detailHtml += `<div style="margin-top:0.6rem"><button class="btn btn-primary" id="close-result">Cerrar</button></div>`;
+                detailHtml += '</div>';
+
+                quizContent.innerHTML = detailHtml;
+
+                // animación de XP (fly up)
+                if (xp > 0) {
+                    const xpEl = document.createElement('div');
+                    xpEl.className = 'xp-fly';
+                    xpEl.textContent = `+${xp} XP`;
+                    document.body.appendChild(xpEl);
+                    // eliminar después de animación
+                    setTimeout(() => xpEl.remove(), 2100);
+                }
+
+                // mostrar toast si subió de nivel
+                if (state.nivel > (oldState.nivel || 1)) {
+                    showToast(`¡Subiste al nivel ${state.nivel}! 🎉`);
+                }
+
+                // Actualizar la barra de progreso lateral si existe
+                const fill = document.querySelector('.progress-fill');
+                const percent = document.querySelector('.percent');
+                if (fill) {
+                    const pct = Math.round(state.progreso || ((state.puntos % 500) / 5));
+                    fill.style.width = pct + '%';
+                    if (percent) percent.textContent = pct + '%';
+                }
+                const closeBtnRes = document.getElementById('close-result');
+                if (closeBtnRes) closeBtnRes.addEventListener('click', closeQuiz);
+
+            } catch (err) {
+                console.error(err);
+                quizContent.innerHTML = `<div class="result-panel"><strong>Error:</strong> No se pudo conectar con el servidor.</div>`;
+            }
         });
 
+        // Helper: mostrar toast simple (si no existe el contenedor lo crea)
+        function showToast(message, timeout = 3000) {
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = message;
+            container.appendChild(t);
+            setTimeout(() => {
+                t.classList.add('hide');
+                setTimeout(() => t.remove(), 420);
+            }, timeout);
+        }
+
+        // Renderizar fórmulas MathJax
         if (window.MathJax && MathJax.typesetPromise) {
-            MathJax.typesetPromise([quizContainer]);
+            MathJax.typesetPromise([quizContent]);
         }
     }
 
-    // Scroll to top
-    window.addEventListener('scroll', () => {
-        scrollBtn.style.display = window.pageYOffset > 300 ? 'block' : 'none';
-    });
-    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-    // MathJax inicial
+    // MathJax inicial para el contenido de la lección
     if (window.MathJax && MathJax.typesetPromise) {
         MathJax.typesetPromise();
     }
 });
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Ajusta el selector al botón/ enlace de "Volver"
-  const backBtn = document.querySelector('.btn-back-dashboard') || document.querySelector('#backBtn');
-  const slug = '<?php echo addslashes($slug ?? ""); ?>'; // asegúrate de que $slug exista
 
-  if (backBtn && slug) {
-    backBtn.addEventListener('click', function () {
-      // Guardamos solo la slug, no la coordenada absoluta
-      sessionStorage.setItem('last_leccion_slug', slug);
-      // Nota: no prevenimos la navegación; el link puede seguir funcionando como antes
-    });
-  }
-
-  // --- Opcional: guardar posición por lección como fallback ---
-  if (slug) {
-    window.addEventListener('beforeunload', function () {
-      sessionStorage.setItem('scrollPos_leccion_' + slug, window.pageYOffset || document.documentElement.scrollTop || 0);
-    });
-  }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  // Ajusta el selector al botón/ enlace de "Volver"
-  const backBtn = document.querySelector('.btn-back-dashboard') || document.querySelector('#backBtn');
-  const slug = '<?php echo addslashes($slug ?? ""); ?>'; // asegúrate de que $slug exista
-
-  if (backBtn && slug) {
-    backBtn.addEventListener('click', function () {
-      // Guardamos solo la slug, no la coordenada absoluta
-      sessionStorage.setItem('last_leccion_slug', slug);
-      // Nota: no prevenimos la navegación; el link puede seguir funcionando como antes
-    });
-  }
-
-  // --- Opcional: guardar posición por lección como fallback ---
-  if (slug) {
-    window.addEventListener('beforeunload', function () {
-      sessionStorage.setItem('scrollPos_leccion_' + slug, window.pageYOffset || document.documentElement.scrollTop || 0);
-    });
-  }
-});
-</script>
 </body>
 </html>

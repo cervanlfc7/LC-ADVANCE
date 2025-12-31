@@ -6,8 +6,8 @@
 // Descripción: Inicio de sesión de usuarios
 // ==========================================
 
-session_start();
 require_once 'config/config.php';
+iniciarSesionSegura();
 require_once 'config/csrf.php';
 
 // Si ya hay sesión activa, redirige al mapa en vez de dashboard
@@ -17,6 +17,13 @@ if (isset($_SESSION['usuario_id'])) {
 
 $mensaje = '';
 
+// Mensajes por parámetros (timeout, logout, etc.)
+if (!empty($_GET['timeout'])) {
+    $mensaje = '⚠️ Tu sesión expiró por inactividad. Por favor vuelve a iniciar sesión.';
+}
+if (!empty($_GET['logout'])) {
+    $mensaje = 'Has cerrado sesión correctamente.';
+}
 // Procesar formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     protegerCSRF();
@@ -34,10 +41,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($usuario && password_verify($contrasena, $usuario['contrasena_hash'])) {
             // Login exitoso
+            session_regenerate_id(true);
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
             $_SESSION['usuario_puntos'] = $usuario['puntos'];
             $_SESSION['usuario_nivel'] = $usuario['nivel'];
+            $_SESSION['last_activity'] = time();
+
+            // Si el login incluye materia en la URL, guardarla
+            if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
             // Redirige directamente al mapa del juego
             redirigir('mapa/index.html');

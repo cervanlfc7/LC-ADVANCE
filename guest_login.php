@@ -1,6 +1,9 @@
 <?php
 // guest_login.php — Inicio de sesión rápido en modo "Invitado" (solo lectura)
-session_start();
+require_once 'config/config.php';
+// Iniciar sesión segura y regenerar id
+iniciarSesionSegura();
+session_regenerate_id(true);
 
 // Asegurarse de limpiar cualquier sesión previa sensible
 unset($_SESSION['usuario_id']);
@@ -15,9 +18,10 @@ $_SESSION['usuario_nombre'] = 'Invitado';
 $_SESSION['usuario_puntos'] = 0;
 $_SESSION['usuario_nivel'] = 1;
 $_SESSION['usuario_es_invitado'] = true;
+$_SESSION['last_activity'] = time();
 
-// Aviso breve (opcional) — se puede leer en dashboard o en header
-$_SESSION['mensaje_guest'] = 'Has entrado como Invitado. El progreso NO se guardará.';
+// Guardar materia si se pasó por la URL
+if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
 // Redirigir al mapa (invitado)
 header('Location: mapa/index.html');

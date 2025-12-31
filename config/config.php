@@ -79,6 +79,112 @@ function redirigir($url) {
     exit;
 }
 
+/* ================================
+   SESIONES SEGURAS Y POLÍTICAS
+   ================================ */
+
+define('SESSION_TIMEOUT', 3600); // 1 hora en segundos
+
+/**
+ * Inicia sesión de forma consistente y aplica parámetros seguros a la cookie.
+ */
+function iniciarSesionSegura() {
+    if (session_status() === PHP_SESSION_NONE) {
+        $cookieParams = session_get_cookie_params();
+        // Uso de SameSite y flags seguros para cookie
+        session_set_cookie_params([
+            'lifetime' => $cookieParams['lifetime'],
+            'path' => $cookieParams['path'],
+            'domain' => $cookieParams['domain'],
+            'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+        session_start();
+    }
+}
+
+/**
+ * Requiere que exista una sesión (tanto usuario registrado como invitado).
+ * Actualiza el timestamp de actividad y aplica timeout.
+ */
+function requireLogin($allowGuest = true) {
+    iniciarSesionSegura();
+
+    // Si no hay usuario ni invitado, redirigir a login
+    if (empty($_SESSION['usuario_id']) && (empty($_SESSION['usuario_es_invitado']) || !$allowGuest)) {
+        redirigir('login.php');
+    }
+
+    // Timeout por inactividad
+    if (isset($_SESSION['last_activity']) && (time() - (int)$_SESSION['last_activity']) > SESSION_TIMEOUT) {
+        // destruir sesión segura
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params['path'], $params['domain'], $params['secure'] ?? false, $params['httponly'] ?? true
+            );
+        }
+        session_destroy();
+        // redirigir con un indicador opcional
+        redirigir('login.php?timeout=1');
+    }
+
+    // Actualizar último tiempo de actividad
+    $_SESSION['last_activity'] = time();
+}
+
+/**
+ * Requiere que exista un contexto de materia antes de acceder a cierto contenido (p. ej. dashboard)
+ * Si no existe en GET o SESSION, redirige a `index.php` para que el usuario seleccione.
+ */
+function requireMateriaContext() {
+    iniciarSesionSegura();
+    $materia = null;
+
+    if (!empty($_GET['materia'])) {
+        $materia = trim($_GET['materia']);
+        $_SESSION['selected_materia'] = $materia;
+    } elseif (!empty($_SESSION['selected_materia'])) {
+        $materia = $_SESSION['selected_materia'];
+    }
+
+    if (empty($materia)) {
+        // Si venimos desde dashboard.php sin parámetros, mostramos el selector en forma de popup
+        $script = basename($_SERVER['PHP_SELF'] ?? '');
+        if ($script === 'dashboard.php') {
+            // Si la llegada incluye ?profesor=... permitimos la entrada (no forzar selector)
+            if (!empty($_GET['profesor'])) {
+                return null;
+            }
+            // Redirigimos a index para que muestre el modal select-materia y pasamos un indicador
+            redirigir('index.php?seleccionar_materia=1&from=dashboard');
+        }
+
+        // Comportamiento por defecto: forzar selección de materia
+        redirigir('index.php?seleccionar_materia=1');
+    }
+
+    return $materia;
+}
+
+/**
+ * Cierra la sesión de forma segura (por timeout o logout explícito)
+ */
+function cerrarSesionSegura() {
+    iniciarSesionSegura();
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params['path'], $params['domain'], $params['secure'] ?? false, $params['httponly'] ?? true
+        );
+    }
+    session_destroy();
+}
+
+
 // ================================
 // PUNTOS Y NIVELES
 // ================================
