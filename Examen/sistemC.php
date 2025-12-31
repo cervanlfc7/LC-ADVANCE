@@ -339,8 +339,22 @@ const btnReintentar = document.getElementById("btnReintentar");
 let vidaActual = 10;
 let reprobado = false; // Ahora también usaremos esta bandera para bloquear avances
 
+// Construir la URL de retorno: preferimos el referrer si viene de dashboard, sino usamos dashboard preservando profesor o materia si vinieran por GET
+const phpReturnParam = "<?= !empty($_GET['profesor']) ? '?profesor=' . urlencode($_GET['profesor']) : (!empty($_GET['materia']) ? '?materia=' . urlencode($_GET['materia']) : '') ?>";
+const computedDashboard = window.location.origin + '/LC-ADVANCE/dashboard.php' + phpReturnParam;
 btnSalir.addEventListener("click", () => {
-  window.location.href = "http://localhost/LC-ADVANCE/LC-ADVANCE/index.php";
+  try {
+    if (document.referrer && document.referrer.includes('/dashboard.php')) {
+      // Si venimos del dashboard, volvemos a esa URL exacta (preserva filtros y anclas)
+      window.location.href = document.referrer;
+    } else {
+      // Fallback: dashboard con parámetros si existían
+      window.location.href = computedDashboard;
+    }
+  } catch (e) {
+    // En caso de error, fallback seguro al dashboard
+    window.location.href = window.location.origin + '/LC-ADVANCE/dashboard.php';
+  }
 });
 
 btnReintentar.addEventListener("click", () => {

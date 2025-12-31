@@ -23,10 +23,11 @@ if (!empty($_SESSION['usuario_es_invitado'])) {
     ];
 } else {
     $stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
-    $stmt->execute([(int)$_SESSION['usuario_id']]);
+    $stmt->execute([(int)($_SESSION['usuario_id'] ?? 0)]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$usuario) {
+        // Si no existe usuario en sesión, redirigimos a login por seguridad
         session_destroy();
         header('Location: login.php');
         exit;
@@ -45,23 +46,33 @@ if ($usuario['puntos'] >= 500) $badges[] = ['nombre'=>'Nivel 1: Novato','tipo'=>
 if ($usuario['puntos'] >= 1000) $badges[] = ['nombre'=>'Nivel 2: Explorador','tipo'=>'silver'];
 if ($usuario['puntos'] >= 2000) $badges[] = ['nombre'=>'Nivel 3: Élite','tipo'=>'gold'];
 
-// ------------------ AGRUPAR LECCIONES ------------------
-$lecciones_agrupadas = [];
-$materias_disponibles = [];
-
-foreach ($lecciones as $l) {
-    $m = $l['materia'] ?? 'Sin Materia';
-    $materias_disponibles[] = $m;
-    $lecciones_agrupadas[$m][] = $l;
-}
-
-$materias_disponibles = array_unique($materias_disponibles);
-
-// ------------------ FILTROS ------------------
-$filter_materia   = isset($_GET['materia']) ? trim($_GET['materia']) : null;
 $filter_profesor  = empty($filter_materia) && isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
 $filter_materias  = [];
 $highlight_materia = null;
+
+// Inicializaciones necesarias para filtros y agrupación de lecciones
+$lecciones_agrupadas = [];
+$materias_disponibles = []; // usada por el filtro por profesor más abajo (evita warnings)
+
+// Agrupar lecciones por materia. Evitar duplicados por 'slug' y por título dentro de la misma materia.
+$seen_slugs = [];
+$seen_titles = [];
+foreach ($lecciones as $le) {
+    $slug = $le['slug'] ?? null;
+    if ($slug !== null) {
+        if (isset($seen_slugs[$slug])) continue; // ya agregado por slug
+        $seen_slugs[$slug] = true;
+    }
+
+    $m = $le['materia'] ?? 'Sin Materia';
+    $titulo_norm = norm($le['titulo'] ?? '');
+    if (isset($seen_titles[$m][$titulo_norm])) continue; // ya agregado por título en la misma materia
+    $seen_titles[$m][$titulo_norm] = true;
+
+    $materias_disponibles[] = $m;
+    $lecciones_agrupadas[$m][] = $le;
+}
+$materias_disponibles = array_unique($materias_disponibles); 
 
 // ---- MAPEO PROFESOR -> MATERIAS ----
 $profesor_materia_map = [
@@ -275,38 +286,7 @@ if (empty($_SESSION['usuario_es_invitado'])) {
             </div>
         </div>
 
-        <div class="lessons-area">
-            <h3>📖 MÓDULOS DE ESTUDIO DISPONIBLES</h3>
-            <?php if (empty($lecciones_agrupadas)): ?>
-                <p class="text-muted">No hay lecciones disponibles.</p>
-            <?php else: ?>
-                <?php foreach ($lecciones_agrupadas as $materia => $temas): ?>
-                    <div class="materia-group mb-4" id="materia-<?php echo urlencode($materia); ?>"> 
-                        <h4 class="materia-title"><?php echo htmlspecialchars($materia); ?></h4>
-                        <div class="leccion-list">
-                            <?php foreach ($temas as $tema): 
-                                $es_completada = in_array($tema['slug'], $completadas);
-                                $leccion_href = 'leccion_detalle.php?slug=' . urlencode($tema['slug']);
-                                if (!empty($filter_materia)) $leccion_href .= '&materia=' . urlencode($filter_materia);
-                            ?>
-                                <div class="leccion-item <?php echo $es_completada ? 'leccion-completed' : 'leccion-pending'; ?>">
-                                    <span class="leccion-status">
-                                        <?php echo $es_completada ? '✅' : '▶️'; ?> 
-                                    </span>
-                                    <span class="leccion-name">
-                                        <?php echo htmlspecialchars($tema['titulo']); ?>
-                                    </span>
-                                    <a href="<?php echo $leccion_href; ?>" 
-                                        class="btn btn-small <?php echo $es_completada ? 'btn-repeat' : 'btn-play'; ?>">
-                                        <?php echo $es_completada ? 'REPETIR' : 'JUGAR'; ?>
-                                    </a>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+        <!-- Bloque duplicado de lecciones eliminado intencionalmente: la lista de módulos se muestra una sola vez arriba -->
     </div>
 </div>
 
@@ -645,25 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 
-<!-- Si hay filtro activo, mostrar CTA al examen -->
-<?php if ($filter_materia): ?>
-    <div class="exam-cta" style="margin-top:18px; text-align:center;">
-        <a href="Examen/sistemC.php?materia=<?php echo urlencode($filter_materia); ?>" class="btn btn-exam">
-            📝 Ir al Examen de <?php echo htmlspecialchars($filter_materia); ?>
-        </a>
-    </div>
-<?php endif; ?>
-
-<!-- CTA: si hay N materias filtradas, mostrar botón por cada una -->
-<?php if (!empty($filter_materias)): ?>
-    <div class="exam-cta" style="margin-top:18px; text-align:center;">
-        <?php foreach ($filter_materias as $fm): ?>
-            <a href="Examen/sistemC.php?materia=<?php echo urlencode($fm); ?>" class="btn btn-exam" style="margin:6px;">
-                📝 Examen: <?php echo htmlspecialchars($fm); ?>
-            </a>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
+<!-- Bloque duplicado de examen eliminado: el CTA al examen se renderiza previamente en la parte superior para evitar duplicados. -->
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
