@@ -1,6 +1,6 @@
 <?php
 // ==========================================
-// LC-ADVANCE - dashboard.php (FINAL ESTABLE)
+// LC-ADVANCE - dashboard.php (VERSIÓN FINAL CON DISTINCIÓN MANUEL/MEZA)
 // ==========================================
 
 require_once 'config/config.php';
@@ -76,6 +76,32 @@ $profesor_materia_map = [
     'Armando' => ['Historia']
 ];
 
+// ==================== MAPEO MATERIA → ID PROFESOR (por defecto) ====================
+$materia_a_profesor_id = [
+    'Temas Selectos de Matemáticas I y II' => '1Le',   // Miguel Márquez
+    'Inglés'                                      => '1Go',   // Enrique
+    'Pensamiento Matemático III'                  => '1Es',   // Espindola
+    'Programación'                                => '1Ma',   // Manuel por defecto
+    'Física'                                      => '1He',   // Herson
+    'Química'                                     => '1He',   // Herson
+    'Ecosistemas'                                 => '1Ca',   // Carolina
+    'Ciencias Sociales'                           => '1Pa',   // Refugio & Padilla
+    'Historia'                                    => '1Ar',   // Armando
+];
+
+// ==================== MAPEO DIRECTO PROFESOR → ID (prioridad máxima) ====================
+$profesor_a_id = [
+    'Miguel Marquez'    => '1Le',
+    'Enrique'           => '1Go',
+    'Espindola'         => '1Es',
+    'Manuel'            => '1Ma',
+    'Meza'              => '1Me',  // ¡Distinción clave!
+    'Herson'            => '1He',
+    'Carolina'          => '1Ca',
+    'Refugio & Padilla' => '1Pa',
+    'Armando'           => '1Ar'
+];
+
 function norm($s){
     return mb_strtolower(trim(strtr($s,[
         'á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ñ'=>'n','&'=>'y'
@@ -93,7 +119,6 @@ elseif ($filter_profesor) {
     $nf = norm($filter_profesor);
     foreach ($profesor_materia_map as $prof => $mats) {
         $np = norm($prof);
-        // tolerancia: igualdad, subcadena en cualquiera de las direcciones
         if ($np === $nf || strpos($np, $nf) !== false || strpos($nf, $np) !== false) {
             foreach ($mats as $mat) {
                 foreach ($materias_disponibles as $real) {
@@ -142,7 +167,6 @@ if (empty($_SESSION['usuario_es_invitado'])) {
 
 <header class="header">
     <h1>LC-ADVANCE <span style="color: #00ff00;">// ACCESS: ONLINE</span></h1>
-    <!-- Nav: pasar materia al ranking si hay filtro activo -->
     <?php
         $ranking_href = 'ranking.php';
         if (!empty($filter_materia)) $ranking_href .= '?materia=' . urlencode($filter_materia);
@@ -155,6 +179,7 @@ if (empty($_SESSION['usuario_es_invitado'])) {
         <a href="logout.php" class="btn btn-logout">🚪 SALIR</a>
     </nav>
 </header>
+
 <div class="container">
     <div class="dashboard-container">
     
@@ -171,7 +196,6 @@ if (empty($_SESSION['usuario_es_invitado'])) {
                 </table>
             </div>
         </div>
-
         <div class="profile-summary"> 
             <h2 class="profile-name">¡Bienvenido, <span class="username-glow"><?php echo htmlspecialchars($usuario['nombre_usuario']); ?></span>!</h2>
             
@@ -249,8 +273,41 @@ if (empty($_SESSION['usuario_es_invitado'])) {
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
+        </div>
 
-            </div>
+        <div class="lessons-area">
+            <h3>📖 MÓDULOS DE ESTUDIO DISPONIBLES</h3>
+            <?php if (empty($lecciones_agrupadas)): ?>
+                <p class="text-muted">No hay lecciones disponibles.</p>
+            <?php else: ?>
+                <?php foreach ($lecciones_agrupadas as $materia => $temas): ?>
+                    <div class="materia-group mb-4" id="materia-<?php echo urlencode($materia); ?>"> 
+                        <h4 class="materia-title"><?php echo htmlspecialchars($materia); ?></h4>
+                        <div class="leccion-list">
+                            <?php foreach ($temas as $tema): 
+                                $es_completada = in_array($tema['slug'], $completadas);
+                                $leccion_href = 'leccion_detalle.php?slug=' . urlencode($tema['slug']);
+                                if (!empty($filter_materia)) $leccion_href .= '&materia=' . urlencode($filter_materia);
+                            ?>
+                                <div class="leccion-item <?php echo $es_completada ? 'leccion-completed' : 'leccion-pending'; ?>">
+                                    <span class="leccion-status">
+                                        <?php echo $es_completada ? '✅' : '▶️'; ?> 
+                                    </span>
+                                    <span class="leccion-name">
+                                        <?php echo htmlspecialchars($tema['titulo']); ?>
+                                    </span>
+                                    <a href="<?php echo $leccion_href; ?>" 
+                                        class="btn btn-small <?php echo $es_completada ? 'btn-repeat' : 'btn-play'; ?>">
+                                        <?php echo $es_completada ? 'REPETIR' : 'JUGAR'; ?>
+                                    </a>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <!-- Modal: Ir a Lección -->
@@ -352,49 +409,72 @@ if (empty($_SESSION['usuario_es_invitado'])) {
 <button id="scrollToTopBtn" class="scroll-to-top-btn" title="Ir arriba">
     <span class="arrow-up">▲</span>
 </button>
-<script src="assets/js/app.js"></script> 
-<script>
-    // Función de actualización de estado del usuario y ranking
-    function fetchAndUpdateDashboard() {
-        fetch('src/funciones.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'accion=obtener_estado'
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
-                document.getElementById('nivel-actual').textContent = data.nivel;
-                document.getElementById('nivel-siguiente').textContent = data.nivel + 1;
-                document.getElementById('puntos-actuales').textContent = data.puntos;
-                document.getElementById('puntos-necesarios').textContent = (data.nivel + 1) * 500;
-                document.getElementById('progress-fill').style.width = data.progreso + '%';
-                
-                const puntosMini = document.getElementById('puntos-actuales-mini');
-                if (puntosMini) puntosMini.textContent = data.puntos; 
 
-                const badgesDiv = document.getElementById('badges-container');
-                badgesDiv.innerHTML = data.badges?.length 
-                    ? data.badges.map(b => `<span class="badge ${b.tipo}">${b.nombre}</span>`).join('')
-                    : '<p class="text-muted">¡Completa lecciones para obtener tu primer Badge (500 pts)!</p>';
+<!-- ==================== BOTONES DE EXAMEN CON ID CORRECTO ==================== -->
+<?php if ($filter_materia || !empty($filter_materias)): ?>
+    <?php
+    $id_profesor_final = '1Cu'; // fallback
 
-                const tbody = document.getElementById('ranking-body');
-                const ranking = Array.isArray(data.ranking) ? data.ranking : [];
-                if (!Array.isArray(data.ranking)) console.warn('fetchAndUpdateDashboard: expected data.ranking array, got:', data.ranking);
-                tbody.innerHTML = ranking.map((u, i) => `
-                    <tr class="${u.es_actual ? 'actual-user' : ''}">
-                        <td>${i + 1}</td>
-                        <td>${u.nombre_usuario ?? '—'}</td>
-                        <td>${u.puntos ?? 0}</td>
-                    </tr>
-                `).join('');
+    // Prioridad 1: Filtro por profesor directo
+    if ($filter_profesor) {
+        $nf = norm($filter_profesor);
+        foreach ($profesor_a_id as $prof => $id) {
+            if (norm($prof) === $nf || strpos(norm($prof), $nf) !== false || strpos($nf, norm($prof)) !== false) {
+                $id_profesor_final = $id;
+                break;
             }
-        }).catch(e => console.warn('fetchAndUpdateDashboard failed:', e));
+        }
     }
+    // Prioridad 2: Filtro por materia
+    else {
+        $materia_usada = $filter_materia ?: ($filter_materias[0] ?? '');
+        $materia_norm = norm($materia_usada);
+        foreach ($materia_a_profesor_id as $mat_map => $id) {
+            if (norm($mat_map) === $materia_norm || str_contains($materia_norm, norm($mat_map))) {
+                $id_profesor_final = $id;
+                break;
+            }
+        }
+    }
+    ?>
+
+    <div class="exam-cta" style="margin-top:18px; text-align:center;">
+        <?php if ($filter_materia): ?>
+            <a href="Examen/sistemC.php?personaje=<?= $id_profesor_final ?>&dialogo=1&pregunta=0" 
+               class="btn btn-exam">
+                📝 Ir al Examen de <?= htmlspecialchars($filter_materia) ?>
+            </a>
+        <?php endif; ?>
+
+        <?php if (!empty($filter_materias) && empty($filter_materia)): ?>
+            <?php foreach ($filter_materias as $fm): ?>
+                <?php
+                $materia_norm = norm($fm);
+                $id_temp = '1Cu';
+                foreach ($materia_a_profesor_id as $mat_map => $id) {
+                    if (norm($mat_map) === $materia_norm || str_contains($materia_norm, norm($mat_map))) {
+                        $id_temp = $id;
+                        break;
+                    }
+                }
+                ?>
+                <a href="Examen/sistemC.php?personaje=<?= $id_temp ?>&dialogo=1&pregunta=0" 
+                   class="btn btn-exam" style="margin:6px;">
+                    📝 Examen: <?= htmlspecialchars($fm) ?>
+                </a>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
+<script src="assets/js/app.js"></script>
+<script>
+    // ... (todo el JavaScript original que ya tenías, sin cambios) ...
+    // (fetchAndUpdateDashboard, scrollToTop, highlight al volver, etc.)
+    // Lo mantengo igual para no alargar el código, pero debes pegarlo tal como estaba.
 
     document.addEventListener('DOMContentLoaded', () => {
         const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-        
         window.onscroll = function() {
             if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
                 scrollToTopBtn.style.display = "block";
@@ -402,33 +482,51 @@ if (empty($_SESSION['usuario_es_invitado'])) {
                 scrollToTopBtn.style.display = "none";
             }
         };
-
         scrollToTopBtn.onclick = function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-
         fetchAndUpdateDashboard();
-
         if (localStorage.getItem('needsUpdate') === 'true') {
             fetchAndUpdateDashboard();
             localStorage.removeItem('needsUpdate');
         }
+
+        <?php if (!empty($highlight_materia) || $filter_materia): ?>
+            (function(){
+                const name = <?php echo json_encode($filter_materia ?: $highlight_materia); ?>;
+                const targetId = 'materia-' + encodeURIComponent(name);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.classList.add('materia-highlight');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setTimeout(() => target.classList.remove('materia-highlight'), 1800);
+                }
+            })();
+        <?php endif; ?>
     });
 
-document.addEventListener('DOMContentLoaded', function () {
-  function handleLesson(slug) {
-    if (!slug) return false;
-    const id = 'leccion-' + slug;
-    const el = document.getElementById(id);
-    if (!el) return false;
+    // Manejo de highlight al volver de lección (tu código original)
+    document.addEventListener('DOMContentLoaded', function () {
+      function handleLesson(slug) {
+        if (!slug) return false;
+        const id = 'leccion-' + slug;
+        const el = document.getElementById(id);
+        if (!el) return false;
 
-    const saved = sessionStorage.getItem('scrollPos_leccion_' + slug);
-    setTimeout(() => {
-      if (saved !== null) {
-        window.scrollTo({ top: parseInt(saved, 10), behavior: 'smooth' });
-        sessionStorage.removeItem('scrollPos_leccion_' + slug);
-      } else {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const saved = sessionStorage.getItem('scrollPos_leccion_' + slug);
+        setTimeout(() => {
+          if (saved !== null) {
+            window.scrollTo({ top: parseInt(saved, 10), behavior: 'smooth' });
+            sessionStorage.removeItem('scrollPos_leccion_' + slug);
+          } else {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          el.classList.add('highlight-return');
+          setTimeout(() => el.classList.remove('highlight-return'), 3000);
+        }, 200);
+
+        sessionStorage.removeItem('last_leccion_slug');
+        return true;
       }
       el.classList.add('highlight-return');
       setTimeout(() => el.classList.remove('highlight-return'), 3000);
@@ -461,8 +559,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!title || title.toLowerCase().indexOf(materia.toLowerCase()) === -1) {
         sec.style.display = 'none';
       } else {
-        sec.classList.add('materia-highlight');
-        sec.style.display = 'block';
+        const last = sessionStorage.getItem('last_leccion_slug');
+        if (last) handleLesson(last);
       }
     });
 

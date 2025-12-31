@@ -52,20 +52,10 @@ if ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Imágenes
-$sql = "SELECT ImgC FROM imgcombate WHERE IDPersonajeC = ?";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("s", $idPersonaje);
-$stmt->execute();
-$result = $stmt->get_result();
-$imgIdle = "cucoidle";
-$imgAtk = "cucoatk1";
-while ($row = $result->fetch_assoc()) {
-  $nombre = strtolower($row["ImgC"]);
-  if (str_ends_with($nombre, "idle")) $imgIdle = $nombre;
-  if (str_contains($nombre, "atk")) $imgAtk = $nombre;
-}
-$stmt->close();
+// Imagen del profesor
+$imgProfesor = $idPersonaje . ".png";
+$imgPorDefecto = "default.png";
+$imgFinal = file_exists($imgProfesor) ? $imgProfesor : $imgPorDefecto;
 
 // Preguntas
 $sql = "SELECT * FROM preguntas WHERE IDPersonajeC = ? ORDER BY IDPregunta ASC";
@@ -89,8 +79,6 @@ $stmt->close();
 
 $conexion->close();
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="es">
@@ -119,7 +107,7 @@ $conexion->close();
 
     .imagen-personaje {
       position: absolute;
-      top: 80px;
+      top: 3px;
       left: 50%;
       transform: translateX(-50%);
       width: 350px;
@@ -161,55 +149,50 @@ $conexion->close();
       z-index: 2;
     }
 
-    .dialogo-texto {
-      width: 100%;
+    #estadoMaestro {
+      position: absolute;
+      bottom: 100px;
+      left: 5%;
+      width: 90%;
+      height: 40px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: white;
+      text-transform: uppercase;
+      z-index: 2;
     }
 
-    #estadoMaestro {
-  position: absolute;
-  bottom: 100px;
-  left: 5%;
-  width: 90%;
-  height: 40px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: white;
-  text-transform: uppercase;
-  z-index: 2;
-}
+    .barra-vida {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-.barra-vida {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+    .etiqueta {
+      font-size: 10px;
+      color: white;
+      font-family: 'Press Start 2P', monospace;
+    }
 
-.etiqueta {
-  font-size: 10px;
-  color: white;
-  font-family: 'Press Start 2P', monospace;
-}
+    .vida-contenedor {
+      width: 120px;
+      height: 16px;
+      border: 2px solid white;
+      background-color: black;
+      position: relative;
+    }
 
-.vida-contenedor {
-  width: 120px;
-  height: 16px;
-  border: 2px solid white;
-  background-color: black;
-  position: relative;
-}
-
-.vida-relleno {
-  height: 100%;
-  background-color: darkred;
-  width: 100%;
-  transition: width 0.3s ease;
-}
-
+    .vida-relleno {
+      height: 100%;
+      background-color: darkred;
+      width: 100%;
+      transition: width 0.3s ease;
+    }
 
     .botonera {
       position: absolute;
@@ -286,76 +269,58 @@ $conexion->close();
     }
 
     @keyframes aparecer {
-      0% {
-        transform: translate(-50%, 0%) scale(0.5);
-        opacity: 0;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-50%, -150%) scale(1);
-        opacity: 0;
-      }
+      0% { transform: translate(-50%, 0%) scale(0.5); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
     }
+
     @keyframes temblor {
-  0%   { transform: translateX(0); }
-  10%  { transform: translateX(-8px); }
-  20%  { transform: translateX(8px); }
-  30%  { transform: translateX(-10px); }
-  40%  { transform: translateX(10px); }
-  50%  { transform: translateX(-6px); }
-  60%  { transform: translateX(6px); }
-  70%  { transform: translateX(-4px); }
-  80%  { transform: translateX(4px); }
-  90%  { transform: translateX(-2px); }
-  100% { transform: translateX(0); }
-}
+      0% { transform: translateX(0); }
+      10% { transform: translateX(-8px); }
+      20% { transform: translateX(8px); }
+      30% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      50% { transform: translateX(-6px); }
+      60% { transform: translateX(6px); }
+      70% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+      90% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
 
-.temblando {
-  animation: temblor 0.5s ease;
-}
-
-
+    .temblando {
+      animation: temblor 0.5s ease;
+    }
   </style>
 </head>
 <body>
   <div class="cuadro">
     <div class="imagen-personaje">
-  <img id="cucoidle" src="http://localhost/LC_ADVANCE_EQ03/LC-ADVANCE/Examen/imagenes/imgCuco/idleCu.png" alt="Cuco">
-</div>
+      <img id="imgProfesor" src="<?= htmlspecialchars($imgFinal) ?>" alt="Profesor <?= $nombreMaestro ?>">
+    </div>
 
-
-    <!-- 🗨️ Cuadro de diálogo -->
     <div class="barra-estado">
       <div class="dialogo-texto" id="dialogo"></div>
     </div>
 
-    <!-- 🟦 Cuadro de estado del maestro -->
-<!-- 🟦 Cuadro de estado del maestro -->
-<div id="estadoMaestro">
-  <span class="etiqueta"><?= $nombreMaestro ?></span>
-  <div class="barra-vida">
-    <span class="etiqueta">CALIF</span>
-    <div class="vida-contenedor">
-      <div id="vidaRelleno" class="vida-relleno"></div>
+    <div id="estadoMaestro">
+      <span class="etiqueta"><?= $nombreMaestro ?></span>
+      <div class="barra-vida">
+        <span class="etiqueta">CALIF</span>
+        <div class="vida-contenedor">
+          <div id="vidaRelleno" class="vida-relleno"></div>
+        </div>
+        <span id="calificacionTexto" class="etiqueta">10/10</span>
+      </div>
     </div>
-    <span id="calificacionTexto" class="etiqueta">10/10</span>
-  </div>
-</div>
 
-
-
-
-    <!-- 🎮 Botonera -->
+    <!-- Botonera actualizada -->
     <div class="botonera">
       <button class="boton" id="btnExamen" disabled>SIGUIENTE</button>
-      <button class="boton">HUIR</button>
-      <button class="boton">RETAR AL PROFESOR</button>
+      <button class="boton" id="btnSalir">SALIR</button>
+      <button class="boton" id="btnReintentar" disabled>REINTENTAR EXAMEN</button>
     </div>
 
-    <!-- ✔️ Palomita -->
     <div id="palomita" class="palomita" style="display: none;">✔️</div>
   </div>
 
@@ -368,11 +333,21 @@ let preguntaActual = <?= $indicePregunta ?>;
 
 const contenedor = document.getElementById("dialogo");
 const btnExamen = document.getElementById("btnExamen");
-const imgCuco = document.getElementById("imgCuco");
-const imgIdle = "imagenes/imgCuco/<?= $imgIdle ?>.png";
-const imgAtk = "imagenes/imgCuco/<?= $imgAtk ?>.png";
+const btnSalir = document.getElementById("btnSalir");
+const btnReintentar = document.getElementById("btnReintentar");
 
 let vidaActual = 10;
+let reprobado = false; // Ahora también usaremos esta bandera para bloquear avances
+
+btnSalir.addEventListener("click", () => {
+  window.location.href = "http://localhost/LC-ADVANCE/LC-ADVANCE/index.php";
+});
+
+btnReintentar.addEventListener("click", () => {
+  if (!btnReintentar.disabled) {
+    window.location.href = `?personaje=<?= $idPersonaje ?>&dialogo=1&pregunta=0`;
+  }
+});
 
 function reducirVida() {
   vidaActual = Math.max(0, vidaActual - 1);
@@ -384,14 +359,26 @@ function reducirVida() {
   estado.classList.add("temblando");
   setTimeout(() => estado.classList.remove("temblando"), 500);
 
-  if (vidaActual <= 5) {
-    contenedor.innerHTML = `<div class="pregunta">❌ REPROBASTE EL EXAMEN</div>`;
+  if (vidaActual <= 5 && !reprobado) {
+    reprobado = true;
+    contenedor.innerHTML = `<div class="pregunta" style="font-size: 12px; color: red;">❌ REPROBASTE EL EXAMEN</div>`;
     btnExamen.disabled = true;
-    document.querySelectorAll(".opcion").forEach(btn => btn.disabled = true);
+    
+    // Deshabilitamos opciones si las hay visibles
+    document.querySelectorAll(".opcion").forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
+    });
+    
+    btnReintentar.disabled = false;
+    
+    // ¡Importante! Ya no avanzamos más ni mostramos más preguntas
   }
 }
 
 function mostrarDialogo(texto, tipo) {
+  if (reprobado) return; // Bloqueamos si ya reprobó
+
   let i = 0;
   contenedor.textContent = "";
   btnExamen.disabled = true;
@@ -421,6 +408,8 @@ function mostrarDialogo(texto, tipo) {
 }
 
 function mostrarPregunta(index) {
+  if (reprobado) return; // Bloqueamos si ya reprobó
+
   const actual = preguntas[index];
   if (!actual) {
     dialogoActual++;
@@ -440,28 +429,51 @@ function mostrarPregunta(index) {
   btnExamen.disabled = true;
 
   document.querySelectorAll(".opcion").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", function handler() {
+      // Removemos listeners para evitar clics múltiples
+      document.querySelectorAll(".opcion").forEach(b => b.removeEventListener("click", handler));
+
       const seleccion = parseInt(btn.getAttribute("data-opcion"));
+      
       if (seleccion === actual.RespuestaCorrecta) {
+        // ACIERTO
         document.getElementById("palomita").style.display = "block";
         setTimeout(() => {
           document.getElementById("palomita").style.display = "none";
-          preguntaActual++;
-          if (actual.TipoPreguntaC === "Dialogo") {
-            dialogoActual++;
-            avanzarDialogo();
-          } else {
-            mostrarPregunta(preguntaActual);
+          
+          if (!reprobado) { // Solo avanza si no ha reprobado aún
+            preguntaActual++;
+            if (actual.TipoPreguntaC === "Dialogo") {
+              dialogoActual++;
+              avanzarDialogo();
+            } else {
+              mostrarPregunta(preguntaActual);
+            }
           }
         }, 1000);
       } else {
+        // ERROR
         reducirVida();
+        
+        setTimeout(() => {
+          if (!reprobado) { // Solo avanza si no ha reprobado aún
+            preguntaActual++;
+            if (actual.TipoPreguntaC === "Dialogo") {
+              dialogoActual++;
+              avanzarDialogo();
+            } else {
+              mostrarPregunta(preguntaActual);
+            }
+          }
+        }, 800);
       }
     });
   });
 }
 
 function avanzarDialogo() {
+  if (reprobado) return; // Bloqueamos si ya reprobó
+
   const siguiente = dialogos.find(d => d.id === dialogoActual);
   if (!siguiente) {
     contenedor.textContent = "✅ COMBATE FINALIZADO";
@@ -472,17 +484,22 @@ function avanzarDialogo() {
   mostrarDialogo(siguiente.texto, siguiente.tipo);
 }
 
-// 🔄 Inicio
+// Inicio
 const primero = dialogos.find(d => d.id === dialogoActual);
 if (primero) {
   mostrarDialogo(primero.texto, primero.tipo);
 } else {
   contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
 }
+
+// Tecla 0 para cambiar profesor
+document.addEventListener('keydown', function(e) {
+  if (e.key === '0') {
+    e.preventDefault();
+    const nuevoID = prompt("Ingresa el IDPersonajeC del profesor (ej: 1Cu, 1Es, 1He...):");
+    if (nuevoID && nuevoID.trim() !== '') {
+      window.location.href = `?personaje=${encodeURIComponent(nuevoID)}&dialogo=1&pregunta=0`;
+    }
+  }
+});
 </script>
-
-
-
-</body>
-</html>
-
