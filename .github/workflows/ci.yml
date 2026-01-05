@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2']
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: lc_advance
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v3
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, pdo_mysql, curl
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            mysqladmin ping -h 127.0.0.1 -uroot -proot >/dev/null 2>&1 && break || sleep 1
+          done
+
+      - name: Import SQL dump (if present)
+        run: |
+          if [ -f sql/lc_advance.sql ]; then
+            mysql -h127.0.0.1 -uroot -proot lc_advance < sql/lc_advance.sql
+            php scripts/seed_test_data.php
+          else
+            echo "No SQL dump found, skipping import"
+          fi
+
+      - name: Start PHP Built-in Server
+        run: php -S 127.0.0.1:8000 -t . >/dev/null 2>&1 &
+
+      - name: Run tests
+        env:
+          TEST_BASE_URL: 'http://127.0.0.1:8000/'
+          DB_HOST: '127.0.0.1'
+          DB_NAME: 'lc_advance'
+          DB_USER: 'root'
+          DB_PASS: 'root'
+        run: php tests/run_all_tests.php

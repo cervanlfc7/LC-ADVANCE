@@ -10,6 +10,14 @@ if ($conexion->connect_error) {
     die(json_encode(["success" => false, "error" => $conexion->connect_error]));
 }
 
+// Asegurar que la tabla maestroact exista para evitar errores en tiempo de ejecución
+$conexion->query("CREATE TABLE IF NOT EXISTS `maestroact` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `IDPersonajeC` VARCHAR(100) NOT NULL,
+  `Maestro_Actual` VARCHAR(255) NOT NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
 // --- Catálogo: nombreProfesor → IDPersonajeC --- (usando nombres cortos como en original)
 $mapaIDs = [
     "Miguel"    => "1Le",

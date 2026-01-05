@@ -1,0 +1,42 @@
+﻿
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | LC-ADVANCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    </head>
+<body class="auth-page">
+    
+<div class="auth-form-wrapper"> 
+    <h1 class="auth-title">🎮 Acceso Nivel 1</h1> 
+
+    
+    <form method="POST" action="" class="auth-form"> 
+        <input type="hidden" name="csrf_token" value="c6a9979090168494c7fde63d7c43623936d2f0c4ff92affb28285c4baa77160d">
+        <div class="input-group"> 
+            <label for="nombre_usuario">👤 Usuario:</label>
+            <input type="text" id="nombre_usuario" name="nombre_usuario" required class="retro-input" placeholder="Tu nombre de código"> 
+        </div>
+
+        <div class="input-group">
+            <label for="contrasena">🔑 Contraseña:</label>
+            <input type="password" id="contrasena" name="contrasena" required class="retro-input" placeholder="Clave de acceso">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full-width animate-glitch" data-text="Entrar">Entrar</button>
+    </form>
+
+    <p class="auth-links"> 
+        <a href="register.php" class="link-glow">🆕 Crear cuenta</a> 
+        <span>|</span> 
+        <a href="index.php" class="link-glow">⬅️ Volver al Inicio</a>
+    </p>
+</div>
+
+<script src="assets/js/app.js"></script>
+
+</body>
+</html>

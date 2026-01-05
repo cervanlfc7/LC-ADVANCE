@@ -25,10 +25,11 @@ define('APP_NAME', 'CBTIS168 Study Game');
 // ================================
 
 // Cambia los valores según tu entorno local o hosting
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'lc_advance');
-define('DB_USER', 'root');
-define('DB_PASS', ''); // Cambia si tu usuario tiene contraseña
+// Permitir sobrescritura por variables de entorno para CI y despliegue
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: 'lc_advance');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') ?: ''); // Cambia si tu usuario tiene contraseña
 
 // ================================
 // CONEXIÓN PDO SEGURA

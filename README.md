@@ -1,7 +1,13 @@
 # LC-ADVANCE
 
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+
 Resumen
 -------
+
+> Note: Replace the `OWNER/REPO` part of the badge URL with your repository owner/name to enable the badge.
+
+
 Aplicación web educativa (PHP + MySQL + JS) para lecciones interactivas, quizzes con cálculo de puntaje, progreso de usuario, badges y ranking.
 
 Estructura principal
@@ -81,6 +87,7 @@ Si prefieres un único dump que contenga el esquema principal y los diálogos/pr
   ```
   c:\xampp\mysql\bin\mysql.exe -u root -p < sql\lc_advance.sql
   ```
+- **Seed para CI / pruebas:** hemos añadido `scripts/seed_test_data.php` que crea un usuario de prueba (`ci_test_user` / `ci_test@example.com` con contraseña `Test1234`) si no existe. Esto es invocado por el workflow de CI justo después de importar `sql/lc_advance.sql`.
 
 - Tras importar, ajusta `config/config.php` para usar `DB_NAME = 'lc_advance'` (ya está preconfigurado en este repositorio).
 
@@ -114,6 +121,10 @@ Tablas faltantes / errores comunes ⚠️
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
   ```
+
+  Nota: en esta rama hemos añadido una comprobación en `mapa/updateDB.php` que crea la tabla `maestroact` si no existe, para evitar este error en instalaciones nuevas o incompletas.
+
+- Integración CI: se añadió un workflow de GitHub Actions en `/.github/workflows/ci.yml` que levanta una DB MySQL, importa `sql/lc_advance.sql` si está presente, arranca un servidor PHP y ejecuta la suite de tests (incluye verificación de contenido y un test E2E que realiza registro/login automático si la ruta requiere autenticación). Puedes anular la URL de pruebas con la variable de entorno `TEST_BASE_URL` si el servidor está en otra ruta.
 
 - Si aparece "Access denied" o problemas de credenciales:
   ```sql
@@ -213,3 +224,17 @@ Novedades
 - Acceso invitado: ahora puedes entrar como invitado desde la landing (botón "Entrar como invitado"). 
   - Modo invitado: lectura y pruebas locales permitidas; NO se guarda progreso ni puntos.
   - Archivos relevantes: [guest_login.php](guest_login.php), [src/funciones.php](src/funciones.php), [leccion_detalle.php](leccion_detalle.php).
+
+---
+
+## Checklist de lanzamiento (rápido) ✅
+
+- [ ] Confirmar que `sql/lc_advance.sql` está actualizado y probado localmente (importar y verificar tablas y conteos).  
+- [ ] Ejecutar `php scripts/seed_test_data.php` si deseas un usuario de prueba (`ci_test_user`).  
+- [ ] Ejecutar tests locales:
+  - php tests/run_all_tests.php  
+- [ ] Subir rama con cambios y abrir PR; verificar que GitHub Actions pase (workflow `CI`).  
+- [ ] Hacer una prueba manual rápida: crear usuario, tomar un quiz, confirmar `user_progress` y `usuarios.puntos`.  
+- [ ] Mergear y cerrar versión.
+
+Si quieres, puedo preparar la PR y los pasos finales (branch + PR + descripción) y dejar todo listo para merge.
