@@ -5,7 +5,7 @@ header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
 
-$conexion = new mysqli("localhost", "root", "", "dialogos");
+$conexion = new mysqli("localhost", "root", "", "lc_advance");
 if ($conexion->connect_error) {
     die(json_encode(["success" => false, "error" => $conexion->connect_error]));
 }

@@ -380,6 +380,14 @@ INSERT INTO `imgcombate` (`IDPersonajeC`, `IDImgC`, `ImgC`) VALUES
 ('1Cu', '1', 'cucoidle'),
 ('1Cu', '2', 'cucoatk1');
 
+-- Estructura de tabla para la tabla `maestroact` (usada por mapa/updateDB.php)
+CREATE TABLE IF NOT EXISTS `maestroact` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `IDPersonajeC` VARCHAR(100) NOT NULL,
+  `Maestro_Actual` VARCHAR(255) NOT NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- Índices para tablas volcadas
 --
 -- Indices de la tabla `preguntas`
