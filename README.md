@@ -71,6 +71,8 @@ Instalación rápida
 
    - Si quieres usar otro nombre de BD: actualiza `config/config.php` (DB_NAME) y, si corresponde, la conexión en `mapa/updateDB.php`.
 
+> Nota: en esta rama se ha unificado la BD en `lc_advance` y `mapa/updateDB.php` ya apunta a `lc_advance` (antes usaba `dialogos`).
+
 **Unificación a `lc_advance` (nuevo):**
 
 Si prefieres un único dump que contenga el esquema principal y los diálogos/preguntas, hay un archivo unificado:
