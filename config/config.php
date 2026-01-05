@@ -26,7 +26,7 @@ define('APP_NAME', 'CBTIS168 Study Game');
 
 // Cambia los valores según tu entorno local o hosting
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'cbtis168_study_game');
+define('DB_NAME', 'lc_advance');
 define('DB_USER', 'root');
 define('DB_PASS', ''); // Cambia si tu usuario tiene contraseña
 

@@ -71,6 +71,24 @@ Instalación rápida
 
    - Si quieres usar otro nombre de BD: actualiza `config/config.php` (DB_NAME) y, si corresponde, la conexión en `mapa/updateDB.php`.
 
+**Unificación a `lc_advance` (nuevo):**
+
+Si prefieres un único dump que contenga el esquema principal y los diálogos/preguntas, hay un archivo unificado:
+
+- Importar el dump unificado (contiene `CREATE DATABASE lc_advance`):
+  ```
+  c:\xampp\mysql\bin\mysql.exe -u root -p < sql\lc_advance.sql
+  ```
+
+- Tras importar, ajusta `config/config.php` para usar `DB_NAME = 'lc_advance'` (ya está preconfigurado en este repositorio).
+
+- Verifica rápida la importación:
+  ```sql
+  USE lc_advance; SHOW TABLES; SELECT COUNT(*) FROM preguntas; SELECT COUNT(*) FROM dilogoscombate;
+  ```
+
+
+
 3. Configura conexión DB en [config/config.php](config/config.php) (DB_HOST, DB_NAME, DB_USER, DB_PASS).
 
 4. Inicia Apache + MySQL (XAMPP) y abre:
