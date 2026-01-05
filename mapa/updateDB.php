@@ -24,10 +24,21 @@ $mapaIDs = [
 ];
 
 // --- Recibir datos desde el juego ---
-$data = json_decode(file_get_contents("php://input"), true);
+$raw_input = file_get_contents("php://input");
+$data = json_decode($raw_input, true);
 // Fallback to form-encoded POST if JSON decoding fails (some clients may not send proper JSON)
 if (!is_array($data)) {
     $data = $_POST;
+}
+// If still empty but raw input exists, try parsing urlencoded or re-decode
+if (empty($data) && !empty($raw_input)) {
+    parse_str($raw_input, $parsed);
+    if (!empty($parsed)) {
+        $data = $parsed;
+    } else {
+        $decoded = json_decode($raw_input, true);
+        if (is_array($decoded)) $data = $decoded;
+    }
 }
 $maestro = $data["maestro"] ?? null;
 $materia_received = $data["materia"] ?? null;
