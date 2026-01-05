@@ -25,6 +25,10 @@ $mapaIDs = [
 
 // --- Recibir datos desde el juego ---
 $data = json_decode(file_get_contents("php://input"), true);
+// Fallback to form-encoded POST if JSON decoding fails (some clients may not send proper JSON)
+if (!is_array($data)) {
+    $data = $_POST;
+}
 $maestro = $data["maestro"] ?? null;
 $materia_received = $data["materia"] ?? null;
 
