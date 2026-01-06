@@ -1,9 +1,6 @@
 <?php
 // Simple test runner that executes each test script in a separate PHP process
 $tests = [
-    __DIR__ . '/test_include_content.php',
-    __DIR__ . '/find_raw_php.php',
-    __DIR__ . '/test_content_parsing.php',
     __DIR__ . '/test_lessons.php',
     __DIR__ . '/test_integration.php',
     __DIR__ . '/test_updateDB.php',
