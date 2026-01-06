@@ -5,10 +5,18 @@ header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
 
-$conexion = new mysqli("localhost", "root", "", "dialogos");
+$conexion = new mysqli("localhost", "root", "", "lc_advance");
 if ($conexion->connect_error) {
     die(json_encode(["success" => false, "error" => $conexion->connect_error]));
 }
+
+// Asegurar que la tabla maestroact exista para evitar errores en tiempo de ejecución
+$conexion->query("CREATE TABLE IF NOT EXISTS `maestroact` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `IDPersonajeC` VARCHAR(100) NOT NULL,
+  `Maestro_Actual` VARCHAR(255) NOT NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 
 // --- Catálogo: nombreProfesor → IDPersonajeC --- (usando nombres cortos como en original)
 $mapaIDs = [
@@ -24,7 +32,22 @@ $mapaIDs = [
 ];
 
 // --- Recibir datos desde el juego ---
-$data = json_decode(file_get_contents("php://input"), true);
+$raw_input = file_get_contents("php://input");
+$data = json_decode($raw_input, true);
+// Fallback to form-encoded POST if JSON decoding fails (some clients may not send proper JSON)
+if (!is_array($data)) {
+    $data = $_POST;
+}
+// If still empty but raw input exists, try parsing urlencoded or re-decode
+if (empty($data) && !empty($raw_input)) {
+    parse_str($raw_input, $parsed);
+    if (!empty($parsed)) {
+        $data = $parsed;
+    } else {
+        $decoded = json_decode($raw_input, true);
+        if (is_array($decoded)) $data = $decoded;
+    }
+}
 $maestro = $data["maestro"] ?? null;
 $materia_received = $data["materia"] ?? null;
 
