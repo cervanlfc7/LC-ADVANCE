@@ -80,10 +80,10 @@ curl -X POST http://localhost:8000/src/funciones.php \
 
 ---
 
-## 📊 Endpoint de Estado
+## 📊 Endpoint de Estado (con TOP 10)
 
 ```bash
-# Obtener puntos, nivel, badges del usuario
+# Obtener puntos, nivel, badges y ranking del usuario
 curl -X POST http://localhost:8000/src/funciones.php \
   -d "accion=obtener_estado"
 ```
@@ -95,7 +95,11 @@ curl -X POST http://localhost:8000/src/funciones.php \
   "puntos": 580,
   "nivel": 2,
   "progreso": 30,
-  "badges": [{"nombre": "Nivel 1", "tipo": "bronze"}]
+  "badges": [{"nombre": "Nivel 1: Novato", "tipo": "bronze"}],
+  "ranking": [
+    {"nombre_usuario": "Admin", "puntos": 5000, "es_actual": false},
+    {"nombre_usuario": "Estudiante1", "puntos": 580, "es_actual": true}
+  ]
 }
 ```
 

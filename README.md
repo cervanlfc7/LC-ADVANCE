@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/cervanlfc7/LC-ADVANCE/actions/workflows/ci.yml/badge.svg)](https://github.com/cervanlfc7/LC-ADVANCE/actions/workflows/ci.yml)
 
-**Plataforma educativa interactiva** con lecciones, quizzes adaptativos, sistema de puntos, badges y ranking en tiempo real.
+**Plataforma educativa interactiva** con lecciones, quizzes adaptativos, sistema de puntos, badges, ranking en tiempo real y mapa de combate interactivo.
 
 ---
 
@@ -21,11 +21,51 @@
 1. [Requisitos](#requisitos)
 2. [Instalación rápida](#instalación-rápida)
 3. [Getting Started (Primeros pasos)](#getting-started)
-4. [Estructura del proyecto](#estructura-del-proyecto)
-5. [Guía de API & Endpoints](#guía-de-api--endpoints)
-6. [Cómo agregar lecciones](#cómo-agregar-lecciones)
-7. [Testing & CI/CD](#testing--cicd)
-8. [Troubleshooting](#troubleshooting)
+4. [Características Principales](#características-principales)
+5. [Estructura del proyecto](#estructura-del-proyecto)
+6. [Guía de API & Endpoints](#guía-de-api--endpoints)
+7. [Cómo agregar lecciones](#cómo-agregar-lecciones)
+8. [Testing & CI/CD](#testing--cicd)
+9. [Troubleshooting](#troubleshooting)
+
+---
+
+## ✨ Características Principales
+
+### 🎓 Lecciones Interactivas
+- ✅ 200+ lecciones en múltiples materias
+- ✅ Contenido estructurado con quizzes integrados
+- ✅ Progreso guardado automáticamente
+- ✅ Acceso invitado (lectura sin guardar)
+
+### 🏆 Sistema de Puntos y Ranking
+- ✅ **Top 10 Ranking en vivo** - Se actualiza automáticamente cada 15 segundos
+- ✅ Puntos por respuesta correcta
+- ✅ Cálculo automático de niveles
+- ✅ Badges (insignias) por logros
+- ✅ Solo usuarios logueados aparecen en ranking
+
+### 🗺️ Mapa Interactivo
+- ✅ Combate educativo con maestros
+- ✅ Selección dinámica de personajes
+- ✅ Sistema de diálogos inmersivo
+
+### 🔐 Autenticación y Seguridad
+- ✅ Login/Register con hashing bcrypt
+- ✅ Sesiones seguras
+- ✅ Protección CSRF
+- ✅ Validación de entrada
+
+### 📱 Responsive Design
+- ✅ Funciona en desktop y mobile
+- ✅ Diseño retro 8-bit moderno
+- ✅ Efectos visuales y animaciones
+
+### 🚀 Performance
+- ✅ Tests automatizados
+- ✅ CI/CD con GitHub Actions
+- ✅ Carga rápida de contenido
+- ✅ Actualizaciones en tiempo real
 
 ---
 
@@ -125,32 +165,46 @@ php -S localhost:8000 -t .
 4. Click **"Registrar"**
 5. Ve a **Login** → Ingresa credenciales
 
-### Tomar una lección
+### Tomar una lección y subir en el ranking
 
 1. Haz login
 2. Ve a **Dashboard** (automático después de login)
 3. Selecciona una materia (Inglés, Matemáticas, etc.)
 4. Click en una lección (ej: "PAST SIMPLE DOMINATION 2025")
 5. Lee el contenido y click **"🧠 Ir al Quiz"**
-6. Responde las 10 preguntas
+6. Responde las preguntas (máximo 10)
 7. ¡Recibirás puntos! 🎉
+
+### Ver tu posición en el ranking
+
+- ✅ El **TOP 10** aparece en el lado derecho del Dashboard
+- ✅ Tu usuario se destaca en **verde neón** si estás en el top 10
+- ✅ Se actualiza cada 15 segundos automáticamente
+- ✅ Solo usuarios logueados aparecen en el ranking
+
+### Subir de nivel
+
+- **Cada 500 puntos = 1 Nivel**
+- **500 pts** → Nivel 1: Novato (Badge bronze)
+- **1000 pts** → Nivel 2: Explorador (Badge silver)
+- **2000 pts** → Nivel 3: Élite (Badge gold)
 
 ### Verificar progreso en BD
 
 ```sql
 USE lc_advance;
 
--- Ver todos los usuarios
-SELECT id, nombre_usuario, correo, puntos, nivel FROM usuarios;
+-- Ver todos los usuarios y sus puntos
+SELECT nombre_usuario, puntos, nivel FROM usuarios ORDER BY puntos DESC;
 
--- Ver progreso de un usuario
-SELECT u.nombre_usuario, up.slug, up.score, up.lesson_xp, up.completed 
+-- Ver progreso de un usuario específico
+SELECT u.nombre_usuario, up.slug, up.score, up.completed 
 FROM user_progress up 
 JOIN usuarios u ON u.id = up.user_id 
 WHERE u.nombre_usuario = 'estudiante_prueba';
 
--- Ver puntos totales
-SELECT nombre_usuario, puntos, nivel FROM usuarios ORDER BY puntos DESC;
+-- Top 10 ranking
+SELECT nombre_usuario, puntos, nivel FROM usuarios ORDER BY puntos DESC LIMIT 10;
 ```
 
 ---
@@ -265,7 +319,7 @@ curl -X POST http://localhost/LC-ADVANCE/src/funciones.php \
 }
 ```
 
-#### Obtener estado del usuario
+#### Obtener estado del usuario (con ranking)
 ```bash
 curl -X POST http://localhost/LC-ADVANCE/src/funciones.php \
   -d "accion=obtener_estado"
@@ -279,7 +333,7 @@ curl -X POST http://localhost/LC-ADVANCE/src/funciones.php \
   "nivel": 2,
   "progreso": 30,
   "badges": [
-    {"nombre": "Nivel 1", "tipo": "bronze"}
+    {"nombre": "Nivel 1: Novato", "tipo": "bronze"}
   ],
   "ranking": [
     {"nombre_usuario": "usuario1", "puntos": 1500, "es_actual": false},

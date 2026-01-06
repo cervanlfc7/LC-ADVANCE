@@ -364,6 +364,136 @@ mysql -u root -p
 # Nota: mapa/updateDB.php ya crea la tabla si falta
 ```
 
+### ❌ "Mapa no carga / error "maestroact not found""
+
+**Síntomas:**
+```
+Table 'lc_advance.maestroact' doesn't exist
+```
+
+**Solución:**
+
+```bash
+# mapa/updateDB.php ya crea la tabla si no existe
+# Pero puedes crearla manualmente:
+
+mysql -u root -p
+> USE lc_advance;
+> CREATE TABLE IF NOT EXISTS maestroact (
+>   id INT AUTO_INCREMENT PRIMARY KEY,
+>   IDPersonajeC VARCHAR(100) NOT NULL,
+>   Maestro_Actual VARCHAR(255) NOT NULL,
+>   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+> );
+```
+
+---
+
+## 🔍 Herramientas de Debug
+
+### 🚀 Test Rápidos
+
+```php
+// En test_prof.php (ya incluido)
+// Prueba de endpoints:
+$_POST['accion'] = 'obtener_estado';
+include 'src/funciones.php';
+// Debería retornar: { usuario: ..., puntos: ..., nivel: ..., badges: [...], ranking: [...] }
+```
+
+---
+
+## 🏆 Ranking - Solución de Problemas
+
+### ❌ "El ranking no aparece en el dashboard"
+
+**Posibles Causas:**
+1. JavaScript no se ejecuta (errores en consola)
+2. Usuario no está logueado (se oculta para anónimos)
+3. AJAX no obtiene datos del servidor
+
+**Solución:**
+
+```javascript
+// En assets/js/app.js, verifica que se ejecute al cargar:
+document.addEventListener('DOMContentLoaded', function() {
+  fetchAndUpdateDashboard(); // Primera llamada
+  setInterval(fetchAndUpdateDashboard, 15000); // Cada 15 segundos
+});
+
+// Abre consola (F12) y ejecuta manualmente:
+fetchAndUpdateDashboard();
+// Debería ver la respuesta JSON en Console
+```
+
+### ❌ "El ranking muestra puntos incorrectos"
+
+**Causa:** La función `obtener_estado` calcula mal el progreso
+
+**Solución:**
+
+```php
+// src/funciones.php línea ~150
+// La fórmula es:
+// progreso = (puntos - nivel * 500) / 500 * 100
+
+// Ejemplo:
+// - nivel 1: necesita 500 puntos (500 - 0 = 500)
+// - nivel 2: necesita otros 500 (1000 - 500 = 500)
+// - En puntos = 750: progreso = (750 - 500) / 500 * 100 = 50%
+
+// Verifica en base de datos:
+SELECT nombre_usuario, puntos, 
+       FLOOR(puntos / 500) AS nivel,
+       (puntos - FLOOR(puntos / 500) * 500) / 500 * 100 AS progreso
+FROM usuarios
+ORDER BY puntos DESC
+LIMIT 10;
+```
+
+### ❌ "El ranking no se actualiza en tiempo real"
+
+**Solución:**
+
+```javascript
+// Asegúrate que el intervalo esté activo en app.js:
+let updateInterval = setInterval(fetchAndUpdateDashboard, 15000);
+
+// Si creas nuevas páginas, inicia el intervalo:
+function startRankingUpdates() {
+  if (typeof updateInterval === 'undefined') {
+    updateInterval = setInterval(fetchAndUpdateDashboard, 15000);
+  }
+}
+
+// Llama en cada página que lo necesite:
+document.addEventListener('DOMContentLoaded', startRankingUpdates);
+```
+
+### ❌ "El usuario actual no se destaca en el ranking"
+
+**Causa:** Sesión no iniciada o usuario no en top 10
+
+**Solución:**
+
+```php
+// src/funciones.php verifica:
+session_start();
+if (!isset($_SESSION['nombre_usuario'])) {
+  // Usuario anónimo: no ve ranking privado
+  // Pero sí ve ranking público si lo permites
+}
+
+// Si el usuario está fuera del top 10:
+// El ranking muestra top 10 solamente
+// El usuario puede ver su propia posición en su dashboard
+
+// Para ver posición completa:
+SELECT COUNT(*) + 1 as posicion 
+FROM usuarios 
+WHERE puntos > (SELECT puntos FROM usuarios WHERE nombre_usuario = 'user');
+```
+
 ---
 
 ## 🔍 Herramientas de Debug

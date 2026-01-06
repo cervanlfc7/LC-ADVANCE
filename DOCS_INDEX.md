@@ -60,11 +60,12 @@ php -S localhost:8000 -t .
 **Tiempo:** 15 min de lectura
 
 Contiene:
+- ✅ Características principales (Ranking, Badges, Progreso)
 - ✅ Requisitos del sistema
 - ✅ Instalación paso a paso
-- ✅ Getting Started (crear usuario, tomar lección)
+- ✅ Getting Started (crear usuario, tomar lección, ver ranking)
 - ✅ Estructura del proyecto
-- ✅ Endpoints principales
+- ✅ Endpoints principales (con ranking data)
 - ✅ Cómo agregar lecciones (paso a paso)
 - ✅ Testing y CI/CD
 - ✅ Troubleshooting básico
@@ -73,6 +74,7 @@ Contiene:
 - Primera vez usando el proyecto
 - Entender la estructura general
 - Instalación y setup inicial
+- Entender cómo funcionan los puntos y rankings
 
 ---
 
@@ -85,8 +87,8 @@ Contiene:
 - ✅ Stack tecnológico explicado
 - ✅ Ciclo de desarrollo (branching, commits, PRs)
 - ✅ Estructura de código (por archivo)
-- ✅ Cómo funciona cada módulo
-- ✅ Flujos principales (login, quiz, dashboard)
+- ✅ Cómo funciona cada módulo (incluido ranking)
+- ✅ Flujos principales (login, quiz, dashboard con ranking)
 - ✅ Guía completa: cómo agregar funcionalidad
 - ✅ Performance y optimizaciones
 - ✅ Seguridad (implementado + por hacer)
@@ -97,6 +99,7 @@ Contiene:
 - Agregar nuevas funcionalidades
 - Mejorar performance o seguridad
 - Contribuir al proyecto
+- Entender cómo el ranking se actualiza en tiempo real
 
 ---
 

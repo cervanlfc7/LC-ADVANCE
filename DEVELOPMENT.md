@@ -172,21 +172,63 @@ q0=answer1&q1=answer2...
 // 6. Verifica badges completados
 ```
 
-#### `obtener_estado`
-```php
-// Devuelve puntos, nivel, badges, ranking del usuario actual
-// Usado por dashboard para actualizar UI
+### 10. POST `/src/funciones.php?accion=obtener_estado`
 
-// Response
+Obtener estado actual del usuario incluyendo **top 10 ranking en vivo**.
+
+**Características:**
+- ✅ Devuelve puntos, nivel, badges del usuario
+- ✅ Incluye top 10 usuarios ordenados por puntos DESC
+- ✅ Marca al usuario actual con `es_actual: true`
+- ✅ Se ejecuta cada 15 segundos desde el dashboard
+- ✅ Solo usuarios logueados ven ranking
+
+**Parámetros POST:**
+
+| Parámetro | Tipo | Requerido | Descripción |
+|-----------|------|----------|-----------|
+| `accion` | string | Sí | Valor: `obtener_estado` |
+
+**Respuesta JSON:**
+
+```json
 {
   "ok": true,
   "puntos": 580,
   "nivel": 2,
   "progreso": 30,
-  "badges": [{"nombre": "Nivel 1", "tipo": "bronze"}],
-  "ranking": [...]
+  "badges": [
+    {
+      "nombre": "Nivel 1: Novato",
+      "tipo": "bronze"
+    },
+    {
+      "nombre": "Nivel 2: Explorador",
+      "tipo": "silver"
+    }
+  ],
+  "ranking": [
+    {
+      "nombre_usuario": "Admin",
+      "puntos": 5000,
+      "es_actual": false
+    },
+    {
+      "nombre_usuario": "Campeón",
+      "puntos": 4200,
+      "es_actual": false
+    },
+    {
+      "nombre_usuario": "estudiante_prueba",
+      "puntos": 580,
+      "es_actual": true
+    }
+  ]
 }
 ```
+
+**Archivo:** [`src/funciones.php`](src/funciones.php#L24)
+**Frontend:** [`assets/js/app.js`](assets/js/app.js#L267) - Función `fetchAndUpdateDashboard()`
 
 #### `completar`
 ```php
