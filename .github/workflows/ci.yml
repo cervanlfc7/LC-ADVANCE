@@ -57,6 +57,14 @@ jobs:
       - name: Start PHP Built-in Server
         run: php -S 127.0.0.1:8000 -t . >/dev/null 2>&1 &
 
+      - name: Wait for PHP server to be ready
+        run: |
+          for i in {1..30}; do
+            curl -s http://127.0.0.1:8000/ >/dev/null 2>&1 && echo "Server is ready" && break
+            echo "Waiting for server... ($i)"
+            sleep 1
+          done
+
       - name: Run tests
         env:
           TEST_BASE_URL: 'http://127.0.0.1:8000/'
