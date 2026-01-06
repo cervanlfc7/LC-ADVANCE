@@ -115,29 +115,8 @@ LEFT JOIN usuarios_badges ub ON u.id = ub.usuario_id
 GROUP BY u.id
 ORDER BY u.puntos DESC;
 
--- Usuarios de prueba
-INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, puntos, nivel) VALUES
-('admin', 'admin@cbtis168.edu.mx', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 0, 1),
-('Ana123', 'ana@cbtis168.edu.mx', '$2y$10$f1k3n8j9m2k5l7p0q9r8t.u1v2w3x4y5z6A7B8C9D0E1F2G3H4I5J', 750, 2),
-('LuisGamer', 'luis@cbtis168.edu.mx', '$2y$10$a1b2c3d4e5f6g7h8i9j0k.l1m2n3o4p5q6r7s8t9u0v1w2x3y4z5A', 1200, 3);
-
--- Progreso de ejemplo
-INSERT INTO user_progress (user_id, slug, score, lesson_xp, completed) VALUES
-(2, 'derivadas-basicas-pendientes-dominio', 8, 130, 1),
-(2, 'bases-datos-relacionales', 10, 150, 1),
-(3, 'a1-greetings-introduction', 7, 120, 1);
-
--- Lecciones completadas
-INSERT INTO lecciones_completadas (usuario_id, slug) VALUES
-(2, 'derivadas-basicas-pendientes-dominio'),
-(2, 'bases-datos-relacionales'),
-(3, 'a1-greetings-introduction');
-
--- Asignar badges
-INSERT INTO usuarios_badges (usuario_id, badge_id) VALUES
-(2, 1),
-(3, 1),
-(3, 2);
+-- Usuarios de prueba: NINGUNO (la BD inicia vacía)
+-- Los usuarios se crean mediante el formulario de registro en register.php
 
 -- =====================================================
 -- End: schema.sql
