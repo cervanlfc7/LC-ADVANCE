@@ -4,29 +4,14 @@
 
 **Plataforma educativa interactiva** con lecciones, quizzes adaptativos, sistema de puntos, badges, ranking en tiempo real y mapa de combate interactivo.
 
----
+## 📋 Contenido Rápido
 
-## 📋 Tabla de Contenidos
+- **[Requisitos](#requisitos)** | **[Instalación](#instalación-rápida)** | **[Getting Started](#getting-started)** | **[Agregar Lecciones](#cómo-agregar-lecciones)** | **[Troubleshooting](#troubleshooting)**
 
-### 📚 Documentación Principal
-
-1. **Este archivo (README.md)** - Guía general, instalación y uso
-2. **[DEVELOPMENT.md](DEVELOPMENT.md)** - 🔧 Guía de desarrollo para programadores
-3. **[API.md](API.md)** - 📡 Documentación completa de endpoints
-4. **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - ⚡ Cheat sheet para tareas comunes
-5. **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - 🔍 Soluciones a problemas comunes
-
-### En este archivo
-
-1. [Requisitos](#requisitos)
-2. [Instalación rápida](#instalación-rápida)
-3. [Getting Started (Primeros pasos)](#getting-started)
-4. [Características Principales](#características-principales)
-5. [Estructura del proyecto](#estructura-del-proyecto)
-6. [Guía de API & Endpoints](#guía-de-api--endpoints)
-7. [Cómo agregar lecciones](#cómo-agregar-lecciones)
-8. [Testing & CI/CD](#testing--cicd)
-9. [Troubleshooting](#troubleshooting)
+**Documentación complementaria:**
+- [DEVELOPMENT.md](DEVELOPMENT.md) - Arquitectura y desarrollo
+- [API.md](API.md) - Endpoints y referencias
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Soluciones a problemas
 
 ---
 
@@ -247,113 +232,18 @@ LC-ADVANCE/
 
 ---
 
-## Guía de API & Endpoints
+## Endpoints & API
 
-### 🔐 Autenticación
+**Ver documentación completa en [API.md](API.md)**
 
-#### Login
-```bash
-curl -X POST http://localhost/LC-ADVANCE/login.php \
-  -d "nombre_usuario=estudiante_prueba&contrasena=Test1234"
-```
+**Endpoints principales:**
+- `POST /login.php` - Autenticación
+- `GET /leccion_detalle.php?slug=...&materia=...` - Ver lección
+- `POST /src/funciones.php` - Calificar quiz (accion=calificar_quiz)
+- `POST /src/funciones.php` - Obtener estado (accion=obtener_estado)
+- `POST /mapa/updateDB.php` - Actualizar maestro del mapa
 
-#### Logout
-```bash
-curl -X GET http://localhost/LC-ADVANCE/logout.php
-```
-
----
-
-### 📚 Lecciones
-
-#### Ver lección específica
-```bash
-# Parámetros GET
-# slug: identificador único de la lección
-# materia: nombre de la materia
-
-curl "http://localhost/LC-ADVANCE/leccion_detalle.php?slug=b1-past-simple-2025&materia=Inglés"
-```
-
-**Lecciones disponibles (algunos ejemplos):**
-- `b1-past-simple-2025` → Inglés
-- `a2-food-restaurant-shopping-cyberpunk` → Inglés
-- `derivadas-basicas-pendientes-dominio` → Matemáticas
-
----
-
-### 🧠 Quizzes & Progreso
-
-#### Calificar un quiz
-```bash
-curl -X POST http://localhost/LC-ADVANCE/src/funciones.php \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "accion=calificar_quiz&slug=b1-past-simple-2025&q0=answer1&q1=answer2&q2=answer3..."
-```
-
-**Respuesta (JSON):**
-```json
-{
-  "ok": true,
-  "score": 8,
-  "xp_ganado": 80,
-  "new_puntos": 580,
-  "new_nivel": 2,
-  "details": [
-    {"pregunta": "...", "correcta": "...", "respuesta": "...", "acertada": true}
-  ]
-}
-```
-
-#### Obtener estado del usuario (con ranking)
-```bash
-curl -X POST http://localhost/LC-ADVANCE/src/funciones.php \
-  -d "accion=obtener_estado"
-```
-
-**Respuesta (JSON):**
-```json
-{
-  "ok": true,
-  "puntos": 580,
-  "nivel": 2,
-  "progreso": 30,
-  "badges": [
-    {"nombre": "Nivel 1: Novato", "tipo": "bronze"}
-  ],
-  "ranking": [
-    {"nombre_usuario": "usuario1", "puntos": 1500, "es_actual": false},
-    {"nombre_usuario": "estudiante_prueba", "puntos": 580, "es_actual": true}
-  ]
-}
-```
-
-#### Actualizar progreso
-```bash
-curl -X POST http://localhost/LC-ADVANCE/update_progress.php \
-  -d "slug=b1-past-simple-2025&correctas=8&xp=80"
-```
-
----
-
-### 🗺️ Mapa / Sistema de Combate
-
-#### Actualizar maestro actual
-```bash
-curl -X POST http://localhost/LC-ADVANCE/mapa/updateDB.php \
-  -H "Content-Type: application/json" \
-  -d '{"maestro":"Miguel","materia":"Inglés"}'
-```
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "message": "Registro insertado",
-  "maestro": "Miguel",
-  "materia": "Inglés"
-}
-```
+Ver [API.md](API.md) para ejemplos curl y respuestas JSON detalladas.
 
 ---
 
@@ -497,139 +387,45 @@ Ver estado en: https://github.com/cervanlfc7/LC-ADVANCE/actions
 
 ## Troubleshooting
 
-### ❌ "Error de conexión a BD"
+**Ver soluciones detalladas en [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
 
-**Solución:**
-```bash
-# Verifica que MySQL está activo
-# XAMPP: abre Control Panel y haz click "Start" en MySQL
+**Problemas comunes rápidos:**
 
-# Verifica credenciales en config/config.php
-cat config/config.php | grep DB_
+| Problema | Solución |
+|----------|----------|
+| Error BD | Verifica `config/config.php` y que MySQL está activo |
+| "Tabla no existe" | Ejecuta: `mysql -u root -p < db/lc_advance.sql` |
+| Parse error en PHP | Ejecuta: `php -l src/content.php` |
+| Login no funciona | Verifica `session_start()` en el top de los archivos |
+| Puntos no se actualizan | Verifica respuesta del endpoint con curl |
 
-# Prueba conexión:
-mysql -h localhost -u root -p
-# Ingresa contraseña (vacía si no hay) y presiona Enter
-```
-
-### ❌ "Tabla 'lc_advance.usuarios' no existe"
-
-**Solución:**
-```bash
-# Re-importa la BD
-mysql -u root -p < db/lc_advance.sql
-
-# Verifica que se importó correctamente
-mysql -u root -p
-> USE lc_advance;
-> SHOW TABLES;
-> SELECT COUNT(*) FROM usuarios;
-```
-
-### ❌ "Parse error en src/content.php"
-
-**Solución:**
-```bash
-# Verifica sintaxis
-php -l src/content.php
-
-# Si hay error, busca caracteres problemáticos:
-# - Asegúrate de usar <<<'EOT' (no <<<EOT)
-# - No escapes <?php dentro de los heredocs
-# - Cierra cada EOT; en nueva línea
-```
-
-### ❌ "Login no funciona"
-
-**Solución:**
-```bash
-# Verifica que las sesiones están habilitadas
-# En config/config.php, busca session_start()
-# Debe estar en el top del archivo
-
-# Verifica tabla usuarios
-mysql -u root -p
-> USE lc_advance;
-> SELECT id, nombre_usuario, correo FROM usuarios;
-```
-
-### ❌ "Los puntos no se actualizan"
-
-**Solución:**
-```bash
-# 1. Verifica que el usuario tiene sesión activa
-# 2. Revisa la respuesta del endpoint
-curl -X POST http://localhost/LC-ADVANCE/src/funciones.php \
-  -d "accion=obtener_estado"
-
-# 3. Mira los logs de PHP
-# XAMPP: C:\xampp\php\logs\php_error_log
-
-# 4. Verifica tabla user_progress
-mysql -u root -p
-> USE lc_advance;
-> SELECT * FROM user_progress;
-```
-
-### ❌ "Mapa no carga / error "maestroact not found"
-
-**Solución:**
-```bash
-# mapa/updateDB.php ya crea la tabla si no existe
-# Pero puedes crearla manualmente:
-
-mysql -u root -p
-> USE lc_advance;
-> CREATE TABLE IF NOT EXISTS maestroact (
->   id INT AUTO_INCREMENT PRIMARY KEY,
->   IDPersonajeC VARCHAR(100) NOT NULL,
->   Maestro_Actual VARCHAR(255) NOT NULL,
->   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-> );
-```
-
----
+Ver [TROUBLESHOOTING.md](TROUBLESHOOTING.md) para soluciones completas.
 
 ## 🚀 Despliegue a Producción
 
-### Antes de publicar:
+1. Ejecuta tests: `php tests/run_all_tests.php`
+2. Haz backup: `mysqldump -u root -p lc_advance > backup.sql`
+3. Actualiza `config/config.php` con credenciales de producción
+4. Habilita HTTPS
+5. Asegura permisos: `chmod 600 config/config.php`
 
-```bash
-# 1. Verifica tests pasan
-php tests/run_all_tests.php
-
-# 2. Haz backup de BD
-mysqldump -u root -p lc_advance > backup_lc_advance.sql
-
-# 3. Actualiza config/config.php con credenciales de producción
-define('DB_HOST', 'prod-server.com');
-define('DB_USER', 'prod_user');
-define('DB_PASS', 'secure_password');
-
-# 4. Habilita HTTPS en tu servidor web
-# 5. Asegura que las credenciales estén en variables de entorno (.env)
-# 6. Configura permisos de archivos (config.php debe ser 600)
-chmod 600 config/config.php
-```
-
-### Con Docker (opcional):
-
-```bash
-# Crea un Dockerfile en la raíz del proyecto:
-FROM php:8.2-apache
-RUN docker-php-ext-install pdo_mysql
-COPY . /var/www/html/
-EXPOSE 80
-CMD ["apache2-foreground"]
-
-# Construir y correr:
-docker build -t lc-advance .
-docker run -p 80:80 -e DB_HOST=mysql lc-advance
-```
+Ver [DEVELOPMENT.md](DEVELOPMENT.md) para más detalles de arquitectura y deployment.
 
 ---
 
-## 📞 Soporte
+## � Documentación Completa
+
+| Documento | Para Qué |
+|-----------|----------|
+| **README.md** (este archivo) | Instalación, instalación y uso básico |
+| **[DEVELOPMENT.md](DEVELOPMENT.md)** | Arquitectura, cómo agregar funcionalidades |
+| **[API.md](API.md)** | Endpoints, ejemplos curl, respuestas JSON |
+| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | Cheat sheet y comandos rápidos |
+| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Soluciones a problemas comunes |
+
+---
+
+## �📞 Soporte
 
 - 🐛 Reporta bugs en Issues: https://github.com/cervanlfc7/LC-ADVANCE/issues
 - 💡 Solicita features en Discussions: https://github.com/cervanlfc7/LC-ADVANCE/discussions
