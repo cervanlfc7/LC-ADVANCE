@@ -56,13 +56,19 @@ if ($accion === 'obtener_estado') {
 
     // === RANKING TOP 10 ===
     try {
+        // Obtener el nombre del usuario actual desde la BD por su ID
+        $stmt = $pdo->prepare("SELECT nombre_usuario FROM usuarios WHERE id = ?");
+        $stmt->execute([$usuario_id]);
+        $usuario_actual = $stmt->fetch(PDO::FETCH_ASSOC);
+        $nombre_usuario_actual = $usuario_actual['nombre_usuario'] ?? '';
+
+        // Obtener top 10
         $stmt = $pdo->query("SELECT nombre_usuario, puntos FROM usuarios ORDER BY puntos DESC LIMIT 10");
         $ranking = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Agregar flag para identificar al usuario actual
-        $usuario_nombre = $_SESSION['usuario_nombre'] ?? '';
         foreach ($ranking as &$r) {
-            $r['es_actual'] = ($r['nombre_usuario'] === $usuario_nombre);
+            $r['es_actual'] = ($r['nombre_usuario'] === $nombre_usuario_actual);
         }
     } catch (Exception $e) {
         error_log("Error al obtener ranking: " . $e->getMessage());

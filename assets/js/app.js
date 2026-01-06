@@ -258,6 +258,10 @@ document.addEventListener('DOMContentLoaded', function(){
         // remove empty feedback placeholders
         document.querySelectorAll('.quiz-feedback').forEach(f => { if(!f.textContent.trim()) f.remove(); });
     }catch(e){ /* no-op */ }
+    
+    // Iniciar ranking en dashboard
+    fetchAndUpdateDashboard();
+    setInterval(fetchAndUpdateDashboard, 15000);
 });
 
 // ========================================
@@ -333,11 +337,4 @@ function fetchAndUpdateDashboard() {
     })
     .catch(err => console.error('Error al actualizar dashboard:', err));
 }
-
-// Ejecutar al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    fetchAndUpdateDashboard();
-    // Actualizar cada 15 segundos para mantener el ranking fresco
-    setInterval(fetchAndUpdateDashboard, 15000);
-});
 
