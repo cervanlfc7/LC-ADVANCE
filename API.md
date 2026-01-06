@@ -500,10 +500,103 @@ Próximas versiones incluirán:
 
 ## Changelog
 
-**2025-01-05:**
+**2026-01-05:**
+- ✅ **NUEVO**: Endpoint `/api/ranking.php` para obtener ranking top 10
 - ✅ Documentación API completa
 - ✅ Ejemplos curl para cada endpoint
 - ✅ Estructura de respuesta estándar
+
+---
+
+## 🆕 Endpoints AJAX (v2.1.0)
+
+### GET `/api/ranking.php` ⭐ NUEVO
+
+Obtiene el ranking top 10, puntos, nivel, progreso y badges del usuario actual.
+
+**Autenticación:** Requerida (`$_SESSION['usuario_id']`) o modo invitado
+
+**Respuesta exitosa (200 OK):**
+```json
+{
+  "ok": true,
+  "puntos": 40,
+  "nivel": 1,
+  "progreso": 0,
+  "badges": [
+    {
+      "nombre": "Nivel 1: Novato",
+      "tipo": "bronze"
+    }
+  ],
+  "ranking": [
+    {
+      "id": 26,
+      "nombre_usuario": "Maria",
+      "puntos": 40,
+      "es_actual": true
+    },
+    {
+      "id": 25,
+      "nombre_usuario": "cervanlfc7",
+      "puntos": 30,
+      "es_actual": false
+    }
+  ]
+}
+```
+
+**Respuesta error (401 Unauthorized):**
+```json
+{
+  "ok": false,
+  "error": "No autenticado"
+}
+```
+
+**Respuesta invitado:**
+```json
+{
+  "ok": true,
+  "puntos": 0,
+  "nivel": 1,
+  "progreso": 0,
+  "badges": [],
+  "ranking": []
+}
+```
+
+**Ejemplo con curl:**
+```bash
+# Con sesión autenticada
+curl -b cookies.txt http://localhost:8000/api/ranking.php
+
+# Respuesta:
+# {"ok":true,"puntos":40,"nivel":1,"progreso":0,"badges":[],"ranking":[...]}
+```
+
+**Ejemplo con JavaScript (usado en dashboard.php):**
+```javascript
+fetch('api/ranking.php', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+})
+.then(res => res.json())
+.then(data => {
+    if (data.ok) {
+        // Actualizar UI con data.puntos, data.ranking, etc.
+        console.log('Top jugador:', data.ranking[0].nombre_usuario);
+    }
+});
+```
+
+**Notas:**
+- Se ejecuta automáticamente cada 15 segundos en dashboard.php
+- El campo `es_actual` indica si es el usuario logueado (true/false)
+- Badges se calculan automáticamente basado en puntos:
+  - 500+ pts → "Nivel 1: Novato" (bronze)
+  - 1000+ pts → "Nivel 2: Explorador" (silver)
+  - 2000+ pts → "Nivel 3: Élite" (gold)
 
 ---
 
@@ -514,4 +607,4 @@ https://github.com/cervanlfc7/LC-ADVANCE/issues
 
 ---
 
-**Última actualización:** Enero 2025
+**Última actualización:** Enero 2026

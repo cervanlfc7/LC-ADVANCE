@@ -42,12 +42,14 @@ php -S localhost:8000 -t .
 ### 🔧 Tengo un problema (algo no funciona)
 
 1. [TROUBLESHOOTING.md](TROUBLESHOOTING.md) → Soluciones paso a paso
-2. [QUICK_REFERENCE.md](QUICK_REFERENCE.md) → Errores comunes
+2. **[FIX_RANKING_v2.1.0.md](FIX_RANKING_v2.1.0.md)** → 🆕 TOP 10 Ranking (solución específica)
+3. [QUICK_REFERENCE.md](QUICK_REFERENCE.md) → Errores comunes
 
 **Errores frecuentes:**
 - [MySQL connection refused](TROUBLESHOOTING.md#-mysql-connection-refused)
 - [Parse error en PHP](TROUBLESHOOTING.md#-parse-error-en-srccontentphp)
 - [Los puntos no se guardan](TROUBLESHOOTING.md#-los-puntos-no-se-guardan-después-del-quiz)
+- **[TOP 10 Ranking no se muestra](FIX_RANKING_v2.1.0.md)** 🆕 v2.1.0
 - [Lección no aparece](TROUBLESHOOTING.md#-lección-no-aparece-en-dashboard)
 
 ---

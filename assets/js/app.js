@@ -129,6 +129,7 @@ if (loginBtn && authWrapper && usernameInput && passwordInput) {
             }, 2000);
         }
     });
+}
 
     /* ===============================
        Dark mode toggle + persistencia
@@ -268,15 +269,21 @@ document.addEventListener('DOMContentLoaded', function(){
 // TOP 10 RANKING - Actualizar dashboard
 // ========================================
 function fetchAndUpdateDashboard() {
-    fetch('src/funciones.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'accion=obtener_estado'
+    fetch('api/ranking.php', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) {
+            console.error('Response status:', res.status);
+            throw new Error('HTTP error ' + res.status);
+        }
+        return res.json();
+    })
     .then(data => {
+        console.log('Datos recibidos del ranking:', data);
         if (!data.ok) {
-            console.log('Error al obtener estado:', data.error);
+            console.log('Error al obtener ranking:', data.error);
             return;
         }
 
@@ -314,6 +321,9 @@ function fetchAndUpdateDashboard() {
 
         // ===== LLENAR TOP 10 RANKING =====
         const rankingBody = document.getElementById('ranking-body');
+        console.log('rankingBody element:', rankingBody);
+        console.log('data.ranking:', data.ranking);
+        
         if (rankingBody && data.ranking) {
             if (data.ranking.length === 0) {
                 rankingBody.innerHTML = '<tr><td colspan="3" class="text-muted">Sé el primero en el ranking 🏆</td></tr>';
@@ -331,7 +341,10 @@ function fetchAndUpdateDashboard() {
                         `;
                     })
                     .join('');
+                console.log('Ranking actualizado con ' + data.ranking.length + ' jugadores');
             }
+        } else {
+            console.warn('rankingBody no existe o data.ranking no tiene datos');
         }
 
     })

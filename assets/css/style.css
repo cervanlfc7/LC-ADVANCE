@@ -1255,7 +1255,6 @@ svg text {
 
 @media(max-width:720px){
     .lessons-modal .modal-content { padding:12px; max-width: 96%; width:96%; }
-    .ranking-floating { display:none; } /* reduce clutter */
 }
 
 .arrow-up {
@@ -7725,6 +7724,7 @@ button:hover, .btn-prediction:hover, .btn-interview:hover, .btn-sample:hover, .t
 
 /* Ranking panel (dashboard) */
 .ranking-floating {
+    display: block;
     position: fixed; /* flota y no tapa la cabecera */
     top: calc(var(--header-height, 64px) + 16px); /* colocado justo debajo del header */
     right: 16px;

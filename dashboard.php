@@ -448,187 +448,32 @@ if (empty($_SESSION['usuario_es_invitado'])) {
 <?php endif; ?>
 
 <script src="assets/js/app.js"></script>
-<script>
-    // ... (todo el JavaScript original que ya tenías, sin cambios) ...
-    // (fetchAndUpdateDashboard, scrollToTop, highlight al volver, etc.)
-    // Lo mantengo igual para no alargar el código, pero debes pegarlo tal como estaba.
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-        window.onscroll = function() {
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-                scrollToTopBtn.style.display = "block";
-            } else {
-                scrollToTopBtn.style.display = "none";
-            }
-        };
+<script>
+// ============================================
+// DASHBOARD MAIN SCRIPT
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Dashboard DOMContentLoaded iniciado');
+    
+    // ===== SCROLL TO TOP BUTTON =====
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+    window.onscroll = function() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            scrollToTopBtn.style.display = "block";
+        } else {
+            scrollToTopBtn.style.display = "none";
+        }
+    };
+    
+    if (scrollToTopBtn) {
         scrollToTopBtn.onclick = function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-        fetchAndUpdateDashboard();
-        if (localStorage.getItem('needsUpdate') === 'true') {
-            fetchAndUpdateDashboard();
-            localStorage.removeItem('needsUpdate');
-        }
-
-        <?php if (!empty($highlight_materia) || $filter_materia): ?>
-            (function(){
-                const name = <?php echo json_encode($filter_materia ?: $highlight_materia); ?>;
-                const targetId = 'materia-' + encodeURIComponent(name);
-                const target = document.getElementById(targetId);
-                if (target) {
-                    target.classList.add('materia-highlight');
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    setTimeout(() => target.classList.remove('materia-highlight'), 1800);
-                }
-            })();
-        <?php endif; ?>
-    });
-
-    // Manejo de highlight al volver de lección (tu código original)
-    document.addEventListener('DOMContentLoaded', function () {
-      function handleLesson(slug) {
-        if (!slug) return false;
-        const id = 'leccion-' + slug;
-        const el = document.getElementById(id);
-        if (!el) return false;
-
-        const saved = sessionStorage.getItem('scrollPos_leccion_' + slug);
-        setTimeout(() => {
-          if (saved !== null) {
-            window.scrollTo({ top: parseInt(saved, 10), behavior: 'smooth' });
-            sessionStorage.removeItem('scrollPos_leccion_' + slug);
-          } else {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-          el.classList.add('highlight-return');
-          setTimeout(() => el.classList.remove('highlight-return'), 3000);
-        }, 200);
-
-        sessionStorage.removeItem('last_leccion_slug');
-        return true;
-      }
-      el.classList.add('highlight-return');
-      setTimeout(() => el.classList.remove('highlight-return'), 3000);
-    }, 200);
-
-    sessionStorage.removeItem('last_leccion_slug');
-    return true;
-  }
-
-  const hash = window.location.hash;
-  if (hash && hash.startsWith('#leccion-')) {
-    handleLesson(decodeURIComponent(hash.replace('#leccion-','')));
-  } else {
-    const last = sessionStorage.getItem('last_leccion_slug');
-    if (last) handleLesson(last);
-  }
-});
-
-// Insertar en dashboard (script al final) para ocultar otras materias si hay ?materia= o ?profesor=
-document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  const materia = params.get('materia');
-  const profesor = params.get('profesor');
-
-  // Manejo por `materia` (comportamiento existente)
-  if (materia) {
-    // Compatibilidad: algunas vistas usan `.materia-group` y otras `.materia-section`
-    document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
-      const title = sec.querySelector('.materia-title')?.textContent || '';
-      if (!title || title.toLowerCase().indexOf(materia.toLowerCase()) === -1) {
-        sec.style.display = 'none';
-      } else {
-        const last = sessionStorage.getItem('last_leccion_slug');
-        if (last) handleLesson(last);
-      }
-    });
-
-    // Asegurar que los enlaces a lecciones mantengan el parámetro `materia`
-    document.querySelectorAll('.leccion-list a').forEach(a => {
-      try {
-        const url = new URL(a.href, window.location.origin);
-        if (!url.searchParams.get('materia')) {
-          url.searchParams.set('materia', materia);
-          a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
-        }
-      } catch(e){ /* no hacer nada si la URL es relativa o inválida */ }
-    });
-
-    // Si hay un hash a una lección, desplazar suavemente hacia ella después de filtrar
-    if (location.hash && location.hash.startsWith('#leccion-')) {
-      setTimeout(() => {
-        const target = document.getElementById(location.hash.replace('#',''));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          target.classList.add('highlight-return');
-          setTimeout(() => target.classList.remove('highlight-return'), 1800);
-        }
-      }, 200);
     }
 
-    return; // ya no procesar `profesor` cuando hay `materia` explícita
-  }
-
-  // Manejo por `profesor` (nuevo): mostrar las materias mapeadas y asegurarse de propagar el parámetro a los enlaces
-  if (profesor) {
-    // Mapear profesor -> materias (mantener sincronizado con PHP `$profesor_materia_map`)
-    const profesorMateriaMap = {
-      'Miguel Marquez': ['Temas Selectos de Matemáticas I y II'],
-      'Enrique': ['Inglés'],
-      'Espindola': ['Pensamiento Matemático III'],
-      'Manuel': ['Programación'],
-      'Meza': ['Programación'],
-      'Herson': ['Física','Química'],
-      'Carolina': ['Ecosistemas'],
-      'Refugio & Padilla': ['Ciencias Sociales'],
-      'Armando': ['Historia']
-    };
-
-    // Buscar la clave del mapa de profesor ignorando mayúsculas y acentos
-    function normJs(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/&/g,'y').trim(); }
-    let profKey = Object.keys(profesorMateriaMap).find(k => {
-      return normJs(k).includes(normJs(profesor)) || normJs(profesor).includes(normJs(k));
-    });
-    const wanted = (profesorMateriaMap[profKey] || []).map(s => normJs(s));
-
-    document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
-      const title = sec.querySelector('.materia-title')?.textContent || '';
-      const keep = wanted.some(w => normJs(title).indexOf(w) !== -1);
-      if (!keep) sec.style.display = 'none'; else { sec.style.display = 'block'; sec.classList.add('materia-highlight'); }
-    });
-
-    // Asegurar que los enlaces a lecciones mantengan el parámetro `profesor`
-    document.querySelectorAll('.leccion-list a').forEach(a => {
-      try {
-        const url = new URL(a.href, window.location.origin);
-        if (!url.searchParams.get('profesor')) {
-          url.searchParams.set('profesor', profesor);
-          a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
-        }
-      } catch(e){ /* no hacer nada si la URL es relativa o inválida */ }
-    });
-
-    // Si hay #leccion, desplazar hacia la lección destacada
-    if (location.hash && location.hash.startsWith('#leccion-')) {
-      setTimeout(() => {
-        const target = document.getElementById(location.hash.replace('#',''));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          target.classList.add('highlight-return');
-          setTimeout(() => target.classList.remove('highlight-return'), 1800);
-        }
-      }, 200);
-    }
-  }
-});
-
-</script>
-
-<!-- Bloque duplicado de examen eliminado: el CTA al examen se renderiza previamente en la parte superior para evitar duplicados. -->
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+    // ===== HIGHLIGHT MATERIA AL CARGAR =====
     <?php if (!empty($highlight_materia) || $filter_materia): ?>
         (function(){
             const name = <?php echo json_encode($filter_materia ?: $highlight_materia); ?>;
@@ -642,36 +487,97 @@ document.addEventListener('DOMContentLoaded', () => {
         })();
     <?php endif; ?>
 
-    // ============================================
-    // SCROLL REVEAL ANIMATIONS
-    // Mostrar lecciones y grupos conforme hace scroll
-    // ============================================
+    // ===== SCROLL REVEAL ANIMATIONS =====
     (function() {
-        // Seleccionar todos los elementos que deben animarse
         const elementsToAnimate = document.querySelectorAll('.leccion-item, .materia-group');
-        
-        // Configurar Intersection Observer
         const observerOptions = {
-            threshold: 0.1,  // Activar cuando 10% del elemento es visible
-            rootMargin: '0px 0px -50px 0px'  // Empezar la animación 50px antes
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
         };
         
         const observer = new IntersectionObserver(function(entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    // Agregar clase para activar animación
                     entry.target.classList.add('visible');
-                    // Dejar de observar para mejorar rendimiento
                     observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
         
-        // Observar cada elemento
         elementsToAnimate.forEach(element => {
             observer.observe(element);
         });
     })();
+
+    // ===== FILTRADO POR MATERIA O PROFESOR =====
+    const params = new URLSearchParams(window.location.search);
+    const materia = params.get('materia');
+    const profesor = params.get('profesor');
+
+    if (materia) {
+        document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
+            const title = sec.querySelector('.materia-title')?.textContent || '';
+            if (!title || title.toLowerCase().indexOf(materia.toLowerCase()) === -1) {
+                sec.style.display = 'none';
+            } else {
+                sec.style.display = 'block';
+            }
+        });
+
+        document.querySelectorAll('.leccion-list a').forEach(a => {
+            try {
+                const url = new URL(a.href, window.location.origin);
+                if (!url.searchParams.get('materia')) {
+                    url.searchParams.set('materia', materia);
+                    a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
+                }
+            } catch(e){ }
+        });
+    }
+
+    if (profesor) {
+        const profesorMateriaMap = {
+            'Miguel Marquez': ['Temas Selectos de Matemáticas I y II'],
+            'Enrique': ['Inglés'],
+            'Espindola': ['Pensamiento Matemático III'],
+            'Manuel': ['Programación'],
+            'Meza': ['Programación'],
+            'Herson': ['Física','Química'],
+            'Carolina': ['Ecosistemas'],
+            'Refugio & Padilla': ['Ciencias Sociales'],
+            'Armando': ['Historia']
+        };
+
+        function normJs(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/&/g,'y').trim(); }
+        let profKey = Object.keys(profesorMateriaMap).find(k => {
+            return normJs(k).includes(normJs(profesor)) || normJs(profesor).includes(normJs(k));
+        });
+        const wanted = (profesorMateriaMap[profKey] || []).map(s => normJs(s));
+
+        document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
+            const title = sec.querySelector('.materia-title')?.textContent || '';
+            const keep = wanted.some(w => normJs(title).indexOf(w) !== -1);
+            if (!keep) sec.style.display = 'none';
+            else { 
+                sec.style.display = 'block'; 
+                sec.classList.add('materia-highlight'); 
+            }
+        });
+
+        document.querySelectorAll('.leccion-list a').forEach(a => {
+            try {
+                const url = new URL(a.href, window.location.origin);
+                if (!url.searchParams.get('profesor')) {
+                    url.searchParams.set('profesor', profesor);
+                    a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
+                }
+            } catch(e){ }
+        });
+    }
+
+    // ===== FETCH Y ACTUALIZAR DASHBOARD =====
+    // Nota: fetchAndUpdateDashboard() ya se ejecuta en app.js al cargar
+    // No necesitamos llamarla aquí también
 });
 </script>
 
