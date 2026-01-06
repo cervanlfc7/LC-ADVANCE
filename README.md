@@ -647,8 +647,6 @@ docker run -p 80:80 -e DB_HOST=mysql lc-advance
 ---
 
 **¡Gracias por usar LC-ADVANCE!** 🎓✨
-
-Estructura principal
 --------------------
 - [dashboard.php](dashboard.php) — Panel principal del usuario.
 - [index.php](index.php) — Landing / acceso rápido al dashboard.
