@@ -113,20 +113,6 @@ mysql -u root -p < db/lc_advance.sql
 - Tabla `dialogosmapa` (diálogos del mapa)
 - Tabla `maestroact` (maestros actuales en mapa)
 
-#### Opción B: Importar esquemas por separado (antiguo)
-
-> ℹ️ **Nota:** Esta opción es para compatibilidad con versiones antiguas. Se recomienda usar la **Opción A**.
-
-```bash
-# Base de datos principal (deprecado)
-mysql -u root -p < sql/schema.sql
-
-# Sistema de combate (deprecado)
-mysql -u root -p -e "CREATE DATABASE dialogos;"
-mysql -u root -p dialogos < sql/Sistema-combate/dialogosmapa.sql
-mysql -u root -p dialogos < sql/Sistema-combate/preguntas.sql
-```
-
 ### 3️⃣ Configurar credenciales
 
 Edita `config/config.php`:
@@ -244,10 +230,6 @@ LC-ADVANCE/
 │
 ├── db/
 │   └── lc_advance.sql        # 🔑 Dump unificado (USAR ESTE)
-│
-├── sql/
-│   ├── schema.sql            # Schema básico (deprecado)
-│   └── Sistema-combate/      # Dumps adicionales (deprecado)
 │
 ├── scripts/
 │   └── seed_test_data.php    # Crear usuario de prueba CI
@@ -535,7 +517,7 @@ mysql -h localhost -u root -p
 **Solución:**
 ```bash
 # Re-importa la BD
-mysql -u root -p < sql/lc_advance.sql
+mysql -u root -p < db/lc_advance.sql
 
 # Verifica que se importó correctamente
 mysql -u root -p
