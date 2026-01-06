@@ -642,7 +642,7 @@ docker run -p 80:80 -e DB_HOST=mysql lc-advance
 
 - 🐛 Reporta bugs en Issues: https://github.com/cervanlfc7/LC-ADVANCE/issues
 - 💡 Solicita features en Discussions: https://github.com/cervanlfc7/LC-ADVANCE/discussions
-- 📧 Contacta al equipo: [lcadvance40@gmail.com](lcadvance40@gmail.com)
+- 📧 Contacta al equipo: lcadvance40@gmail.com
 
 ---
 
