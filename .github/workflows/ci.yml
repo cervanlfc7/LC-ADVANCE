@@ -55,13 +55,21 @@ jobs:
           fi
 
       - name: Start PHP Built-in Server
-        run: php -S 127.0.0.1:8000 -t . >/dev/null 2>&1 &
+        run: nohup php -S 127.0.0.1:8000 -t . > /tmp/php_server.log 2>&1 & sleep 5
 
-      - name: Wait for PHP server to be ready
+      - name: Verify PHP server is running
         run: |
-          for i in {1..30}; do
-            curl -s http://127.0.0.1:8000/ >/dev/null 2>&1 && echo "Server is ready" && break
-            echo "Waiting for server... ($i)"
+          for i in {1..60}; do
+            if curl -s -f http://127.0.0.1:8000/index.php >/dev/null 2>&1; then
+              echo "✓ Server ready at http://127.0.0.1:8000"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "✗ Server failed to start"
+              cat /tmp/php_server.log
+              exit 1
+            fi
+            echo "Waiting for server ($i/60)..."
             sleep 1
           done
 

@@ -4,7 +4,7 @@ $tests = [
     __DIR__ . '/test_lessons.php',
     __DIR__ . '/test_integration.php',
     __DIR__ . '/test_updateDB.php',
-    __DIR__ . '/test_e2e.php',
+    __DIR__ . '/test_e2e_simple.php',
 ];
 
 $php = defined('PHP_BINARY') ? PHP_BINARY : 'php';

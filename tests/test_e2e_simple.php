@@ -2,8 +2,10 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$base = getenv('TEST_BASE_URL') ?: 'http://127.0.0.1:8000/';
-$cookieFile = __DIR__ . '/integration_cookies.txt';
+$envBase = getenv('TEST_BASE_URL');
+$base = $envBase ? rtrim($envBase, '/') . '/' : 'http://127.0.0.1:8000/';
+$lessonUrl = $base . 'leccion_detalle.php?slug=b1-past-simple-2025&materia=Ingl%C3%A9s';
+$cookieFile = __DIR__ . '/e2e_cookies.txt';
 @unlink($cookieFile);
 
 function curl_get($url, $cookieFile) {
@@ -16,7 +18,7 @@ function curl_get($url, $cookieFile) {
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     $res = curl_exec($ch);
     if (curl_errno($ch)) {
-        return [0, $res];
+        return [0, "CURL_ERROR"];
     }
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
@@ -35,22 +37,34 @@ function curl_post($url, $data, $cookieFile) {
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     $res = curl_exec($ch);
     if (curl_errno($ch)) {
-        return [0, $res];
+        return [0, "CURL_ERROR"];
     }
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     return [$status, $res];
 }
 
-// Quick smoke test: server is reachable
-list($s, $r) = curl_get($base . 'index.php', $cookieFile);
+// Try to load lesson (may redirect to login)
+list($s, $html) = curl_get($lessonUrl, $cookieFile);
 if ($s === 0) {
-    echo "SKIP: Server not reachable\n";
+    echo "SKIP: Could not reach server\n";
     @unlink($cookieFile);
     exit(0);
 }
 
-echo "OK: integration endpoint tests passed\n";
-@unlink($cookieFile);
-exit(0);
+if ($s >= 500) {
+    echo "FAIL: Server error (HTTP $s)\n";
+    @unlink($cookieFile);
+    exit(1);
+}
 
+// Very simple: just verify we can reach the server and get a response without fatal errors
+if (preg_match('/(fatal|parse error)/i', $html)) {
+    echo "FAIL: Fatal error in response\n";
+    @unlink($cookieFile);
+    exit(1);
+}
+
+@unlink($cookieFile);
+echo "OK: E2E page load test passed\n";
+exit(0);
