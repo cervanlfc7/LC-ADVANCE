@@ -1132,6 +1132,25 @@ svg text {
     background: rgba(0, 0, 0, 0.3);
 }
 
+/* Scrollbar para ranking-scroll-area */
+.ranking-scroll-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ranking-scroll-area::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+.ranking-scroll-area::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--neon-cyan), var(--neon-pink));
+    border-radius: 10px;
+}
+
+.ranking-scroll-area::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--neon-pink), var(--neon-cyan));
+}
+
 .ranking-table {
     width: 100%;
     border-collapse: collapse;
@@ -7800,6 +7819,36 @@ button:hover, .btn-prediction:hover, .btn-interview:hover, .btn-sample:hover, .t
 
 .ranking-floating .ranking-table tbody tr:hover {
     background: rgba(0, 255, 255, 0.1);
+}
+
+.ranking-floating .ranking-table tbody tr.ranking-current-user {
+    background: rgba(0, 255, 0, 0.15) !important;
+    border-left: 4px solid var(--neon-green);
+}
+
+.ranking-floating .ranking-table tbody tr.ranking-current-user td {
+    color: var(--neon-green);
+    text-shadow: 0 0 8px var(--neon-green);
+    font-weight: bold;
+}
+
+.ranking-floating .ranking-table .rank-number {
+    font-weight: bold;
+    color: var(--neon-yellow);
+    text-align: center;
+    width: 30px;
+    text-shadow: 0 0 8px var(--neon-yellow);
+}
+
+.ranking-floating .ranking-table .rank-player {
+    flex: 1;
+}
+
+.ranking-floating .ranking-table .rank-points {
+    text-align: right;
+    color: var(--neon-cyan);
+    font-weight: bold;
+    text-shadow: 0 0 6px var(--neon-cyan);
 }
 
 .ranking-floating .ranking-table tbody tr:nth-child(1) td:nth-child(1) {

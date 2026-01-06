@@ -260,3 +260,84 @@ document.addEventListener('DOMContentLoaded', function(){
     }catch(e){ /* no-op */ }
 });
 
+// ========================================
+// TOP 10 RANKING - Actualizar dashboard
+// ========================================
+function fetchAndUpdateDashboard() {
+    fetch('src/funciones.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'accion=obtener_estado'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.ok) {
+            console.log('Error al obtener estado:', data.error);
+            return;
+        }
+
+        // ===== ACTUALIZAR PUNTOS Y NIVEL =====
+        const puntosEl = document.getElementById('puntos-actuales');
+        const nivelEl = document.getElementById('nivel-actual');
+        const puntosProgressEl = document.getElementById('puntos-actuales-mini');
+        const puntosNecesariosEl = document.getElementById('puntos-necesarios');
+
+        if (puntosEl) puntosEl.textContent = data.puntos || 0;
+        if (nivelEl) nivelEl.textContent = data.nivel || 1;
+        if (puntosProgressEl) puntosProgressEl.textContent = data.puntos || 0;
+        
+        // Calcular puntos necesarios: (nivel+1) * 500
+        const puntos_necesarios = ((data.nivel || 1) + 1) * 500;
+        if (puntosNecesariosEl) puntosNecesariosEl.textContent = puntos_necesarios;
+
+        // Actualizar barra de progreso
+        const puntos_base = (data.nivel || 1) * 500;
+        const progreso = Math.min(100, Math.max(0, ((data.puntos || 0) - puntos_base) / 500 * 100));
+        const progressFill = document.getElementById('progress-fill');
+        if (progressFill) progressFill.style.width = progreso + '%';
+
+        // ===== ACTUALIZAR BADGES =====
+        const badgesContainer = document.getElementById('badges-container');
+        if (badgesContainer && data.badges) {
+            if (data.badges.length === 0) {
+                badgesContainer.innerHTML = '<p class="text-muted">¡Completa lecciones para obtener tu primer Badge (500 pts)!</p>';
+            } else {
+                badgesContainer.innerHTML = data.badges
+                    .map(b => `<span class="badge ${b.tipo || 'bronze'}">${b.nombre}</span>`)
+                    .join('');
+            }
+        }
+
+        // ===== LLENAR TOP 10 RANKING =====
+        const rankingBody = document.getElementById('ranking-body');
+        if (rankingBody && data.ranking) {
+            if (data.ranking.length === 0) {
+                rankingBody.innerHTML = '<tr><td colspan="3" class="text-muted">Sé el primero en el ranking 🏆</td></tr>';
+            } else {
+                rankingBody.innerHTML = data.ranking
+                    .slice(0, 10)  // Solo top 10
+                    .map((player, idx) => {
+                        const isCurrent = player.es_actual ? 'ranking-current-user' : '';
+                        return `
+                            <tr class="${isCurrent}">
+                                <td class="rank-number">${idx + 1}</td>
+                                <td class="rank-player">${player.nombre_usuario || 'Anónimo'}</td>
+                                <td class="rank-points">${player.puntos || 0} pts</td>
+                            </tr>
+                        `;
+                    })
+                    .join('');
+            }
+        }
+
+    })
+    .catch(err => console.error('Error al actualizar dashboard:', err));
+}
+
+// Ejecutar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    fetchAndUpdateDashboard();
+    // Actualizar cada 15 segundos para mantener el ranking fresco
+    setInterval(fetchAndUpdateDashboard, 15000);
+});
+

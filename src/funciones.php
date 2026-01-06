@@ -36,27 +36,43 @@ if ($accion === 'obtener_estado') {
 
     $stmt = $pdo->prepare("SELECT puntos, nivel FROM usuarios WHERE id = ?");
     $stmt->execute([$usuario_id]);
-    $user = $stmt->fetch();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $progreso = ($user['puntos'] % 500) / 5;
+    if (!$user) {
+        echo json_encode(['ok' => false, 'error' => 'Usuario no encontrado']);
+        exit;
+    }
+
+    $puntos = (int)$user['puntos'];
+    $nivel = (int)$user['nivel'];
+    $puntos_base = $nivel * 500;
+    $progreso = min(100, max(0, (($puntos - $puntos_base) / 500) * 100));
 
     // === BADGES ===
     $badges = [];
-    if ($user['puntos'] >= 500) $badges[] = ['nombre' => 'Nivel 1', 'tipo' => 'bronze'];
-    if ($user['puntos'] >= 1000) $badges[] = ['nombre' => 'Nivel 2', 'tipo' => 'silver'];
-    if ($user['puntos'] >= 2000) $badges[] = ['nombre' => 'Nivel 3', 'tipo' => 'gold'];
+    if ($puntos >= 500) $badges[] = ['nombre' => 'Nivel 1: Novato', 'tipo' => 'bronze'];
+    if ($puntos >= 1000) $badges[] = ['nombre' => 'Nivel 2: Explorador', 'tipo' => 'silver'];
+    if ($puntos >= 2000) $badges[] = ['nombre' => 'Nivel 3: Élite', 'tipo' => 'gold'];
 
-    // === RANKING ===
-    $stmt = $pdo->query("SELECT nombre_usuario, puntos FROM usuarios ORDER BY puntos DESC LIMIT 10");
-    $ranking = $stmt->fetchAll();
-    foreach ($ranking as &$r) {
-        $r['es_actual'] = ($r['nombre_usuario'] === $_SESSION['usuario_nombre']);
+    // === RANKING TOP 10 ===
+    try {
+        $stmt = $pdo->query("SELECT nombre_usuario, puntos FROM usuarios ORDER BY puntos DESC LIMIT 10");
+        $ranking = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Agregar flag para identificar al usuario actual
+        $usuario_nombre = $_SESSION['usuario_nombre'] ?? '';
+        foreach ($ranking as &$r) {
+            $r['es_actual'] = ($r['nombre_usuario'] === $usuario_nombre);
+        }
+    } catch (Exception $e) {
+        error_log("Error al obtener ranking: " . $e->getMessage());
+        $ranking = [];
     }
 
     echo json_encode([
         'ok' => true,
-        'puntos' => $user['puntos'],
-        'nivel' => $user['nivel'],
+        'puntos' => $puntos,
+        'nivel' => $nivel,
         'progreso' => $progreso,
         'badges' => $badges,
         'ranking' => $ranking
