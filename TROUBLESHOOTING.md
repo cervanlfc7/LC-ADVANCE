@@ -54,7 +54,7 @@ SQLSTATE[42S02]: Table 'lc_advance.usuarios' doesn't exist
 mysql -u root -p -e "SHOW DATABASES LIKE 'lc_advance';"
 
 # 2. Si no existe, importar dump
-mysql -u root -p < sql/lc_advance.sql
+mysql -u root -p < db/lc_advance.sql
 
 # 3. Verificar tablas
 mysql -u root -p
@@ -553,7 +553,7 @@ Antes de reportar un bug, verifica:
 
 - [ ] PHP version >= 8.1 (`php -v`)
 - [ ] MySQL está corriendo (`mysql -u root -p`)
-- [ ] `sql/lc_advance.sql` fue importado (`mysql> SHOW DATABASES;`)
+- [ ] `db/lc_advance.sql` fue importado (`mysql> SHOW DATABASES;`)
 - [ ] `config/config.php` tiene credenciales correctas
 - [ ] `src/content.php` no tiene errores (`php -l src/content.php`)
 - [ ] Página recargada sin caché (Ctrl+Shift+R)

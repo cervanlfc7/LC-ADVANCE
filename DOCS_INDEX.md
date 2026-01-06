@@ -14,7 +14,7 @@ Bienvenido a la documentación de **LC-ADVANCE**, una plataforma educativa inter
 **Pasos:**
 ```bash
 # 1. Instalar
-mysql -u root -p < sql/lc_advance.sql
+mysql -u root -p < db/lc_advance.sql
 
 # 2. Iniciar
 php -S localhost:8000 -t .

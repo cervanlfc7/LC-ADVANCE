@@ -12,7 +12,7 @@ git clone https://github.com/cervanlfc7/LC-ADVANCE.git
 cd LC-ADVANCE
 
 # 2. Importar BD
-mysql -u root -p < sql/lc_advance.sql
+mysql -u root -p < db/lc_advance.sql
 
 # 3. Configurar credenciales
 # Edita config/config.php
@@ -159,7 +159,7 @@ leccion_detalle.php     ← Vista de lección + quiz
 dashboard.php           ← Panel del usuario
 assets/js/app.js        ← Lógica cliente (listeners)
 assets/css/style.css    ← Estilos
-sql/lc_advance.sql      ← BD dump (importar aquí)
+db/lc_advance.sql       ← BD dump (importar aquí)
 ```
 
 ---
@@ -296,7 +296,7 @@ Register → Login → Dashboard
 
 | Error | Solución |
 |-------|----------|
-| "Table not found" | `mysql -u root -p < sql/lc_advance.sql` |
+| "Table not found" | `mysql -u root -p < db/lc_advance.sql` |
 | "Access denied" | Verifica DB_USER/DB_PASS en `config/config.php` |
 | "Parse error in src/content.php" | Busca `<?php` sin escapar o `<<<EOT` sin cerrar |
 | "Login no funciona" | Verifica sesión y tabla `usuarios` |
@@ -318,7 +318,7 @@ Register → Login → Dashboard
 
 - 📚 README completo: [README.md](README.md)
 - 🔧 Guía de desarrollo: [DEVELOPMENT.md](DEVELOPMENT.md)
-- 📝 SQL schema: [sql/lc_advance.sql](sql/lc_advance.sql)
+- 📝 SQL schema: [db/lc_advance.sql](db/lc_advance.sql)
 - 🧪 Tests: [tests/run_all_tests.php](tests/run_all_tests.php)
 - 📦 GitHub: https://github.com/cervanlfc7/LC-ADVANCE
 
