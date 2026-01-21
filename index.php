@@ -30,11 +30,36 @@ $usuario_logueado = isset($_SESSION['usuario_id']);
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
 
     <script src="assets/js/app.js" defer></script>
+    <style>
+        /* Ajustes para que el index ocupe todo el ancho en PC */
+        .home .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 20px !important;
+            margin: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .home .intro {
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 40px 0 !important;
+            box-sizing: border-box;
+        }
+
+        /* Asegurar que los párrafos no se estiren demasiado para legibilidad */
+        .home .intro p {
+            max-width: 1200px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+    </style>
 </head>
-<body>
+<body class="home">
 
 <header class="header">
     <h1>🎮 LC-ADVANCE</h1>
+    <button class="hamburger" type="button" aria-label="Menu">☰</button>
     <nav>
         <?php if ($usuario_logueado): ?>
             <button class="btn btn-dashboard" onclick="window.location='mapa/index.html'">Panel de Control</button>

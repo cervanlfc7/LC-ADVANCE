@@ -164,22 +164,44 @@ INSERT INTO `dilogoscombate` (`IDPersonajeC`, `IDDialogoC`, `TipodialogoC`, `Dia
 ('1Cu', '3', 'Pregunta', 'Híjole, compadre… pues ojalá lo encuentres, porque esos animalitos luego son más listos que los alumnos, ¡ja! Pero bueno, ni modo, la vida sigue. Y hablando de cosas importantes… ¿ya te chutaste el examen que te dejé? Porque ese sí no se va a escapar como el cochino, ¿eh?'),
 ('1Cu', '4', 'Pregunta', 'Falta poco compadre'),
 ('1Cu', '5', 'Final', 'Ya acabaste? eso es todo compadre'),
-('1He', '1', 'Continuo', '¿Como? ¿El puerquito que traían? no ni idea ni sabia de el'),
-('1He', '2', 'Pregunta', 'Pero acuérdense que tienen que hacer mi examen'),
-('1He', '3', 'Pregunta', 'Ya casi terminas'),
-('1He', '4', 'Final', '¿Ya acabaste?! Eso es todo ¡'),
-('1Me', '1', 'Continuo', 'Qué onda compadrito! ¿Cómo anda?'),
-('1Me', '2', 'Pregunta', 'Hoy toca examen así que póngase las pilas '),
-('1Me', '3', 'Pregunta', 'Tú puedes compadrito échale ganas'),
-('1Me', '4', 'Final', '¡Eso es todo! '),
-('1Go', '1', 'Continuo', '¡¿Que tal cómo andamos?!'),
-('1Go', '2', 'Pregunta', '¿Hoy es examen? vámonos al salón'),
-('1Go', '3', 'Pregunta', 'Ya casi acabas tú puedes'),
-('1Go', '4', 'Final', 'Hasta luego, Go home!!'),
-('1Pa', '1', 'Continuo', '¡¿Qué onda joven como esta?!'),
+('1Es', '1', 'Continuo', 'Bienvenido estudiante, hoy practicaremos cálculo diferencial'),
+('1Es', '2', 'Continuo', 'Las derivadas son fundamentales en matemáticas avanzadas'),
+('1Es', '3', 'Pregunta', 'Ahora resolvamos unos problemas de derivadas'),
+('1Es', '4', 'Pregunta', 'Vas bien, continúa'),
+('1Es', '5', 'Final', 'Excelente trabajo, has dominado las derivadas correctamente'),
+('1Le', '1', 'Continuo', 'Hola compadre, hoy exploraremos los números primos'),
+('1Le', '2', 'Continuo', 'La teoría de números es fascinante y desafiante'),
+('1Le', '3', 'Pregunta', '¿Estás listo para resolver estos problemas?'),
+('1Le', '4', 'Pregunta', 'Muy bien, casi terminas'),
+('1Le', '5', 'Final', 'Bravo, demostraste entender bien la teoría de números'),
+('1He', '1', 'Continuo', 'Hola estudiante, ¿listos para física y química?'),
+('1He', '2', 'Pregunta', 'Recuerden que deben dominar estos conceptos fundamentales'),
+('1He', '3', 'Pregunta', 'Ya casi terminas, vamos bien'),
+('1He', '4', 'Final', 'Excelente desempeño en ciencias exactas'),
+('1Ca', '1', 'Continuo', 'Bienvenido a la clase de biología'),
+('1Ca', '2', 'Pregunta', 'La ecología es vital para entender nuestro planeta'),
+('1Ca', '3', 'Pregunta', 'Sigue adelante, te va muy bien'),
+('1Ca', '4', 'Final', 'Perfecto, comprendes bien los conceptos biológicos'),
+('1Go', '1', 'Continuo', 'How are you today?'),
+('1Go', '2', 'Pregunta', 'Ready for English practice?'),
+('1Go', '3', 'Pregunta', 'Keep going, you are doing great'),
+('1Go', '4', 'Final', 'Congratulations, excellent English level'),
+('1Ma', '1', 'Continuo', 'Hola, bienvenido a programación'),
+('1Ma', '2', 'Pregunta', 'Aprenderemos algoritmos y estructuras de datos'),
+('1Ma', '3', 'Pregunta', 'Excelente, sigue así'),
+('1Ma', '4', 'Final', 'Perfecto, dominas la programación'),
+('1Me', '1', 'Continuo', 'Hola estudiante, hoy practicaremos SQL'),
+('1Me', '2', 'Pregunta', 'Las bases de datos son esenciales en informática'),
+('1Me', '3', 'Pregunta', 'Casi terminas, vamos bien'),
+('1Me', '4', 'Final', 'Excelente, dominas SQL correctamente'),
+('1Pa', '1', 'Continuo', '¡Qué onda joven como esta!'),
 ('1Pa', '2', 'Pregunta', 'Vamos al salón que les toca examen'),
 ('1Pa', '3', 'Pregunta', 'Ándele ya casi acaba'),
-('1Pa', '4', 'Final', '¡Hasta luego joven!');
+('1Pa', '4', 'Final', '¡Hasta luego joven!'),
+('1Ar', '1', 'Continuo', 'Hola estudiante, hoy hablaremos de la historia de México'),
+('1Ar', '2', 'Pregunta', 'Estamos en un momento crucial de nuestro pasado'),
+('1Ar', '3', 'Pregunta', 'Vas muy bien, continuemos'),
+('1Ar', '4', 'Final', 'Excelente, has demostrado conocer nuestra historia');
 
 --
 -- Estructura de tabla para la tabla `idsmaestros`
@@ -337,6 +359,35 @@ INSERT INTO `preguntas` (`IDPregunta`, `IDPersonajeC`, `Pregunta`, `TipoPregunta
 (108, '1Ar', 'El asesinato de Francisco I. Madero ocurrió en:', 'Continua', 'A) La Decena Trágica', 'B) El Plan de San Luis', 'C) La Batalla de Celaya', 1),
 (109, '1Ar', 'El Tratado de Guadalupe Hidalgo fue en:', 'Continua', 'A) 1821', 'B) 1848', 'C) 1917', 2),
 (110, '1Ar', '¿Quién gritó el Grito de Dolores en 1810?', 'Dialogo', 'A) Morelos', 'B) Miguel Hidalgo', 'C) Iturbide', 2);
+
+-- Primero, completar idsmaestros con maestros faltantes
+INSERT IGNORE INTO `idsmaestros` (`PersonajeC`, `IDPersonajeC`) VALUES
+('Espindola', '1Es'),
+('Miguel Márquez', '1Le'),
+('Armando', '1Ar');
+
+-- Ahora agregar diálogos faltantes para maestros incompletos
+
+-- Para 1Es (Espindola) - Derivadas/Matemáticas
+INSERT INTO `dilogoscombate` (`IDPersonajeC`, `IDDialogoC`, `TipodialogoC`, `DialogoC`) VALUES
+('1Es', '5', 'Final', 'Muy bien, eso fue excelente. Recuerda siempre practicar tus derivadas.');
+
+-- Para 1Le (Miguel Márquez) - Teoría de Números
+INSERT INTO `dilogoscombate` (`IDPersonajeC`, `IDDialogoC`, `TipodialogoC`, `DialogoC`) VALUES
+('1Le', '1', 'Continuo', 'Hola compadre, ¿listos para explorar los números primos?'),
+('1Le', '2', 'Pregunta', '¿Vamos a resolver algunos problemas de teoría de números?'),
+('1Le', '3', 'Pregunta', 'Excelente, sigamos adelante'),
+('1Le', '4', 'Final', 'Bravo, demostraste entender bien la teoría de números.');
+
+-- Para 1Ar (Armando) - Historia de México
+INSERT INTO `dilogoscombate` (`IDPersonajeC`, `IDDialogoC`, `TipodialogoC`, `DialogoC`) VALUES
+('1Ar', '1', 'Continuo', '¡Hola estudiante! Hoy hablaremos de la historia de México'),
+('1Ar', '2', 'Pregunta', '¿Estás listo para aprender sobre nuestro pasado?'),
+('1Ar', '3', 'Pregunta', 'Vas muy bien, continuemos'),
+('1Ar', '4', 'Final', 'Excelente, has demostrado conocer nuestra historia.');
+
+-- Corregir tipo de diálogo en preguntas (cambiar "Dialogo" a "Continua")
+UPDATE `preguntas` SET `TipoPreguntaC` = 'Continua' WHERE `TipoPreguntaC` = 'Dialogo';
 
 -- Indices and final ALTER and COMMIT
 

@@ -4,6 +4,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <meta charset="UTF-8" />
   <title>LC-ADVANCE.GAME</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape" />
   <style>
     html, body {
       margin: 0;
@@ -70,6 +71,31 @@
 }
 
 
+    /* ORIENTACIÓN HORIZONTAL OBLIGATORIA */
+    @media screen and (orientation: portrait) {
+      body::before {
+        content: "🔄 POR FAVOR, GIRA TU DISPOSITIVO PARA JUGAR (MODO HORIZONTAL)";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        color: #0cc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+        text-align: center;
+        padding: 20px;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 16px;
+        border: 4px solid #f0f;
+      }
+      #game, #mobileControls, #pauseMenu, #mensajeE {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -101,7 +127,7 @@
     padding: 10px 15px;           /* espacio interno */
     border-radius: 6px;           /* esquinas redondeadas */
     font-family: 'Press Start 2P', monospace; /* estilo retro 8-bit */
-    font-size: 12px;
+    font-size: 18px;
     z-index: 9999;                /* se superpone a todo */
     pointer-events: none;         /* evitar clicks por defecto */
   }
@@ -125,11 +151,343 @@
     padding:6px 8px;
     border-radius:6px;
     font-family: 'Press Start 2P', monospace;
-    font-size: 11px;
+    font-size: 13px;
   }
-  .prompt-text { font-size: 14px; }
+  .prompt-text { font-size: 18px; }
+  
+  /* Controles móviles */
+  .mobile-controls {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 16px;
+    gap: 24px;
+    z-index: 10000;
+    pointer-events: auto;
+    width: 100%;
+  }
+  .mobile-controls .dpad {
+    display: grid;
+    grid-template-columns: 48px 48px 48px;
+    grid-template-rows: 48px 48px 48px;
+    gap: 8px;
+  }
+  .mobile-controls .dpad .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.6);
+    color: #0cc;
+    border: 2px solid #0cc;
+    border-radius: 10px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    box-shadow: 0 0 10px rgba(0,204,204,0.6);
+    user-select: none;
+    touch-action: none;
+  }
+  .mobile-controls .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mobile-controls .actions .btn {
+    min-width: 100px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.7);
+    color: #ff0;
+    border: 2px solid #ff0;
+    border-radius: 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    box-shadow: 0 0 10px rgba(255,255,0,0.4);
+    user-select: none;
+    touch-action: none;
+  }
+  @media (min-width: 1025px) {
+    .mobile-controls { display: none; }
+  }
+
+  /* Ajustes para orientación vertical (portrait): botones más grandes */
+  @media (orientation: portrait) {
+    .mobile-controls .dpad {
+      grid-template-columns: 64px 64px 64px;
+      grid-template-rows: 64px 64px 64px;
+      gap: 10px;
+    }
+    .mobile-controls .dpad .btn { font-size: 20px; border-width: 3px; }
+    .mobile-controls .actions .btn { min-width: 120px; font-size: 16px; padding: 14px 16px; }
+    #mensajeE { font-size: 20px; }
+    .prompt-text { font-size: 20px; }
+  }
+
+  html, body {
+      margin: 0;
+      background: #000;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    
+    canvas#game {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+      image-rendering: pixelated;
+      border: 2px solid #fff;
+      background: #838383;
+      display: block;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    #pauseMenu {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #111;
+      color: #0cc;
+      padding: 20px;
+      border: 3px solid #0cc;
+      text-align: center;
+      z-index: 1000;
+      font-family: 'Press Start 2P', monospace;
+      box-shadow: 0 0 10px #0cc;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow: auto;
+    }
+
+    #pauseMenu h2 {
+      margin: 0 0 15px 0;
+      font-size: clamp(16px, 4vw, 24px);
+      text-shadow: 0 0 3px #0cc;
+    }
+
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .menu-buttons button {
+      padding: 10px 15px;
+      background: #222;
+      color: #f0f;
+      border: 2px solid #f0f;
+      cursor: pointer;
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(10px, 2vw, 14px);
+      text-shadow: 0 0 3px #f0f;
+      box-shadow: 0 0 8px #f0f;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .menu-buttons button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px #ff0;
+      color: #ff0;
+      border-color: #ff0;
+      text-shadow: 0 0 4px #ff0;
+    }
+
+    #mensajeE {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(10px, 1.5vw, 14px);
+      z-index: 9999;
+      pointer-events: none;
+      max-width: 200px;
+      word-wrap: break-word;
+    }
+
+    .interaction-prompt {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(9px, 1.2vw, 12px);
+      border: 1px solid #0cc;
+      box-shadow: 0 0 8px rgba(0, 204, 204, 0.4);
+    }
+
+    .prompt-key {
+      background: #00ffff;
+      color: #000;
+      font-weight: 700;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: clamp(8px, 1vw, 10px);
+    }
+
+    .prompt-text {
+      font-size: clamp(9px, 1.2vw, 12px);
+    }
+
+    /* ===== CONTROLES MÓVILES ===== */
+    .mobile-controls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 12px;
+      gap: 16px;
+      z-index: 10000;
+      pointer-events: auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .mobile-controls .dpad {
+      display: grid;
+      grid-template-columns: 36px 36px 36px;
+      grid-template-rows: 36px 36px 36px;
+      gap: 6px;
+    }
+
+    .mobile-controls .dpad .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      color: #0cc;
+      border: 2px solid #0cc;
+      border-radius: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      box-shadow: 0 0 10px rgba(0, 204, 204, 0.6);
+      user-select: none;
+      touch-action: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 0;
+      min-width: 36px;
+      min-height: 36px;
+    }
+
+    .mobile-controls .dpad .btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 5px rgba(0, 204, 204, 0.8);
+    }
+
+    .mobile-controls .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mobile-controls .actions .btn {
+      min-width: 80px;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #ff0;
+      border: 2px solid #ff0;
+      border-radius: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(9px, 1vw, 11px);
+      box-shadow: 0 0 8px rgba(255, 255, 0, 0.4);
+      user-select: none;
+      touch-action: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mobile-controls .actions .btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 12px rgba(255, 255, 0, 0.6);
+    }
+
+    /* Ocultar en desktop */
+    @media (min-width: 1025px) {
+      .mobile-controls {
+        display: none;
+      }
+    }
+
+    /* Landscape específico */
+    @media (orientation: landscape) {
+      .mobile-controls .dpad {
+        grid-template-columns: 32px 32px 32px;
+        grid-template-rows: 32px 32px 32px;
+        gap: 5px;
+      }
+
+      .mobile-controls .dpad .btn {
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 10px;
+      }
+
+      .mobile-controls .actions .btn {
+        min-width: 70px;
+        padding: 6px 8px;
+        font-size: 8px;
+      }
+    }
+
+    /* Portrait */
+    @media (orientation: portrait) {
+      .mobile-controls .dpad {
+        grid-template-columns: 48px 48px 48px;
+        grid-template-rows: 48px 48px 48px;
+        gap: 8px;
+      }
+
+      .mobile-controls .dpad .btn {
+        min-width: 48px;
+        min-height: 48px;
+        font-size: 16px;
+        border-width: 2px;
+      }
+
+      .mobile-controls .actions .btn {
+        min-width: 100px;
+        padding: 10px 12px;
+        font-size: 10px;
+      }
+    }
 </style>
   <canvas id="game" width="512" height="512"></canvas>
+  <!-- Controles móviles -->
+  <div class="mobile-controls" id="mobileControls">
+    <div class="dpad">
+      <div></div>
+      <button class="btn" id="btnUp" aria-label="Arriba">▲</button>
+      <div></div>
+      <button class="btn" id="btnLeft" aria-label="Izquierda">◀</button>
+      <div></div>
+      <button class="btn" id="btnRight" aria-label="Derecha">▶</button>
+      <div></div>
+      <button class="btn" id="btnDown" aria-label="Abajo">▼</button>
+      <div></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="btnInteract" aria-label="Hablar">HABLAR</button>
+      <button class="btn" id="btnPause" aria-label="Pausa">PAUSA</button>
+    </div>
+  </div>
 
   <script type="module">
 // Única zona de estado global
@@ -148,6 +506,36 @@ const world = {
 const KEYS = new Set();
 window.addEventListener("keydown", (e) => KEYS.add(e.key.toLowerCase()));
 window.addEventListener("keyup", (e) => KEYS.delete(e.key.toLowerCase()));
+
+// Controles móviles: mapear a KEYS
+function bindTouchButton(el, keyDown, keyUp, pulse=false) {
+  if (!el) return;
+  const addKey = () => { KEYS.add(keyDown); if (pulse) setTimeout(()=>KEYS.delete(keyDown), 120); };
+  const removeKey = () => { KEYS.delete(keyDown); if (keyUp) KEYS.delete(keyUp); };
+  const onStart = (ev) => { ev.preventDefault(); addKey(); };
+  const onEnd = (ev) => { ev.preventDefault(); removeKey(); };
+  el.addEventListener('touchstart', onStart, { passive: false });
+  el.addEventListener('touchend', onEnd, { passive: false });
+  el.addEventListener('mousedown', onStart);
+  el.addEventListener('mouseup', onEnd);
+  el.addEventListener('mouseleave', onEnd);
+}
+
+// Inicializar controles móviles
+(() => {
+  const up = document.getElementById('btnUp');
+  const down = document.getElementById('btnDown');
+  const left = document.getElementById('btnLeft');
+  const right = document.getElementById('btnRight');
+  const interact = document.getElementById('btnInteract');
+  const pause = document.getElementById('btnPause');
+  bindTouchButton(up, 'arrowup');
+  bindTouchButton(down, 'arrowdown');
+  bindTouchButton(left, 'arrowleft');
+  bindTouchButton(right, 'arrowright');
+  bindTouchButton(interact, 'e', null, true);
+  bindTouchButton(pause, 'escape', null, true);
+})();
 
 // Utilidades básicas de colisión
 function intersectsRect(a, b) {

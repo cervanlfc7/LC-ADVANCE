@@ -174,10 +174,11 @@ if (empty($_SESSION['usuario_es_invitado'])) {
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="dashboard">
 
 <header class="header">
     <h1>LC-ADVANCE <span style="color: #00ff00;">// ACCESS: ONLINE</span></h1>
+    <button class="hamburger" type="button" aria-label="Menu">☰</button>
     <?php
         $ranking_href = 'ranking.php';
         if (!empty($filter_materia)) $ranking_href .= '?materia=' . urlencode($filter_materia);
@@ -311,6 +312,25 @@ if (empty($_SESSION['usuario_es_invitado'])) {
   const PROFESOR_MAP = <?php echo json_encode($profesor_materia_map ?? [], JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>;
 
   (function(){
+    // Hamburger Menu Logic
+    const hamburger = document.querySelector('.hamburger');
+    const nav = document.querySelector('header nav');
+    
+    if (hamburger && nav) {
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('active');
+            hamburger.textContent = nav.classList.contains('active') ? '✖' : '☰';
+        });
+
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !nav.contains(e.target) && nav.classList.contains('active')) {
+                nav.classList.remove('active');
+                hamburger.textContent = '☰';
+            }
+        });
+    }
+
     function openModal(){ document.getElementById('lessons-modal').classList.add('open'); document.getElementById('lessons-modal').setAttribute('aria-hidden','false'); document.getElementById('lessons-search').focus(); }
     function closeModal(){ document.getElementById('lessons-modal').classList.remove('open'); document.getElementById('lessons-modal').setAttribute('aria-hidden','true'); }
     document.getElementById('goToLessonsBtn')?.addEventListener('click', function(e){ e.preventDefault(); openModal(); });
@@ -459,19 +479,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // ===== SCROLL TO TOP BUTTON =====
     const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-    window.onscroll = function() {
-        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-            scrollToTopBtn.style.display = "block";
-        } else {
-            scrollToTopBtn.style.display = "none";
-        }
-    };
-    
-    if (scrollToTopBtn) {
-        scrollToTopBtn.onclick = function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
+    function toggleScrollBtn(){
+        const scrolledAmount = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        const scrolled = scrolledAmount > 300;
+        scrollToTopBtn.style.display = scrolled ? 'flex' : 'none';
     }
+    window.addEventListener('scroll', toggleScrollBtn, { passive: true });
+    toggleScrollBtn();
+    scrollToTopBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
     // ===== HIGHLIGHT MATERIA AL CARGAR =====
     <?php if (!empty($highlight_materia) || $filter_materia): ?>
@@ -489,24 +504,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== SCROLL REVEAL ANIMATIONS =====
     (function() {
-        const elementsToAnimate = document.querySelectorAll('.leccion-item, .materia-group');
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
+        const els = Array.from(document.querySelectorAll('.leccion-item, .materia-group'));
+        if (!els.length) return;
+        const reveal = el => el.classList.add('visible');
+        const pending = new Set(els.filter(el => !el.classList.contains('visible')));
+        const io = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting && pending.has(e.target)) {
+                    reveal(e.target);
+                    io.unobserve(e.target);
+                    pending.delete(e.target);
                 }
             });
-        }, observerOptions);
-        
-        elementsToAnimate.forEach(element => {
-            observer.observe(element);
-        });
+        }, { threshold: [0, 0.1, 0.25], rootMargin: '0px 0px -10% 0px' }) : null;
+        if (io) pending.forEach(el => io.observe(el));
+        let ticking = false;
+        const check = () => {
+            ticking = false;
+            const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+            const margin = Math.max(40, vh * 0.1);
+            pending.forEach(el => {
+                const r = el.getBoundingClientRect();
+                if (r.top < vh - margin && r.bottom > margin) {
+                    reveal(el);
+                    if (io) io.unobserve(el);
+                    pending.delete(el);
+                }
+            });
+        };
+        const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(check); } };
+        ['scroll','touchmove','resize','orientationchange'].forEach(ev => window.addEventListener(ev, onScroll, { passive: true }));
+        setTimeout(check, 0);
+        setTimeout(check, 300);
     })();
 
     // ===== FILTRADO POR MATERIA O PROFESOR =====

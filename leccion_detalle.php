@@ -69,7 +69,9 @@ if (!empty($_GET['profesor'])) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title><?php echo htmlspecialchars($leccion['titulo']); ?> | LC-ADVANCE</title>
     
     <!-- Fuentes cyberpunk -->
@@ -89,6 +91,47 @@ if (!empty($_GET['profesor'])) {
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- Css para el contenido -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* LECCIONES FULL WIDTH */
+        .lesson-main.full-width {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 1 1 100% !important;
+            padding: 0 var(--space-md) !important;
+            margin: 0 !important;
+        }
+
+        .main-content {
+            padding: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* ORIENTACIÓN HORIZONTAL OBLIGATORIA */
+        @media screen and (orientation: portrait) {
+            body::before {
+                content: "🔄 POR FAVOR, GIRA TU DISPOSITIVO PARA UNA MEJOR EXPERIENCIA (MODO HORIZONTAL)";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #000;
+                color: #0ff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 99999;
+                text-align: center;
+                padding: 2rem;
+                font-family: 'Orbitron', sans-serif;
+                font-size: 1.5rem;
+                border: 4px solid #f0f;
+            }
+            .page-wrapper {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 <body class="<?php echo ($slug === 'contaminacion-ambiental') ? 'page-lesson-contaminacion' : ''; ?>">
 
@@ -98,6 +141,7 @@ if (!empty($_GET['profesor'])) {
         <div class="header-title">
             <h1>LC-ADVANCE <span class="access">ACCESS: ONLINE</span></h1>
         </div>
+        <button class="hamburger" type="button" aria-label="Menu">☰</button>
         <nav class="header-nav">
             <a href="dashboard.php<?php echo $return_params; ?>" class="btn btn-nav">⬅️ Dashboard</a>
             <a href="ranking.php" class="btn btn-nav">🏆 Ranking</a>
@@ -106,17 +150,13 @@ if (!empty($_GET['profesor'])) {
     </header>
 
     <main class="main-content">
-        <div class="lesson-layout">
-
             <!-- Contenido principal (siempre visible) -->
-            <section class="lesson-main">
+            <section class="lesson-main full-width">
                 <h2 class="module-title">MÓDULO DE APRENDIZAJE</h2>
 
                 <div class="tabs">
-                    <button class="tab-btn active" data-tab="content">📚 Contenido</button>
-                    <button class="tab-btn" data-tab="quiz">
-                        <?php echo $completed ? '✅ Repetir Quiz' : '🧠 Iniciar Quiz'; ?>
-                    </button>
+                    <button class="tab-btn active" data-tab="content">📚 CONTENIDO</button>
+                    <button class="tab-btn" data-tab="quiz">🧠 <?php echo $completed ? 'REPETIR QUIZ' : 'INICIAR QUIZ'; ?></button>
                 </div>
 
                 <div id="content-panel" class="panel">
@@ -136,42 +176,14 @@ if (!empty($_GET['profesor'])) {
                     </div>
 
                     <div class="lesson-actions">
-                        <button class="btn btn-primary btn-small open-quiz-btn">🧠 Ir al Quiz</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Sidebar -->
-            <aside class="lesson-sidebar">
-                <div class="sidebar-card">
-                    <div class="info-item">
-                        <span class="label">Materia</span>
-                        <span class="value"><?php echo htmlspecialchars($leccion['materia']); ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Puntuación</span>
-                        <span class="value"><?php echo $old_score; ?> / <?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?></span>
-                    </div>
-                    <div class="info-item progress-item">
-                        <span class="label">Progreso</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: <?php echo $progress_percent; ?>%;"></div>
-                        </div>
-                        <span class="percent"><?php echo $progress_percent; ?>%</span>
-                    </div>
-
-                    <div class="sidebar-actions">
-                        <button class="btn btn-primary btn-small open-quiz-btn">
-                            <?php echo $completed ? '✅ Repetir Quiz' : '🧠 Iniciar Quiz'; ?>
-                        </button>
+                        <button class="btn btn-primary btn-small open-quiz-btn">🧠 INICIAR QUIZ</button>
                         <a href="dashboard.php<?php echo $return_params; ?>#leccion-<?php echo htmlspecialchars($slug); ?>"
                            class="btn btn-secondary btn-small back-dashboard-btn">
-                            ← Volver al Dashboard
+                           ↩️ VOLVER AL DASHBOARD
                         </a>
                     </div>
                 </div>
-            </aside>
-        </div>
+            </section>
     </main>
 
     <!-- MODAL QUIZ (separado del contenido principal) -->
@@ -201,6 +213,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabContent = document.querySelector('.tab-btn[data-tab="content"]');
     const scrollTopBtn = document.getElementById('scroll-top');
     const backBtn = document.querySelector('.back-dashboard-btn');
+    const hamburger = document.querySelector('.hamburger');
+    const headerNav = document.querySelector('.header-nav');
+
+    // Hamburger Menu Logic
+    if (hamburger && headerNav) {
+        hamburger.addEventListener('click', () => {
+            headerNav.classList.toggle('active');
+            hamburger.textContent = headerNav.classList.contains('active') ? '✖' : '☰';
+        });
+
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !headerNav.contains(e.target) && headerNav.classList.contains('active')) {
+                headerNav.classList.remove('active');
+                hamburger.textContent = '☰';
+            }
+        });
+    }
 
     const quizData = <?php echo json_encode($quiz_selected); ?>;
 
@@ -424,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+<script src="assets/js/app.js"></script>
 
 </body>
 </html>

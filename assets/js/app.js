@@ -265,6 +265,38 @@ document.addEventListener('DOMContentLoaded', function(){
     setInterval(fetchAndUpdateDashboard, 15000);
 });
 
+document.addEventListener('DOMContentLoaded', function(){
+    try {
+        const hdr = document.querySelector('.header');
+        if (hdr) {
+            let btn = hdr.querySelector('.hamburger');
+            const nav = hdr.querySelector('nav');
+            if (!btn) {
+                btn = document.createElement('button');
+                btn.className = 'hamburger';
+                btn.type = 'button';
+                btn.setAttribute('aria-label', 'Menu');
+                btn.textContent = '☰';
+                hdr.insertBefore(btn, nav);
+            }
+            btn.addEventListener('click', function(){ hdr.classList.toggle('nav-open'); });
+        }
+        const mh = document.querySelector('.main-header');
+        if (mh) {
+            let btn2 = mh.querySelector('.hamburger');
+            const nav2 = mh.querySelector('.header-nav');
+            if (!btn2) {
+                btn2 = document.createElement('button');
+                btn2.className = 'hamburger';
+                btn2.type = 'button';
+                btn2.setAttribute('aria-label', 'Menu');
+                btn2.textContent = '☰';
+                mh.insertBefore(btn2, nav2);
+            }
+            btn2.addEventListener('click', function(){ mh.classList.toggle('nav-open'); });
+        }
+    } catch(e){}
+});
 // ========================================
 // TOP 10 RANKING - Actualizar dashboard
 // ========================================
