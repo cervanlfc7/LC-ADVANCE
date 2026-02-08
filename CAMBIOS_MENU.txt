@@ -1,0 +1,35 @@
+
+CAMBIOS REALIZADOS EN LA NAVEGACION DEL MENU
+=============================================
+
+1. REDUCCION DE TAMAÑO DE BOTONES
+   - Padding reducido: de 12px 20px a 4px 8px  
+   - Font-size reducido: de 0.8rem a 0.6rem
+   - Los botones ahora son mucho mas compactos
+
+2. ESTILO DE APLICACION
+   - Botones Dashboard: Color neon verde (#66ff66)
+   - Botones Logout: Color neon amarillo (#ffff00)
+   - Fuente: Press Start 2P (consistente con la app)
+   - Bordes: 1px solid con colores neon
+
+3. EFECTOS DE HOVER
+   - Cambio de fondo al pasar el mouse
+   - Efecto glow (box-shadow) que brilla
+   - Transiciones suaves (0.2s)
+
+4. ESPECIFICACIONES TECNICAS
+   - Archivo modificado: assets/css/style.css
+   - Nuevas reglas CSS agregadas para:
+     * nav a.btn-dashboard
+     * nav a.btn-dashboard:hover
+     * nav a.btn-logout
+     * nav a.btn-logout:hover
+   
+RESULTADO FINAL
+================
+Los botones del menu hamburguesa ahora tienen:
+- Un tamaño significativamente reducido
+- Consistencia con el tema neon de la aplicacion
+- Mejor proporcion en la interfaz
+- Efectos visuales atractivos al interactuar

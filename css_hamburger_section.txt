@@ -1,0 +1,50 @@
+ap: 10px;
+    align-items: center;
+}
+
+/* Hamburger menu - compacto y táctil para móviles */
+.header .hamburger, .main-header .hamburger {
+    display: none;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1.5px solid var(--neon-yellow);
+    color: var(--neon-yellow);
+    font-size: 18px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    transition: background 0.2s, transform 0.15s;
+}
+.header .hamburger:active, .main-header .hamburger:active {
+    transform: scale(0.95);
+    background: rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 480px) {
+    .header .hamburger, .main-header .hamburger {
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 16px;
+        padding: 3px 6px;
+        border-radius: 5px;
+    }
+}
+
+@media (max-width: 992px) {
+    .header .hamburger, .main-header .hamburger {
+        display: block;
+    }
+
+    .header nav, .main-header .header-nav {
+        position: fixed;
+        top: 68px; /* header-height + border */
+        left: -100%;
+        width: 280px;
+        height: calc(100vh - 68px);
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 30px 20px;
+        gap: 15px;

@@ -1,0 +1,42 @@
+Found: <nav
+
+ type="button" aria-label="Menu">☰</button>
+    <?php
+        $ranking_href = 'ranking.php';
+        if (!empty($filter_materia)) $ranking_href .= '?materia=' . urlencode($filter_materia);
+    ?>
+    <nav>
+        <a href="index.php" class="btn btn-dashboard">🏠 Inicio</a>
+        <a href="mapa/index.html" class="btn btn-dashboard">🎮 Ir al Mapa</a>
+        <a href="<?php echo $ranking_href; ?>" class="btn btn-dashboard">🏆 Ranking</a>
+        <a href="#" id="goToLessonsBtn" class="btn btn-dashboard">📚 Ir a Lección</a>
+        <a href="logout.php" class="btn btn-logout">🚪 SALIR</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="dashboard-container">
+    
+        <h1 class="auth-title">💻 PANEL DE JUGADOR</h1>
+        
+        <div class="ranking-floating" id="ranking-floating">
+            <h3>🔝 TOP 10</h3>
+            <div class="ranking-scroll-area">
+                <table class="ranking-table">
+                    <thead>
+                        <tr><th>#</th><th>JUGADOR</th><th>PUNTOS</th></tr>
+                    </thead>
+                    <tbody id="ranking-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="profile-summary"> 
+            <h2 class="profile-name">¡Bienvenido, <span class="username-glow"><?php echo htmlspecialchars($usuario['nombre_usuario']); ?></span>!</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card level-card">
+                    <h4>NIVEL ACTUAL</h4>
+                    <span class="big-stat user-nivel" id="nivel-actual"><?php echo $usuario['nivel']; ?></span>
+                </div>
+                <div class="stat-card points-card">
+             

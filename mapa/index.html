@@ -92,7 +92,7 @@
         font-size: 16px;
         border: 4px solid #f0f;
       }
-      #game, #mobileControls, #pauseMenu, #mensajeE {
+      #game, #mobileControls, #pauseMenu, #mensajeE, .btn-esc-mobile {
         display: none !important;
       }
     }
@@ -116,6 +116,11 @@
 </div>
 <!-- Cuadro fijo en la esquina superior derecha -->
 <div id="mensajeE"></div>
+  <!-- Botón ESC/Menú para móviles (emula Escape: abre menú de pausa/salir) -->
+  <button type="button" id="btnEscMenu" class="btn-esc-mobile" aria-label="Abrir menú (igual que ESC)">
+    <span class="btn-esc-icon">⎋</span>
+    <span class="btn-esc-label">Menú</span>
+  </button>
 
 <style>
   #mensajeE {
@@ -208,6 +213,43 @@
   }
   @media (min-width: 1025px) {
     .mobile-controls { display: none; }
+    .btn-esc-mobile { display: none !important; }
+  }
+
+  /* Botón ESC/Menú solo en móviles: emula Escape para abrir menú de pausa/salir */
+  .btn-esc-mobile {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 9998;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #0cc;
+    border: 2px solid #0cc;
+    border-radius: 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0, 204, 204, 0.5);
+    pointer-events: auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    line-height: 1.2;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-esc-mobile:active {
+    transform: scale(0.95);
+    background: rgba(0, 204, 204, 0.2);
+  }
+  .btn-esc-mobile .btn-esc-icon { font-size: 14px; }
+  @media (max-width: 1024px) {
+    .btn-esc-mobile { display: flex; }
+  }
+  @media (orientation: portrait) {
+    .btn-esc-mobile { top: 14px; left: 14px; padding: 10px 14px; font-size: 11px; }
+    .btn-esc-mobile .btn-esc-icon { font-size: 16px; }
   }
 
   /* Ajustes para orientación vertical (portrait): botones más grandes */
@@ -535,6 +577,18 @@ function bindTouchButton(el, keyDown, keyUp, pulse=false) {
   bindTouchButton(right, 'arrowright');
   bindTouchButton(interact, 'e', null, true);
   bindTouchButton(pause, 'escape', null, true);
+
+  // Botón ESC/Menú en móviles: abre el menú de pausa (igual que tecla Escape)
+  const btnEscMenu = document.getElementById('btnEscMenu');
+  if (btnEscMenu) {
+    btnEscMenu.addEventListener('click', () => {
+      const pauseMenu = document.getElementById('pauseMenu');
+      if (pauseMenu) {
+        pauseMenu.style.display = (pauseMenu.style.display === 'block') ? 'none' : 'block';
+      }
+    });
+    btnEscMenu.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+  }
 })();
 
 // Utilidades básicas de colisión

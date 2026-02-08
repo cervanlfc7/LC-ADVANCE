@@ -1,0 +1,28 @@
+2997: .auth-form button.btn-full-width {
+9138: .menu-item button .block{display:block;font-size:13px;color:var(--accent-2);}
+9139: .menu-item .item-details { margin-left:auto; text-align:right; font-size:13px; color:#ddd; }
+9142: .menu-item button.active { background: linear-gradient(90deg,var(--accent-2),var(--accent-1)); color:#000; border-radius:8px; padding:6px 8px; }
+9273:   .menu-item { padding:10px; }
+12962:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+13211:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+13426:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+14050:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+14370:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+14943:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+15157:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+15391:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+15627:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+15830:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+16073:     .homeo-quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+16296:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+16509:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+16718:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+16931:     .quiz-question button { display: block; width: 100%; margin: 0.5rem 0; }
+17145:     .quiz-question button { display:block; width:100%; margin:.5rem 0; }
+17363:     .quiz-question button { display: block; width: 100%; margin: .3rem 0; font-size: .8rem; }
+17582:     .quiz-question button { display: block; width: 100%; margin: .2rem 0; font-size: .75rem; }
+17798:     .quiz-question button { display:block; width:100%; margin:.2rem 0; font-size:.75rem; }
+18014:     .quiz-question button { display:block; width:100%; margin:.2rem 0; font-size:.75rem; }
+100448:     .header nav { gap: 8px; width: 100%; }
+100490:     .header nav { display: none; flex-direction: column; gap: 8px; width: 100%; }
+100569:     .header nav .btn { font-size: 12px; }

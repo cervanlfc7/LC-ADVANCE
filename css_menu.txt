@@ -1,0 +1,33 @@
+radius: 12px;
+  --ease: cubic-bezier(.16,.8,.27,1);
+}
+
+/* ---------- MENU INTERACTIVO ---------- */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 14px;
+}
+.menu-item {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));
+  border: 2px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius);
+  padding: 12px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.menu-item button {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display:inline-block;
+  text-align:left;
+  padding:8px;
+  color: var(--accent-1);
+  transition: transform .12s ease, color .12s ease;
+}
+.menu-item button .block{display:block;font-size:13px;color:var(--accent-2);}
+.menu-item .item-details { margin-left:auto; text-align:right; fon

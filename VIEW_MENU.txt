@@ -1,0 +1,48 @@
+utton class="filter-btn" data-filter="sides">🍟 SIDES</button>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-grid" id="menuGrid">
+                            <!-- Items generados por JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- PEDIDO ACTUAL -->
+                    <div class="pedido-actual">
+                        <div class="pedido-header">
+                            <h3>🛒 YOUR ORDER</h3>
+                            <div class="pedido-stats">
+                                <span id="itemCount">0</span> items
+                            </div>
+                        </div>
+                        
+                        <div class="pedido-items" id="orderItems">
+                            <div class="empty-order">
+                                <p>Your order is empty</p>
+                                <p>Click items from the menu to add them</p>
+                            </div>
+                        </div>
+                        
+                        <div class="pedido-total">
+                            <div class="total-line">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">$0.00</span>
+                            </div>
+                            <div class="total-line">
+                                <span>Tax (10%):</span>
+                                <span id="tax">$0.00</span>
+                            </div>
+                            <div class="total-line total">
+                                <span>TOTAL:</span>
+                                <span id="totalAmount">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DIÁLOGO INTERACTIVO -->
+                <div class="dialogo-interactivo">
+                    <div class="dialogo-header">
+                        <h3>💬 CONVERSATION SIMULATOR</h3>
+                        <div class="voice-controls">
+                            <button class="btn-voice"

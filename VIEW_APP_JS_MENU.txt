@@ -1,0 +1,54 @@
+            const nav = hdr.querySelector('nav');
+            if (!btn) {
+                btn = document.createElement('button');
+                btn.className = 'hamburger';
+                btn.type = 'button';
+                btn.setAttribute('aria-label', 'Menu');
+                btn.textContent = '☰';
+                hdr.insertBefore(btn, nav);
+            }
+            btn.addEventListener('click', function(){ hdr.classList.toggle('nav-open'); });
+        }
+        const mh = document.querySelector('.main-header');
+        if (mh) {
+            let btn2 = mh.querySelector('.hamburger');
+            const nav2 = mh.querySelector('.header-nav');
+            if (!btn2) {
+                btn2 = document.createElement('button');
+                btn2.className = 'hamburger';
+                btn2.type = 'button';
+                btn2.setAttribute('aria-label', 'Menu');
+                btn2.textContent = '☰';
+                mh.insertBefore(btn2, nav2);
+            }
+            btn2.addEventListener('click', function(){ mh.classList.toggle('nav-open'); });
+        }
+    } catch(e){}
+});
+// ========================================
+// TOP 10 RANKING - Actualizar dashboard
+// ========================================
+function fetchAndUpdateDashboard() {
+    fetch('api/ranking.php', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => {
+        if (!res.ok) {
+            console.error('Response status:', res.status);
+            throw new Error('HTTP error ' + res.status);
+        }
+        return res.json();
+    })
+    .then(data => {
+        console.log('Datos recibidos del ranking:', data);
+        if (!data.ok) {
+            console.log('Error al obtener ranking:', data.error);
+            return;
+        }
+
+        // ===== ACTUALIZAR PUNTOS Y NIVEL =====
+        const puntosEl = document.getElementById('puntos-actuales');
+        const nivelEl = document.getElementById('nivel-actual');
+        const puntosProgressEl = document.getElementById('puntos-actuales-mini');
+        const puntosNecesariosEl = document.getElementById('puntos-necesarios');

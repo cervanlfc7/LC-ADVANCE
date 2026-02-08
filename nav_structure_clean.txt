@@ -1,0 +1,7 @@
+0: <nav>
+1:         <a href="index.php" class="btn btn-dashboard">🏠 Inicio</a>
+2:         <a href="mapa/index.html" class="btn btn-dashboard">🎮 Ir al Mapa</a>
+3:         <a href="<?php echo $ranking_href; ?>" class="btn btn-dashboard">🏆 Ranking</a>
+4:         <a href="#" id="goToLessonsBtn" class="btn btn-dashboard">📚 Ir a Lección</a>
+5:         <a href="logout.php" class="btn btn-logout">🚪 SALIR</a>
+6:     </nav>
