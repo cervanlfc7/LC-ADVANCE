@@ -23,6 +23,6 @@ $_SESSION['last_activity'] = time();
 // Guardar materia si se pasó por la URL
 if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
-// Redirigir al mapa (invitado)
-header('Location: mapa/index.html');
+// Redirige al mapa
+redirigir('mapa/index.php');
 exit;

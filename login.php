@@ -12,7 +12,7 @@ require_once 'config/csrf.php';
 
 // Si ya hay sesión activa, redirige al mapa en vez de dashboard
 if (isset($_SESSION['usuario_id'])) {
-    redirigir('mapa/index.html');
+    redirigir('mapa/index.php');
 }
 
 $mensaje = '';
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
             // Redirige directamente al mapa del juego
-            redirigir('mapa/index.html');
+            redirigir('mapa/index.php');
         } else {
             $mensaje = '❌ Usuario o contraseña incorrectos.';
         }
@@ -104,6 +104,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script src="assets/js/app.js"></script>
-
+<?php if (!empty($_GET['timeout']) || !empty($_GET['logout'])): ?>
+<script>
+    // Limpieza agresiva de posición del jugador en timeout/logout
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith("map.player_pos") || key === "map.player_pos")) {
+            localStorage.removeItem(key);
+            i--;
+        }
+    }
+</script>
+<?php endif; ?>
 </body>
 </html>

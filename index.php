@@ -62,7 +62,7 @@ $usuario_logueado = isset($_SESSION['usuario_id']);
     <button class="hamburger" type="button" aria-label="Menu">☰</button>
     <nav>
         <?php if ($usuario_logueado): ?>
-            <button class="btn btn-dashboard" onclick="window.location='mapa/index.html'">Panel de Control</button>
+            <button class="btn btn-dashboard" onclick="window.location='mapa/index.php'">Panel de Control</button>
             <button class="btn btn-logout" onclick="window.location='logout.php'">Cerrar Sesión</button>
         <?php else: ?>
             <button class="btn btn-login" onclick="window.location='login.php'">Iniciar Sesión</button>
@@ -118,7 +118,7 @@ $usuario_logueado = isset($_SESSION['usuario_id']);
         <section class="dashboard-preview">
             <h2>👋 ¡Hola, <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?>!</h2>
             <p>Tu progreso te espera. Continúa tu aventura.</p>
-            <button class="btn btn-dashboard" onclick="window.location='mapa/index.html'">Ir al Panel</button>
+            <button class="btn btn-dashboard" onclick="window.location='mapa/index.php'">Ir al Panel</button>
         </section>
     <?php endif; ?>
 

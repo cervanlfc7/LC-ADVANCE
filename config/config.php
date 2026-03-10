@@ -84,24 +84,40 @@ function redirigir($url) {
    SESIONES SEGURAS Y POLÍTICAS
    ================================ */
 
-define('SESSION_TIMEOUT', 3600); // 1 hora en segundos
+define('SESSION_TIMEOUT', 1800); // 30 minutos en segundos
 
 /**
  * Inicia sesión de forma consistente y aplica parámetros seguros a la cookie.
  */
 function iniciarSesionSegura() {
     if (session_status() === PHP_SESSION_NONE) {
-        $cookieParams = session_get_cookie_params();
-        // Uso de SameSite y flags seguros para cookie
+        // Establecer cookies de sesión que expiren al cerrar el navegador para mayor seguridad
         session_set_cookie_params([
-            'lifetime' => $cookieParams['lifetime'],
-            'path' => $cookieParams['path'],
-            'domain' => $cookieParams['domain'],
+            'lifetime' => 0,
+            'path' => '/',
+            'domain' => '',
             'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
             'httponly' => true,
             'samesite' => 'Lax'
         ]);
         session_start();
+    }
+    
+    // Verificación de Timeout Centralizada
+    if (isset($_SESSION['usuario_id']) && isset($_SESSION['last_activity'])) {
+        if ((time() - $_SESSION['last_activity']) > SESSION_TIMEOUT) {
+            cerrarSesionSegura();
+            redirigir((strpos($_SERVER['PHP_SELF'], 'mapa/') !== false ? '../' : '') . 'login.php?timeout=1');
+        }
+    }
+    $_SESSION['last_activity'] = time();
+
+    // Regenerar ID periódicamente para prevenir secuestro de sesión
+    if (!isset($_SESSION['created_at'])) {
+        $_SESSION['created_at'] = time();
+    } elseif (time() - $_SESSION['created_at'] > 1800) {
+        session_regenerate_id(true);
+        $_SESSION['created_at'] = time();
     }
 }
 
@@ -116,24 +132,6 @@ function requireLogin($allowGuest = true) {
     if (empty($_SESSION['usuario_id']) && (empty($_SESSION['usuario_es_invitado']) || !$allowGuest)) {
         redirigir('login.php');
     }
-
-    // Timeout por inactividad
-    if (isset($_SESSION['last_activity']) && (time() - (int)$_SESSION['last_activity']) > SESSION_TIMEOUT) {
-        // destruir sesión segura
-        $_SESSION = [];
-        if (ini_get('session.use_cookies')) {
-            $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000,
-                $params['path'], $params['domain'], $params['secure'] ?? false, $params['httponly'] ?? true
-            );
-        }
-        session_destroy();
-        // redirigir con un indicador opcional
-        redirigir('login.php?timeout=1');
-    }
-
-    // Actualizar último tiempo de actividad
-    $_SESSION['last_activity'] = time();
 }
 
 /**
