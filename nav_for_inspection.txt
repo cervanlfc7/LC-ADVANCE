@@ -1,7 +1,0 @@
-<nav>
-        <a href="index.php" class="btn btn-dashboard">🏠 Inicio</a>
-        <a href="mapa/index.html" class="btn btn-dashboard">🎮 Ir al Mapa</a>
-        <a href="<?php echo $ranking_href; ?>" class="btn btn-dashboard">🏆 Ranking</a>
-        <a href="#" id="goToLessonsBtn" class="btn btn-dashboard">📚 Ir a Lección</a>
-        <a href="logout.php" class="btn btn-logout">🚪 SALIR</a>
-    
