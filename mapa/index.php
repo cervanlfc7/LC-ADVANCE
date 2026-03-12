@@ -147,17 +147,72 @@ $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
       </div>
     </div>
  <script type="module">
+<<<<<<< Updated upstream
 
 // ===== LÓGICA DE IDENTIFICACIÓN Y MOVIMIENTO DE PROFESORES (ROBUSTA) =====
 const PROFESORES = { 130:"Miguel", 132:"Enrique", 135:"Espindola", 137:"Manuel", 138:"Meza", 140:"Herson", 141:"Carolina", 142:"Refugio & Padilla" };
+=======
+const P_KEY = "<?php echo $session_key; ?>";
+const NPC_KEY = "<?php echo $npc_key; ?>";
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d", { alpha: false });
+let ZOOM = 3;
+if (window.innerWidth < 900) {
+  ZOOM = 1.5;
+}
+
+const world = {
+  map: null, tilesets: [], cameraX: 0, cameraY: 0,
+  player: { x: 0, y: 0, speed: 130, sprite: null, dir: 'D' },
+  npcs: [], collisions: [], interactions: [],
+  carpaBBox: { x:0, y:0, w:0, h:0 },
+  lastTime: 0
+};
+
+const PROFESORES = { 
+  130: "Miguel Marquez", 
+  132: "Enrique", // Corregido: este es Enrique
+  135: "Espindola", 
+  137: "Manuel", 
+  138: "Enrique", // Solo uno como Enrique
+  140: "Herson", 
+  141: "Carolina", 
+  142: "Refugio & Padilla",
+  120: "Armando"
+};
+
+// Mapeo igual al de dashboard.php
+const PROFESOR_MATERIA_MAP = {
+  'Miguel Marquez': ['Temas Selectos de Matemáticas I y II'],
+  'Enrique': ['Programación'],
+  'Espindola': ['Pensamiento Matemático III'],
+  'Manuel': ['Programación'],
+  'Meza': ['Programación'],
+  'Herson': ['Física','Química'],
+  'Carolina': ['Ecosistemas'],
+  'Refugio & Padilla': ['Ciencias Sociales'],
+  'Armando': ['Historia']
+};
+
+const GID_PROF_MAP = {
+  3285: "Miguel Marquez", 3286: "Miguel Marquez", 3305: "Miguel Marquez", 3306: "Miguel Marquez",
+  3277: "Carolina", 3278: "Carolina", 3297: "Carolina", 3298: "Carolina",
+  3281: "Enrique", 3282: "Enrique", 3301: "Enrique", 3302: "Enrique", // Corregido: estos son Enrique
+    'Herson': ['Física I','Química I'],
+  3289: "Espindola", 3290: "Espindola", 3309: "Espindola", 3310: "Espindola",
+  3275: "Manuel", 3276: "Manuel", 3295: "Manuel", 3296: "Manuel",
+  3283: "Herson", 3284: "Herson", 3303: "Herson", 3304: "Herson",
+  3279: "Enrique", 3280: "Enrique", 3299: "Enrique", 3300: "Enrique", // Solo estos como Enrique
+  3291: "Refugio & Padilla", 3292: "Refugio & Padilla", 3311: "Refugio & Padilla", 3312: "Refugio & Padilla"
+};
+>>>>>>> Stashed changes
 
 function linesIntersect(p1, p2, p3, p4) {
-  const denom = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
-  if (denom === 0) return false;
-  const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / denom;
-  const u = ((p1.x - p3.x) * (p1.y - p2.y) - (p1.y - p3.y) * (p1.x - p2.x)) / denom;
-  return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+  const d = (p1.x-p2.x)*(p3.y-p4.y)-(p1.y-p2.y)*(p3.x-p4.x); if (d===0) return false;
+  const t = ((p1.x-p3.x)*(p3.y-p4.y)-(p1.y-p3.y)*(p3.x-p4.x))/d, u = ((p1.x-p3.x)*(p1.y-p2.y)-(p1.y-p3.y)*(p1.x-p2.x))/d;
+  return t>=0 && t<=1 && u>=0 && u<=1;
 }
+<<<<<<< Updated upstream
 
 function intersects(rect, obj) {
   if (obj.points) {
@@ -276,11 +331,141 @@ function raycast(ox, oy, angle, maxD) {
     const d = i * stepD;
     if (checkColNPC(ox + Math.cos(angle)*d, oy + Math.sin(angle)*d)) return d - stepD;
   }
-  return maxD;
+=======
+function intersectsRect(a, b) {
+  return !(a.x + a.width <= b.x ||
+           a.x >= b.x + b.width ||
+           a.y + a.height <= b.y ||
+           a.y >= b.y + b.height);
+}
+function pointInPolygon(x, y, points) {
+  if (!Array.isArray(points) || points.length === 0) return false;
+  let inside = false;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const xi = points[i].x, yi = points[i].y;
+    const xj = points[j].x, yj = points[j].y;
+    const intersect = ((yi > y) !== (yj > y)) &&
+      (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+function intersectsPolygon(rect, polyOrObj) {
+  const points = Array.isArray(polyOrObj) ? polyOrObj : (polyOrObj && polyOrObj.points) || polyOrObj && polyOrObj.polygon;
+  if (!Array.isArray(points) || points.length === 0) return false;
+  for (const p of points) {
+    if (p.x >= rect.x && p.x <= rect.x + rect.width && p.y >= rect.y && p.y <= rect.y + rect.height) {
+      return true;
+    }
+  }
+  const corners = [
+    { x: rect.x, y: rect.y },
+    { x: rect.x + rect.width, y: rect.y },
+    { x: rect.x, y: rect.y + rect.height },
+    { x: rect.x + rect.width, y: rect.y + rect.height }
+  ];
+  if (corners.some(c => pointInPolygon(c.x, c.y, points))) return true;
+  // Edges intersection
+  function segIntersect(a, b, c, d) {
+    function orient(a, b, c) { return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x); }
+    function onSegment(a, b, c) { return Math.min(a.x, b.x) <= c.x && c.x <= Math.max(a.x, b.x) && Math.min(a.y, b.y) <= c.y && c.y <= Math.max(a.y, b.y); }
+    const o1 = orient(a, b, c);
+    const o2 = orient(a, b, d);
+    const o3 = orient(c, d, a);
+    const o4 = orient(c, d, b);
+    if (o1 === 0 && onSegment(a, b, c)) return true;
+    if (o2 === 0 && onSegment(a, b, d)) return true;
+    if (o3 === 0 && onSegment(c, d, a)) return true;
+    if (o4 === 0 && onSegment(c, d, b)) return true;
+    return (o1 > 0) !== (o2 > 0) && (o3 > 0) !== (o4 > 0);
+  }
+  const rectEdges = [
+    [{ x: rect.x, y: rect.y }, { x: rect.x + rect.width, y: rect.y }],
+    [{ x: rect.x + rect.width, y: rect.y }, { x: rect.x + rect.width, y: rect.y + rect.height }],
+    [{ x: rect.x + rect.width, y: rect.y + rect.height }, { x: rect.x, y: rect.y + rect.height }],
+    [{ x: rect.x, y: rect.y + rect.height }, { x: rect.x, y: rect.y }]
+  ];
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % points.length];
+    for (const [c, d] of rectEdges) {
+      if (segIntersect(a, b, c, d)) return true;
+    }
+  }
+  return false;
+}
+function rectOverlapsAnyInteraction(rect) {
+  for (const obj of (world.interactions || [])) {
+    if (!obj) continue;
+    if (obj.points && obj.points.length) {
+      if (intersectsPolygon(rect, obj)) return true;
+      continue;
+    }
+    const ox = obj.x || 0, oy = obj.y || 0, ow = obj.width || 0, oh = obj.height || 0;
+    if (!(rect.x + rect.width <= ox || rect.x >= ox + ow || rect.y + rect.height <= oy || rect.y >= oy + oh)) {
+      return true;
+    }
+  }
+  return false;
 }
 
+// ---
+function getHitbox(x, y) { return { x: x - 6, y: y + 4, width: 12, height: 8 }; }
+function checkColPlayer(x, y) {
+  const r = getHitbox(x, y);
+  return world.collisions.some(c => {
+    if (c.points && c.points.length) {
+      if (intersectsPolygon(r, c)) return !rectOverlapsAnyInteraction(r);
+    } else {
+      if (intersectsRect(r, c)) return !rectOverlapsAnyInteraction(r);
+    }
+    return false;
+  });
+}
+function checkColNPC(x, y) {
+  const r = getHitbox(x, y);
+  return world.collisions.some(c => {
+    if (c.points && c.points.length) {
+      if (intersectsPolygon(r, c)) return !rectOverlapsAnyInteraction(r);
+    } else {
+      if (intersectsRect(r, c)) return !rectOverlapsAnyInteraction(r);
+    }
+    return false;
+  });
+}
+// El jugador puede atravesar a los profesores (NPCs), pero los NPCs no atraviesan edificios
+function checkEntityCol(x, y, self) {
+  // Solo checa colisión entre NPCs, no con el jugador
+  if (self == null) return false;
+  const r = getHitbox(x, y);
+  return world.npcs.some(n => n !== self && intersectsRect(r, getHitbox(n.x, n.y)));
+}
+
+function resolveSpawn(x, y) {
+  if (!checkColNPC(x,y)) return {x,y};
+  const steps=[8,16,24,32,48,64,80,96,128], dirs=[{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0},{dx:1,dy:-1},{dx:-1,dy:-1},{dx:1,dy:1},{dx:-1,dy:1}];
+  for(const s of steps) for(const d of dirs){ const nx=x+d.dx*s, ny=y+d.dy*s; if(!checkColNPC(nx,ny))return{x:nx,y:ny}; }
+  return {x,y};
+}
+let WALKABLE_PTS=[];
+function buildWalkableGrid() {
+  if(!world.collisions.length)return;
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  world.collisions.forEach(c=>{ minX=Math.min(minX,c.x); minY=Math.min(minY,c.y); maxX=Math.max(maxX,c.x+(c.width||16)); maxY=Math.max(maxY,c.y+(c.height||16)); });
+  for(let x=minX-320; x<=maxX+320; x+=20) for(let y=minY-320; y<=maxY+320; y+=20) if(!checkColNPC(x,y)) WALKABLE_PTS.push({x,y});
+}
+function walkableNear(cx, cy, rad) {
+  const r2=rad*rad, pool=WALKABLE_PTS.filter(p=>{const dx=p.x-cx,dy=p.y-cy; return dx*dx+dy*dy<=r2;});
+  return pool.length ? pool[Math.floor(Math.random()*pool.length)] : (WALKABLE_PTS[0]||{x:cx,y:cy});
+}
+function raycast(ox, oy, ang, maxD) {
+  for(let i=1; i<=6; i++){ const d=i*(maxD/6); if(checkColNPC(ox+Math.cos(ang)*d, oy+Math.sin(ang)*d)) return d-(maxD/6); }
+>>>>>>> Stashed changes
+  return maxD;
+}
 class NPC {
   constructor(name, tiles, x, y, inter) {
+<<<<<<< Updated upstream
     this.name  = name; this.tiles = tiles;
     this.x = x; this.y = y; this.bx = x; this.by = y;
     this.tx = x; this.ty = y; this.inter = inter;
@@ -611,6 +796,97 @@ function draw(){
   [...world.npcs,pEnt].sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   if(world.map) world.map.layers.filter(l=>(l.name==="Techo"||l.name==="Edificios2")&&l.visible).forEach(l=>renderLayer(l)); ctx.restore();
 }
+=======
+    this.name=name; this.tiles=tiles; this.x=x; this.y=y; this.bx=x; this.by=y; this.tx=x; this.ty=y; this.inter=inter;
+    this.speed=42+Math.random()*16; this.waitTimer=Math.random()*0.6; this.stuckTimer=0; this.escapeTimer=0; this.steerOffset=0; this.steerDir=1;
+    this.patrolRadius=Math.random()<0.4?340:190; this._pickNewTarget();
+  }
+  _pickNewTarget() { const pt=walkableNear(this.bx,this.by,this.patrolRadius); this.tx=pt.x; this.ty=pt.y; this.waitTimer=0.2+Math.random()*0.9; this.stuckTimer=0; this.steerDir=Math.random()<0.5?1:-1; }
+  _hardEscape() {
+    const cx=this.x, cy=this.y, near=WALKABLE_PTS.map(p=>({p,d:Math.hypot(p.x-cx,p.y-cy)})).filter(o=>o.d>10&&o.d<220).sort((a,b)=>a.d-b.d);
+    if(near.length){ const p=near[0].p; this.x=p.x; this.y=p.y; } this._pickNewTarget();
+  }
+  update(dt) {
+    if(Math.hypot(this.x-world.player.x,this.y-world.player.y)<26) return;
+    if(this.waitTimer>0){ this.waitTimer-=dt; return; }
+    if(Math.hypot(this.x-this.bx,this.y-this.by)>this.patrolRadius*1.3){ const b=walkableNear(this.bx,this.by,80); this.tx=b.x; this.ty=b.y; }
+    if(Math.hypot(this.x-this.tx,this.y-this.ty)<6){ this._pickNewTarget(); return; }
+    const ang=Math.atan2(this.ty-this.y,this.tx-this.x), free=raycast(this.x,this.y,ang+this.steerOffset,32);
+    if(free<16){ this.steerOffset+=this.steerDir*(Math.PI/8); if(Math.abs(this.steerOffset)>Math.PI*1.1){this.steerDir*=-1; this.steerOffset=this.steerDir*Math.PI/8;} }
+    else{ this.steerOffset*=0.82; if(Math.abs(this.steerOffset)<0.05)this.steerOffset=0; }
+    const ma=ang+this.steerOffset, sx=Math.cos(ma)*this.speed*dt, sy=Math.sin(ma)*this.speed*dt;
+    let mx=false, my=false; if(!checkColNPC(this.x+sx,this.y)){this.x+=sx; mx=true;} if(!checkColNPC(this.x,this.y+sy)){this.y+=sy; my=true;}
+    world.npcs.forEach(o=>{ if(o!==this){ const dx=this.x-o.x, dy=this.y-o.y, d=Math.hypot(dx,dy); if(d<14&&d>0){const p=(14-d)/14*2.5; this.x+=(dx/d)*p; this.y+=(dy/d)*p;} } });
+    if(!mx&&!my){ this.stuckTimer+=dt; this.escapeTimer+=dt; if(this.stuckTimer>0.25)this._pickNewTarget(); if(this.escapeTimer>1.2)this._hardEscape(); }
+    else { this.stuckTimer=0; this.escapeTimer=Math.max(0,this.escapeTimer-dt*1.5); }
+  }
+  draw() {
+    ctx.fillStyle="rgba(0,0,0,0.28)"; ctx.beginPath(); ctx.ellipse(Math.floor(this.x),Math.floor(this.y+6),7,3,0,0,Math.PI*2); ctx.fill();
+    this.tiles.forEach(t=>{ const info=getTile(t.gid); if(info) ctx.drawImage(info.ts.img, info.sx,info.sy,16,16, Math.floor(this.x+t.dx-16),Math.floor(this.y+t.dy-16),16,16); });
+  }
+}
+const KEYS=new Set(); window.onkeydown=e=>KEYS.add(e.key.toLowerCase()); window.onkeyup=e=>KEYS.delete(e.key.toLowerCase());
+const sprites={ L:new Image(),R:new Image(),U:new Image(),D:new Image(), load:()=>{ sprites.L.src="./C_L.gif"; sprites.R.src="./C_R.gif"; sprites.U.src="./C_U.gif"; sprites.D.src="./C_D.gif"; } }; sprites.load();
+function getTile(gid) {
+  const raw=gid; gid&=~0xE0000000; if(!gid)return null; const ts=world.tilesets.find(t=>gid>=t.firstgid&&gid<=t.lastgid);
+  if(!ts)return null; const lid=gid-ts.firstgid; return {ts,sx:(lid%ts.cols)*16,sy:Math.floor(lid/ts.cols)*16,raw};
+}
+function updateGame(dt) {
+  let dx=0, dy=0; if(KEYS.has("arrowleft")||KEYS.has("a")) dx=-1; else if(KEYS.has("arrowright")||KEYS.has("d")) dx=1;
+  if(KEYS.has("arrowup")||KEYS.has("w")) dy=-1; else if(KEYS.has("arrowdown")||KEYS.has("s")) dy=1;
+  if(dx||dy){ 
+    const m=Math.hypot(dx,dy), mx=(dx/m)*world.player.speed*dt, my=(dy/m)*world.player.speed*dt;
+    if(!checkColPlayer(world.player.x+mx,world.player.y)) world.player.x+=mx;
+    if(!checkColPlayer(world.player.x,world.player.y+my)) world.player.y+=my;
+    if(dx<0)world.player.dir='L'; else if(dx>0)world.player.dir='R'; else if(dy<0)world.player.dir='U'; else if(dy>0)world.player.dir='D';
+  }
+  world.cameraX+=(world.player.x-canvas.width/(2*ZOOM)-world.cameraX)*0.15; world.cameraY+=(world.player.y-canvas.height/(2*ZOOM)-world.cameraY)*0.15;
+  const n=world.npcs.find(n=>Math.hypot(n.x-world.player.x,n.y-world.player.y)<32), ui=document.getElementById("interaction");
+  if(n){
+    ui.style.display = "block";
+    ui.innerText = `[E] HABLAR CON ${n.name.toUpperCase()}`;
+    if (KEYS.has("e")) {
+      saveState();
+      let materias = PROFESOR_MATERIA_MAP[n.name] || [];
+      if (n.name === 'Herson' && materias.length > 1) {
+        // Mostrar selección de materia para Herson
+        let opts = materias.map(m => `<button style='margin:6px 0; font-size:1em; padding:8px 18px; border-radius:8px; border:2px solid #00ffff; background:#111; color:#00ffff; font-family:inherit; box-shadow:0 0 8px #00ffff;' onclick=window.location.href='../dashboard.php?materia='+encodeURIComponent('${m}')>${m}</button>`).join('<br>');
+        ui.innerHTML = `<div style='margin-bottom:8px;'>Selecciona materia:</div>${opts}`;
+        KEYS.delete("e");
+        return;
+      }
+      let materia = materias[0] || null;
+      if (materia) {
+        window.location.href = `../dashboard.php?materia=${encodeURIComponent(materia)}`;
+      } else {
+        window.location.href = `../dashboard.php?profesor=${encodeURIComponent(n.name)}`;
+      }
+    }
+  } else ui.style.display = "none";
+  if(KEYS.has("escape")){ document.getElementById("pauseMenu").style.display='block'; KEYS.delete("escape"); }
+}
+function saveState(){ localStorage.setItem(P_KEY,JSON.stringify({x:world.player.x,y:world.player.y})); localStorage.setItem(NPC_KEY,JSON.stringify(world.npcs.map(n=>({x:n.x,y:n.y})))); }
+function renderLayer(l){
+  if(!l.chunks)return; const vw=canvas.width/ZOOM+32, vh=canvas.height/ZOOM+32;
+  l.chunks.forEach(chk=>{
+    const cx=chk.x*16, cy=chk.y*16; if(cx+chk.width*16<world.cameraX||cx>world.cameraX+vw||cy+chk.height*16<world.cameraY||cy>world.cameraY+vh)return;
+    for(let r=0; r<chk.height; r++) for(let c=0; c<chk.width; c++){
+      const gid=chk.data[r*chk.width+c]; if(!gid)continue; const info=getTile(gid); if(!info)continue; const tx=(chk.x+c)*16, ty=(chk.y+r)*16;
+      if(tx+16<world.cameraX||tx>world.cameraX+vw||ty+16<world.cameraY||ty>world.cameraY+vh)continue;
+      const fH=info.raw&0x80000000, fV=info.raw&0x40000000, fD=info.raw&0x20000000; ctx.save(); ctx.translate(tx+8,ty+8);
+      if(fD){ctx.rotate(Math.PI/2); ctx.scale(fV?-1:1,fH?-1:1);} else ctx.scale(fH?-1:1,fV?-1:1);
+      ctx.drawImage(info.ts.img, info.sx,info.sy,16,16, -8,-8,16,16); ctx.restore();
+    }
+  });
+}
+function draw(){
+  ctx.imageSmoothingEnabled=false; ctx.fillStyle="#000"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.save(); ctx.scale(ZOOM,ZOOM); ctx.translate(-Math.floor(world.cameraX),-Math.floor(world.cameraY));
+  if(world.map) world.map.layers.filter(l=>l.type==="tilelayer"&&l.visible&&l.name!=="Techo"&&l.name!=="Maestros"&&l.name!=="Edificios2").forEach(l=>renderLayer(l));
+  const pEnt={y:world.player.y,draw(){ctx.fillStyle="rgba(0,0,0,0.28)"; ctx.beginPath(); ctx.ellipse(Math.floor(world.player.x),Math.floor(world.player.y+6),7,3,0,0,Math.PI*2); ctx.fill(); ctx.drawImage(sprites[world.player.dir],Math.floor(world.player.x-10),Math.floor(world.player.y-17),20,20);}};
+  [...world.npcs,pEnt].sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
+  if(world.map) world.map.layers.filter(l=>(l.name==="Techo"||l.name==="Edificios2")&&l.visible).forEach(l=>renderLayer(l)); ctx.restore();
+}
+>>>>>>> Stashed changes
 function frame(t){ const dt=Math.min((t-world.lastTime)/1000,0.1); world.lastTime=t; if(canvas.width!==window.innerWidth||canvas.height!==window.innerHeight){canvas.width=window.innerWidth; canvas.height=window.innerHeight;} updateGame(dt); world.npcs.forEach(n=>n.update(dt)); draw(); requestAnimationFrame(frame); }
 async function init(){
   try {
@@ -652,6 +928,7 @@ async function init(){
       world.cameraX = world.player.x - (canvas.width / (2 * ZOOM));
       world.cameraY = world.player.y - (canvas.height / (2 * ZOOM));
     }
+<<<<<<< Updated upstream
     // Cargar NPCs de la capa Maestros
     const mLayer = world.map.layers.find(l=>l.name==='Maestros');
     if (mLayer?.chunks) {
@@ -674,6 +951,26 @@ async function init(){
         // Actualizar base al punto seguro para que el rango de patrulla sea correcto
         npc.bx = safe.x; npc.by = safe.y;
         world.npcs.push(npc);
+=======
+    // Inicializar NPCs solo si el mapa está cargado
+    const ml=world.map?.layers?.find(l=>l.name==='Maestros');
+    if(ml?.chunks){
+      const gr=new Map();
+      ml.chunks.forEach(c=>{
+        for(let r=0;r<c.height;r++)for(let l=0;l<c.width;l++){
+          const gid=c.data[r*c.width+l]; if(gid<3200)continue;
+          c.data[r*c.width+l]=0;
+          const tx=(c.x+l)*16,ty=(c.y+r)*16;
+          let g=[...gr.values()].find(g=>Math.hypot(g.x-tx,g.y-ty)<64);
+          if(!g){g={x:tx,y:ty,tiles:[]}; gr.set(`${tx},${ty}`,g);}
+          g.tiles.push({dx:tx-g.x,dy:ty-g.y,gid});
+        }
+      });
+      gr.forEach(g=>{
+        const inter=world.interactions?.find(i=>Math.hypot(i.x-g.x,i.y-g.y)<220); let name="Profesor";
+        if(inter&&PROFESORES[inter.id]) name=PROFESORES[inter.id]; else { const fg=g.tiles[0]?.gid&~0xE0000000; if(GID_PROF_MAP[fg])name=GID_PROF_MAP[fg]; }
+        const safe=resolveSpawn(g.x,g.y), npc=new NPC(name,g.tiles,safe.x,safe.y,inter); npc.bx=safe.x; npc.by=safe.y; world.npcs.push(npc);
+>>>>>>> Stashed changes
       });
     }
     requestAnimationFrame(frame);

@@ -172,7 +172,9 @@ function requireMateriaContext() {
  * Cierra la sesión de forma segura (por timeout o logout explícito)
  */
 function cerrarSesionSegura() {
-    iniciarSesionSegura();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();

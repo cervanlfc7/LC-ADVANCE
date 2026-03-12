@@ -342,7 +342,7 @@ p {
     padding: 12px 15px;
     border: 1px solid rgba(0, 243, 255, 0.3);
     text-align: center;
-    min-width: 120px;
+    min-width: 100%;
     font-size: 0.9em;
 }
 
