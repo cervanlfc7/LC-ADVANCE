@@ -63,11 +63,11 @@ elseif (isset($_GET['materia']) && $_GET['materia'] !== '') {
 // Datos del usuario para la sidebar
 $user_data = ['puntos' => 0, 'nivel' => 1, 'nombre' => 'Estudiante', 'progreso' => 0];
 if ($user_id) {
-    $stmt2 = $pdo->prepare("SELECT nombre, puntos, nivel FROM usuarios WHERE id = ?");
+    $stmt2 = $pdo->prepare("SELECT nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
     $stmt2->execute([$user_id]);
     $row = $stmt2->fetch(PDO::FETCH_ASSOC);
     if ($row) {
-        $user_data['nombre'] = $row['nombre'] ?? 'Estudiante';
+        $user_data['nombre'] = $row['nombre_usuario'] ?? 'Estudiante';
         $user_data['puntos'] = (int)($row['puntos'] ?? 0);
         $user_data['nivel'] = (int)($row['nivel'] ?? 1);
         $user_data['progreso'] = min(100, round(($user_data['puntos'] % 500) / 5));
@@ -127,7 +127,9 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             flex: 1;
             gap: 0;
             align-items: flex-start;
-            min-height: calc(100vh - 64px);
+            width: 100%;
+            margin-left: 0;
+            padding-left: var(--sidebar-w);
         }
 
         /* ======= SIDEBAR ======= */
@@ -137,18 +139,18 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             max-width: var(--sidebar-w);
             background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,10,20,0.98) 100%);
             border-right: 1px solid var(--border-glow);
-            min-height: calc(100vh - 64px);
-            padding: 1.2rem 1rem;
+            padding: 0.8rem 0.7rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.6rem;
             position: fixed;
+            left: 0;
             top: 64px;
+            height: calc(100vh - 64px);
             overflow-y: auto;
             z-index: 10;
             scrollbar-width: thin;
             scrollbar-color: var(--neon-cyan) transparent;
-            height: calc(100vh - 64px);
         }
 
         .lesson-sidebar::-webkit-scrollbar { width: 4px; }
@@ -158,7 +160,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .sidebar-user-card {
             background: var(--bg-panel);
             border: 1px solid var(--border-glow);
-            padding: 1rem;
+            padding: 0.7rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -172,25 +174,25 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         }
 
         .sidebar-avatar {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            margin: 0 auto 0.6rem;
+            font-size: 1.4rem;
+            margin: 0 auto 0.4rem;
             box-shadow: 0 0 16px rgba(0,255,255,0.4);
         }
 
         .sidebar-username {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             color: var(--neon-cyan);
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.15rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -199,28 +201,28 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .sidebar-level-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
             background: rgba(255,255,0,0.1);
             border: 1px solid var(--neon-yellow);
             color: var(--neon-yellow);
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.6rem;
-            padding: 0.2rem 0.6rem;
-            letter-spacing: 0.08em;
-            margin-top: 0.4rem;
+            font-size: 0.55rem;
+            padding: 0.15rem 0.5rem;
+            letter-spacing: 0.06em;
+            margin-top: 0.3rem;
         }
 
         /* XP Bar */
         .sidebar-xp-block {
-            margin-top: 0.8rem;
+            margin-top: 0.5rem;
         }
         .sidebar-xp-label {
             display: flex;
             justify-content: space-between;
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: rgba(0,255,255,0.6);
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.2rem;
         }
         .sidebar-xp-bar {
             height: 6px;
@@ -240,10 +242,10 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         /* Puntos totales */
         .sidebar-points {
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: rgba(255,255,255,0.5);
             text-align: center;
-            margin-top: 0.4rem;
+            margin-top: 0.3rem;
         }
         .sidebar-points strong {
             color: var(--neon-green);
@@ -257,62 +259,62 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
 
         .sidebar-section-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.55rem;
-            letter-spacing: 0.15em;
+            font-size: 0.5rem;
+            letter-spacing: 0.12em;
             color: rgba(0,255,255,0.5);
             text-transform: uppercase;
-            padding: 0.5rem 0.8rem;
+            padding: 0.4rem 0.6rem;
             border-bottom: 1px solid var(--border-glow);
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.3rem;
         }
 
         /* Esta lección */
         .sidebar-current-lesson {
-            padding: 0.7rem 0.8rem;
+            padding: 0.5rem 0.6rem;
         }
         .sidebar-current-lesson .lesson-name {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: var(--neon-cyan);
-            line-height: 1.4;
-            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            margin-bottom: 0.3rem;
         }
         .sidebar-current-lesson .lesson-subject {
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: rgba(255,255,255,0.4);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
         }
 
         /* Puntuación actual */
         .sidebar-score-display {
-            padding: 0.7rem 0.8rem;
+            padding: 0.5rem 0.6rem;
         }
         .score-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
         .score-value {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--neon-yellow);
             text-shadow: 0 0 10px rgba(255,255,0,0.4);
         }
         .score-max {
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: rgba(255,255,255,0.3);
         }
         .score-pct-bar {
             height: 4px;
             background: rgba(255,255,255,0.08);
             border-radius: 2px;
-            margin-top: 0.5rem;
+            margin-top: 0.4rem;
             overflow: hidden;
         }
         .score-pct-fill {
@@ -324,15 +326,15 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         }
         .score-status {
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.55rem;
-            margin-top: 0.4rem;
+            font-size: 0.5rem;
+            margin-top: 0.3rem;
             color: <?php echo $completed ? 'var(--neon-green)' : 'rgba(255,255,255,0.3)'; ?>;
         }
 
         /* Navegación de lecciones de la materia */
         .sidebar-nav-list {
-            padding: 0.4rem 0;
-            max-height: 240px;
+            padding: 0.3rem 0;
+            max-height: 200px;
             overflow-y: auto;
             scrollbar-width: none;
         }
@@ -341,15 +343,15 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .sidebar-nav-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.45rem 0.8rem;
+            gap: 0.35rem;
+            padding: 0.35rem 0.6rem;
             text-decoration: none;
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.58rem;
+            font-size: 0.52rem;
             color: rgba(255,255,255,0.45);
             border-left: 2px solid transparent;
             transition: all 0.18s;
-            line-height: 1.3;
+            line-height: 1.25;
         }
         .sidebar-nav-item:hover {
             color: var(--neon-cyan);
@@ -384,15 +386,15 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             border: 1px solid var(--neon-cyan);
             color: var(--neon-cyan);
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.6rem;
-            letter-spacing: 0.1em;
-            padding: 0.7rem;
+            font-size: 0.55rem;
+            letter-spacing: 0.08em;
+            padding: 0.5rem;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
         .sidebar-quiz-btn:hover {
             background: rgba(0,255,255,0.15);
@@ -404,15 +406,15 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .sidebar-back-btn {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.3rem;
             text-decoration: none;
             color: rgba(255,255,255,0.35);
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.58rem;
-            padding: 0.5rem 0.3rem;
+            font-size: 0.52rem;
+            padding: 0.4rem 0.3rem;
             transition: color 0.18s;
             border-top: 1px solid var(--border-glow);
-            padding-top: 0.7rem;
+            padding-top: 0.5rem;
             margin-top: auto;
         }
         .sidebar-back-btn:hover { color: var(--neon-cyan); }
@@ -422,7 +424,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             flex: 1;
             min-width: 0;
             padding: 1.5rem 2rem;
-            margin-left: var(--sidebar-w); /* Margen izquierdo igual al ancho del sidebar */
+            width: 100%;
         }
 
         /* Quitar full-width cuando hay sidebar */
@@ -458,12 +460,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
 
         @media (max-width: 900px) {
             .lesson-sidebar {
-                position: fixed;
                 left: -100%;
-                top: 0;
-                height: 100vh;
-                min-height: 100vh;
-                z-index: 200;
                 transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
                 box-shadow: 4px 0 32px rgba(0,0,0,0.8);
             }
@@ -475,10 +472,14 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
                 inset: 0;
                 background: rgba(0,0,0,0.6);
                 z-index: 199;
+                top: 64px;
             }
             .sidebar-overlay.active { display: block; }
-             .lesson-area {
-               margin-left: 0; /* Quitar margen en móvil */ 
+            .content-wrapper {
+                padding-left: 0;
+            }
+            .lesson-area {
+                width: 100%;
             }
         }
 
