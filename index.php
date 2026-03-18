@@ -13,7 +13,7 @@ require_once 'config/csrf.php';
 // Verificar si el usuario está autenticado
 $usuario_logueado = isset($_SESSION['usuario_id']);
 ?>
-
+<!--ella es calladita-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
