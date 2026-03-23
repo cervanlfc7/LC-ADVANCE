@@ -25,7 +25,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     avatar VARCHAR(100) DEFAULT 'default.png',
     puntos INT DEFAULT 0,
     nivel INT DEFAULT 1,
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    google_id VARCHAR(255) DEFAULT NULL,
+    github_id VARCHAR(255) DEFAULT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (google_id),
+    UNIQUE (github_id)
 );
 
 -- =========================

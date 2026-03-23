@@ -1,16 +1,19 @@
 <?php
 // ==========================================
-// LC-ADVANCE - dashboard.php (VERSIÓN FINAL CON DISTINCIÓN MANUEL/MEZA)
+// LC-ADVANCE - dashboard.php (Rediseño Premium)
 // ==========================================
-
 require_once 'config/config.php';
-requireLogin(true); // permite también invitados
+requireLogin(true);
 require_once 'src/content.php';
 
-// ------------------ AUTENTICACIÓN Y CONTEXTO DE MATERIA ------------------
-// Requerimos que el usuario tenga una materia seleccionada para ver el dashboard completo
-$filter_materia = requireMateriaContext();
+$filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
+$filter_materia = null;
 
+if ($filter_profesor) {
+    $filter_materia = isset($_GET['materia']) ? trim($_GET['materia']) : null;
+} else {
+    $filter_materia = requireMateriaContext();
+}
 
 // ------------------ USUARIO ------------------
 if (!empty($_SESSION['usuario_es_invitado'])) {
@@ -27,136 +30,106 @@ if (!empty($_SESSION['usuario_es_invitado'])) {
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$usuario) {
-        // Si no existe usuario en sesión, redirigimos a login por seguridad
         session_destroy();
         header('Location: login.php');
         exit;
     }
 }
 
-// ------------------ PROGRESO ------------------
 $puntos_por_nivel = 500;
 $puntos_necesarios = ($usuario['nivel'] + 1) * $puntos_por_nivel;
 $puntos_base = $usuario['nivel'] * $puntos_por_nivel;
 $progreso = max(0, min(100, (($usuario['puntos'] - $puntos_base) / $puntos_por_nivel) * 100));
 
-// ------------------ BADGES ------------------
 $badges = [];
-if ($usuario['puntos'] >= 500) $badges[] = ['nombre'=>'Nivel 1: Novato','tipo'=>'bronze'];
-if ($usuario['puntos'] >= 1000) $badges[] = ['nombre'=>'Nivel 2: Explorador','tipo'=>'silver'];
-if ($usuario['puntos'] >= 2000) $badges[] = ['nombre'=>'Nivel 3: Élite','tipo'=>'gold'];
+if ($usuario['puntos'] >= 500) $badges[] = ['nombre'=>'Novato','tipo'=>'bronze', 'icon' => '🥉'];
+if ($usuario['puntos'] >= 1000) $badges[] = ['nombre'=>'Explorador','tipo'=>'silver', 'icon' => '🥈'];
+if ($usuario['puntos'] >= 2000) $badges[] = ['nombre'=>'Élite','tipo'=>'gold', 'icon' => '🥇'];
 
-$filter_profesor  = empty($filter_materia) && isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
-$filter_materias  = [];
-$highlight_materia = null;
-
-// Inicializaciones necesarias para filtros y agrupación de lecciones
-$lecciones_agrupadas = [];
-$materias_disponibles = []; // usada por el filtro por profesor más abajo (evita warnings)
-
-// Agrupar lecciones por materia. Evitar duplicados por 'slug' y por título dentro de la misma materia.
-$seen_slugs = [];
-$seen_titles = [];
-foreach ($lecciones as $le) {
-    $slug = $le['slug'] ?? null;
-    if ($slug !== null) {
-        if (isset($seen_slugs[$slug])) continue; // ya agregado por slug
-        $seen_slugs[$slug] = true;
-    }
-
-    $m = $le['materia'] ?? 'Sin Materia';
-    $titulo_norm = norm($le['titulo'] ?? '');
-    if (isset($seen_titles[$m][$titulo_norm])) continue; // ya agregado por título en la misma materia
-    $seen_titles[$m][$titulo_norm] = true;
-
-    $materias_disponibles[] = $m;
-    $lecciones_agrupadas[$m][] = $le;
-}
-$materias_disponibles = array_unique($materias_disponibles); 
-
-// ---- MAPEO PROFESOR -> MATERIAS ----
-$profesor_materia_map = [
-    'Miguel Marquez' => ['Temas Selectos de Matemáticas I y II'],
-    'Enrique' => ['Inglés'],
-    'Espindola' => ['Pensamiento Matemático III'],
-    'Manuel' => ['Programación'],
-    'Meza' => ['Programación'],
-    'Herson' => ['Física','Química'],
-    'Carolina' => ['Ecosistemas'],
-    'Refugio & Padilla' => ['Ciencias Sociales'],
-    'Armando' => ['Historia']
-];
-
-// ==================== MAPEO MATERIA → ID PROFESOR (por defecto) ====================
-$materia_a_profesor_id = [
-    'Temas Selectos de Matemáticas I y II' => '1Le',   // Miguel Márquez
-    'Inglés'                                      => '1Go',   // Enrique
-    'Pensamiento Matemático III'                  => '1Es',   // Espindola
-    'Programación'                                => '1Ma',   // Manuel por defecto
-    'Física'                                      => '1He',   // Herson
-    'Química'                                     => '1He',   // Herson
-    'Ecosistemas'                                 => '1Ca',   // Carolina
-    'Ciencias Sociales'                           => '1Pa',   // Refugio & Padilla
-    'Historia'                                    => '1Ar',   // Armando
-];
-
-// ==================== MAPEO DIRECTO PROFESOR → ID (prioridad máxima) ====================
-$profesor_a_id = [
-    'Miguel Marquez'    => '1Le',
-    'Enrique'           => '1Go',
-    'Espindola'         => '1Es',
-    'Manuel'            => '1Ma',
-    'Meza'              => '1Me',  // ¡Distinción clave!
-    'Herson'            => '1He',
-    'Carolina'          => '1Ca',
-    'Refugio & Padilla' => '1Pa',
-    'Armando'           => '1Ar'
-];
-
+// ------------------ FILTRADO POR PROFESOR ------------------
 function norm($s){
     return mb_strtolower(trim(strtr($s,[
         'á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ñ'=>'n','&'=>'y'
     ])), 'UTF-8');
 }
 
-// ---- FILTRO DIRECTO POR MATERIA ----
+$profesor_materia_map = [
+    'Miguel Marquez' => ['Temas Selectos de Matemáticas I y II'],
+    'Enrique' => ['Inglés'],
+    'Espindola' => ['Pensamiento Matemático III'],
+    'Manuel' => ['Programación'],
+    'Meza' => ['Programación'],
+    'Herson' => ['Física I','Química I'],
+    'Carolina' => ['Ecosistemas'],
+    'Refugio & Padilla' => ['Ciencias Sociales'],
+    'Armando' => ['Historia de México']
+];
+
+$materia_a_profesor_id = [
+    'Temas Selectos de Matemáticas I y II' => '1Le',
+    'Inglés'                               => '1Go',
+    'Pensamiento Matemático III'           => '1Es',
+    'Programación'                         => '1Ma',
+    'Física I'                             => '1He',
+    'Química I'                            => '1He',
+    'Ecosistemas'                          => '1Ca',
+    'Ciencias Sociales'                    => '1Pa',
+    'Historia de México'                   => '1Ar',
+];
+
+$profesor_a_id = [
+    'Miguel Marquez'    => '1Le',
+    'Enrique'           => '1Go',
+    'Espindola'         => '1Es',
+    'Manuel'            => '1Ma',
+    'Meza'              => '1Me',
+    'Herson'            => '1He',
+    'Carolina'          => '1Ca',
+    'Refugio & Padilla' => '1Pa',
+    'Armando'           => '1Ar'
+];
+
+$filter_materias = [];
 if ($filter_materia) {
     $filter_materias[] = $filter_materia;
-    $highlight_materia = $filter_materia;
-}
-
-// ---- FILTRO POR PROFESOR ----
-elseif ($filter_profesor) {
+} elseif ($filter_profesor) {
     $nf = norm($filter_profesor);
     foreach ($profesor_materia_map as $prof => $mats) {
         $np = norm($prof);
         if ($np === $nf || strpos($np, $nf) !== false || strpos($nf, $np) !== false) {
-            foreach ($mats as $mat) {
-                foreach ($materias_disponibles as $real) {
-                    if (norm($real) === norm($mat) || str_contains(norm($real), norm($mat))) {
-                        $filter_materias[] = $real;
-                    }
-                }
-            }
+            $filter_materias = $mats;
             break;
         }
     }
-    $filter_materias = array_unique($filter_materias);
-    $highlight_materia = $filter_materias[0] ?? null;
 }
 
-// ---- APLICAR FILTRO ----
-if ($filter_materias) {
-    $lecciones_agrupadas = array_filter(
-        $lecciones_agrupadas,
-        fn($k)=> in_array(norm($k), array_map('norm',$filter_materias)),
-        ARRAY_FILTER_USE_KEY
-    );
+$lecciones_agrupadas = [];
+$seen_slugs = [];
+
+foreach ($lecciones as $le) {
+    $slug = $le['slug'] ?? null;
+    if ($slug !== null) {
+        if (isset($seen_slugs[$slug])) continue;
+        $seen_slugs[$slug] = true;
+    }
+    $m = $le['materia'] ?? 'Sin Materia';
+    
+    // Aplicar filtro si existe
+    if (!empty($filter_materias)) {
+        $match = false;
+        foreach ($filter_materias as $fm) {
+            if (norm($m) === norm($fm)) {
+                $match = true;
+                break;
+            }
+        }
+        if (!$match) continue;
+    }
+    
+    $lecciones_agrupadas[$m][] = $le;
 }
 
-// ------------------ PROGRESO LECCIONES ------------------
-$completadas = $_SESSION['completadas'] ?? [];
-
+$completadas = [];
 if (empty($_SESSION['usuario_es_invitado'])) {
     try {
         $stmt = $pdo->prepare("SELECT slug FROM user_progress WHERE user_id=? AND completed=1");
@@ -170,444 +143,620 @@ if (empty($_SESSION['usuario_es_invitado'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASHBOARD | LC-ADVANCE</title>
+    <title>Dashboard | LC-ADVANCE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent-glow: 0 0 30px rgba(0, 255, 255, 0.3);
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+            --neon-green: #39ff14;
+        }
+
+        body {
+            background-color: #050508;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            overflow-x: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black, transparent 85%);
+            animation: gridMove 25s linear infinite;
+        }
+
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 60px; }
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-glass) !important;
+            padding: 15px 30px !important;
+        }
+
+        .header h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        /* Profile Section */
+        .profile-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 30px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        /* Estilo de scrollbar para la sidebar */
+        .profile-card::-webkit-scrollbar {
+            width: 4px;
+        }
+        .profile-card::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .profile-card::-webkit-scrollbar-thumb {
+            background: var(--border-glass);
+            border-radius: 10px;
+        }
+        .profile-card::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-cyan);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .avatar-glow {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .username-premium {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-box {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .progress-container {
+            margin-top: 25px;
+        }
+
+        .progress-bar-premium {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill-premium {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            box-shadow: 0 0 15px var(--neon-cyan);
+            transition: width 1s ease;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 15px 20px 15px 50px;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            color: var(--neon-cyan);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Área de Lecciones */
+        .lessons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .materia-group {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 30px;
+        }
+
+        .materia-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            color: var(--neon-pink);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .materia-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--neon-pink), transparent);
+        }
+
+        .leccion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .leccion-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 20px;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            color: inherit;
+            min-height: 120px;
+            height: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leccion-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            min-width: 0; /* Crucial para evitar desbordamiento en grid/flex */
+        }
+
+        .leccion-status {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .leccion-name {
+            font-family: 'Orbitron', sans-serif; /* Cambiado a una fuente más legible y moderna */
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.5;
+            margin: 0;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            display: block;
+        }
+
+        .leccion-action {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            color: var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .leccion-card:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-5px);
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1);
+        }
+
+        .leccion-card:hover .leccion-action {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        .leccion-card.completed {
+            border-color: rgba(57, 255, 20, 0.2);
+        }
+
+        .leccion-card.completed .leccion-name {
+            color: var(--neon-green);
+        }
+
+        .btn-premium {
+            padding: 12px 24px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-cyan {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .btn-cyan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .badge-item {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-item.gold { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+        .badge-item.silver { border-color: #ccc; color: #ccc; }
+        .badge-item.bronze { border-color: #cd7f32; color: #cd7f32; }
+
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .profile-card {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
 </head>
-<body class="dashboard">
+<body>
+
+<div class="grid-bg"></div>
 
 <header class="header">
-    <h1>LC-ADVANCE <span style="color: #00ff00;">// ACCESS: ONLINE</span></h1>
-    <button class="hamburger" type="button" aria-label="Menu">☰</button>
-    <?php
-        $ranking_href = 'ranking.php';
-        if (!empty($filter_materia)) $ranking_href .= '?materia=' . urlencode($filter_materia);
-    ?>
-    <nav>
-        <a href="index.php" class="btn btn-dashboard">🏠 Inicio</a>
-        <a href="mapa/index.php" class="btn btn-dashboard">🎮 Ir al Mapa</a>
-        <a href="<?php echo $ranking_href; ?>" class="btn btn-dashboard">🏆 Ranking</a>
-        <a href="#" id="goToLessonsBtn" class="btn btn-dashboard">📚 Ir a Lección</a>
-        <a href="logout.php" class="btn btn-logout">🚪 SALIR</a>
-    </nav>
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+        <h1>LC-ADVANCE <span style="color: var(--neon-green); font-size: 10px; margin-left: 10px;">// SYSTEM_DASHBOARD</span></h1>
+        <nav style="display: flex; gap: 15px;">
+            <a href="index.php" class="btn-premium" style="color: #fff; font-size: 8px;">Inicio</a>
+            <a href="mapa/index.php" class="btn-premium btn-cyan">Ir al Mapa</a>
+            <a href="logout.php" class="btn-premium" style="color: var(--neon-pink); font-size: 8px;">Cerrar Sesión</a>
+        </nav>
+    </div>
 </header>
 
-<div class="container">
-    <div class="dashboard-container">
-    
-        <h1 class="auth-title">💻 PANEL DE JUGADOR</h1>
+<main class="container">
+    <div class="dashboard-grid">
         
-        <div class="ranking-floating" id="ranking-floating">
-            <h3>🔝 TOP 10</h3>
-            <div class="ranking-scroll-area">
-                <table class="ranking-table">
-                    <thead>
-                        <tr><th>#</th><th>JUGADOR</th><th>PUNTOS</th></tr>
-                    </thead>
-                    <tbody id="ranking-body"></tbody>
-                </table>
+        <!-- Sidebar Perfil -->
+        <aside class="profile-card">
+            <div class="profile-header">
+                <div class="avatar-glow">🎮</div>
+                <h2 class="username-premium"><?php echo htmlspecialchars($usuario['nombre_usuario']); ?></h2>
             </div>
-        </div>
-        <div class="profile-summary"> 
-            <h2 class="profile-name">¡Bienvenido, <span class="username-glow"><?php echo htmlspecialchars($usuario['nombre_usuario']); ?></span>!</h2>
-            
-            <div class="stats-grid">
-                <div class="stat-card level-card">
-                    <h4>NIVEL ACTUAL</h4>
-                    <span class="big-stat user-nivel" id="nivel-actual"><?php echo $usuario['nivel']; ?></span>
+
+            <div class="stat-box">
+                <span class="stat-label">NIVEL ACTUAL</span>
+                <span class="stat-value"><?php echo $usuario['nivel']; ?></span>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-label">PUNTOS XP</span>
+                <span class="stat-value"><?php echo number_format($usuario['puntos']); ?></span>
+            </div>
+
+            <div class="progress-container">
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5);">
+                    <span>PROGRESO NIVEL <?php echo $usuario['nivel'] + 1; ?></span>
+                    <span><?php echo round($progreso); ?>%</span>
                 </div>
-                <div class="stat-card points-card">
-                    <h4>PUNTOS (XP)</h4>
-                    <span class="big-stat" id="puntos-actuales"><?php echo $usuario['puntos']; ?></span>
+                <div class="progress-bar-premium">
+                    <div class="progress-fill-premium" style="width: <?php echo $progreso; ?>%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 11px; color: var(--neon-yellow); margin-top: 10px;">
+                    <?php echo $puntos_necesarios - $usuario['puntos']; ?> XP para subir
                 </div>
             </div>
 
-            <div class="progress-section">
-                <h3>PROGRESO AL NIVEL <span id="nivel-siguiente"><?php echo $usuario['nivel'] + 1; ?></span></h3>
-                <div class="progress-bar">
-                    <div id="progress-fill" class="progress-fill" style="width: <?php echo $progreso; ?>%;"></div>
-                </div>
-                <p class="progress-info">
-                    <span id="puntos-actuales-mini"><?php echo $usuario['puntos']; ?></span> / 
-                    <span id="puntos-necesarios"><?php echo $puntos_necesarios; ?></span> PUNTOS REQUERIDOS
-                </p>
-                
-                <div class="badges-section">
-                    <h3>🏆 INSIGNIAS OBTENIDAS</h3>
-                    <div id="badges-container" class="badges-list">
-                        <?php if (empty($badges)): ?>
-                            <p class="text-muted">¡Completa lecciones para obtener tu primer Badge (500 pts)!</p>
-                        <?php else: ?>
-                            <?php foreach ($badges as $b): ?>
-                                <span class="badge <?php echo $b['tipo']; ?>"><?php echo $b['nombre']; ?></span>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-            </div>
-            </div>
-            <div class="lessons-area">
-                <h3>📖 MÓDULOS DE ESTUDIO DISPONIBLES</h3>
-                <?php if (empty($lecciones_agrupadas)): ?>
-                    <p class="text-muted">No hay lecciones disponibles. Asegúrate de agregar lecciones en content.php para las materias mapeadas.</p>
-                <?php else: ?>
-                    <?php foreach ($lecciones_agrupadas as $materia => $temas): ?>
-                        <div class="materia-group mb-4" id="materia-<?php echo urlencode($materia); ?>"> 
-                            <h4 class="materia-title"><?php echo htmlspecialchars($materia); ?></h4>
-                            <div class="leccion-list">
-                                <?php foreach ($temas as $tema): 
-                                    $es_completada = in_array($tema['slug'], $completadas);
-                                    // Siempre añadimos la materia al enlace de la lección para preservar el contexto al volver
-                                    $leccion_href = 'leccion_detalle.php?slug=' . urlencode($tema['slug']) . '&materia=' . urlencode($materia);
-                                    // Si el dashboard está filtrado por profesor (ej. ?profesor=Herson), pasar ese parámetro para preservar el filtro al volver
-                                    if (!empty($filter_profesor)) {
-                                        $leccion_href .= '&profesor=' . urlencode($filter_profesor);
-                                    }
-                                ?>
-                                    <div class="leccion-item <?php echo $es_completada ? 'leccion-completed' : 'leccion-pending'; ?>">
-                                        <span class="leccion-status">
-                                            <?php echo $es_completada ? '✅' : '▶️'; ?> 
-                                        </span>
-                                        <span class="leccion-name">
-                                            <?php echo htmlspecialchars($tema['titulo']); ?>
-                                        </span>
-                                        <div class="leccion-actions">
-                                            <a href="<?php echo $leccion_href; ?>" 
-                                                class="btn btn-small <?php echo $es_completada ? 'btn-repeat' : 'btn-play'; ?>">
-                                                <?php echo $es_completada ? 'REPETIR' : 'JUGAR'; ?>
-                                            </a>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
+            <div style="margin-top: 30px;">
+                <span class="stat-label" style="text-align: left;">LOGROS DESBLOQUEADOS</span>
+                <div class="badge-list">
+                    <?php if (empty($badges)): ?>
+                        <p style="font-size: 11px; color: rgba(255,255,255,0.3);">No hay insignias aún.</p>
+                    <?php else: ?>
+                        <?php foreach ($badges as $b): ?>
+                            <div class="badge-item <?php echo $b['tipo']; ?>">
+                                <span><?php echo $b['icon']; ?></span>
+                                <span><?php echo $b['nombre']; ?></span>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <a href="ranking.php" class="btn-premium btn-secondary" style="width: 100%; border: 1px solid var(--border-glass); color: #fff; box-sizing: border-box;">Ver Ranking Global</a>
+            </div>
+        </aside>
+
+        <!-- Área de Lecciones -->
+        <section class="lessons-container">
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="lessonSearch" class="search-input" placeholder="Buscar lección por título o tema..." autocomplete="off">
+                </div>
+            </div>
+
+            <div id="filter-and-combat-area">
+                <?php if ($filter_profesor): ?>
+                    <div class="materia-group" style="border-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); padding: 15px 25px;">
+                        <p style="margin: 0; font-family: 'Press Start 2P', cursive; font-size: 10px; color: var(--neon-cyan);">
+                            👨‍🏫 Filtrado por Profesor: <?php echo htmlspecialchars($filter_profesor); ?>
+                            <a href="dashboard.php" style="margin-left: 20px; color: #fff; text-decoration: underline; font-size: 8px;">Quitar filtro</a>
+                        </p>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($filter_materia || !empty($filter_materias)): ?>
+                    <?php
+                    $id_profesor_final = '1Cu'; // fallback
+                    $materia_usada = $filter_materia ?: ($filter_materias[0] ?? 'General');
+
+                    if ($filter_profesor) {
+                        $nf = norm($filter_profesor);
+                        foreach ($profesor_a_id as $prof => $id) {
+                            if (norm($prof) === $nf || strpos(norm($prof), $nf) !== false || strpos($nf, norm($prof)) !== false) {
+                                $id_profesor_final = $id;
+                                break;
+                            }
+                        }
+                    } else {
+                        $materia_norm = norm($materia_usada);
+                        foreach ($materia_a_profesor_id as $mat_map => $id) {
+                            if (norm($mat_map) === $materia_norm || str_contains($materia_norm, norm($mat_map))) {
+                                $id_profesor_final = $id;
+                                break;
+                            }
+                        }
+                    }
+                    ?>
+                    <div class="materia-group" style="text-align: center; border-color: var(--neon-yellow); background: rgba(255, 255, 0, 0.05);">
+                        <h3 class="materia-title" style="color: var(--neon-yellow); justify-content: center;">⚔️ SISTEMA DE COMBATE</h3>
+                        <p style="margin-bottom: 20px; font-size: 14px;">¿Estás listo para el examen? Enfrenta al profesor y demuestra tus conocimientos.</p>
+                        <?php 
+                            $current_url = urlencode($_SERVER['REQUEST_URI']);
+                            $examen_slug = "examen_final_" . norm($materia_usada);
+                        ?>
+                        <a href="Examen/sistemC.php?personaje=<?= $id_profesor_final ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>" class="btn-premium btn-cyan" style="background: var(--neon-yellow); box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);">
+                            INICIAR EXAMEN
+                        </a>
+                    </div>
                 <?php endif; ?>
             </div>
-        </div>
 
-        <!-- Bloque duplicado de lecciones eliminado intencionalmente: la lista de módulos se muestra una sola vez arriba -->
+            <?php if (empty($lecciones_agrupadas)): ?>
+                <div class="materia-group">
+                    <p style="text-align: center; color: rgba(255,255,255,0.5);">No hay módulos disponibles para esta selección.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($lecciones_agrupadas as $materia => $temas): ?>
+                    <div class="materia-group">
+                        <h3 class="materia-title"><?php echo htmlspecialchars($materia); ?></h3>
+                        <div class="leccion-grid">
+                            <?php foreach ($temas as $tema): 
+                                $es_completada = in_array($tema['slug'], $completadas);
+                                $href = 'leccion_detalle.php?slug=' . urlencode($tema['slug']) . '&materia=' . urlencode($materia);
+                                if ($filter_profesor) $href .= '&profesor=' . urlencode($filter_profesor);
+                            ?>
+                                <a href="<?php echo $href; ?>" class="leccion-card <?php echo $es_completada ? 'completed' : ''; ?>">
+                                    <div class="leccion-info">
+                                        <span class="leccion-status"><?php echo $es_completada ? '✅' : '▶️'; ?></span>
+                                        <span class="leccion-name"><?php echo htmlspecialchars($tema['titulo']); ?></span>
+                                    </div>
+                                    <span class="leccion-action">
+                                        <?php echo $es_completada ? 'REPETIR' : 'ENTRAR'; ?>
+                                    </span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </section>
+
     </div>
-</div>
-
-<!-- Modal: Ir a Lección -->
-<div id="lessons-modal" class="lessons-modal" aria-hidden="true" role="dialog" aria-labelledby="lessons-modal-title">
-  <div class="modal-backdrop" id="lessons-backdrop"></div>
-  <div class="modal-content" role="document">
-    <button class="modal-close btn btn-guest" id="lessons-close">✖</button>
-    <h2 id="lessons-modal-title">📚 Ir a Lección</h2>
-    <div class="modal-controls">
-      <input type="search" id="lessons-search" placeholder="Buscar lección o materia..." aria-label="Buscar lección">
-    </div>
-    <div class="lessons-list" id="lessons-list" aria-live="polite"></div>
-  </div>
-</div>
-
-<script>
-  const ALL_LECCIONES = <?php echo json_encode($lecciones, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>;
-  const CURRENT_MATERIA = <?php echo json_encode($filter_materia); ?>;
-  const CURRENT_PROFESOR = <?php echo json_encode($filter_profesor); ?>;
-  const COMPLETED_SLUGS = <?php echo json_encode(array_values($completadas ?? []), JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>;
-  const PROFESOR_MAP = <?php echo json_encode($profesor_materia_map ?? [], JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>;
-
-  (function(){
-    // Hamburger Menu Logic
-    const hamburger = document.querySelector('.hamburger');
-    const nav = document.querySelector('header nav');
-    
-    if (hamburger && nav) {
-        hamburger.addEventListener('click', () => {
-            nav.classList.toggle('active');
-            hamburger.textContent = nav.classList.contains('active') ? '✖' : '☰';
-        });
-
-        // Cerrar al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!hamburger.contains(e.target) && !nav.contains(e.target) && nav.classList.contains('active')) {
-                nav.classList.remove('active');
-                hamburger.textContent = '☰';
-            }
-        });
-    }
-
-    function openModal(){ document.getElementById('lessons-modal').classList.add('open'); document.getElementById('lessons-modal').setAttribute('aria-hidden','false'); document.getElementById('lessons-search').focus(); }
-    function closeModal(){ document.getElementById('lessons-modal').classList.remove('open'); document.getElementById('lessons-modal').setAttribute('aria-hidden','true'); }
-    document.getElementById('goToLessonsBtn')?.addEventListener('click', function(e){ e.preventDefault(); openModal(); });
-
-    document.getElementById('lessons-close')?.addEventListener('click', closeModal);
-    document.getElementById('lessons-backdrop')?.addEventListener('click', closeModal);
-    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
-
-    const listEl = document.getElementById('lessons-list');
-    const search = document.getElementById('lessons-search');
-
-    function norm(s){ return (s||'').toString().toLowerCase().trim(); }
-
-    function getAllowedMateriasFromProfesor(prof){
-      if(!prof) return null;
-      const nf = norm(prof);
-      for(const k in PROFESOR_MAP){
-        if(norm(k) === nf || norm(k).indexOf(nf)!==-1 || nf.indexOf(norm(k))!==-1){
-          return PROFESOR_MAP[k] || [];
-        }
-      }
-      return null;
-    }
-
-    function renderList(filterText=''){
-      const q = (filterText||'').toLowerCase().trim();
-      const currentMat = norm(CURRENT_MATERIA);
-      const currentProf = CURRENT_PROFESOR ? CURRENT_PROFESOR.toString() : null;
-      const allowedMateriasFromProf = getAllowedMateriasFromProfesor(currentProf);
-
-      const items = ALL_LECCIONES
-        .filter(l => {
-          const hay = (l.titulo || l.titulo_corto || '').toString().toLowerCase();
-          const mat = (l.materia || '').toString().toLowerCase();
-
-          // Si hay una materia activa, sólo mostrar lecciones de esa materia
-          if (currentMat && mat.indexOf(currentMat) === -1) return false;
-
-          // Si hay un profesor activo, limitar a las materias mapeadas a ese profesor
-          if (allowedMateriasFromProf && !allowedMateriasFromProf.some(am => mat.indexOf(am.toString().toLowerCase()) !== -1)) return false;
-
-          // Filtro de búsqueda (por título o materia)
-          return !q || hay.indexOf(q) !== -1 || mat.indexOf(q) !== -1;
-        })
-        .slice(0,250);
-
-      if(!items.length){ listEl.innerHTML = '<p class="text-muted">No se encontraron lecciones.</p>'; return; }
-
-      // Nota de filtro por materia o profesor si aplica
-      const headerParts = [];
-      if (CURRENT_MATERIA) headerParts.push(`Mostrando lecciones para: <strong>${escapeHtml(CURRENT_MATERIA)}</strong>`);
-      if (CURRENT_PROFESOR) headerParts.push(`Filtrado por profesor: <strong>${escapeHtml(CURRENT_PROFESOR)}</strong>`);
-      const header = headerParts.length ? `<div class="lessons-filter-note">${headerParts.join(' • ')}</div>` : '';
-
-      listEl.innerHTML = header + items.map(l=>{
-        const slugVal = l.slug || '';
-        const slug = encodeURIComponent(slugVal);
-        const isCompleted = COMPLETED_SLUGS.includes(slugVal);
-        const statusIcon = isCompleted ? '✅' : '▶️';
-        const materiaParam = CURRENT_MATERIA ? '&materia=' + encodeURIComponent(CURRENT_MATERIA) : '&materia=' + encodeURIComponent(l.materia || '');
-        const profesorParam = CURRENT_PROFESOR ? '&profesor=' + encodeURIComponent(CURRENT_PROFESOR) : '';
-        const href = 'leccion_detalle.php?slug=' + slug + materiaParam + profesorParam;
-        return `<a class="lesson-link" href="${href}"><span class="lesson-left"><span class="lesson-status" aria-hidden="true">${statusIcon}</span><strong>${escapeHtml(l.titulo || l.titulo_corto || l.slug)}</strong></span><span class="lesson-meta">${escapeHtml(l.materia || '')}</span></a>`;
-      }).join('');
-    }
-
-    function escapeHtml(s){ return String(s).replace(/[&<>\"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]; }); }
-
-    search.addEventListener('input', function(){ renderList(this.value); });
-
-    // Inicializar
-    renderList('');
-  })();
-</script>
-
-<button id="scrollToTopBtn" class="scroll-to-top-btn" title="Ir arriba">
-    <span class="arrow-up">▲</span>
-</button>
-
-<!-- ==================== BOTONES DE EXAMEN CON ID CORRECTO ==================== -->
-<?php if ($filter_materia || !empty($filter_materias)): ?>
-    <?php
-    $id_profesor_final = '1Cu'; // fallback
-
-    // Prioridad 1: Filtro por profesor directo
-    if ($filter_profesor) {
-        $nf = norm($filter_profesor);
-        foreach ($profesor_a_id as $prof => $id) {
-            if (norm($prof) === $nf || strpos(norm($prof), $nf) !== false || strpos($nf, norm($prof)) !== false) {
-                $id_profesor_final = $id;
-                break;
-            }
-        }
-    }
-    // Prioridad 2: Filtro por materia
-    else {
-        $materia_usada = $filter_materia ?: ($filter_materias[0] ?? '');
-        $materia_norm = norm($materia_usada);
-        foreach ($materia_a_profesor_id as $mat_map => $id) {
-            if (norm($mat_map) === $materia_norm || str_contains($materia_norm, norm($mat_map))) {
-                $id_profesor_final = $id;
-                break;
-            }
-        }
-    }
-    ?>
-
-    <div class="exam-cta" style="margin-top:18px; text-align:center;">
-        <?php if ($filter_materia): ?>
-            <a href="Examen/sistemC.php?personaje=<?= $id_profesor_final ?>&dialogo=1&pregunta=0" 
-               class="btn btn-exam">
-                📝 Ir al Examen de <?= htmlspecialchars($filter_materia) ?>
-            </a>
-        <?php endif; ?>
-
-        <?php if (!empty($filter_materias) && empty($filter_materia)): ?>
-            <?php foreach ($filter_materias as $fm): ?>
-                <?php
-                $materia_norm = norm($fm);
-                $id_temp = '1Cu';
-                foreach ($materia_a_profesor_id as $mat_map => $id) {
-                    if (norm($mat_map) === $materia_norm || str_contains($materia_norm, norm($mat_map))) {
-                        $id_temp = $id;
-                        break;
-                    }
-                }
-                ?>
-                <a href="Examen/sistemC.php?personaje=<?= $id_temp ?>&dialogo=1&pregunta=0" 
-                   class="btn btn-exam" style="margin:6px;">
-                    📝 Examen: <?= htmlspecialchars($fm) ?>
-                </a>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
-<?php endif; ?>
+</main>
 
 <script src="assets/js/app.js"></script>
-
 <script>
-// ============================================
-// DASHBOARD MAIN SCRIPT
-// ============================================
+    // Scroll reveal logic
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
+    };
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Dashboard DOMContentLoaded iniciado');
-    
-    // ===== SCROLL TO TOP BUTTON =====
-    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-    function toggleScrollBtn(){
-        const scrolledAmount = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-        const scrolled = scrolledAmount > 300;
-        scrollToTopBtn.style.display = scrolled ? 'flex' : 'none';
-    }
-    window.addEventListener('scroll', toggleScrollBtn, { passive: true });
-    toggleScrollBtn();
-    scrollToTopBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-    // ===== HIGHLIGHT MATERIA AL CARGAR =====
-    <?php if (!empty($highlight_materia) || $filter_materia): ?>
-        (function(){
-            const name = <?php echo json_encode($filter_materia ?: $highlight_materia); ?>;
-            const targetId = 'materia-' + encodeURIComponent(name);
-            const target = document.getElementById(targetId);
-            if (target) {
-                target.classList.add('materia-highlight');
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                setTimeout(() => target.classList.remove('materia-highlight'), 1800);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = "1";
+                entry.target.style.transform = "translateY(0)";
+                observer.unobserve(entry.target);
             }
-        })();
-    <?php endif; ?>
+        });
+    }, observerOptions);
 
-    // ===== SCROLL REVEAL ANIMATIONS =====
-    (function() {
-        const els = Array.from(document.querySelectorAll('.leccion-item, .materia-group'));
-        if (!els.length) return;
-        const reveal = el => el.classList.add('visible');
-        const pending = new Set(els.filter(el => !el.classList.contains('visible')));
-        const io = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting && pending.has(e.target)) {
-                    reveal(e.target);
-                    io.unobserve(e.target);
-                    pending.delete(e.target);
-                }
+    document.querySelectorAll('.materia-group').forEach(el => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(30px)";
+        el.style.transition = "var(--transition-smooth)";
+        observer.observe(el);
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('lessonSearch');
+    const materiaGroups = document.querySelectorAll('.materia-group');
+    const combatArea = document.getElementById('filter-and-combat-area');
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        
+        // El área de combate y filtros NO debe desaparecer si hay un término de búsqueda,
+        // a menos que el usuario lo prefiera. Según tu petición, debe mantenerse.
+        if (term !== "") {
+            combatArea.style.opacity = "0.5"; // Lo atenuamos un poco para dar foco a los resultados
+            combatArea.style.pointerEvents = "none"; // Evitamos clics accidentales durante búsqueda
+        } else {
+            combatArea.style.opacity = "1";
+            combatArea.style.pointerEvents = "all";
+        }
+
+        materiaGroups.forEach(group => {
+            // Ignorar el área de combate en el filtrado de lecciones
+            if (group.closest('#filter-and-combat-area')) return;
+
+            const leccionCards = group.querySelectorAll('.leccion-card');
+            let hasVisibleLecciones = false;
+
+            leccionCards.forEach(card => {
+                const title = card.querySelector('.leccion-name').textContent.toLowerCase();
+                const isMatch = title.includes(term);
+                
+                card.style.display = isMatch ? 'grid' : 'none';
+                if (isMatch) hasVisibleLecciones = true;
             });
-        }, { threshold: [0, 0.1, 0.25], rootMargin: '0px 0px -10% 0px' }) : null;
-        if (io) pending.forEach(el => io.observe(el));
-        let ticking = false;
-        const check = () => {
-            ticking = false;
-            const vh = window.innerHeight || document.documentElement.clientHeight || 0;
-            const margin = Math.max(40, vh * 0.1);
-            pending.forEach(el => {
-                const r = el.getBoundingClientRect();
-                if (r.top < vh - margin && r.bottom > margin) {
-                    reveal(el);
-                    if (io) io.unobserve(el);
-                    pending.delete(el);
-                }
-            });
-        };
-        const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(check); } };
-        ['scroll','touchmove','resize','orientationchange'].forEach(ev => window.addEventListener(ev, onScroll, { passive: true }));
-        setTimeout(check, 0);
-        setTimeout(check, 300);
-    })();
 
-    // ===== FILTRADO POR MATERIA O PROFESOR =====
-    const params = new URLSearchParams(window.location.search);
-    const materia = params.get('materia');
-    const profesor = params.get('profesor');
-
-    if (materia) {
-        document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
-            const title = sec.querySelector('.materia-title')?.textContent || '';
-            if (!title || title.toLowerCase().indexOf(materia.toLowerCase()) === -1) {
-                sec.style.display = 'none';
-            } else {
-                sec.style.display = 'block';
+            // Hide/Show the entire materia group based on results
+            group.style.display = hasVisibleLecciones ? 'block' : 'none';
+            
+            // Re-trigger observer for visible elements
+            if (hasVisibleLecciones) {
+                group.style.opacity = "1";
+                group.style.transform = "translateY(0)";
             }
         });
-
-        document.querySelectorAll('.leccion-list a').forEach(a => {
-            try {
-                const url = new URL(a.href, window.location.origin);
-                if (!url.searchParams.get('materia')) {
-                    url.searchParams.set('materia', materia);
-                    a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
-                }
-            } catch(e){ }
-        });
-    }
-
-    if (profesor) {
-        const profesorMateriaMap = {
-            'Miguel Marquez': ['Temas Selectos de Matemáticas I y II'],
-            'Enrique': ['Inglés'],
-            'Espindola': ['Pensamiento Matemático III'],
-            'Manuel': ['Programación'],
-            'Meza': ['Programación'],
-            'Herson': ['Física','Química'],
-            'Carolina': ['Ecosistemas'],
-            'Refugio & Padilla': ['Ciencias Sociales'],
-            'Armando': ['Historia']
-        };
-
-        function normJs(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/&/g,'y').trim(); }
-        let profKey = Object.keys(profesorMateriaMap).find(k => {
-            return normJs(k).includes(normJs(profesor)) || normJs(profesor).includes(normJs(k));
-        });
-        const wanted = (profesorMateriaMap[profKey] || []).map(s => normJs(s));
-
-        document.querySelectorAll('.materia-group, .materia-section').forEach(sec => {
-            const title = sec.querySelector('.materia-title')?.textContent || '';
-            const keep = wanted.some(w => normJs(title).indexOf(w) !== -1);
-            if (!keep) sec.style.display = 'none';
-            else { 
-                sec.style.display = 'block'; 
-                sec.classList.add('materia-highlight'); 
-            }
-        });
-
-        document.querySelectorAll('.leccion-list a').forEach(a => {
-            try {
-                const url = new URL(a.href, window.location.origin);
-                if (!url.searchParams.get('profesor')) {
-                    url.searchParams.set('profesor', profesor);
-                    a.href = url.pathname + '?' + url.searchParams.toString() + (url.hash || '');
-                }
-            } catch(e){ }
-        });
-    }
-
-    // ===== FETCH Y ACTUALIZAR DASHBOARD =====
-    // Nota: fetchAndUpdateDashboard() ya se ejecuta en app.js al cargar
-    // No necesitamos llamarla aquí también
-});
+    });
 </script>
 
 </body>

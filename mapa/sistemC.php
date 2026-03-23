@@ -1,358 +1,436 @@
 <?php
+// ==========================================
+// LC-ADVANCE - sistemC.php (Rediseño Premium)
+// ==========================================
+require_once '../config/config.php';
+iniciarSesionSegura();
+requireLogin(true);
+
 $idPersonaje = $_GET['personaje'] ?? '1Cu';
 $idDialogo = intval($_GET['dialogo'] ?? 1);
 $indicePregunta = intval($_GET['pregunta'] ?? 0);
+$returnUrl = $_GET['return_url'] ?? '../dashboard.php';
+$slugExamen = $_GET['slug'] ?? 'examen_' . $idPersonaje;
 
-$conexion = new mysqli("localhost", "root", "", "dialogos");
-if ($conexion->connect_error) die("Error de conexión: " . $conexion->connect_error);
+try {
+    // Diálogo actual
+    $stmt = $pdo->prepare("SELECT DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? AND IDDialogoC = ?");
+    $stmt->execute([$idPersonaje, $idDialogo]);
+    $row = $stmt->fetch();
+    $texto = "...";
+    $tipoDialogo = "Pregunta";
+    if ($row) {
+        $texto = strtoupper($row["DialogoC"]);
+        $tipoDialogo = $row["TipodialogoC"];
+    }
 
-// Diálogo actual
-$sql = "SELECT DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? AND IDDialogoC = ?";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("si", $idPersonaje, $idDialogo);
-$stmt->execute();
-$result = $stmt->get_result();
-$texto = "...";
-$tipoDialogo = "Pregunta";
-if ($row = $result->fetch_assoc()) {
-  $texto = strtoupper($row["DialogoC"]);
-  $tipoDialogo = $row["TipodialogoC"];
+    // Todos los diálogos
+    $stmt = $pdo->prepare("SELECT IDDialogoC, DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? ORDER BY CAST(IDDialogoC AS UNSIGNED) ASC");
+    $stmt->execute([$idPersonaje]);
+    $dialogos = [];
+    while ($r = $stmt->fetch()) {
+        $dialogos[] = [
+            "id" => intval($r["IDDialogoC"]),
+            "texto" => strtoupper($r["DialogoC"]),
+            "tipo" => $r["TipodialogoC"]
+        ];
+    }
+
+    // Maestro
+    $stmt = $pdo->prepare("SELECT PersonajeC FROM idsmaestros WHERE IDPersonajeC = ?");
+    $stmt->execute([$idPersonaje]);
+    $r = $stmt->fetch();
+    $nombreMaestro = "MAESTRO DESCONOCIDO";
+    if ($r) {
+        $nombreMaestro = "MAESTRO " . strtoupper($r["PersonajeC"]);
+    }
+
+    // Preguntas
+    $stmt = $pdo->prepare("SELECT * FROM preguntas WHERE IDPersonajeC = ? ORDER BY IDPregunta ASC");
+    $stmt->execute([$idPersonaje]);
+    $preguntas = [];
+    while ($r = $stmt->fetch()) {
+        $preguntas[] = [
+            "id" => intval($r["IDPregunta"]),
+            "Pregunta" => strtoupper($r["Pregunta"]),
+            "Opcion1" => strtoupper($r["Opcion1"]),
+            "Opcion2" => strtoupper($r["Opcion2"]),
+            "Opcion3" => strtoupper($r["Opcion3"]),
+            "RespuestaCorrecta" => intval($r["RespuestaCorrecta"]),
+            "TipoPreguntaC" => $r["TipoPreguntaC"]
+        ];
+    }
+
+    // Imagen del profesor (buscamos en la carpeta Examen que es donde están)
+    $imgProfesor = "../Examen/" . $idPersonaje . ".png";
+    if (!file_exists($imgProfesor)) {
+        $imgProfesor = "../Examen/1Cu.png"; // Fallback
+    }
+
+} catch (PDOException $e) {
+    die("Error: " . $e->getMessage());
 }
-$stmt->close();
-
-// Todos los diálogos
-$sql = "SELECT IDDialogoC, DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? ORDER BY IDDialogoC ASC";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("s", $idPersonaje);
-$stmt->execute();
-$result = $stmt->get_result();
-$dialogos = [];
-while ($row = $result->fetch_assoc()) {
-  $dialogos[] = [
-    "id" => intval($row["IDDialogoC"]),
-    "texto" => strtoupper($row["DialogoC"]),
-    "tipo" => $row["TipodialogoC"]
-  ];
-}
-$stmt->close();
-
-// Maestro
-$sql = "SELECT PersonajeC FROM idsmaestros WHERE IDPersonajeC = ?";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("s", $idPersonaje);
-$stmt->execute();
-$result = $stmt->get_result();
-$nombreMaestro = "MAESTRO DESCONOCIDO";
-if ($row = $result->fetch_assoc()) {
-  $nombreMaestro = "MAESTRO " . strtoupper($row["PersonajeC"]);
-}
-$stmt->close();
-
-// Imágenes
-$sql = "SELECT ImgC FROM imgcombate WHERE IDPersonajeC = ?";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("s", $idPersonaje);
-$stmt->execute();
-$result = $stmt->get_result();
-$imgIdle = "cucoidle";
-$imgAtk = "cucoatk1";
-while ($row = $result->fetch_assoc()) {
-  $nombre = strtolower($row["ImgC"]);
-  if (str_ends_with($nombre, "idle")) $imgIdle = $nombre;
-  if (str_contains($nombre, "atk")) $imgAtk = $nombre;
-}
-$stmt->close();
-
-// Preguntas
-$sql = "SELECT * FROM preguntas WHERE IDPersonajeC = ? ORDER BY IDPregunta ASC";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("s", $idPersonaje);
-$stmt->execute();
-$result = $stmt->get_result();
-$preguntas = [];
-while ($row = $result->fetch_assoc()) {
-  $preguntas[] = [
-    "id" => intval($row["IDPregunta"]),
-    "Pregunta" => strtoupper($row["Pregunta"]),
-    "Opcion1" => strtoupper($row["Opcion1"]),
-    "Opcion2" => strtoupper($row["Opcion2"]),
-    "Opcion3" => strtoupper($row["Opcion3"]),
-    "RespuestaCorrecta" => intval($row["RespuestaCorrecta"]),
-    "TipoPreguntaC" => $row["TipoPreguntaC"]
-  ];
-}
-$stmt->close();
-
-$conexion->close();
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Combate modular</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      background-color: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE COMBATE | LC-ADVANCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+            --neon-green: #39ff14;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(10, 10, 15, 0.85);
+        }
 
-    .cuadro {
-      width: 100vh;
-      height: 100vh;
-      box-sizing: border-box;
-      position: relative;
-      border: 2px solid white;
-      overflow: hidden;
-    }
+        body {
+            margin: 0;
+            background-color: #050508;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-    .imagen-personaje {
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 350px;
-      height: 350px;
-      background-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-    }
+        /* Animated Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black, transparent 85%);
+            animation: gridMove 25s linear infinite;
+        }
 
-    .imagen-personaje img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      image-rendering: pixelated;
-    }
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 60px; }
+        }
 
-    .barra-estado {
-      position: absolute;
-      bottom: 140px;
-      left: 5%;
-      width: 90%;
-      height: 200px;
-      border: 2px solid white;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      color: white;
-      text-align: center;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      overflow: hidden;
-      z-index: 2;
-    }
+        .combat-container {
+            width: 95vw;
+            max-width: 1200px;
+            height: 95vh;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 255, 0.1);
+            overflow: hidden;
+        }
 
-    .dialogo-texto {
-      width: 100%;
-    }
+        /* Header / Stats */
+        .combat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px 20px;
+            border-bottom: 1px solid var(--border-glass);
+            flex-shrink: 0;
+            z-index: 10;
+        }
 
-    #estadoMaestro {
-  position: absolute;
-  bottom: 100px;
-  left: 5%;
-  width: 90%;
-  height: 40px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: white;
-  text-transform: uppercase;
-  z-index: 2;
-}
+        .maestro-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-.barra-vida {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+        .maestro-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px var(--neon-cyan);
+        }
 
-.etiqueta {
-  font-size: 10px;
-  color: white;
-  font-family: 'Press Start 2P', monospace;
-}
+        .health-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
 
-.vida-contenedor {
-  width: 120px;
-  height: 16px;
-  border: 2px solid white;
-  background-color: black;
-  position: relative;
-}
+        .health-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--neon-yellow);
+        }
 
-.vida-relleno {
-  height: 100%;
-  background-color: darkred;
-  width: 100%;
-  transition: width 0.3s ease;
-}
+        .health-bar-bg {
+            width: 300px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-glass);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
 
+        .health-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff4444);
+            width: 100%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+        }
 
-    .botonera {
-      position: absolute;
-      bottom: 60px;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-    }
+        /* Character Area */
+        .character-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
 
-    .boton {
-      background-color: black;
-      color: white;
-      border: 2px solid white;
-      padding: 10px 20px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 12px;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: background-color 0.2s;
-    }
+        .character-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90vh;
+            height: 90vh;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
+            z-index: 0;
+            animation: pulse 4s infinite ease-in-out;
+        }
 
-    .boton:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
 
-    .boton:hover:enabled {
-      background-color: white;
-      color: black;
-    }
+        .character-img {
+            position: absolute;
+            bottom: -100px; /* Se apoya sobre el cuadro de diálogo */
+            height: 100vh; /* Altura masiva */
+            width: auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+            z-index: 2;
+            filter: drop-shadow(0 0 50px rgba(0, 255, 255, 0.5));
+            transition: transform 0.3s ease;
+        }
 
-    .pregunta {
-      font-size: 8px;
-      margin-bottom: 10px;
-      line-height: 1.4;
-      text-align: center;
-    }
+        .character-img:hover {
+            transform: scale(1.02);
+        }
 
-    .opciones {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-    }
+        /* Dialog / Question Box */
+        .dialog-box {
+            background: rgba(5, 5, 10, 0.8);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 24px;
+            padding: 35px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), inset 0 0 20px rgba(0, 255, 255, 0.05);
+            flex-shrink: 0;
+            z-index: 5; /* Por encima del personaje */
+            margin-bottom: 20px;
+        }
 
-    .opcion {
-      font-size: 8px;
-      padding: 6px 12px;
-      border: 2px solid white;
-      background-color: black;
-      color: white;
-      font-family: 'Press Start 2P', monospace;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
+        .dialog-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: center;
+            color: #fff;
+        }
 
-    .opcion:hover {
-      background-color: white;
-      color: black;
-    }
+        .question-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--neon-yellow);
+            margin-bottom: 25px;
+            text-align: center;
+            display: block;
+        }
 
-    .palomita {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 80px;
-      color: lime;
-      opacity: 0;
-      animation: aparecer 1s ease-out forwards;
-      z-index: 5;
-    }
+        /* Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
 
-    @keyframes aparecer {
-      0% {
-        transform: translate(-50%, 0%) scale(0.5);
-        opacity: 0;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-50%, -150%) scale(1);
-        opacity: 0;
-      }
-    }
-    @keyframes temblor {
-  0%   { transform: translateX(0); }
-  10%  { transform: translateX(-8px); }
-  20%  { transform: translateX(8px); }
-  30%  { transform: translateX(-10px); }
-  40%  { transform: translateX(10px); }
-  50%  { transform: translateX(-6px); }
-  60%  { transform: translateX(6px); }
-  70%  { transform: translateX(-4px); }
-  80%  { transform: translateX(4px); }
-  90%  { transform: translateX(-2px); }
-  100% { transform: translateX(0); }
-}
+        .option-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 15px 25px;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-.temblando {
-  animation: temblor 0.5s ease;
-}
+        .option-btn:hover:not(:disabled) {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--neon-cyan);
+            transform: translateX(10px);
+        }
 
+        .option-btn span {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--neon-cyan);
+        }
 
-  </style>
+        /* Footer Buttons */
+        .combat-footer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .btn-combat {
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn-next:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-exit {
+            background: transparent;
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        .btn-exit:hover {
+            background: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+
+        /* Correct/Wrong Visuals */
+        .palomita {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            color: var(--neon-green);
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 0 30px var(--neon-green);
+            display: none;
+            animation: popCheck 0.8s ease-out forwards;
+        }
+
+        @keyframes popCheck {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .shaking {
+            animation: shake 0.1s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .combat-container { padding: 15px; height: 95vh; }
+            .health-bar-bg { width: 150px; }
+            .health-label { display: none; }
+            .character-img { max-height: 250px; }
+            .dialog-text { font-size: 10px; }
+            .question-text { font-size: 16px; }
+            .option-btn { font-size: 14px; padding: 12px; }
+        }
+    </style>
 </head>
 <body>
-  <div class="cuadro">
-    <div class="imagen-personaje">
-      <img id="imgCuco" src="imagenes/imgCuco/<?= $imgIdle ?>.png" alt="Personaje">
+
+<div class="grid-bg"></div>
+
+<div class="combat-container" id="combatUI">
+    
+    <!-- Header Stats -->
+    <header class="combat-header">
+        <div class="maestro-info">
+            <span class="maestro-name"><?= htmlspecialchars($nombreMaestro) ?></span>
+            <span style="font-size: 10px; color: rgba(255,255,255,0.4);">MODO: EXAMEN_FINAL</span>
+        </div>
+        <div class="health-bar-container">
+            <span class="health-label">CALIF:</span>
+            <div class="health-bar-bg">
+                <div id="vidaRelleno" class="health-bar-fill"></div>
+            </div>
+            <span id="calificacionTexto" style="font-family: 'Press Start 2P', cursive; font-size: 12px; color: var(--neon-pink);">10/10</span>
+        </div>
+    </header>
+
+    <!-- Center Character Area -->
+    <div class="character-area">
+        <div class="character-glow"></div>
+        <img id="imgCuco" src="<?= $imgProfesor ?>" alt="Profesor" class="character-img">
+        <div id="palomita" class="palomita">✔️</div>
     </div>
 
-    <!-- 🗨️ Cuadro de diálogo -->
-    <div class="barra-estado">
-      <div class="dialogo-texto" id="dialogo"></div>
+    <!-- Bottom Dialog/Action Area -->
+    <div class="dialog-box" id="dialogBox">
+        <div id="dialogContent" class="dialog-text"></div>
     </div>
 
-    <!-- 🟦 Cuadro de estado del maestro -->
-<!-- 🟦 Cuadro de estado del maestro -->
-<div id="estadoMaestro">
-  <span class="etiqueta"><?= $nombreMaestro ?></span>
-  <div class="barra-vida">
-    <span class="etiqueta">CALIF</span>
-    <div class="vida-contenedor">
-      <div id="vidaRelleno" class="vida-relleno"></div>
-    </div>
-    <span id="calificacionTexto" class="etiqueta">10/10</span>
-  </div>
+    <!-- Footer Controls -->
+    <footer class="combat-footer">
+        <button class="btn-combat btn-exit" onclick="window.location.href='../dashboard.php'">HUIR</button>
+        <button class="btn-combat btn-next" id="btnSiguiente" disabled>SIGUIENTE</button>
+    </footer>
+
 </div>
-
-
-
-
-    <!-- 🎮 Botonera -->
-    <div class="botonera">
-      <button class="boton" id="btnExamen" disabled>SIGUIENTE</button>
-      <button class="boton">HUIR</button>
-      <button class="boton">RETAR AL PROFESOR</button>
-    </div>
-
-    <!-- ✔️ Palomita -->
-    <div id="palomita" class="palomita" style="display: none;">✔️</div>
-  </div>
 
 <script>
 const preguntas = <?= json_encode($preguntas) ?>;
@@ -361,123 +439,147 @@ const personaje = "<?= $idPersonaje ?>";
 let dialogoActual = <?= $idDialogo ?>;
 let preguntaActual = <?= $indicePregunta ?>;
 
-const contenedor = document.getElementById("dialogo");
-const btnExamen = document.getElementById("btnExamen");
-const imgCuco = document.getElementById("imgCuco");
-const imgIdle = "imagenes/imgCuco/<?= $imgIdle ?>.png";
-const imgAtk = "imagenes/imgCuco/<?= $imgAtk ?>.png";
+const dialogContent = document.getElementById("dialogContent");
+const btnSiguiente = document.getElementById("btnSiguiente");
+const vidaRelleno = document.getElementById("vidaRelleno");
+const califTexto = document.getElementById("calificacionTexto");
+const combatUI = document.getElementById("combatUI");
 
 let vidaActual = 10;
 
 function reducirVida() {
-  vidaActual = Math.max(0, vidaActual - 1);
-  const porcentaje = (vidaActual / 10) * 100;
-  document.getElementById("vidaRelleno").style.width = porcentaje + "%";
-  document.getElementById("calificacionTexto").textContent = `${vidaActual}/10`;
+    vidaActual = Math.max(0, vidaActual - 1);
+    const porcentaje = (vidaActual / 10) * 100;
+    vidaRelleno.style.width = porcentaje + "%";
+    califTexto.textContent = `${vidaActual}/10`;
 
-  const estado = document.getElementById("estadoMaestro");
-  estado.classList.add("temblando");
-  setTimeout(() => estado.classList.remove("temblando"), 500);
+    // Visual feedback
+    combatUI.classList.add("shaking");
+    document.body.style.backgroundColor = "rgba(255,0,0,0.1)";
+    setTimeout(() => {
+        combatUI.classList.remove("shaking");
+        document.body.style.backgroundColor = "#050508";
+    }, 500);
 
-  if (vidaActual <= 5) {
-    contenedor.innerHTML = `<div class="pregunta">❌ REPROBASTE EL EXAMEN</div>`;
-    btnExamen.disabled = true;
-    document.querySelectorAll(".opcion").forEach(btn => btn.disabled = true);
-  }
+    if (vidaActual <= 5) {
+        dialogContent.innerHTML = `<div style="color:var(--neon-pink); font-size:20px;">❌ REPROBASTE EL EXAMEN</div><p style="margin-top:20px; font-size:10px;">TU CALIFICACIÓN ES INSUFICIENTE.</p>`;
+        btnSiguiente.textContent = "VOLVER";
+        btnSiguiente.disabled = false;
+        btnSiguiente.onclick = () => window.location.href = '<?= $returnUrl ?>';
+        
+        // Registrar intento aunque falle
+        registrarResultado(vidaActual);
+    }
+}
+
+async function registrarResultado(score) {
+    const isGuest = <?= !empty($_SESSION['usuario_es_invitado']) ? 'true' : 'false' ?>;
+    if (isGuest) return;
+
+    const formData = new FormData();
+    formData.append('accion', 'calificar_examen_final');
+    formData.append('slug', '<?= $slugExamen ?>');
+    formData.append('score', score);
+
+    try {
+        const resp = await fetch('../src/funciones.php', { method: 'POST', body: formData });
+        const data = await resp.json();
+        return data;
+    } catch (err) {
+        console.error("Error al registrar resultado:", err);
+    }
 }
 
 function mostrarDialogo(texto, tipo) {
-  let i = 0;
-  contenedor.textContent = "";
-  btnExamen.disabled = true;
-  btnExamen.onclick = null;
+    let i = 0;
+    dialogContent.textContent = "";
+    btnSiguiente.disabled = true;
+    btnSiguiente.onclick = null;
 
-  const intervalo = setInterval(() => {
-    contenedor.textContent += texto.charAt(i);
-    i++;
-    if (i >= texto.length) {
-      clearInterval(intervalo);
-      btnExamen.disabled = false;
+    const intervalo = setInterval(() => {
+        dialogContent.textContent += texto.charAt(i);
+        i++;
+        if (i >= texto.length) {
+            clearInterval(intervalo);
+            btnSiguiente.disabled = false;
 
-      if (tipo === "Pregunta") {
-        btnExamen.onclick = () => {
-          mostrarPregunta(preguntaActual);
-          btnExamen.disabled = true;
-        };
-      } else {
-        btnExamen.onclick = () => {
-          dialogoActual++;
-          avanzarDialogo();
-          btnExamen.disabled = true;
-        };
-      }
-    }
-  }, 20);
+            if (tipo === "Pregunta") {
+                btnSiguiente.onclick = () => {
+                    mostrarPregunta(preguntaActual);
+                };
+            } else {
+                btnSiguiente.onclick = () => {
+                    dialogoActual++;
+                    avanzarDialogo();
+                };
+            }
+        }
+    }, 25);
 }
 
 function mostrarPregunta(index) {
-  const actual = preguntas[index];
-  if (!actual) {
-    dialogoActual++;
-    avanzarDialogo();
-    return;
-  }
+    const actual = preguntas[index];
+    if (!actual) {
+        dialogoActual++;
+        avanzarDialogo();
+        return;
+    }
 
-  const html = `
-    <div class="pregunta">${actual.Pregunta}</div>
-    <div class="opciones">
-      <button class="opcion" data-opcion="1">${actual.Opcion1}</button>
-      <button class="opcion" data-opcion="2">${actual.Opcion2}</button>
-      <button class="opcion" data-opcion="3">${actual.Opcion3}</button>
-    </div>
-  `;
-  contenedor.innerHTML = html;
-  btnExamen.disabled = true;
+    const html = `
+        <span class="question-text">${actual.Pregunta}</span>
+        <div class="options-grid">
+            <button class="option-btn" onclick="verificarRespuesta(1, ${actual.RespuestaCorrecta})"><span>A</span> ${actual.Opcion1}</button>
+            <button class="option-btn" onclick="verificarRespuesta(2, ${actual.RespuestaCorrecta})"><span>B</span> ${actual.Opcion2}</button>
+            <button class="option-btn" onclick="verificarRespuesta(3, ${actual.RespuestaCorrecta})"><span>C</span> ${actual.Opcion3}</button>
+        </div>
+    `;
+    dialogContent.innerHTML = html;
+    btnSiguiente.disabled = true;
+}
 
-  document.querySelectorAll(".opcion").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const seleccion = parseInt(btn.getAttribute("data-opcion"));
-      if (seleccion === actual.RespuestaCorrecta) {
+window.verificarRespuesta = function(seleccion, correcta) {
+    if (seleccion === correcta) {
         document.getElementById("palomita").style.display = "block";
         setTimeout(() => {
-          document.getElementById("palomita").style.display = "none";
-          preguntaActual++;
-          if (actual.TipoPreguntaC === "Dialogo") {
-            dialogoActual++;
-            avanzarDialogo();
-          } else {
-            mostrarPregunta(preguntaActual);
-          }
+            document.getElementById("palomita").style.display = "none";
+            preguntaActual++;
+            const actual = preguntas[preguntaActual-1];
+            if (actual && actual.TipoPreguntaC === "Dialogo") {
+                dialogoActual++;
+                avanzarDialogo();
+            } else {
+                mostrarPregunta(preguntaActual);
+            }
         }, 1000);
-      } else {
+    } else {
         reducirVida();
-      }
-    });
-  });
-}
+    }
+};
 
 function avanzarDialogo() {
-  const siguiente = dialogos.find(d => d.id === dialogoActual);
-  if (!siguiente) {
-    contenedor.textContent = "✅ COMBATE FINALIZADO";
-    btnExamen.disabled = true;
-    return;
-  }
+    const siguiente = dialogos.find(d => d.id === dialogoActual);
+    if (!siguiente) {
+        dialogContent.innerHTML = `<div style="color:var(--neon-green); font-size:20px;">✅ COMBATE FINALIZADO</div><p style="margin-top:20px; font-size:10px;">HAS DEMOSTRADO TU VALÍA.</p>`;
+        btnSiguiente.textContent = "FINALIZAR";
+        btnSiguiente.disabled = false;
+        btnSiguiente.onclick = () => window.location.href = '<?= $returnUrl ?>';
+        
+        // Registrar éxito y dar puntos
+        registrarResultado(vidaActual);
+        return;
+    }
 
-  mostrarDialogo(siguiente.texto, siguiente.tipo);
+    mostrarDialogo(siguiente.texto, siguiente.tipo);
 }
 
-// 🔄 Inicio
+// Iniciar
 const primero = dialogos.find(d => d.id === dialogoActual);
 if (primero) {
-  mostrarDialogo(primero.texto, primero.tipo);
+    mostrarDialogo(primero.texto, primero.tipo);
 } else {
-  contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
+    dialogContent.textContent = "⚠️ No se encontró el diálogo inicial.";
 }
 </script>
 
-
-
 </body>
 </html>
-

@@ -172,5 +172,46 @@ if ($accion === 'calificar_quiz') {
     exit;
 }
 
+if ($accion === 'calificar_examen_final') {
+    $slug = $_POST['slug'] ?? 'examen_final_general';
+    $score = intval($_POST['score'] ?? 0);
+    $max_score = 10;
+    
+    // XP basado en el score (ej: score 10 = 100 XP)
+    $xp_ganado = $score * 10;
+
+    try {
+        // Guardar en user_progress
+        $stmt = $pdo->prepare("SELECT * FROM user_progress WHERE user_id = ? AND slug = ?");
+        $stmt->execute([$usuario_id, $slug]);
+        $progress = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($progress) {
+            // Solo actualizar si el nuevo score es mayor
+            if ($score > $progress['score']) {
+                $pdo->prepare("UPDATE user_progress SET score = ?, lesson_xp = ?, completed = 1 WHERE user_id = ? AND slug = ?")
+                    ->execute([$score, $xp_ganado, $usuario_id, $slug]);
+            }
+        } else {
+            $pdo->prepare("INSERT INTO user_progress (user_id, slug, score, lesson_xp, completed) VALUES (?, ?, ?, ?, 1)")
+                ->execute([$usuario_id, $slug, $score, $xp_ganado]);
+        }
+
+        // Dar los puntos al usuario
+        $pdo->prepare("UPDATE usuarios SET puntos = puntos + ? WHERE id = ?")
+            ->execute([$xp_ganado, $usuario_id]);
+
+        echo json_encode([
+            'ok' => true,
+            'xp_ganado' => $xp_ganado,
+            'score' => $score
+        ]);
+    } catch (Exception $e) {
+        error_log("Error calificar_examen_final: " . $e->getMessage());
+        echo json_encode(['ok' => false, 'error' => 'Error al guardar progreso del examen.']);
+    }
+    exit;
+}
+
 echo json_encode(['ok' => false, 'error' => 'Acción no válida']);
 ?>

@@ -199,6 +199,22 @@ function calcularNivel($puntos) {
 }
 
 // ================================
+// CONFIGURACIÓN OAUTH (SOCIAL LOGIN)
+// ================================
+
+// Google
+define('GOOGLE_CLIENT_ID', '683843517989-s9or7ddfusfl57nvqcllm09kkebd7vvc.apps.googleusercontent.com');
+define('GOOGLE_CLIENT_SECRET', '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'); // Necesitas copiar el Secreto que te dio Google y pegarlo aquí
+
+// GitHub
+define('GITHUB_CLIENT_ID', 'Ov23lipzxi8W4UooK4C3');
+define('GITHUB_CLIENT_SECRET', 'b605fbe1ba5e3b91fba7de7186cd6bd2ef9bb4ce');
+
+// URL de retorno (Callback)
+// Asegúrate de que esta URL esté registrada en tus consolas de desarrollador
+define('AUTH_CALLBACK_URL', 'http://localhost:8080/LC-ADVANCE/auth_callback.php');
+
+// ================================
 // SISTEMA DE BADGES
 // ================================
 
