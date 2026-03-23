@@ -77,7 +77,8 @@ if ($user_id) {
 // Lecciones completadas (para lista de progreso en sidebar)
 $completed_slugs = [];
 if ($user_id) {
-    $stmt3 = $pdo->query("SELECT slug FROM user_progress WHERE user_id = $user_id AND completed = 1");
+    $stmt3 = $pdo->prepare("SELECT slug FROM user_progress WHERE user_id = ? AND completed = 1");
+    $stmt3->execute([$user_id]);
     $completed_slugs = array_column($stmt3->fetchAll(PDO::FETCH_ASSOC), 'slug');
 }
 
@@ -90,22 +91,33 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title><?php echo htmlspecialchars($leccion['titulo']); ?> | LC-ADVANCE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Fuentes premium -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax y Chart.js -->
     <script>
-      MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+      MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/leccion-ecosistemas-carbono.css">    
+    <link rel="stylesheet" href="assets/css/leccion-ley-liebig.css">    
+    <link rel="stylesheet" href="assets/css/leccion-ley-shelford.css">    
     <style>
         /* ======= LAYOUT CON SIDEBAR ======= */
         :root {
-            --sidebar-w: 315px;
+            --sidebar-w: 320px;
+            --header-h: 70px;
+            --accent-glow: 0 0 30px rgba(0, 255, 255, 0.3);
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             --neon-cyan: #00ffff;
             --neon-pink: #ff00ff;
             --neon-yellow: #ffff00;
@@ -115,21 +127,62 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             --border-glow: rgba(0,255,255,0.25);
         }
 
+        body {
+            background-color: #050508;
+            color: #fff;
+            overflow-x: hidden;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Animated Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black, transparent 85%);
+            animation: gridMove 25s linear infinite;
+        }
+
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 60px; }
+        }
+
+        /* Layout */
         .page-wrapper {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Layout principal: sidebar + contenido */
-        .content-wrapper {
+        .main-header {
+            height: var(--header-h);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .content-container {
             display: flex;
             flex: 1;
             gap: 0;
-            align-items: flex-start;
+            align-items: stretch;
             width: 100%;
-            margin-left: 0;
-            padding-left: var(--sidebar-w);
+            height: calc(100vh - var(--header-h));
+            overflow: hidden;
         }
 
         /* ======= SIDEBAR ======= */
@@ -143,10 +196,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             display: flex;
             flex-direction: column;
             gap: 0.6rem;
-            position: fixed;
-            left: 0;
-            top: 64px;
-            height: calc(100vh - 64px);
+            height: 100%;
             overflow-y: auto;
             z-index: 10;
             scrollbar-width: thin;
@@ -160,17 +210,10 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .sidebar-user-card {
             background: var(--bg-panel);
             border: 1px solid var(--border-glow);
+            border-radius: 12px;
             padding: 0.7rem;
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
-        .sidebar-user-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
         }
 
         .sidebar-avatar {
@@ -199,17 +242,15 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         }
 
         .sidebar-level-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            background: rgba(255,255,0,0.1);
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 0, 0.1);
             border: 1px solid var(--neon-yellow);
             color: var(--neon-yellow);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.55rem;
-            padding: 0.15rem 0.5rem;
-            letter-spacing: 0.06em;
-            margin-top: 0.3rem;
+            font-size: 10px;
+            font-family: 'Press Start 2P', cursive;
+            border-radius: 4px;
+            margin-bottom: 5px;
         }
 
         /* XP Bar */
@@ -231,6 +272,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             overflow: hidden;
             position: relative;
         }
+
         .sidebar-xp-fill {
             height: 100%;
             border-radius: 3px;
@@ -255,6 +297,8 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .sidebar-section {
             border: 1px solid var(--border-glow);
             background: var(--bg-panel);
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         .sidebar-section-title {
@@ -363,10 +407,6 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             border-left-color: var(--neon-cyan);
             background: rgba(0,255,255,0.07);
         }
-        .sidebar-nav-item.done .nav-dot {
-            background: var(--neon-green);
-            box-shadow: 0 0 4px var(--neon-green);
-        }
         .nav-dot {
             width: 6px;
             height: 6px;
@@ -378,17 +418,22 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             background: var(--neon-cyan);
             box-shadow: 0 0 6px var(--neon-cyan);
         }
+        .sidebar-nav-item.done .nav-dot {
+            background: var(--neon-green);
+            box-shadow: 0 0 4px var(--neon-green);
+        }
 
         /* Botón quiz en sidebar */
         .sidebar-quiz-btn {
             width: 100%;
             background: linear-gradient(135deg, rgba(0,255,255,0.08), rgba(255,0,255,0.08));
             border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
             color: var(--neon-cyan);
             font-family: 'Orbitron', sans-serif;
             font-size: 0.55rem;
             letter-spacing: 0.08em;
-            padding: 0.5rem;
+            padding: 0.7rem;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -406,38 +451,212 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .sidebar-back-btn {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
             text-decoration: none;
-            color: rgba(255,255,255,0.35);
+            color: rgba(255,255,255,0.5);
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.52rem;
-            padding: 0.4rem 0.3rem;
-            transition: color 0.18s;
-            border-top: 1px solid var(--border-glow);
-            padding-top: 0.5rem;
+            font-size: 0.6rem;
+            padding: 0.7rem;
+            transition: all 0.2s;
             margin-top: auto;
         }
-        .sidebar-back-btn:hover { color: var(--neon-cyan); }
+        .sidebar-back-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+        }
 
         /* ======= ÁREA DE CONTENIDO ======= */
-        .lesson-area {
+        .lesson-main-content {
             flex: 1;
-            min-width: 0;
-            padding: 1.5rem 2rem;
-            width: 100%;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+        .lesson-main-content::-webkit-scrollbar { width: 6px; }
+        .lesson-main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .lesson-content-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.8s ease-out;
         }
 
-        /* Quitar full-width cuando hay sidebar */
-        .lesson-main {
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .main-content {
-            padding: 0 !important;
-            max-width: 100% !important;
+        .lesson-header {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 30px;
+        }
+
+        .lesson-materia {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .lesson-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 10px;
+            letter-spacing: -1px;
+        }
+
+        .lesson-content {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.52rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.25;
+            font-size: 18px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .lesson-content h2, .lesson-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 40px;
+        }
+
+        .lesson-content p {
+            margin-bottom: 25px;
+        }
+
+        .lesson-content code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--neon-yellow);
+            font-family: 'VT323', monospace;
+            font-size: 1.2em;
+        }
+
+        .lesson-content pre {
+            background: #0a0a0f;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 25px 0;
+        }
+
+        /* Botones Premium */
+        .btn-premium {
+            padding: 16px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-glass);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #fff;
+        }
+
+        /* Modal Quiz Premium */
+        .quiz-modal {
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--neon-cyan);
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            border-radius: 24px;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-label:hover {
+            background: rgba(0, 255, 255, 0.05);
+            border-color: var(--neon-cyan);
+        }
+
+        .option-label input:checked + .radio-custom {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .radio-custom {
+            width: 18px; height: 18px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 50%;
         }
 
         /* Sidebar toggle en móvil */
@@ -454,18 +673,20 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             height: 40px;
             font-size: 1.1rem;
             cursor: pointer;
-            align-items: center;
-            justify-content: center;
+            border-radius: 24px;
         }
 
+        /* Mobile Adjustments */
         @media (max-width: 900px) {
             .lesson-sidebar {
+                position: fixed;
                 left: -100%;
-                transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
+                top: var(--header-h);
+                transition: left 0.4s ease;
                 box-shadow: 4px 0 32px rgba(0,0,0,0.8);
             }
             .lesson-sidebar.open { left: 0; }
-            .sidebar-toggle { display: flex; }
+            .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
             .sidebar-overlay {
                 display: none;
                 position: fixed;
@@ -475,12 +696,8 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
                 top: 64px;
             }
             .sidebar-overlay.active { display: block; }
-            .content-wrapper {
-                padding-left: 0;
-            }
-            .lesson-area {
-                width: 100%;
-            }
+            .content-wrapper { padding-left: 0; }
+            .lesson-area { width: 100%; padding: 20px; }
         }
 
         /* ORIENTACIÓN HORIZONTAL */
@@ -496,9 +713,52 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             }
             .page-wrapper { display: none !important; }
         }
+
+        /* Toast / Result Panels */
+        .result-panel {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--neon-cyan);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            font-family: 'Roboto Mono', monospace;
+            color: #fff;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast {
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 4px solid var(--neon-cyan);
+            padding: 1rem 1.5rem;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,255,255,0.2);
+            animation: slideInRight 0.4s ease forwards;
+        }
+        .toast.hide {
+            animation: slideOutRight 0.4s ease forwards;
+        }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        .detail-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-glass); }
+        .detail-item.correct .detail-ok { color: var(--neon-green); font-weight: bold; margin-top: 5px; }
+        .detail-item.wrong .detail-wrong { color: var(--neon-pink); font-weight: bold; margin-top: 5px; }
+        .detail-q { margin-bottom: 5px; }
+        .detail-a { color: rgba(255,255,255,0.7); font-size: 0.9em; }
     </style>
 </head>
 <body class="<?php echo($slug === 'contaminacion-ambiental') ? 'page-lesson-contaminacion' : ''; ?>">
+
+<div class="grid-bg"></div>
 
 <div class="page-wrapper">
 
@@ -506,18 +766,16 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         <div class="header-title">
             <h1>LC-ADVANCE <span class="access">ACCESS: ONLINE</span></h1>
         </div>
-        <button class="hamburger" type="button" aria-label="Menu">☰</button>
-        <nav class="header-nav">
-            <a href="dashboard.php<?php echo $return_params; ?>" class="btn btn-nav">⬅️ Dashboard</a>
-            <a href="ranking.php" class="btn btn-nav">🏆 Ranking</a>
-            <a href="logout.php" class="btn btn-logout">🚪 Salir</a>
-        </nav>
+        <div class="header-nav" style="display: flex; gap: 10px;">
+            <a href="dashboard.php<?php echo $return_params; ?>" class="btn-premium btn-secondary" style="padding: 10px 20px;">Dashboard</a>
+            <a href="logout.php" class="btn-premium btn-secondary" style="padding: 10px 20px; border-color: var(--neon-pink); color: var(--neon-pink);">Salir</a>
+        </div>
     </header>
 
     <!-- Overlay para cerrar sidebar en móvil -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <div class="content-wrapper">
+    <div class="content-container">
 
         <!-- ======= SIDEBAR ======= -->
         <aside class="lesson-sidebar" id="lessonSidebar">
@@ -595,8 +853,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
     endforeach; ?>
                 </div>
             </div>
-            <?php
-endif; ?>
+            <?php endif; ?>
 
             <!-- Volver al dashboard -->
             <a href="dashboard.php<?php echo $return_params; ?>" class="sidebar-back-btn back-dashboard-btn">
@@ -606,63 +863,69 @@ endif; ?>
         </aside><!-- /sidebar -->
 
         <!-- ======= ÁREA DE CONTENIDO ======= -->
-        <div class="lesson-area">
-            <section class="lesson-main">
-                <h2 class="module-title">MÓDULO DE APRENDIZAJE</h2>
-
-                <div class="tabs">
-                    <button class="tab-btn active" data-tab="content">📚 CONTENIDO</button>
-                    <button class="tab-btn" data-tab="quiz">🧠 <?php echo $completed ? 'REPETIR QUIZ' : 'INICIAR QUIZ'; ?></button>
+        <main class="lesson-main-content">
+            <section class="lesson-content-inner">
+                <div class="lesson-header">
+                    <span class="lesson-materia"><?php echo htmlspecialchars($materia_actual); ?></span>
+                    <h2 class="lesson-title"><?php echo htmlspecialchars($leccion['titulo']); ?></h2>
+                    <div style="display: flex; gap: 20px; margin-top: 15px; font-size: 12px; color: rgba(255,255,255,0.5);">
+                        <span>Status: <?php echo $completed ? '<span style="color:var(--neon-green)">Completado</span>' : 'Pendiente'; ?></span>
+                        <span>Score: <span style="color:var(--neon-yellow)"><?php echo $old_score; ?>/<?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?></span></span>
+                    </div>
                 </div>
 
-                <div id="content-panel" class="panel">
-                    <div class="lesson-header">
-                        <div class="lesson-title-row">
-                            <?php echo $leccion['icon'] ?? '<span class="icon-tema">💾</span>'; ?>
-                            <h3 class="lesson-title"><?php echo htmlspecialchars($leccion['titulo']); ?></h3>
-                        </div>
-                        <span class="lesson-materia"><?php echo htmlspecialchars($leccion['materia']); ?></span>
-                        <p class="previous-score">
-                            Puntuación anterior: <strong><?php echo $old_score; ?></strong> / <?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?>
-                        </p>
-                    </div>
+                <div class="lesson-content">
+                    <?php echo $leccion['contenido']; ?>
+                </div>
 
-                    <div class="lesson-content">
-                        <?php echo $leccion['contenido']; ?>
-                    </div>
-
-                    <div class="lesson-actions">
-                        <button class="btn btn-primary btn-small open-quiz-btn">🧠 INICIAR QUIZ</button>
-                        <a href="dashboard.php<?php echo $return_params; ?>#leccion-<?php echo htmlspecialchars($slug); ?>"
-                           class="btn btn-secondary btn-small back-dashboard-btn">
-                           ↩️ VOLVER AL DASHBOARD
-                        </a>
-                    </div>
+                <div style="margin-top: 50px; display: flex; gap: 20px; flex-wrap: wrap; padding-bottom: 60px;">
+                    <button class="btn-premium btn-primary open-quiz-btn" style="flex:1; min-width: 250px;">
+                        🧠 <?php echo $completed ? 'REPETIR QUIZ' : 'INICIAR QUIZ'; ?>
+                    </button>
+                    
+                    <?php
+                    // Mapeo para el examen final
+                    $materia_a_profesor_id = [
+                        'Temas Selectos de Matemáticas I y II' => '1Le',
+                        'Inglés'                               => '1Go',
+                        'Pensamiento Matemático III'           => '1Es',
+                        'Programación'                         => '1Ma',
+                        'Física I'                             => '1He',
+                        'Química I'                            => '1He',
+                        'Ecosistemas'                          => '1Ca',
+                        'Ciencias Sociales'                    => '1Pa',
+                        'Historia de México'                   => '1Ar',
+                    ];
+                    $prof_id = $materia_a_profesor_id[$materia_actual] ?? '1Cu';
+                    $current_url = urlencode($_SERVER['REQUEST_URI']);
+                    $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actual));
+                    ?>
+                    <a href="Examen/sistemC.php?personaje=<?= $prof_id ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>" class="btn-premium btn-secondary" style="border-color: var(--neon-yellow); color: var(--neon-yellow); flex:1; min-width: 250px;">
+                        ⚔️ EXAMEN FINAL
+                    </a>
                 </div>
             </section>
-        </div><!-- /lesson-area -->
+        </main><!-- /lesson-area -->
 
     </div><!-- /content-wrapper -->
-
-    <!-- MODAL QUIZ -->
-    <div id="quiz-overlay" class="overlay hidden">
-        <div class="quiz-modal">
-            <div class="quiz-header">
-                <h3>🧠 Quiz: <?php echo htmlspecialchars($leccion['titulo']); ?></h3>
-                <button class="close-btn" aria-label="Cerrar quiz">✖</button>
-            </div>
-            <div id="quiz-content" class="quiz-body">
-                <div class="loading">Cargando preguntas...</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Toggle sidebar móvil -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir panel">◀</button>
 
-    <button id="scroll-top" class="scroll-top-btn" aria-label="Subir">▲</button>
-
 </div><!-- /page-wrapper -->
+
+<!-- Modal Quiz -->
+<div id="quiz-overlay" class="overlay hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; display:none;">
+    <div class="quiz-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <h3 style="font-family:'Orbitron',sans-serif; margin:0; color:var(--neon-cyan);">QUIZ: <?php echo htmlspecialchars($leccion['titulo']); ?></h3>
+            <button class="close-btn" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        <div id="quiz-content">
+            <div class="loading">Cargando preguntas...</div>
+        </div>
+    </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -670,64 +933,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizContent    = document.getElementById('quiz-content');
     const openQuizBtns   = document.querySelectorAll('.open-quiz-btn');
     const closeBtn       = document.querySelector('.close-btn');
-    const tabQuiz        = document.querySelector('.tab-btn[data-tab="quiz"]');
-    const tabContent     = document.querySelector('.tab-btn[data-tab="content"]');
-    const scrollTopBtn   = document.getElementById('scroll-top');
-    const hamburger      = document.querySelector('.hamburger');
-    const headerNav      = document.querySelector('.header-nav');
     const sidebar        = document.getElementById('lessonSidebar');
     const sidebarToggle  = document.getElementById('sidebarToggle');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    // ── Hamburger ──
-    if (hamburger && headerNav) {
-        hamburger.addEventListener('click', () => {
-            headerNav.classList.toggle('active');
-            hamburger.textContent = headerNav.classList.contains('active') ? '✖' : '☰';
-        });
-        document.addEventListener('click', (e) => {
-            if (!hamburger.contains(e.target) && !headerNav.contains(e.target) && headerNav.classList.contains('active')) {
-                headerNav.classList.remove('active');
-                hamburger.textContent = '☰';
-            }
-        });
-    }
-
     // ── Sidebar toggle (móvil) ──
     function openSidebar()  { sidebar.classList.add('open'); sidebarOverlay.classList.add('active'); sidebarToggle.textContent = '✖'; }
     function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('active'); sidebarToggle.textContent = '◀'; }
-    sidebarToggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
-    sidebarOverlay.addEventListener('click', closeSidebar);
+    if(sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
 
     const quizData = <?php echo json_encode($quiz_selected); ?>;
 
-    // ── Scroll to top ──
-    window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 400));
-    scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
     // ── Abrir quiz ──
     openQuizBtns.forEach(btn => btn.addEventListener('click', openQuiz));
-    if (tabQuiz) tabQuiz.addEventListener('click', openQuiz);
 
     function openQuiz() {
         quizOverlay.classList.remove('hidden');
-        if (tabQuiz) tabQuiz.classList.add('active');
-        tabContent.classList.remove('active');
-        try {
-            if (quizContent.querySelector('.loading')) renderQuiz();
-        } catch (err) {
-            console.error('Error al renderizar quiz:', err);
-            quizContent.innerHTML = `<div class="result-panel"><strong>Error:</strong> No se pudo cargar el quiz.</div>`;
-        }
+        quizOverlay.style.display = 'flex';
+        renderQuiz();
     }
 
     // ── Cerrar quiz ──
     if (closeBtn) closeBtn.addEventListener('click', closeQuiz);
     quizOverlay.addEventListener('click', (e) => { if (e.target === quizOverlay) closeQuiz(); });
+    
     function closeQuiz() {
         quizOverlay.classList.add('hidden');
-        tabContent.classList.add('active');
-        tabQuiz.classList.remove('active');
+        quizOverlay.style.display = 'none';
+        if (quizData.length > 0) {
+            quizContent.innerHTML = '<div class="loading">Cargando preguntas...</div>';
+        }
     }
 
     // ── Renderizar quiz ──
@@ -739,17 +975,19 @@ document.addEventListener('DOMContentLoaded', () => {
         function escapeHtml(str) {
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
         }
+
         let html = '<form id="quiz-form" class="quiz-form">';
         quizData.forEach((q, i) => {
             const name = `q${i}`;
             const shuffled = [...q.opciones].sort(() => Math.random() - 0.5);
             html += `<div class="question-card"><p class="question-text"><strong>${i+1}.</strong> ${escapeHtml(q.pregunta)}</p><div class="options">`;
             shuffled.forEach((op, idx) => {
-                html += `<label class="option-label"><input type="radio" name="${name}" value="${escapeHtml(op)}" ${idx===0?'required':''}><span class="radio-custom"></span><span class="option-text">${escapeHtml(op)}</span></label>`;
+                html += `<label class="option-label"><input type="radio" style="display:none;" name="${name}" value="${escapeHtml(op)}" ${idx===0?'required':''}><span class="radio-custom"></span><span class="option-text">${escapeHtml(op)}</span></label>`;
             });
             html += `</div></div>`;
         });
-        html += `<div class="quiz-submit"><button type="submit" class="btn btn-submit">✅ Enviar y Calificar</button></div></form>`;
+        html += `<div style="text-align:center; margin-top:30px;"><button type="submit" class="btn-premium btn-primary">✅ ENVIAR RESPUESTAS</button></div></form>`;
+        
         quizContent.innerHTML = html;
 
         document.getElementById('quiz-form').addEventListener('submit', async (e) => {
@@ -801,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     detailHtml += '</div>';
                 }
-                detailHtml += `<div style="margin-top:0.6rem"><button class="btn btn-primary" id="close-result">Cerrar</button></div></div>`;
+                detailHtml += `<div style="margin-top:0.6rem"><button class="btn-premium btn-primary" onclick="location.reload()">Cerrar y Continuar</button></div></div>`;
                 quizContent.innerHTML = detailHtml;
 
                 if (xp > 0) {
@@ -811,9 +1049,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.body.appendChild(xpEl);
                     setTimeout(() => xpEl.remove(), 2100);
                 }
-                if (state.nivel > (oldState.nivel || 1)) showToast(`¡Subiste al nivel ${state.nivel}! 🎉`);
 
-                document.getElementById('close-result')?.addEventListener('click', closeQuiz);
+                if (state.nivel > (oldState.nivel || 1)) showToast(`¡Subiste al nivel ${state.nivel}! 🎉`);
 
             } catch (err) {
                 console.error(err);
@@ -857,9 +1094,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 420); }, timeout);
     }
 
-    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([document.querySelector('.lesson-content')]);
 });
 </script>
+
 <script src="assets/js/app.js"></script>
 </body>
 </html>

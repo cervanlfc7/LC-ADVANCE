@@ -1,635 +1,638 @@
 <?php
-@ini_set('display_errors', '0');
-require_once dirname(__DIR__) . '/config/config.php';
+// ==========================================
+// LC-ADVANCE - sistemC.php (Rediseño Premium)
+// ==========================================
+require_once '../config/config.php';
 iniciarSesionSegura();
 requireLogin(true);
-
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET");
-header("Access-Control-Allow-Headers: Content-Type");
 
 $idPersonaje = $_GET['personaje'] ?? '1Cu';
 $idDialogo = intval($_GET['dialogo'] ?? 1);
 $indicePregunta = intval($_GET['pregunta'] ?? 0);
+$returnUrl = $_GET['return_url'] ?? '../dashboard.php';
+$slugExamen = $_GET['slug'] ?? 'examen_' . $idPersonaje;
 
 try {
-  $stmt = $pdo->prepare("SELECT DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? AND IDDialogoC = ?");
-  $stmt->execute([$idPersonaje, $idDialogo]);
-  $row = $stmt->fetch(PDO::FETCH_ASSOC);
-  $texto = "...";
-  $tipoDialogo = "Pregunta";
-  if ($row) {
-    $texto = strtoupper($row["DialogoC"]);
-    $tipoDialogo = $row["TipodialogoC"];
-  }
+    $stmt = $pdo->prepare("SELECT DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? AND IDDialogoC = ?");
+    $stmt->execute([$idPersonaje, $idDialogo]);
+    $row = $stmt->fetch();
+    $texto = "...";
+    $tipoDialogo = "Pregunta";
+    if ($row) {
+        $texto = strtoupper($row["DialogoC"]);
+        $tipoDialogo = $row["TipodialogoC"];
+    }
 
-  $stmt = $pdo->prepare("SELECT IDDialogoC, DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? ORDER BY IDDialogoC ASC");
-  $stmt->execute([$idPersonaje]);
-  $dialogos = [];
-  while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $dialogos[] = [
-      "id" => intval($r["IDDialogoC"]),
-      "texto" => strtoupper($r["DialogoC"]),
-      "tipo" => $r["TipodialogoC"]
-    ];
-  }
+    $stmt = $pdo->prepare("SELECT IDDialogoC, DialogoC, TipodialogoC FROM dilogoscombate WHERE IDPersonajeC = ? ORDER BY CAST(IDDialogoC AS UNSIGNED) ASC");
+    $stmt->execute([$idPersonaje]);
+    $dialogos = [];
+    while ($r = $stmt->fetch()) {
+        $dialogos[] = [
+            "id" => intval($r["IDDialogoC"]),
+            "texto" => strtoupper($r["DialogoC"]),
+            "tipo" => $r["TipodialogoC"]
+        ];
+    }
 
-  $ids = array_column($dialogos, 'id');
-  if (!in_array($idDialogo, $ids, true)) {
-    $idDialogo = $dialogos[0]['id'] ?? 1;
-  }
+    $stmt = $pdo->prepare("SELECT PersonajeC FROM idsmaestros WHERE IDPersonajeC = ?");
+    $stmt->execute([$idPersonaje]);
+    $r = $stmt->fetch();
+    $nombreMaestro = "MAESTRO DESCONOCIDO";
+    if ($r) {
+        $nombreMaestro = "MAESTRO " . strtoupper($r["PersonajeC"]);
+    }
 
-  $stmt = $pdo->prepare("SELECT PersonajeC FROM idsmaestros WHERE IDPersonajeC = ?");
-  $stmt->execute([$idPersonaje]);
-  $r = $stmt->fetch(PDO::FETCH_ASSOC);
-  $nombreMaestro = "MAESTRO DESCONOCIDO";
-  if ($r) {
-    $nombreMaestro = "MAESTRO " . strtoupper($r["PersonajeC"]);
-  }
+    $stmt = $pdo->prepare("SELECT * FROM preguntas WHERE IDPersonajeC = ? ORDER BY IDPregunta ASC");
+    $stmt->execute([$idPersonaje]);
+    $preguntas = [];
+    while ($r = $stmt->fetch()) {
+        $preguntas[] = [
+            "id" => intval($r["IDPregunta"]),
+            "Pregunta" => strtoupper($r["Pregunta"]),
+            "Opcion1" => strtoupper($r["Opcion1"]),
+            "Opcion2" => strtoupper($r["Opcion2"]),
+            "Opcion3" => strtoupper($r["Opcion3"]),
+            "RespuestaCorrecta" => intval($r["RespuestaCorrecta"]),
+            "TipoPreguntaC" => $r["TipoPreguntaC"]
+        ];
+    }
 
-  $imgProfesor = $idPersonaje . ".png";
-  $imgPorDefecto = "default.png";
-  $imgFinal = file_exists($imgProfesor) ? $imgProfesor : $imgPorDefecto;
+    $imgProfesor = $idPersonaje . ".png";
+    if (!file_exists($imgProfesor)) {
+        $imgProfesor = "1Cu.png";
+    }
 
-  $stmt = $pdo->prepare("SELECT * FROM preguntas WHERE IDPersonajeC = ? ORDER BY IDPregunta ASC");
-  $stmt->execute([$idPersonaje]);
-  $preguntas = [];
-  while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $preguntas[] = [
-      "id" => intval($r["IDPregunta"]),
-      "Pregunta" => strtoupper($r["Pregunta"]),
-      "Opcion1" => strtoupper($r["Opcion1"]),
-      "Opcion2" => strtoupper($r["Opcion2"]),
-      "Opcion3" => strtoupper($r["Opcion3"]),
-      "RespuestaCorrecta" => intval($r["RespuestaCorrecta"]),
-      "TipoPreguntaC" => $r["TipoPreguntaC"]
-    ];
-  }
-} catch (Throwable $e) {
-  http_response_code(500);
-  echo "Error interno";
-  exit;
+} catch (PDOException $e) {
+    die("Error: " . $e->getMessage());
 }
-
-// Diálogo actual
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Combate modular</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      background-color: #050505;
-      background-image: 
-        radial-gradient(circle at center, rgba(0, 243, 255, 0.05) 0%, transparent 70%),
-        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-      background-size: 100% 100%, 100% 4px, 3px 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-      color: #fff;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE COMBATE | LC-ADVANCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+            --neon-green: #39ff14;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(10, 10, 15, 0.92);
+        }
 
-    .cuadro {
-      width: 95vw;
-      max-width: 600px;
-      height: 95vh;
-      max-height: 800px;
-      box-sizing: border-box;
-      position: relative;
-      border: 2px solid #00f3ff;
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.2);
-      background-color: rgba(10, 10, 15, 0.95);
-      overflow: hidden;
-      border-radius: 8px;
-    }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
-    .imagen-personaje {
-      position: absolute;
-      top: 5%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 45vh;
-      max-width: 280px;
-      height: 45vh;
-      max-height: 280px;
-      background-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-      filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.5));
-    }
+        body {
+            margin: 0;
+            background-color: #050508;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-    .imagen-personaje img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      image-rendering: pixelated;
-    }
+        /* Animated Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+            mask-image: radial-gradient(circle at center, black, transparent 85%);
+            animation: gridMove 25s linear infinite;
+        }
 
-    .barra-estado {
-      position: absolute;
-      bottom: 165px;
-      left: 5%;
-      width: 90%;
-      height: 25%;
-      min-height: 140px;
-      max-height: 200px;
-      border: 2px solid #00f3ff;
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
-      background: rgba(0, 20, 30, 0.85);
-      backdrop-filter: blur(5px);
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 11px;
-      color: #00f3ff;
-      text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
-      text-align: center;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      overflow-y: auto;
-      z-index: 2;
-      border-radius: 4px;
-    }
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 60px; }
+        }
 
-    #estadoMaestro {
-      position: absolute;
-      bottom: 115px;
-      left: 5%;
-      width: 90%;
-      height: 40px;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      color: #fff;
-      text-transform: uppercase;
-      z-index: 2;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 4px;
-      border: 1px solid rgba(0, 243, 255, 0.2);
-    }
+        /* ============================
+           MAIN LAYOUT: 3 rows
+           - Header (fixed height)
+           - Middle (character + dialog stacked)
+           - Footer (fixed height)
+        ============================ */
+        .combat-container {
+            width: 98vw;
+            max-width: 1200px;
+            height: 98vh;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            position: relative;
+            display: grid;
+            grid-template-rows: auto 1fr auto auto;
+            gap: 0;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 255, 255, 0.08);
+            overflow: hidden;
+            z-index: 1;
+        }
 
-    .barra-vida {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        /* ── HEADER ─────────────────────────── */
+        .combat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(0,0,0,0.3);
+            flex-shrink: 0;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
 
-    .etiqueta {
-      font-size: 9px;
-      color: #fff;
-      font-family: 'Press Start 2P', monospace;
-    }
+        .maestro-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
 
-    .vida-contenedor {
-      width: 100px;
-      height: 12px;
-      border: 1px solid #fff;
-      background-color: #222;
-      position: relative;
-      box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-    }
+        .maestro-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(10px, 2vw, 16px);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px var(--neon-cyan);
+        }
 
-    .vida-relleno {
-      height: 100%;
-      background: linear-gradient(90deg, #ff0055, #ff00ff);
-      box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-      width: 100%;
-      transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+        .health-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .botonera {
-      position: absolute;
-      bottom: 20px;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      padding: 0 10px;
-      box-sizing: border-box;
-      gap: 5px;
-    }
+        .health-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(9px, 1.2vw, 12px);
+            color: var(--neon-yellow);
+            white-space: nowrap;
+        }
 
-    .boton {
-      background: rgba(0, 243, 255, 0.1);
-      color: #00f3ff;
-      border: 1px solid #00f3ff;
-      padding: 15px 10px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 243, 255, 0.2);
-      border-radius: 4px;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+        .health-bar-bg {
+            width: clamp(120px, 25vw, 280px);
+            height: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+        }
 
-    @media (max-width: 480px) {
-      .cuadro {
-        height: 100vh;
-        width: 100vw;
-        border-radius: 0;
-        border: none;
-      }
+        .health-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff2222, #ff6666);
+            width: 100%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 12px rgba(255, 0, 0, 0.5);
+        }
 
-      .imagen-personaje {
-        width: 35vh;
-        height: 35vh;
-        top: 2%;
-      }
+        /* ── CHARACTER AREA ─────────────────── */
+        .character-area {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Personaje pegado abajo del área */
+            overflow: hidden;
+            min-height: 0; /* Permite que el grid comprima correctamente */
+        }
 
-      .barra-estado {
-        bottom: 180px;
-        font-size: 10px;
-        padding: 10px;
-        height: 30%;
-      }
+        /* Glow ambiental detrás del personaje */
+        .character-glow {
+            position: absolute;
+            bottom: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 120%;
+            background: radial-gradient(ellipse at bottom center,
+                rgba(0, 255, 255, 0.18) 0%,
+                rgba(0, 255, 255, 0.05) 45%,
+                transparent 70%);
+            pointer-events: none;
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
 
-      #estadoMaestro {
-        bottom: 130px;
-        font-size: 8px;
-        height: 35px;
-      }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+            50%       { opacity: 1;   transform: translateX(-50%) scaleX(1.06); }
+        }
 
-      .vida-contenedor {
-        width: 70px;
-      }
+        /* El personaje ocupa hasta el 75% de la altura disponible del área,
+           con un máximo absoluto para que no sea gigante */
+        .character-img {
+            position: relative;
+            z-index: 2;
+            /* Altura grande pero controlada */
+            height: clamp(320px, 85%, 620px);
+            width: auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.4))
+                    drop-shadow(0 20px 20px rgba(0,0,0,0.6));
+            transition: transform 0.3s ease, filter 0.3s ease;
+            margin-bottom: -32px;
+        }
 
-      .botonera {
-        flex-direction: column;
-        bottom: 10px;
-        padding: 0 15px;
-        gap: 8px;
-      }
+        .character-img:hover {
+            transform: scale(1.02) translateY(-4px);
+            filter: drop-shadow(0 0 45px rgba(0, 255, 255, 0.6))
+                    drop-shadow(0 20px 20px rgba(0,0,0,0.6));
+        }
 
-      .boton {
-        padding: 12px;
-        font-size: 9px;
-        width: 100%;
-        margin: 0;
-      }
+        /* Efecto correcto ✔ */
+        .palomita {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: clamp(60px, 10vw, 110px);
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 0 30px var(--neon-green);
+            display: none;
+            animation: popCheck 0.8s ease-out forwards;
+        }
 
-      .opcion {
-        font-size: 8px;
-        padding: 12px 8px;
-      }
+        @keyframes popCheck {
+            0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50%  { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
 
-      .pregunta {
-        font-size: 9px;
-        margin-bottom: 10px;
-      }
-    }
+        /* ── DIALOG BOX ─────────────────────── */
+        .dialog-box {
+            background: rgba(5, 5, 12, 0.88);
+            backdrop-filter: blur(16px);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 18px;
+            padding: clamp(16px, 3vh, 30px) clamp(16px, 3vw, 36px);
+            /* Altura mínima fija, máx flexible */
+            min-height: clamp(140px, 22vh, 220px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 24px rgba(0, 255, 255, 0.12), inset 0 0 16px rgba(0, 255, 255, 0.04);
+            margin: 0 16px;
+            z-index: 5;
+        }
 
-    @media (max-height: 600px) {
-      .imagen-personaje {
-        width: 25vh;
-        height: 25vh;
-      }
-      .barra-estado {
-        bottom: 140px;
-        height: 35%;
-      }
-      #estadoMaestro {
-        bottom: 100px;
-      }
-      .botonera {
-        bottom: 10px;
-      }
-    }
+        .dialog-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(10px, 1.4vw, 14px);
+            line-height: 1.9;
+            text-align: center;
+            color: #fff;
+        }
 
-    .boton:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      border-color: #444;
-      color: #444;
-      box-shadow: none;
-    }
+        .question-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(14px, 2vw, 20px);
+            font-weight: 700;
+            color: var(--neon-yellow);
+            margin-bottom: 16px;
+            text-align: center;
+            display: block;
+        }
 
-    .boton:hover:enabled {
-      background: #00f3ff;
-      color: #000;
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
-      transform: translateY(-2px);
-    }
+        /* ── OPTIONS ────────────────────────── */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
 
-    .pregunta {
-      font-size: 10px;
-      margin-bottom: 15px;
-      line-height: 1.5;
-      text-align: center;
-      color: #fff;
-    }
+        .option-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: clamp(10px, 1.5vh, 14px) clamp(14px, 2vw, 22px);
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            font-size: clamp(12px, 1.5vw, 15px);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.4;
+        }
 
-    .opciones {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      align-items: center;
-      width: 100%;
-    }
+        .option-btn:hover:not(:disabled) {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--neon-cyan);
+            transform: translateX(8px);
+            box-shadow: 0 0 12px rgba(0,255,255,0.15);
+        }
 
-    .opcion {
-      font-size: 9px;
-      width: 100%;
-      padding: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      font-family: 'Press Start 2P', monospace;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border-radius: 4px;
-    }
+        .option-btn span {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(8px, 1vw, 11px);
+            color: var(--neon-cyan);
+            flex-shrink: 0;
+        }
 
-    .opcion:hover {
-      background: rgba(0, 243, 255, 0.2);
-      border-color: #00f3ff;
-      color: #00f3ff;
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
-    }
+        /* ── FOOTER ─────────────────────────── */
+        .combat-footer {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 14px 24px 20px;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid var(--border-glass);
+            flex-wrap: wrap;
+        }
 
-    .palomita {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 80px;
-      color: #00ff88;
-      text-shadow: 0 0 20px #00ff88;
-      opacity: 0;
-      animation: aparecer 1s ease-out forwards;
-      z-index: 5;
-    }
+        .btn-combat {
+            padding: clamp(10px, 1.5vh, 15px) clamp(20px, 3vw, 32px);
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(8px, 1.1vw, 10px);
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
 
-    @keyframes aparecer {
-      0% { transform: translate(-50%, 0%) scale(0.5); opacity: 0; }
-      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-      100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
-    }
+        .btn-next {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 16px rgba(0, 255, 255, 0.3);
+        }
 
-    @keyframes temblor {
-      0% { transform: translateX(0); }
-      10% { transform: translateX(-8px); }
-      20% { transform: translateX(8px); }
-      30% { transform: translateX(-10px); }
-      40% { transform: translateX(10px); }
-      50% { transform: translateX(-6px); }
-      60% { transform: translateX(6px); }
-      70% { transform: translateX(-4px); }
-      80% { transform: translateX(4px); }
-      90% { transform: translateX(-2px); }
-      100% { transform: translateX(0); }
-    }
+        .btn-next:hover:not(:disabled) {
+            box-shadow: 0 0 28px rgba(0, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
 
-    .temblando {
-      animation: temblor 0.5s ease;
-    }
-  </style>
+        .btn-next:disabled {
+            background: #2a2a2a;
+            color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-exit {
+            background: transparent;
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        .btn-exit:hover {
+            background: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 16px rgba(255, 0, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* ── FEEDBACK ANIMATIONS ────────────── */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%       { transform: translateX(-8px); }
+            40%       { transform: translateX(8px); }
+            60%       { transform: translateX(-6px); }
+            80%       { transform: translateX(6px); }
+        }
+
+        .shaking {
+            animation: shake 0.4s ease;
+        }
+
+        /* ── MOBILE ─────────────────────────── */
+        @media (max-width: 600px) {
+            .combat-container {
+                width: 100vw;
+                height: 100dvh;
+                border-radius: 0;
+            }
+
+            .character-img {
+                height: clamp(240px, 55vw, 380px);
+                margin-bottom: -20px;
+            }
+
+            .health-label {
+                display: none;
+            }
+
+            .dialog-box {
+                margin: 0 10px;
+                min-height: 160px;
+            }
+
+            .combat-footer {
+                padding: 10px 16px 14px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .character-img {
+                height: clamp(180px, 45vh, 300px);
+            }
+            .dialog-box {
+                min-height: 120px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="cuadro">
-    <div class="imagen-personaje">
-      <img id="imgProfesor" src="<?= htmlspecialchars($imgFinal) ?>" alt="Profesor <?= $nombreMaestro ?>">
-    </div>
 
-    <div class="barra-estado">
-      <div class="dialogo-texto" id="dialogo"></div>
-    </div>
+<div class="grid-bg"></div>
 
-    <div id="estadoMaestro">
-      <span class="etiqueta"><?= $nombreMaestro ?></span>
-      <div class="barra-vida">
-        <span class="etiqueta">CALIF</span>
-        <div class="vida-contenedor">
-          <div id="vidaRelleno" class="vida-relleno"></div>
+<div class="combat-container" id="combatUI">
+
+    <!-- Header Stats -->
+    <header class="combat-header">
+        <div class="maestro-info">
+            <span class="maestro-name"><?= htmlspecialchars($nombreMaestro) ?></span>
+            <span style="font-size: clamp(8px,1vw,10px); color: rgba(255,255,255,0.35); letter-spacing:1px;">MODO: EXAMEN_FINAL</span>
         </div>
-        <span id="calificacionTexto" class="etiqueta">10/10</span>
-      </div>
+        <div class="health-bar-container">
+            <span class="health-label">CALIF:</span>
+            <div class="health-bar-bg">
+                <div id="vidaRelleno" class="health-bar-fill"></div>
+            </div>
+            <span id="calificacionTexto" style="font-family:'Press Start 2P',cursive; font-size:clamp(10px,1.5vw,13px); color:var(--neon-pink); min-width:48px; text-align:right;">10/10</span>
+        </div>
+    </header>
+
+    <!-- Character Area -->
+    <div class="character-area">
+        <div class="character-glow"></div>
+        <img id="imgCuco" src="<?= $imgProfesor ?>" alt="Profesor" class="character-img">
+        <div id="palomita" class="palomita">✔️</div>
     </div>
 
-    <!-- Botonera actualizada -->
-    <div class="botonera">
-      <button class="boton" id="btnExamen" disabled>SIGUIENTE</button>
-      <button class="boton" id="btnSalir">SALIR</button>
-      <button class="boton" id="btnReintentar" disabled>REINTENTAR EXAMEN</button>
+    <!-- Dialog / Questions -->
+    <div class="dialog-box" id="dialogBox">
+        <div id="dialogContent" class="dialog-text"></div>
     </div>
 
-    <div id="palomita" class="palomita" style="display: none;">✔️</div>
-  </div>
+    <!-- Footer Controls -->
+    <footer class="combat-footer">
+        <button class="btn-combat btn-exit" onclick="window.location.href='../dashboard.php'">HUIR</button>
+        <button class="btn-combat btn-next" id="btnSiguiente" disabled>SIGUIENTE</button>
+    </footer>
+
+</div>
 
 <script>
-const preguntas = <?= json_encode($preguntas) ?>;
-const dialogos = <?= json_encode($dialogos) ?>;
-const personaje = "<?= $idPersonaje ?>";
+const preguntas   = <?= json_encode($preguntas) ?>;
+const dialogos    = <?= json_encode($dialogos) ?>;
+const personaje   = "<?= $idPersonaje ?>";
 let dialogoActual = <?= $idDialogo ?>;
 let preguntaActual = <?= $indicePregunta ?>;
 
-const contenedor = document.getElementById("dialogo");
-const btnExamen = document.getElementById("btnExamen");
-const btnSalir = document.getElementById("btnSalir");
-const btnReintentar = document.getElementById("btnReintentar");
+const dialogContent = document.getElementById("dialogContent");
+const btnSiguiente  = document.getElementById("btnSiguiente");
+const vidaRelleno   = document.getElementById("vidaRelleno");
+const califTexto    = document.getElementById("calificacionTexto");
+const combatUI      = document.getElementById("combatUI");
 
 let vidaActual = 10;
-let reprobado = false; // Ahora también usaremos esta bandera para bloquear avances
-
-// Construir la URL de retorno: preferimos el referrer si viene de dashboard, sino usamos dashboard preservando profesor o materia si vinieran por GET
-const phpReturnParam = "<?= !empty($_GET['profesor']) ? '?profesor=' . urlencode($_GET['profesor']) : (!empty($_GET['materia']) ? '?materia=' . urlencode($_GET['materia']) : '') ?>";
-const computedDashboard = window.location.origin + '/LC-ADVANCE/dashboard.php' + phpReturnParam;
-btnSalir.addEventListener("click", () => {
-  try {
-    if (document.referrer && document.referrer.includes('/dashboard.php')) {
-      // Si venimos del dashboard, volvemos a esa URL exacta (preserva filtros y anclas)
-      window.location.href = document.referrer;
-    } else {
-      // Fallback: dashboard con parámetros si existían
-      window.location.href = computedDashboard;
-    }
-  } catch (e) {
-    // En caso de error, fallback seguro al dashboard
-    window.location.href = window.location.origin + '/LC-ADVANCE/dashboard.php';
-  }
-});
-
-btnReintentar.addEventListener("click", () => {
-  if (!btnReintentar.disabled) {
-    window.location.href = `?personaje=<?= $idPersonaje ?>&dialogo=1&pregunta=0`;
-  }
-});
 
 function reducirVida() {
-  vidaActual = Math.max(0, vidaActual - 1);
-  const porcentaje = (vidaActual / 10) * 100;
-  document.getElementById("vidaRelleno").style.width = porcentaje + "%";
-  document.getElementById("calificacionTexto").textContent = `${vidaActual}/10`;
+    vidaActual = Math.max(0, vidaActual - 1);
+    const porcentaje = (vidaActual / 10) * 100;
+    vidaRelleno.style.width = porcentaje + "%";
+    califTexto.textContent  = `${vidaActual}/10`;
 
-  const estado = document.getElementById("estadoMaestro");
-  estado.classList.add("temblando");
-  setTimeout(() => estado.classList.remove("temblando"), 500);
+    combatUI.classList.add("shaking");
+    document.body.style.backgroundColor = "rgba(255,0,0,0.08)";
+    setTimeout(() => {
+        combatUI.classList.remove("shaking");
+        document.body.style.backgroundColor = "#050508";
+    }, 450);
 
-  if (vidaActual <= 5 && !reprobado) {
-    reprobado = true;
-    contenedor.innerHTML = `<div class="pregunta" style="font-size: 12px; color: red;">❌ REPROBASTE EL EXAMEN</div>`;
-    btnExamen.disabled = true;
-    
-    // Deshabilitamos opciones si las hay visibles
-    document.querySelectorAll(".opcion").forEach(btn => {
-      btn.disabled = true;
-      btn.style.opacity = "0.5";
-    });
-    
-    btnReintentar.disabled = false;
-    
-    // ¡Importante! Ya no avanzamos más ni mostramos más preguntas
-  }
+    if (vidaActual <= 5) {
+        dialogContent.innerHTML = `
+            <div style="color:var(--neon-pink); font-size:clamp(14px,2vw,20px);">❌ REPROBASTE EL EXAMEN</div>
+            <p style="margin-top:14px; font-size:clamp(8px,1vw,10px); color:rgba(255,255,255,0.6);">TU CALIFICACIÓN ES INSUFICIENTE.</p>`;
+        btnSiguiente.textContent = "VOLVER";
+        btnSiguiente.disabled = false;
+        btnSiguiente.onclick = () => window.location.href = '<?= $returnUrl ?>';
+        registrarResultado(vidaActual);
+    }
+}
+
+async function registrarResultado(score) {
+    const isGuest = <?= !empty($_SESSION['usuario_es_invitado']) ? 'true' : 'false' ?>;
+    if (isGuest) return;
+
+    const formData = new FormData();
+    formData.append('accion', 'calificar_examen_final');
+    formData.append('slug', '<?= $slugExamen ?>');
+    formData.append('score', score);
+
+    try {
+        const resp = await fetch('../src/funciones.php', { method: 'POST', body: formData });
+        return await resp.json();
+    } catch (err) {
+        console.error("Error al registrar resultado:", err);
+    }
 }
 
 function mostrarDialogo(texto, tipo) {
-  if (reprobado) return; // Bloqueamos si ya reprobó
+    let i = 0;
+    dialogContent.textContent = "";
+    btnSiguiente.disabled = true;
+    btnSiguiente.onclick = null;
 
-  let i = 0;
-  contenedor.textContent = "";
-  btnExamen.disabled = true;
-  btnExamen.onclick = null;
+    const intervalo = setInterval(() => {
+        dialogContent.textContent += texto.charAt(i);
+        i++;
+        if (i >= texto.length) {
+            clearInterval(intervalo);
+            btnSiguiente.disabled = false;
 
-  const intervalo = setInterval(() => {
-    contenedor.textContent += texto.charAt(i);
-    i++;
-    if (i >= texto.length) {
-      clearInterval(intervalo);
-      btnExamen.disabled = false;
-
-      if (tipo === "Pregunta") {
-        btnExamen.onclick = () => {
-          mostrarPregunta(preguntaActual);
-          btnExamen.disabled = true;
-        };
-      } else {
-        btnExamen.onclick = () => {
-          dialogoActual++;
-          avanzarDialogo();
-          btnExamen.disabled = true;
-        };
-      }
-    }
-  }, 20);
+            if (tipo === "Pregunta") {
+                btnSiguiente.onclick = () => mostrarPregunta(preguntaActual);
+            } else {
+                btnSiguiente.onclick = () => {
+                    dialogoActual++;
+                    avanzarDialogo();
+                };
+            }
+        }
+    }, 25);
 }
 
 function mostrarPregunta(index) {
-  if (reprobado) return; // Bloqueamos si ya reprobó
+    const actual = preguntas[index];
+    if (!actual) {
+        dialogoActual++;
+        avanzarDialogo();
+        return;
+    }
 
-  const actual = preguntas[index];
-  if (!actual) {
-    dialogoActual++;
-    avanzarDialogo();
-    return;
-  }
-
-  const html = `
-    <div class="pregunta">${actual.Pregunta}</div>
-    <div class="opciones">
-      <button class="opcion" data-opcion="1">${actual.Opcion1}</button>
-      <button class="opcion" data-opcion="2">${actual.Opcion2}</button>
-      <button class="opcion" data-opcion="3">${actual.Opcion3}</button>
-    </div>
-  `;
-  contenedor.innerHTML = html;
-  btnExamen.disabled = true;
-
-  document.querySelectorAll(".opcion").forEach(btn => {
-    btn.addEventListener("click", function handler() {
-      // Removemos listeners para evitar clics múltiples
-      document.querySelectorAll(".opcion").forEach(b => b.removeEventListener("click", handler));
-
-      const seleccion = parseInt(btn.getAttribute("data-opcion"));
-      
-      if (seleccion === actual.RespuestaCorrecta) {
-        // ACIERTO
-        document.getElementById("palomita").style.display = "block";
-        setTimeout(() => {
-          document.getElementById("palomita").style.display = "none";
-          
-          if (!reprobado) { // Solo avanza si no ha reprobado aún
-            preguntaActual++;
-            if (actual.TipoPreguntaC === "Dialogo") {
-              dialogoActual++;
-              avanzarDialogo();
-            } else {
-              mostrarPregunta(preguntaActual);
-            }
-          }
-        }, 1000);
-      } else {
-        // ERROR
-        reducirVida();
-        
-        setTimeout(() => {
-          if (!reprobado) { // Solo avanza si no ha reprobado aún
-            preguntaActual++;
-            if (actual.TipoPreguntaC === "Dialogo") {
-              dialogoActual++;
-              avanzarDialogo();
-            } else {
-              mostrarPregunta(preguntaActual);
-            }
-          }
-        }, 800);
-      }
-    });
-  });
+    dialogContent.innerHTML = `
+        <span class="question-text">${actual.Pregunta}</span>
+        <div class="options-grid">
+            <button class="option-btn" onclick="verificarRespuesta(1,${actual.RespuestaCorrecta})"><span>A</span>${actual.Opcion1}</button>
+            <button class="option-btn" onclick="verificarRespuesta(2,${actual.RespuestaCorrecta})"><span>B</span>${actual.Opcion2}</button>
+            <button class="option-btn" onclick="verificarRespuesta(3,${actual.RespuestaCorrecta})"><span>C</span>${actual.Opcion3}</button>
+        </div>`;
+    btnSiguiente.disabled = true;
 }
+
+window.verificarRespuesta = function(seleccion, correcta) {
+    if (seleccion === correcta) {
+        const palomita = document.getElementById("palomita");
+        palomita.style.display = "block";
+        setTimeout(() => {
+            palomita.style.display = "none";
+            preguntaActual++;
+            const actual = preguntas[preguntaActual - 1];
+            if (actual && actual.TipoPreguntaC === "Dialogo") {
+                dialogoActual++;
+                avanzarDialogo();
+            } else {
+                mostrarPregunta(preguntaActual);
+            }
+        }, 1000);
+    } else {
+        reducirVida();
+    }
+};
 
 function avanzarDialogo() {
-  if (reprobado) return; // Bloqueamos si ya reprobó
-
-  const siguiente = dialogos.find(d => d.id === dialogoActual);
-  if (!siguiente) {
-    contenedor.textContent = "✅ COMBATE FINALIZADO";
-    btnExamen.disabled = true;
-    return;
-  }
-
-  mostrarDialogo(siguiente.texto, siguiente.tipo);
+    const siguiente = dialogos.find(d => d.id === dialogoActual);
+    if (!siguiente) {
+        dialogContent.innerHTML = `
+            <div style="color:var(--neon-green); font-size:clamp(14px,2vw,20px);">✅ COMBATE FINALIZADO</div>
+            <p style="margin-top:14px; font-size:clamp(8px,1vw,10px); color:rgba(255,255,255,0.6);">HAS DEMOSTRADO TU VALÍA.</p>`;
+        btnSiguiente.textContent = "FINALIZAR";
+        btnSiguiente.disabled = false;
+        btnSiguiente.onclick = () => window.location.href = '<?= $returnUrl ?>';
+        registrarResultado(vidaActual);
+        return;
+    }
+    mostrarDialogo(siguiente.texto, siguiente.tipo);
 }
 
-// Inicio
+// Iniciar
 const primero = dialogos.find(d => d.id === dialogoActual);
 if (primero) {
-  mostrarDialogo(primero.texto, primero.tipo);
+    mostrarDialogo(primero.texto, primero.tipo);
 } else {
-  contenedor.textContent = "⚠️ No se encontró el diálogo inicial.";
+    dialogContent.textContent = "⚠️ No se encontró el diálogo inicial.";
 }
-
-// Tecla 0 para cambiar profesor
-document.addEventListener('keydown', function(e) {
-  if (e.key === '0') {
-    e.preventDefault();
-    const nuevoID = prompt("Ingresa el IDPersonajeC del profesor (ej: 1Cu, 1Es, 1He...):");
-    if (nuevoID && nuevoID.trim() !== '') {
-      window.location.href = `?personaje=${encodeURIComponent(nuevoID)}&dialogo=1&pregunta=0`;
-    }
-  }
-});
 </script>
+
+</body>
+</html>
