@@ -105,9 +105,13 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/leccion-ecosistemas-carbono.css">    
-    <link rel="stylesheet" href="assets/css/leccion-ley-liebig.css">    
-    <link rel="stylesheet" href="assets/css/leccion-ley-shelford.css">    
+    <?php
+    // Carga el CSS específico de la lección si existe
+    $css_leccion = "assets/css/leccion-{$slug}.css";
+    if (file_exists(__DIR__ . '/' . $css_leccion)):
+    ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($css_leccion); ?>">
+    <?php endif; ?>
     <style>
         /* ======= LAYOUT CON SIDEBAR ======= */
         :root {
