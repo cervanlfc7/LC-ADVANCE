@@ -160,6 +160,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             min-height: 100vh;
             height: 100vh;
             overflow: hidden;
+            transition: var(--transition-smooth);
         }
 
         .main-header {
@@ -190,18 +191,61 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             width: var(--sidebar-w);
             min-width: var(--sidebar-w);
             max-width: var(--sidebar-w);
-            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,10,20,0.98) 100%);
+            background: linear-gradient(180deg, rgba(5, 5, 10, 0.98) 0%, rgba(10, 20, 40, 0.95) 100%);
+            backdrop-filter: blur(20px);
             border-right: 1px solid var(--border-glow);
-            padding: 0.8rem 0.7rem;
+            padding: 1.2rem 1rem;
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 1rem;
             height: 100%;
             overflow-y: auto;
-            z-index: 10;
+            overflow-x: hidden;
+            z-index: 100;
             scrollbar-width: thin;
             scrollbar-color: var(--neon-cyan) transparent;
+            transition: var(--transition-smooth);
+            position: relative;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
         }
+
+        .lesson-sidebar.collapsed {
+            width: 80px;
+            min-width: 80px;
+            padding: 1.2rem 0.5rem;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-username,
+        .lesson-sidebar.collapsed .sidebar-level-badge,
+        .lesson-sidebar.collapsed .sidebar-xp-label,
+        .lesson-sidebar.collapsed .sidebar-xp-bar,
+        .lesson-sidebar.collapsed .sidebar-points,
+        .lesson-sidebar.collapsed .sidebar-section-title,
+        .lesson-sidebar.collapsed .sidebar-current-lesson,
+        .lesson-sidebar.collapsed .sidebar-score-display,
+        .lesson-sidebar.collapsed .sidebar-nav-item span:not(.nav-dot),
+        .lesson-sidebar.collapsed .sidebar-quiz-btn span,
+        .lesson-sidebar.collapsed .sidebar-back-btn {
+            display: none;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-avatar {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 0;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-section {
+            border: none;
+            background: transparent;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-nav-item {
+            justify-content: center;
+            padding: 0.8rem 0;
+        }
+        
+        .lesson-sidebar.collapsed .nav-dot { width: 12px; height: 12px; }
 
         .lesson-sidebar::-webkit-scrollbar { width: 4px; }
         .lesson-sidebar::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 2px; }
@@ -420,7 +464,36 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         }
         .sidebar-nav-item.done .nav-dot {
             background: var(--neon-green);
-            box-shadow: 0 0 4px var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* Tooltips cuando colapsado */
+        .lesson-sidebar.collapsed .sidebar-nav-item {
+            position: relative;
+        }
+        
+        .lesson-sidebar.collapsed .sidebar-nav-item::after {
+            content: attr(data-title);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--neon-cyan);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+            border: 1px solid var(--neon-cyan);
+            z-index: 1001;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-nav-item:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(20px);
         }
 
         /* Botón quiz en sidebar */
@@ -659,45 +732,81 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             border-radius: 50%;
         }
 
-        /* Sidebar toggle en móvil */
-        .sidebar-toggle {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            left: 12px;
-            z-index: 500;
-            background: var(--bg-dark);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
+        /* Sidebar toggle - Integrado en la barra lateral */
+        .sidebar-collapse-btn {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
             width: 40px;
             height: 40px;
-            font-size: 1.1rem;
+            background: var(--bg-dark);
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            border-radius: 50%;
             cursor: pointer;
-            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            transition: var(--transition-smooth);
+            font-size: 1.2rem;
+        }
+
+        .sidebar-collapse-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-cyan);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lesson-sidebar.collapsed .sidebar-collapse-btn {
+            right: -20px;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar-collapse-btn { display: none; }
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-cyan);
+        }
+
+        .lesson-sidebar.collapsed ~ .sidebar-toggle {
+            left: 95px;
+        }
+
+        .lesson-sidebar.collapsed ~ .lesson-main-content {
+            padding-left: 20px;
         }
 
         /* Mobile Adjustments */
-        @media (max-width: 900px) {
+        @media (max-width: 992px) {
             .lesson-sidebar {
                 position: fixed;
-                left: -100%;
+                left: -320px;
                 top: var(--header-h);
-                transition: left 0.4s ease;
-                box-shadow: 4px 0 32px rgba(0,0,0,0.8);
+                transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 10px 0 50px rgba(0,0,0,0.9);
+                width: 300px;
+                max-width: 85vw;
             }
             .lesson-sidebar.open { left: 0; }
-            .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
             .sidebar-overlay {
                 display: none;
                 position: fixed;
                 inset: 0;
-                background: rgba(0,0,0,0.6);
-                z-index: 199;
-                top: 64px;
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(4px);
+                z-index: 99;
+                top: var(--header-h);
             }
             .sidebar-overlay.active { display: block; }
-            .content-wrapper { padding-left: 0; }
-            .lesson-area { width: 100%; padding: 20px; }
+            .lesson-main-content { padding: 20px; }
         }
 
         /* ORIENTACIÓN HORIZONTAL */
@@ -779,6 +888,8 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
 
         <!-- ======= SIDEBAR ======= -->
         <aside class="lesson-sidebar" id="lessonSidebar">
+            <!-- Botón colapsar (escritorio) -->
+            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Contraer/Expandir">◀</button>
 
             <!-- Tarjeta de usuario -->
             <div class="sidebar-user-card">
@@ -845,9 +956,10 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         $href = "leccion_detalle.php?slug=" . urlencode($lm['slug']) . ($nav_params ? '&' . ltrim($nav_params, '?') : '');
 ?>
                     <a href="<?php echo $is_current ? '#' : htmlspecialchars($href); ?>"
-                       class="<?php echo $classes; ?>">
+                       class="<?php echo $classes; ?>"
+                       data-title="<?php echo htmlspecialchars($lm['titulo']); ?>">
                         <span class="nav-dot <?php echo $is_current ? 'active-dot' : ''; ?>"></span>
-                        <?php echo htmlspecialchars($lm['titulo']); ?>
+                        <span><?php echo htmlspecialchars($lm['titulo']); ?></span>
                     </a>
                     <?php
     endforeach; ?>
@@ -909,8 +1021,9 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
 
     </div><!-- /content-wrapper -->
 
-    <!-- Toggle sidebar móvil -->
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir panel">◀</button>
+    <!-- El toggle móvil ahora es manejado por el hamburger del header si existe, 
+         o podemos dejar un botón flotante solo para móvil más pequeño -->
+    <button class="sidebar-toggle-mobile" id="sidebarToggleMobile" style="display:none; position:fixed; bottom:20px; left:20px; z-index:100; background:var(--bg-dark); border:1px solid var(--neon-cyan); color:var(--neon-cyan); width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer; align-items:center; justify-content:center; box-shadow:0 0 10px var(--neon-cyan);">☰</button>
 
 </div><!-- /page-wrapper -->
 
@@ -937,11 +1050,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarToggle  = document.getElementById('sidebarToggle');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    // ── Sidebar toggle (móvil) ──
-    function openSidebar()  { sidebar.classList.add('open'); sidebarOverlay.classList.add('active'); sidebarToggle.textContent = '✖'; }
-    function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('active'); sidebarToggle.textContent = '◀'; }
-    if(sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
-    if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    // ── Sidebar Toggle Logic ──
+    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+    const mobileToggle       = document.getElementById('sidebarToggleMobile');
+    const headerHamburger    = document.querySelector('.main-header .hamburger');
+    
+    // Cargar estado escritorio
+    const sidebarState = localStorage.getItem('sidebarCollapsed');
+    if (sidebarState === 'true' && window.innerWidth > 992) {
+        sidebar.classList.add('collapsed');
+        if(sidebarCollapseBtn) sidebarCollapseBtn.textContent = '▶';
+    }
+
+    function toggleDesktopCollapse() {
+        sidebar.classList.toggle('collapsed');
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        if(sidebarCollapseBtn) sidebarCollapseBtn.textContent = isCollapsed ? '▶' : '◀';
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+
+    function toggleMobileMenu() {
+        sidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('active');
+    }
+
+    if(sidebarCollapseBtn) sidebarCollapseBtn.addEventListener('click', toggleDesktopCollapse);
+    if(mobileToggle) mobileToggle.addEventListener('click', toggleMobileMenu);
+    
+    // Sincronizar con el hamburger del header si existe
+    if(headerHamburger) {
+        headerHamburger.addEventListener('click', (e) => {
+            // Prevenir comportamiento por defecto del app.js si es necesario
+            toggleMobileMenu();
+        });
+    }
+
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    });
+    
+    // Mostrar/Ocultar toggle móvil solo en pantallas pequeñas si no hay hamburger
+    function adjustToggles() {
+        if (window.innerWidth <= 992) {
+            sidebar.classList.remove('collapsed');
+            if(!headerHamburger && mobileToggle) mobileToggle.style.display = 'flex';
+        } else {
+            if(mobileToggle) mobileToggle.style.display = 'none';
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+        }
+    }
+    window.addEventListener('resize', adjustToggles);
+    adjustToggles();
+
+    // ── Hover effects para sidebar icons (cuando está colapsado) ──
+    const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
+    sidebarItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            if (sidebar.classList.contains('collapsed')) {
+                // Podríamos mostrar tooltips aquí
+            }
+        });
+    });
 
     const quizData = <?php echo json_encode($quiz_selected); ?>;
 
