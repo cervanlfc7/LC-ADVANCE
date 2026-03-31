@@ -6,13 +6,43 @@ require_once 'config/config.php';
 requireLogin(true);
 require_once 'src/content.php';
 
+
+// Determinar profesor/materia por defecto según usuario si no hay filtro
 $filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
 $filter_materia = null;
 
+if (!$filter_profesor && !$filter_materia) {
+    // Si el usuario tiene materia/profesor asignado, usarlo
+    // Ejemplo: por nivel, asignar materia/profesor
+    $nivel = $usuario['nivel'] ?? 1;
+    $materia_por_nivel = [
+        1 => 'Temas Selectos de Matemáticas I y II',
+        2 => 'Inglés',
+        3 => 'Pensamiento Matemático III',
+        4 => 'Programación',
+        5 => 'Física I',
+        6 => 'Química I',
+        7 => 'Ecosistemas',
+        8 => 'Ciencias Sociales',
+        9 => 'Historia de México'
+    ];
+    $profesor_por_nivel = [
+        1 => 'Miguel Marquez',
+        2 => 'Enrique',
+        3 => 'Espindola',
+        4 => 'Manuel',
+        5 => 'Herson',
+        6 => 'Herson',
+        7 => 'Carolina',
+        8 => 'Refugio & Padilla',
+        9 => 'Armando'
+    ];
+    $filter_materia = $materia_por_nivel[$nivel] ?? null;
+    $filter_profesor = $profesor_por_nivel[$nivel] ?? null;
+}
+
 if ($filter_profesor) {
     $filter_materia = isset($_GET['materia']) ? trim($_GET['materia']) : null;
-} else {
-    $filter_materia = requireMateriaContext();
 }
 
 // ------------------ USUARIO ------------------

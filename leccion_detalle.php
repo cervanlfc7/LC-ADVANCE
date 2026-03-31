@@ -105,9 +105,15 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/leccion-ecosistemas-carbono.css">    
-    <link rel="stylesheet" href="assets/css/leccion-ley-liebig.css">    
-    <link rel="stylesheet" href="assets/css/leccion-ley-shelford.css">    
+    <?php
+    // Cargar automáticamente todos los estilos de lecciones y evitar import list manual.
+    $lessonCssFolder = 'assets/css';
+    $cssFiles = glob($lessonCssFolder . '/leccion-*.css');
+    foreach ($cssFiles as $cssFile) {
+        $cssUrl = str_replace('\\', '/', $cssFile);
+        echo '<link rel="stylesheet" href="' . htmlspecialchars($cssUrl) . '">' . "\n";
+    }
+    ?>
     <style>
         /* ======= LAYOUT CON SIDEBAR ======= */
         :root {
@@ -186,33 +192,208 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             overflow: hidden;
         }
 
+        .lesson-main-content {
+            flex: 1;
+            min-height: calc(100vh - var(--header-h));
+            overflow-y: auto;
+            padding: 30px;
+            background: linear-gradient(180deg, rgba(2,2,15,0.9), rgba(8,12,25,0.98));
+        }
+
+        .lesson-main-content > .leccion-ecosistemas-rem,
+        .lesson-main-content > .leccion-ecosistemas-movimientos-tierra,
+        .lesson-main-content > .leccion-ecosistemas-carbono,
+        .lesson-main-content > .leccion-biomas,
+        .lesson-main-content > .leccion-quimica-equilibrio,
+        .lesson-main-content > .leccion-biologia-niveles-v6,
+        .lesson-main-content > .leccion-fisica-energia {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .lesson-sidebar, .lesson-main-content { -webkit-overflow-scrolling: touch; }
+
+
         /* ======= SIDEBAR ======= */
         .lesson-sidebar {
             width: var(--sidebar-w);
             min-width: var(--sidebar-w);
             max-width: var(--sidebar-w);
-            background: linear-gradient(180deg, rgba(5, 5, 10, 0.98) 0%, rgba(10, 20, 40, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-glow);
+            background: linear-gradient(180deg, rgba(7, 7, 18, 0.95) 0%, rgba(14, 24, 42, 0.96));
+            backdrop-filter: blur(18px);
+            border-right: 1px solid rgba(0, 255, 255, 0.15);
             padding: 1.2rem 1rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            height: 100%;
+            max-height: calc(100vh - var(--header-h));
             overflow-y: auto;
             overflow-x: hidden;
-            z-index: 100;
+            z-index: 110;
             scrollbar-width: thin;
             scrollbar-color: var(--neon-cyan) transparent;
-            transition: var(--transition-smooth);
-            position: relative;
-            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, width 0.3s ease, padding 0.3s ease;
+            position: fixed;
+            top: var(--header-h);
+            bottom: 0;
+            left: 0;
+            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.5);
+            transform: translateX(0);
         }
 
         .lesson-sidebar.collapsed {
-            width: 80px;
-            min-width: 80px;
-            padding: 1.2rem 0.5rem;
+            width: 85px;
+            min-width: 85px;
+            max-width: 85px;
+            padding: 1.2rem 0.6rem;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-arrow-btn {
+            transform: rotate(180deg);
+        }
+
+        .lesson-sidebar.hidden {
+            transform: translateX(-105%);
+            opacity: 0.97;
+            pointer-events: none;
+        }
+
+        .lesson-sidebar.open {
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .content-container {
+            margin-left: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w));
+            transition: margin-left 0.3s ease, width 0.3s ease;
+        }
+
+        body.sidebar-collapsed .content-container {
+            margin-left: 85px;
+            width: calc(100% - 85px);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 105;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            pointer-events: auto;
+            opacity: 1;
+        }
+
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 120;
+        }
+
+        .page-wrapper { padding-top: var(--header-h); }
+
+        .sidebar-collapse-btn {
+            position: absolute;
+            top: 12px;
+            right: -12px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,255,255,0.35);
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ffff;
+            cursor: pointer;
+            font-size: 0.8rem;
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 1px 8px rgba(0,255,255,0.35);
+            transition: transform 0.2s ease;
+            z-index: 111;
+        }
+
+        .sidebar-collapse-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .mobile-sidebar-toggle {
+            display: none;
+            border: 1px solid rgba(0,255,255,0.45);
+            background: rgba(0, 0, 0, 0.7);
+            color: #00ffff;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .lesson-sidebar {
+                width: min(84vw, 320px);
+                min-width: 0;
+                max-width: min(84vw, 320px);
+                transform: translateX(-105%);
+                position: fixed;
+                top: var(--header-h);
+                left: 0;
+                height: calc(100vh - var(--header-h));
+            }
+            .lesson-sidebar.collapsed {
+                width: min(84vw, 320px);
+            }
+            .content-container {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar-collapse-btn { top: 8px; right: -16px; }
+            .mobile-sidebar-toggle { display: inline-flex; }
+        }
+
+        @media (max-width: 768px) {
+            .lesson-sidebar { width: 86vw; }
+            .lesson-sidebar.collapsed { width: 86vw; }
+            .lesson-sidebar.hidden { transform: translateX(-110%); }
+            .mobile-sidebar-toggle { position: absolute; top: 12px; left: 16px; }
+            .lesson-main-content { padding: 20px; }
+        }
+
+        .lesson-sidebar.collapsed .sidebar-logo,
+        .lesson-sidebar.collapsed .sidebar-title,
+        .lesson-sidebar.collapsed .sidebar-section-title {
+            display: none;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-nav-item {
+            justify-content: center;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-nav-item span:not(.nav-dot),
+        .lesson-sidebar.collapsed .sidebar-username,
+        .lesson-sidebar.collapsed .sidebar-level-badge,
+        .lesson-sidebar.collapsed .sidebar-xp-label,
+        .lesson-sidebar.collapsed .sidebar-points,
+        .lesson-sidebar.collapsed .sidebar-current-lesson,
+        .lesson-sidebar.collapsed .sidebar-score-display,
+        .lesson-sidebar.collapsed .sidebar-quiz-btn span,
+        .lesson-sidebar.collapsed .sidebar-back-btn {
+            display: none;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-avatar {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 0;
         }
 
         .lesson-sidebar.collapsed .sidebar-username,
@@ -220,13 +401,23 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         .lesson-sidebar.collapsed .sidebar-xp-label,
         .lesson-sidebar.collapsed .sidebar-xp-bar,
         .lesson-sidebar.collapsed .sidebar-points,
-        .lesson-sidebar.collapsed .sidebar-section-title,
         .lesson-sidebar.collapsed .sidebar-current-lesson,
         .lesson-sidebar.collapsed .sidebar-score-display,
         .lesson-sidebar.collapsed .sidebar-nav-item span:not(.nav-dot),
         .lesson-sidebar.collapsed .sidebar-quiz-btn span,
         .lesson-sidebar.collapsed .sidebar-back-btn {
             display: none;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-section-title {
+            display: block;
+            font-size: 0.45rem;
+            color: rgba(0,255,255,0.4);
+            padding: 0.25rem 0.35rem;
+        }
+
+        .lesson-sidebar.collapsed .sidebar-nav-item {
+            justify-content: center;
         }
 
         .lesson-sidebar.collapsed .sidebar-avatar {
@@ -769,6 +960,39 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
             .sidebar-collapse-btn { display: none; }
         }
 
+        .sidebar-toggle-mobile {
+            display: none;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar-toggle-mobile {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: var(--bg-dark);
+                border: 2px solid var(--neon-cyan);
+                color: var(--neon-cyan);
+                font-size: 1.2rem;
+                box-shadow: 0 0 12px var(--neon-cyan);
+                z-index: 110;
+                cursor: pointer;
+            }
+
+            .lesson-sidebar {
+                left: -320px;
+            }
+
+            .lesson-sidebar.open {
+                left: 0;
+            }
+        }
+
         .sidebar-toggle:hover {
             transform: scale(1.1);
             background: var(--neon-cyan);
@@ -875,9 +1099,12 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
         <div class="header-title">
             <h1>LC-ADVANCE <span class="access">ACCESS: ONLINE</span></h1>
         </div>
-        <div class="header-nav" style="display: flex; gap: 10px;">
-            <a href="dashboard.php<?php echo $return_params; ?>" class="btn-premium btn-secondary" style="padding: 10px 20px;">Dashboard</a>
-            <a href="logout.php" class="btn-premium btn-secondary" style="padding: 10px 20px; border-color: var(--neon-pink); color: var(--neon-pink);">Salir</a>
+        <div style="display:flex; align-items:center; gap: 0.8rem;">
+            <button class="mobile-sidebar-toggle" id="mobileSidebarToggleBtn" aria-label="Abrir menú">☰ Menú</button>
+            <div class="header-nav" style="display: flex; gap: 10px;">
+                <a href="dashboard.php<?php echo $return_params; ?>" class="btn-premium btn-secondary" style="padding: 10px 20px;">Dashboard</a>
+                <a href="logout.php" class="btn-premium btn-secondary" style="padding: 10px 20px; border-color: var(--neon-pink); color: var(--neon-pink);">Salir</a>
+            </div>
         </div>
     </header>
 
@@ -987,7 +1214,7 @@ $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') ==
                 </div>
 
                 <div class="lesson-content">
-                    <?php echo $leccion['contenido']; ?>
+                    <?php echo trim($leccion['contenido']); ?>
                 </div>
 
                 <div style="margin-top: 50px; display: flex; gap: 20px; flex-wrap: wrap; padding-bottom: 60px;">
@@ -1069,9 +1296,22 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('sidebarCollapsed', isCollapsed);
     }
 
+    function openSidebarMobile() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+    }
+
+    function closeSidebarMobile() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    }
+
     function toggleMobileMenu() {
-        sidebar.classList.toggle('open');
-        sidebarOverlay.classList.toggle('active');
+        if (sidebar.classList.contains('open')) {
+            closeSidebarMobile();
+        } else {
+            openSidebarMobile();
+        }
     }
 
     if(sidebarCollapseBtn) sidebarCollapseBtn.addEventListener('click', toggleDesktopCollapse);
@@ -1080,25 +1320,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sincronizar con el hamburger del header si existe
     if(headerHamburger) {
         headerHamburger.addEventListener('click', (e) => {
-            // Prevenir comportamiento por defecto del app.js si es necesario
+            e.preventDefault();
             toggleMobileMenu();
         });
     }
 
-    if(sidebarOverlay) sidebarOverlay.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('active');
-    });
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebarMobile);
     
     // Mostrar/Ocultar toggle móvil solo en pantallas pequeñas si no hay hamburger
     function adjustToggles() {
         if (window.innerWidth <= 992) {
             sidebar.classList.remove('collapsed');
-            if(!headerHamburger && mobileToggle) mobileToggle.style.display = 'flex';
+            sidebar.classList.remove('open');
+            closeSidebarMobile();
+            if(!headerHamburger && mobileToggle) {
+                mobileToggle.style.display = 'flex';
+            }
         } else {
             if(mobileToggle) mobileToggle.style.display = 'none';
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('active');
+            closeSidebarMobile();
+            // restaurar estado de colapso fijo para escritorio
+            const sidebarState = localStorage.getItem('sidebarCollapsed');
+            if (sidebarState === 'true') {
+                sidebar.classList.add('collapsed');
+            } else {
+                sidebar.classList.remove('collapsed');
+            }
         }
     }
     window.addEventListener('resize', adjustToggles);

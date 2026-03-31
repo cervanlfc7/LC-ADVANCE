@@ -1,0 +1,1045 @@
+/* ============================================================
+   ESTILOS ÚNICOS: PUNTOS CRÍTICOS — MÁXIMOS Y MÍNIMOS
+   Cyberpunk Educational Design — Pensamiento Matemático III
+   Namespace: .leccion-matematicas-criticos
+   ============================================================ */
+
+.leccion-matematicas-criticos {
+    /* Paleta neon — Máximos/Mínimos */
+    --neon-max:    #ff00ff;   /* Magenta — máximos */
+    --neon-min:    #39ff14;   /* Verde   — mínimos */
+    --neon-crit:   #ffff00;   /* Amarillo — puntos críticos */
+    --neon-curva:  #00ffff;   /* Cian     — curva/tema */
+    --neon-alerta: #ff3366;   /* Rojo     — errores */
+    --neon-info:   #00ff9d;   /* Verde-agua — info/curricular */
+
+    --bg-main:   #07071a;
+    --bg-sec:    rgba(0, 10, 30, 0.55);
+    --bg-card:   rgba(5, 5, 22, 0.88);
+    --bg-sim:    #050510;
+
+    --font-mono: 'Roboto Mono', 'Courier New', monospace;
+    --font-disp: 'Orbitron', 'Segoe UI', sans-serif;
+    --fs-sm: 0.875rem;
+    --fs-base: 1rem;
+    --fs-md: 1.0625rem;
+    --fs-lg: 1.25rem;
+    --fs-xl: 1.5rem;
+    --fs-2xl: 2rem;
+
+    --sp-xs: 4px;
+    --sp-sm: 8px;
+    --sp-md: 16px;
+    --sp-lg: 24px;
+    --sp-xl: 32px;
+
+    --tr: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 16px;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+.leccion-matematicas-criticos {
+    position: relative;
+    background: linear-gradient(150deg, #07071a 0%, #0b0d24 55%, #080718 100%);
+    color: #dde9f7;
+    font-family: var(--font-mono);
+    font-size: var(--fs-base);
+    line-height: 1.7;
+    padding: var(--sp-xl) var(--sp-lg);
+    border-radius: var(--r-lg);
+    box-shadow: 0 0 40px rgba(0,255,255,0.1), inset 0 1px 0 rgba(0,255,255,0.07);
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    overflow-x: hidden;
+}
+
+.leccion-matematicas-criticos::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,255,0.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    border-radius: var(--r-lg);
+    z-index: 0;
+}
+
+.leccion-matematicas-criticos > * { position: relative; z-index: 1; }
+
+/* ============================================================
+   CABECERA
+   ============================================================ */
+.leccion-matematicas-criticos .leccion-header {
+    text-align: center;
+    margin-bottom: var(--sp-xl);
+    padding: var(--sp-xl) var(--sp-lg);
+    border-bottom: 1px solid rgba(0,255,255,0.18);
+}
+
+.leccion-matematicas-criticos .header-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-sm);
+    justify-content: center;
+    margin-bottom: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .materia-badge,
+.leccion-matematicas-criticos .nivel-badge,
+.leccion-matematicas-criticos .tiempo-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    background: rgba(0,255,255,0.08);
+    border: 1px solid var(--neon-curva);
+    border-radius: 20px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--neon-curva);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.leccion-matematicas-criticos .nivel-badge {
+    background: rgba(255,255,0,0.08);
+    border-color: var(--neon-crit);
+    color: var(--neon-crit);
+}
+
+.leccion-matematicas-criticos .tiempo-badge {
+    background: rgba(57,255,20,0.08);
+    border-color: var(--neon-min);
+    color: var(--neon-min);
+}
+
+.leccion-matematicas-criticos .titulo-leccion {
+    font-family: var(--font-disp);
+    font-size: clamp(var(--fs-xl), 5vw, var(--fs-2xl));
+    font-weight: 700;
+    color: var(--neon-curva);
+    margin: var(--sp-md) 0 var(--sp-sm);
+    line-height: 1.2;
+    text-shadow: 0 0 10px rgba(0,255,255,0.5);
+    animation: pcGlow 3.5s ease-in-out infinite;
+}
+
+@keyframes pcGlow {
+    0%, 100% { text-shadow: 0 0 6px rgba(0,255,255,0.5); }
+    50%       { text-shadow: 0 0 16px rgba(0,255,255,0.85), 0 0 30px rgba(0,255,255,0.25); }
+}
+
+.leccion-matematicas-criticos .leccion-subtitulo {
+    font-size: var(--fs-md);
+    color: rgba(200,220,240,0.65);
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   OBJETIVOS
+   ============================================================ */
+.leccion-matematicas-criticos .objetivos-rapidos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--sp-md);
+    margin-bottom: var(--sp-xl);
+}
+
+.leccion-matematicas-criticos .objetivo-card {
+    display: flex;
+    gap: var(--sp-md);
+    align-items: flex-start;
+    background: rgba(0,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.22);
+    border-left: 4px solid var(--neon-curva);
+    padding: var(--sp-md) var(--sp-lg);
+    border-radius: var(--r-md);
+    transition: var(--tr);
+}
+
+.leccion-matematicas-criticos .objetivo-card:hover {
+    background: rgba(0,255,255,0.09);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 16px rgba(0,255,255,0.15);
+}
+
+.leccion-matematicas-criticos .obj-icon {
+    font-size: 1.6rem;
+    min-width: 34px;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.leccion-matematicas-criticos .obj-text h4 {
+    margin: 0 0 var(--sp-xs) 0;
+    color: var(--neon-curva);
+    font-size: var(--fs-md);
+    font-family: var(--font-disp);
+}
+
+.leccion-matematicas-criticos .obj-text p {
+    margin: 0;
+    color: rgba(180,200,230,0.7);
+    font-size: var(--fs-sm);
+}
+
+/* ============================================================
+   SECCIONES GENÉRICAS
+   ============================================================ */
+.leccion-matematicas-criticos section {
+    margin: var(--sp-xl) 0;
+    padding: var(--sp-lg) var(--sp-xl);
+    background: var(--bg-sec);
+    border: 1px solid rgba(0,255,255,0.16);
+    border-radius: var(--r-lg);
+    transition: border-color 0.3s;
+}
+
+.leccion-matematicas-criticos section:hover {
+    border-color: rgba(0,255,255,0.3);
+}
+
+.leccion-matematicas-criticos .seccion-titulo {
+    font-family: var(--font-disp);
+    font-size: var(--fs-lg);
+    color: var(--neon-curva);
+    margin: 0 0 var(--sp-lg) 0;
+    padding-bottom: var(--sp-sm);
+    border-bottom: 1px solid rgba(0,255,255,0.18);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-sm);
+    flex-wrap: wrap;
+}
+
+.leccion-matematicas-criticos section p {
+    color: rgba(220,235,250,0.85);
+    margin-bottom: var(--sp-md);
+}
+
+/* ============================================================
+   CONTEXTO REAL
+   ============================================================ */
+.leccion-matematicas-criticos .context-card {
+    padding: var(--sp-lg);
+    background: rgba(0,136,255,0.07);
+    border: 2px solid rgba(0,136,255,0.35);
+    border-radius: var(--r-md);
+}
+
+.leccion-matematicas-criticos .real-data {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-sm);
+    margin-top: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .data-tag {
+    padding: 5px 14px;
+    background: rgba(0,255,157,0.08);
+    border: 1px solid rgba(0,255,157,0.4);
+    border-radius: 20px;
+    color: var(--neon-info);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+}
+
+/* ============================================================
+   GRID CONCEPTUAL
+   ============================================================ */
+.leccion-matematicas-criticos .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--sp-lg);
+    margin: var(--sp-lg) 0;
+}
+
+.leccion-matematicas-criticos .concept-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0,255,255,0.25);
+    border-left: 4px solid var(--neon-curva);
+    padding: var(--sp-lg);
+    border-radius: var(--r-md);
+    transition: var(--tr);
+}
+
+.leccion-matematicas-criticos .concept-card:hover {
+    border-color: var(--neon-curva);
+    box-shadow: 0 4px 16px rgba(0,255,255,0.15);
+    transform: translateY(-2px);
+}
+
+.leccion-matematicas-criticos .concept-card h3 {
+    font-family: var(--font-disp);
+    color: var(--neon-curva);
+    font-size: var(--fs-md);
+    margin: 0 0 var(--sp-md) 0;
+}
+
+.leccion-matematicas-criticos .concept-card ul {
+    padding-left: var(--sp-md);
+    margin: var(--sp-sm) 0;
+}
+
+.leccion-matematicas-criticos .concept-card ul li {
+    margin: var(--sp-sm) 0;
+    color: rgba(220,235,250,0.85);
+    font-size: var(--fs-sm);
+}
+
+.leccion-matematicas-criticos .importante {
+    margin-top: var(--sp-md);
+    padding: var(--sp-sm) var(--sp-md);
+    background: rgba(255,255,0,0.06);
+    border-left: 3px solid var(--neon-crit);
+    border-radius: var(--r-sm);
+    color: var(--neon-crit);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+}
+
+/* ============================================================
+   TABLA DE SIGNOS
+   ============================================================ */
+.leccion-matematicas-criticos .tabla-signos {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--sp-lg) 0;
+    font-size: var(--fs-sm);
+    overflow: hidden;
+    border-radius: var(--r-md);
+}
+
+.leccion-matematicas-criticos .tabla-signos thead tr {
+    background: rgba(0,255,255,0.1);
+}
+
+.leccion-matematicas-criticos .tabla-signos th {
+    padding: var(--sp-md);
+    text-align: center;
+    color: var(--neon-curva);
+    font-family: var(--font-disp);
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(0,255,255,0.25);
+}
+
+.leccion-matematicas-criticos .tabla-signos td {
+    padding: var(--sp-md);
+    text-align: center;
+    border: 1px solid rgba(0,255,255,0.12);
+    color: rgba(220,235,250,0.85);
+    font-size: var(--fs-sm);
+    transition: var(--tr);
+}
+
+.leccion-matematicas-criticos .tabla-signos tbody tr {
+    transition: var(--tr);
+}
+
+.leccion-matematicas-criticos .tabla-signos tbody tr:hover {
+    background: rgba(0,255,255,0.04);
+}
+
+.leccion-matematicas-criticos .tabla-signos .max {
+    background: rgba(255,0,255,0.08);
+}
+.leccion-matematicas-criticos .tabla-signos .max td:last-child {
+    color: var(--neon-max);
+    font-weight: 700;
+}
+
+.leccion-matematicas-criticos .tabla-signos .min {
+    background: rgba(57,255,20,0.07);
+}
+.leccion-matematicas-criticos .tabla-signos .min td:last-child {
+    color: var(--neon-min);
+    font-weight: 700;
+}
+
+/* ============================================================
+   EJEMPLO PASO A PASO
+   ============================================================ */
+.leccion-matematicas-criticos .ejemplo-paso {
+    margin: var(--sp-lg) 0;
+    padding: var(--sp-lg);
+    background: rgba(0,255,157,0.05);
+    border: 1px solid rgba(0,255,157,0.25);
+    border-left: 4px solid var(--neon-info);
+    border-radius: var(--r-md);
+}
+
+.leccion-matematicas-criticos .ejemplo-paso h3 {
+    font-family: var(--font-disp);
+    color: var(--neon-info);
+    font-size: var(--fs-md);
+    margin: 0 0 var(--sp-md) 0;
+}
+
+.leccion-matematicas-criticos .ejemplo-paso ol {
+    padding-left: var(--sp-lg);
+    margin: 0;
+}
+
+.leccion-matematicas-criticos .ejemplo-paso ol li {
+    margin: var(--sp-md) 0;
+    color: rgba(220,235,250,0.88);
+    font-size: var(--fs-sm);
+    line-height: 1.8;
+}
+
+.leccion-matematicas-criticos .ejemplo-paso ol li ul {
+    padding-left: var(--sp-md);
+    margin-top: var(--sp-sm);
+}
+
+.leccion-matematicas-criticos .ejemplo-paso ol li ul li {
+    margin: var(--sp-xs) 0;
+}
+
+/* ============================================================
+   SEGUNDA DERIVADA — TARJETA EXTRA
+   ============================================================ */
+.leccion-matematicas-criticos .segunda-deriv-box {
+    padding: var(--sp-lg);
+    background: rgba(255,0,255,0.05);
+    border: 2px solid rgba(255,0,255,0.3);
+    border-radius: var(--r-md);
+    margin: var(--sp-lg) 0;
+}
+
+.leccion-matematicas-criticos .segunda-deriv-box h3 {
+    font-family: var(--font-disp);
+    color: var(--neon-max);
+    margin: 0 0 var(--sp-md) 0;
+    font-size: var(--fs-md);
+}
+
+/* ============================================================
+   SIMULADOR
+   ============================================================ */
+.leccion-matematicas-criticos .simulator-container {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: auto auto;
+    gap: var(--sp-lg);
+    background: var(--bg-sim);
+    border: 1px solid var(--neon-curva);
+    border-radius: var(--r-lg);
+    padding: var(--sp-lg);
+    box-shadow: 0 0 20px rgba(0,255,255,0.1);
+}
+
+.leccion-matematicas-criticos .simulator-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-md);
+    grid-row: 1 / span 2;
+}
+
+.leccion-matematicas-criticos .simulator-controls label {
+    color: var(--neon-curva);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+}
+
+.leccion-matematicas-criticos .simulator-controls input[type="text"] {
+    width: 100%;
+    background: #000;
+    color: var(--neon-curva);
+    border: 1px solid var(--neon-curva);
+    padding: 0.55rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    border-radius: var(--r-sm);
+    outline: none;
+    transition: var(--tr);
+    box-sizing: border-box;
+}
+
+.leccion-matematicas-criticos .simulator-controls input[type="text"]:focus {
+    box-shadow: 0 0 0 2px rgba(0,255,255,0.25);
+}
+
+.leccion-matematicas-criticos .keypad-mini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-xs);
+}
+
+.leccion-matematicas-criticos .keypad-mini button {
+    background: rgba(0,255,255,0.08);
+    border: 1px solid rgba(0,255,255,0.4);
+    color: var(--neon-curva);
+    padding: 0.3rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: var(--tr);
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.leccion-matematicas-criticos .keypad-mini button:hover {
+    background: var(--neon-curva);
+    color: #000;
+    box-shadow: 0 0 8px rgba(0,255,255,0.4);
+}
+
+.leccion-matematicas-criticos .simulator-visualization {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.leccion-matematicas-criticos .simulator-visualization svg {
+    width: 100%;
+    height: auto;
+    border-radius: var(--r-sm);
+    border: 1px solid rgba(0,255,255,0.2);
+    cursor: crosshair;
+    display: block;
+}
+
+.leccion-matematicas-criticos .simulator-data {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .data-panel {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,255,255,0.15);
+    border-radius: var(--r-md);
+    padding: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .data-panel h4 {
+    font-family: var(--font-disp);
+    color: var(--neon-curva);
+    font-size: var(--fs-sm);
+    margin: 0 0 var(--sp-sm) 0;
+    padding-bottom: var(--sp-xs);
+    border-bottom: 1px solid rgba(0,255,255,0.15);
+}
+
+.leccion-matematicas-criticos .data-panel #listaCriticos ul {
+    padding-left: var(--sp-md);
+    margin: 0;
+}
+
+.leccion-matematicas-criticos .data-panel #listaCriticos li {
+    margin: var(--sp-xs) 0;
+    font-size: var(--fs-sm);
+    color: rgba(220,235,250,0.85);
+}
+
+.leccion-matematicas-criticos .data-panel #listaCriticos .tipo-max {
+    color: var(--neon-max);
+    font-weight: 700;
+}
+
+.leccion-matematicas-criticos .data-panel #listaCriticos .tipo-min {
+    color: var(--neon-min);
+    font-weight: 700;
+}
+
+.leccion-matematicas-criticos .data-panel #listaCriticos .tipo-infl {
+    color: var(--neon-crit);
+    font-weight: 700;
+}
+
+/* Botón principal simulador */
+.leccion-matematicas-criticos .btn-actualizar {
+    background: linear-gradient(135deg, rgba(0,255,255,0.15), rgba(0,136,255,0.1));
+    border: 1px solid var(--neon-curva);
+    color: var(--neon-curva);
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    transition: var(--tr);
+    width: 100%;
+    min-height: 40px;
+}
+
+.leccion-matematicas-criticos .btn-actualizar:hover {
+    background: var(--neon-curva);
+    color: #000;
+    box-shadow: 0 0 14px rgba(0,255,255,0.4);
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   LEGEND DEL SIMULADOR
+   ============================================================ */
+.leccion-matematicas-criticos .sim-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-sm);
+    margin-top: var(--sp-sm);
+}
+
+.leccion-matematicas-criticos .legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-xs);
+    font-size: var(--fs-sm);
+    color: rgba(200,220,240,0.8);
+}
+
+.leccion-matematicas-criticos .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   ERRORES COMUNES
+   ============================================================ */
+.leccion-matematicas-criticos .errores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .error-card {
+    background: rgba(26,10,10,0.7);
+    border: 1px solid rgba(255,51,102,0.25);
+    border-left: 4px solid var(--neon-alerta);
+    padding: var(--sp-md) var(--sp-lg);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: var(--tr);
+    user-select: none;
+}
+
+.leccion-matematicas-criticos .error-card:hover {
+    background: rgba(255,51,102,0.07);
+    transform: translateX(4px);
+}
+
+.leccion-matematicas-criticos .error-card strong {
+    color: var(--neon-alerta);
+    font-size: var(--fs-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-sm);
+}
+
+.leccion-matematicas-criticos .error-card strong::before {
+    content: '▶';
+    font-size: 0.55rem;
+    transition: transform 0.25s;
+}
+
+.leccion-matematicas-criticos .error-card.expandido strong::before {
+    transform: rotate(90deg);
+}
+
+.leccion-matematicas-criticos .error-detail {
+    display: none;
+    margin-top: var(--sp-md);
+    padding: var(--sp-md);
+    background: rgba(255,51,102,0.05);
+    border-left: 3px solid rgba(255,102,153,0.4);
+    border-radius: var(--r-sm);
+    color: #ff9bb5;
+    font-size: var(--fs-sm);
+    line-height: 1.8;
+    animation: pcSlideIn 0.25s ease;
+}
+
+.leccion-matematicas-criticos .error-card.expandido .error-detail {
+    display: block;
+}
+
+@keyframes pcSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   CONEXIÓN CURRICULAR
+   ============================================================ */
+.leccion-matematicas-criticos .curricular .curricular-content p {
+    margin: var(--sp-sm) 0;
+    color: rgba(220,235,250,0.85);
+    font-size: var(--fs-sm);
+}
+
+.leccion-matematicas-criticos .curricular .curricular-content strong {
+    color: var(--neon-info);
+}
+
+.leccion-matematicas-criticos .competencias-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-sm);
+    margin-top: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .competencia-badge {
+    padding: 5px 14px;
+    background: rgba(0,255,157,0.06);
+    border: 1px solid rgba(0,255,157,0.35);
+    border-radius: 20px;
+    color: var(--neon-info);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+}
+
+/* ============================================================
+   PROBLEMAS TIPO EXAMEN
+   ============================================================ */
+.leccion-matematicas-criticos .problema-lista {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-lg);
+}
+
+.leccion-matematicas-criticos .problema-item {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(0,255,255,0.18);
+    border-radius: var(--r-md);
+    padding: var(--sp-lg);
+    transition: var(--tr);
+}
+
+.leccion-matematicas-criticos .problema-item:hover {
+    border-color: rgba(0,255,255,0.35);
+}
+
+.leccion-matematicas-criticos .problema-item h3 {
+    font-family: var(--font-disp);
+    color: var(--neon-curva);
+    font-size: var(--fs-md);
+    margin: 0 0 var(--sp-sm) 0;
+}
+
+.leccion-matematicas-criticos .problema-item p {
+    color: rgba(220,235,250,0.88);
+    font-size: var(--fs-sm);
+    margin-bottom: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .btn-solucion {
+    background: transparent;
+    border: 1px solid rgba(0,255,255,0.5);
+    color: var(--neon-curva);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    transition: var(--tr);
+    min-height: 36px;
+}
+
+.leccion-matematicas-criticos .btn-solucion:hover {
+    background: var(--neon-curva);
+    color: #000;
+    box-shadow: 0 0 10px rgba(0,255,255,0.35);
+}
+
+.leccion-matematicas-criticos .solucion-box {
+    display: none;
+    margin-top: var(--sp-md);
+    padding: var(--sp-md) var(--sp-lg);
+    background: rgba(0,255,157,0.05);
+    border-left: 4px solid var(--neon-info);
+    border-radius: var(--r-sm);
+    font-size: var(--fs-sm);
+    line-height: 1.9;
+    color: rgba(220,235,250,0.9);
+    animation: pcSlideIn 0.3s ease;
+}
+
+.leccion-matematicas-criticos .solucion-box.visible {
+    display: block;
+}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.leccion-matematicas-criticos .quiz-container {
+    background: rgba(10,10,26,0.85);
+    padding: var(--sp-xl);
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(0,255,255,0.25);
+    box-shadow: 0 0 20px rgba(0,255,255,0.06);
+}
+
+.leccion-matematicas-criticos .quiz-pregunta {
+    margin: var(--sp-lg) 0;
+    padding: var(--sp-md) var(--sp-lg);
+    background: rgba(0,0,0,0.35);
+    border-radius: var(--r-md);
+    border-bottom: 1px solid rgba(0,255,255,0.12);
+    transition: var(--tr);
+}
+
+.leccion-matematicas-criticos .quiz-pregunta:hover {
+    background: rgba(0,255,255,0.03);
+    transform: translateX(3px);
+}
+
+.leccion-matematicas-criticos .quiz-pregunta p {
+    font-weight: 700;
+    color: var(--neon-curva);
+    font-size: var(--fs-sm);
+    margin: 0 0 var(--sp-md) 0;
+}
+
+.leccion-matematicas-criticos .quiz-pregunta label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-sm);
+    margin: var(--sp-sm) 0;
+    padding: var(--sp-sm) var(--sp-md);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: var(--tr);
+    font-size: var(--fs-sm);
+    color: rgba(220,235,250,0.85);
+    min-height: 40px;
+    user-select: none;
+}
+
+.leccion-matematicas-criticos .quiz-pregunta label:hover {
+    background: rgba(0,255,255,0.07);
+}
+
+.leccion-matematicas-criticos .quiz-pregunta input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--neon-curva);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.leccion-matematicas-criticos .btn-evaluar {
+    margin-top: var(--sp-lg);
+    background: linear-gradient(135deg, var(--neon-curva), var(--neon-max));
+    color: #000;
+    border: none;
+    padding: 0.75rem 1.8rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    cursor: pointer;
+    border-radius: 24px;
+    transition: var(--tr);
+    letter-spacing: 0.5px;
+    min-height: 44px;
+}
+
+.leccion-matematicas-criticos .btn-evaluar:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px rgba(0,255,255,0.4), 0 0 20px rgba(255,0,255,0.25);
+}
+
+.leccion-matematicas-criticos .quiz-feedback {
+    margin-top: var(--sp-lg);
+    padding: var(--sp-lg);
+    border-radius: var(--r-md);
+    background: rgba(0,0,0,0.5);
+    border-left: 4px solid var(--neon-curva);
+    font-size: var(--fs-sm);
+    line-height: 1.9;
+    animation: pcSlideIn 0.3s ease;
+}
+
+.leccion-matematicas-criticos .quiz-feedback h4 {
+    color: var(--neon-curva);
+    font-family: var(--font-disp);
+    margin: 0 0 var(--sp-md) 0;
+}
+
+.leccion-matematicas-criticos .quiz-feedback ul {
+    padding-left: var(--sp-lg);
+    margin: 0;
+}
+
+.leccion-matematicas-criticos .quiz-feedback ul li {
+    margin: var(--sp-sm) 0;
+    color: rgba(220,235,250,0.85);
+}
+
+.leccion-matematicas-criticos .quiz-feedback .correct { color: var(--neon-min); font-weight: 700; }
+.leccion-matematicas-criticos .quiz-feedback .incorrect { color: var(--neon-alerta); font-weight: 700; }
+
+/* Label highlight */
+.leccion-matematicas-criticos .quiz-pregunta label.correct-ans {
+    background: rgba(57,255,20,0.08);
+    border-left: 3px solid var(--neon-min);
+}
+
+.leccion-matematicas-criticos .quiz-pregunta label.wrong-ans {
+    background: rgba(255,51,102,0.08);
+    border-left: 3px solid var(--neon-alerta);
+}
+
+/* ============================================================
+   CIERRE METACOGNITIVO
+   ============================================================ */
+.leccion-matematicas-criticos .reflexion-box {
+    background: rgba(0,0,0,0.35);
+    padding: var(--sp-lg);
+    border-radius: var(--r-md);
+    border: 1px solid rgba(57,255,20,0.2);
+    margin-bottom: var(--sp-lg);
+}
+
+.leccion-matematicas-criticos .reflexion-box > p {
+    color: var(--neon-min);
+    font-weight: 600;
+    margin-bottom: var(--sp-md);
+}
+
+.leccion-matematicas-criticos .reflexion-box textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.65);
+    color: #dde9f7;
+    border: 1px solid rgba(57,255,20,0.3);
+    border-radius: var(--r-md);
+    padding: var(--sp-md);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    line-height: 1.7;
+    resize: vertical;
+    transition: var(--tr);
+    min-height: 110px;
+    box-sizing: border-box;
+}
+
+.leccion-matematicas-criticos .reflexion-box textarea:focus {
+    outline: none;
+    border-color: var(--neon-min);
+    box-shadow: 0 0 8px rgba(57,255,20,0.2);
+}
+
+.leccion-matematicas-criticos .reflexion-box textarea::placeholder {
+    color: rgba(180,200,220,0.4);
+}
+
+.leccion-matematicas-criticos .sugerencia {
+    margin-top: var(--sp-md);
+    font-size: var(--fs-sm);
+    color: rgba(200,220,240,0.6);
+    font-style: italic;
+}
+
+.leccion-matematicas-criticos .recursos {
+    padding: var(--sp-lg);
+    background: rgba(0,0,0,0.3);
+    border-radius: var(--r-md);
+    border: 1px solid rgba(0,255,255,0.12);
+}
+
+.leccion-matematicas-criticos .recursos h3 {
+    font-family: var(--font-disp);
+    color: var(--neon-curva);
+    font-size: var(--fs-md);
+    margin: 0 0 var(--sp-md) 0;
+}
+
+.leccion-matematicas-criticos .recursos ul {
+    padding-left: var(--sp-lg);
+    margin: 0;
+}
+
+.leccion-matematicas-criticos .recursos ul li {
+    margin: var(--sp-sm) 0;
+    font-size: var(--fs-sm);
+}
+
+.leccion-matematicas-criticos .recursos ul li a {
+    color: var(--neon-curva);
+    text-decoration: none;
+    transition: var(--tr);
+}
+
+.leccion-matematicas-criticos .recursos ul li a:hover {
+    text-decoration: underline;
+    color: #fff;
+}
+
+/* ============================================================
+   RESPONSIVE — TABLET
+   ============================================================ */
+@media (max-width: 992px) {
+    .leccion-matematicas-criticos .simulator-container {
+        grid-template-columns: 1fr;
+    }
+
+    .leccion-matematicas-criticos .simulator-controls {
+        grid-row: auto;
+    }
+
+    .leccion-matematicas-criticos .simulator-data {
+        grid-template-columns: 1fr;
+    }
+
+    .leccion-matematicas-criticos {
+        padding: var(--sp-lg) var(--sp-md);
+    }
+
+    .leccion-matematicas-criticos section {
+        padding: var(--sp-md) var(--sp-lg);
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — MÓVIL
+   ============================================================ */
+@media (max-width: 640px) {
+    .leccion-matematicas-criticos {
+        padding: var(--sp-md) var(--sp-sm);
+        margin: 0.75rem auto;
+        border-radius: var(--r-md);
+    }
+
+    .leccion-matematicas-criticos .titulo-leccion {
+        font-size: 1.3rem;
+    }
+
+    .leccion-matematicas-criticos section {
+        padding: var(--sp-md);
+        margin: var(--sp-md) 0;
+    }
+
+    .leccion-matematicas-criticos .concept-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .leccion-matematicas-criticos .errores-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .leccion-matematicas-criticos .simulator-data {
+        grid-template-columns: 1fr;
+    }
+
+    .leccion-matematicas-criticos .quiz-container {
+        padding: var(--sp-md);
+    }
+
+    .leccion-matematicas-criticos .quiz-pregunta {
+        padding: var(--sp-md);
+    }
+}
