@@ -106,6 +106,7 @@ function iniciarSesionSegura() {
     // Verificación de Timeout Centralizada
     if (isset($_SESSION['usuario_id']) && isset($_SESSION['last_activity'])) {
         if ((time() - $_SESSION['last_activity']) > SESSION_TIMEOUT) {
+            logSeguridadEvento('TIMEOUT', 'Sesión expirada por inactividad', $_SESSION['usuario_id'] ?? null);
             cerrarSesionSegura();
             redirigir((strpos($_SERVER['PHP_SELF'], 'mapa/') !== false ? '../' : '') . 'login.php?timeout=1');
         }
@@ -118,6 +119,58 @@ function iniciarSesionSegura() {
     } elseif (time() - $_SESSION['created_at'] > 1800) {
         session_regenerate_id(true);
         $_SESSION['created_at'] = time();
+    }
+
+    // CSRF token único por sesión
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+}
+
+/**
+ * Devuelve token CSRF para forms y AJAX.
+ */
+function csrfToken() {
+    if (session_status() === PHP_SESSION_NONE) {
+        iniciarSesionSegura();
+    }
+    return $_SESSION['csrf_token'] ?? '';
+}
+
+/**
+ * Valida token CSRF entrante.
+ */
+function validarCsrfToken($token) {
+    if (session_status() === PHP_SESSION_NONE) {
+        iniciarSesionSegura();
+    }
+    return !empty($token) && !empty($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
+ * Registra eventos de seguridad en la base de datos.
+ * Tipos: 'CSRF_FAIL', 'LOGIN_FAIL', 'TIMEOUT', 'ACCESO_NO_AUTORIZADO'.
+ */
+function logSeguridadEvento($tipo, $detalle = '', $usuario_id = null) {
+    global $pdo;
+    try {
+        $p = $pdo->prepare("INSERT INTO security_logs (evento_tipo, usuario_id, detalle, creado_en) VALUES (?, ?, ?, NOW())");
+        $p->execute([$tipo, $usuario_id, $detalle]);
+    } catch (Exception $e) {
+        // Si no existe la tabla, intentamos crearla y reintentar una sola vez.
+        try {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS security_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                evento_tipo VARCHAR(80) NOT NULL,
+                usuario_id INT NULL,
+                detalle TEXT NULL,
+                creado_en DATETIME NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+            $p = $pdo->prepare("INSERT INTO security_logs (evento_tipo, usuario_id, detalle, creado_en) VALUES (?, ?, ?, NOW())");
+            $p->execute([$tipo, $usuario_id, $detalle]);
+        } catch (Exception $ex) {
+            error_log("Error logSeguridadEvento: " . $ex->getMessage());
+        }
     }
 }
 

@@ -1,16 +1,14 @@
 <?php
 // ==========================================
-// LC-ADVANCE - index.php (Versión Mejorada 2025 v2.0)
+// LC-ADVANCE - index.php (Rediseño Premium 2025)
 // ==========================================
-// Fecha: 07 Noviembre 2025
+// Diseño Responsivo con Animaciones del Dashboard
 // ==========================================
 
 require_once 'config/config.php';
-// Asegurar que la sesión se inicie con las políticas definidas
 iniciarSesionSegura();
 require_once 'config/csrf.php';
 
-// Verificar si el usuario está autenticado
 $usuario_logueado = isset($_SESSION['usuario_id']);
 ?>
 
@@ -19,577 +17,981 @@ $usuario_logueado = isset($_SESSION['usuario_id']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LC-ADVANCE</title>
-
-    <!-- Fuente retro y Google Fonts para más variety -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Force dark theme for lesson pages early to avoid flash -->
-    <script>(function(){try{const KEY='lc_advance_theme'; const saved=localStorage.getItem(KEY); if(!saved && (location.pathname.indexOf('leccion_detalle.php')!==-1 || location.search.indexOf('slug=')!==-1)){ document.documentElement.classList.add('dark'); try{localStorage.setItem(KEY,'dark')}catch(e){} } }catch(e){} })();</script>
-    <!-- Icono favicon retro -->
+    <title>LC-ADVANCE | Plataforma Educativa Gamificada</title>
+    
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
-
-    <script src="assets/js/app.js" defer></script>
+    
     <style>
-        /* Corporate-Grade Retro Modern Style */
+        /* ════════════════════════════════════════════════
+           VARIABLES (DASHBOARD THEME)
+           ════════════════════════════════════════════════ */
         :root {
-            --accent-glow: 0 0 30px rgba(0, 255, 255, 0.3);
-            --card-bg: rgba(20, 20, 25, 0.7);
-            --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            --header-blur: blur(12px);
-            --section-spacing: clamp(40px, 8vw, 100px);
+            --bg: #060a12;
+            --surface: #0c1220;
+            --surface2: #101828;
+            --border: rgba(0, 230, 255, 0.12);
+            --border2: rgba(0, 230, 255, 0.22);
+            --cyan: #00e5ff;
+            --cyan-dim: rgba(0, 229, 255, 0.12);
+            --pink: #ff3cac;
+            --green: #00ff87;
+            --yellow: #ffd23f;
+            --text: #e8f4ff;
+            --muted: rgba(200, 230, 255, 0.5);
+            --font-display: "Syne", sans-serif;
+            --font-body: "Space Grotesk", sans-serif;
+            --font-mono: "JetBrains Mono", monospace;
+            --transition: all 0.22s ease;
         }
 
-        .home {
-            overflow-x: hidden;
-            background-color: #050508;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
             scroll-behavior: smooth;
         }
 
-        /* Animated Grid Background */
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: var(--font-body);
+            cursor: pointer;
+            border: none;
+        }
+
+        /* ════════════════════════════════════════════════
+           ANIMATED BACKGROUND
+           ════════════════════════════════════════════════ */
         .grid-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
+            inset: 0;
             pointer-events: none;
-            z-index: -1;
-            mask-image: radial-gradient(circle at center, black, transparent 80%);
-            animation: gridMove 20s linear infinite;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.018) 1px, transparent 1px);
+            background-size: 48px 48px;
+            animation: gridScroll 30s linear infinite;
         }
 
-        @keyframes gridMove {
-            from { background-position: 0 0; }
-            to { background-position: 0 50px; }
+        @keyframes gridScroll {
+            to { background-position: 0 48px; }
         }
 
-        .home .container {
-            max-width: 1300px !important;
-            width: 100% !important;
-            padding: 0 20px !important;
-            margin: 0 auto !important;
-            box-sizing: border-box;
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* Refined Header */
-        .header {
-            background: rgba(0, 0, 0, 0.6) !important;
-            backdrop-filter: var(--header-blur);
-            -webkit-backdrop-filter: var(--header-blur);
-            border-bottom: 1px solid rgba(255, 204, 0, 0.2) !important;
-            transition: var(--transition-smooth);
+        .bg-orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.07), transparent 70%);
+            top: -120px;
+            right: -100px;
+            animation: orbPulse 9s ease-in-out infinite;
         }
 
-        /* Enhanced Hero Section */
+        .bg-orb-2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(255, 60, 172, 0.055), transparent 70%);
+            bottom: 0;
+            left: -80px;
+            animation: orbPulse 11s ease-in-out infinite reverse;
+        }
+
+        @keyframes orbPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.14); }
+        }
+
+        /* ════════════════════════════════════════════════
+           HEADER
+           ════════════════════════════════════════════════ */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0 28px;
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(6, 10, 18, 0.88);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+            animation: fadeInDown 0.6s ease-out;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .logo-text:hover {
+            letter-spacing: -0.3px;
+        }
+
+        .logo-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--green);
+            opacity: 0.85;
+            animation: floatUp 3s ease-in-out infinite;
+            animation-delay: 0.1s;
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            animation: fadeInRight 0.5s ease-out;
+        }
+
+        /* ════════════════════════════════════════════════
+           BUTTONS
+           ════════════════════════════════════════════════ */
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 7px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border2);
+            color: var(--muted);
+            background: transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInRight 0.5s ease-out backwards;
+        }
+
+        .btn:nth-child(1) { animation-delay: 0.15s; }
+        .btn:nth-child(2) { animation-delay: 0.22s; }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .btn:active::before {
+            width: 100px;
+            height: 100px;
+            opacity: 0;
+        }
+
+        .btn:hover {
+            color: var(--cyan);
+            border-color: rgba(0, 229, 255, 0.5);
+            background: rgba(0, 229, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.15);
+        }
+
+        .btn-primary {
+            border-color: var(--cyan);
+            color: var(--bg);
+            background: var(--cyan);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            background: #33eeff;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 28px rgba(0, 229, 255, 0.35);
+        }
+
+        /* ════════════════════════════════════════════════
+           CONTAINER
+           ════════════════════════════════════════════════ */
+        .container {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 1320px);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ════════════════════════════════════════════════
+           HERO SECTION
+           ════════════════════════════════════════════════ */
         .hero {
-            min-height: 95vh;
+            min-height: 90vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 100px 20px;
-            background: none;
-            position: relative;
+            padding: 60px 20px;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
         }
 
-        .hero::before {
-            content: "";
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.08) 0%, transparent 50%);
-            z-index: -1;
-            animation: pulseHero 8s ease-in-out infinite;
-        }
-
-        @keyframes pulseHero {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 1; }
-        }
-
-        .hero h2 {
+        .hero h1 {
+            font-family: var(--font-display);
             font-size: clamp(32px, 8vw, 72px);
-            font-family: var(--font-pixel);
-            background: linear-gradient(to bottom, #fff, var(--neon-cyan));
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: none;
-            margin-bottom: 30px;
-            letter-spacing: -2px;
+            background-clip: text;
+            line-height: 1.1;
         }
 
         .hero p {
-            font-size: clamp(18px, 2.5vw, 24px);
-            font-family: var(--font-retro);
-            max-width: 900px;
-            color: var(--text-dim);
-            margin-bottom: 50px;
-            line-height: 1.4;
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--muted);
+            max-width: 800px;
+            margin-bottom: 40px;
+            line-height: 1.6;
         }
 
-        /* Stats Bar */
-        .stats-bar {
+        .hero-buttons {
             display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
             justify-content: center;
-            gap: clamp(20px, 5vw, 80px);
-            margin-top: 60px;
-            padding: 30px;
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: var(--header-blur);
-            animation: fadeInUp 1s ease-out 0.9s both;
+            margin-bottom: 60px;
         }
 
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .btn-hero {
+            padding: 12px 32px;
+            font-size: 11px;
+        }
+
+        /* ════════════════════════════════════════════════
+           STATS SECTION
+           ════════════════════════════════════════════════ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 80px;
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: scaleInCubic 0.4s ease-out backwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+        .stat-card:hover {
+            border-color: rgba(0, 229, 255, 0.35);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0, 229, 255, 0.12);
         }
 
         .stat-value {
-            font-family: var(--font-pixel);
-            font-size: 24px;
-            color: var(--neon-yellow);
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--cyan);
+            margin-bottom: 8px;
         }
 
         .stat-label {
-            font-family: var(--font-retro);
-            font-size: 14px;
-            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 11px;
             text-transform: uppercase;
+            color: var(--muted);
             letter-spacing: 1px;
         }
 
-        /* Premium Feature Sections */
+        /* ════════════════════════════════════════════════
+           FEATURE SECTION
+           ════════════════════════════════════════════════ */
         .feature-section {
-            padding: var(--section-spacing) 0;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: center;
+            margin-bottom: 100px;
+            animation: fadeInUp 0.6s ease-out backwards;
         }
 
-        .feature-text h3 {
-            font-size: clamp(28px, 4vw, 42px);
-            font-family: var(--font-pixel);
+        .feature-section:nth-child(even) {
+            direction: rtl;
+        }
+
+        .feature-section:nth-child(even) > * {
+            direction: ltr;
+        }
+
+        .feature-text h2 {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 24px;
             color: #fff;
-            margin-bottom: 25px;
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
         .feature-text p {
-            font-size: 20px;
-            font-family: var(--font-retro);
-            color: var(--text-dim);
-            margin-bottom: 30px;
+            font-size: 16px;
+            color: var(--muted);
+            margin-bottom: 20px;
+            line-height: 1.8;
         }
 
-        .feature-asset {
-            background: #000;
-            border: 2px solid rgba(0, 255, 255, 0.4);
-            border-radius: 12px;
-            padding: 0;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 255, 0.1);
+        .feature-visual {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
         }
 
-        .feature-asset img {
-            width: 100%;
-            height: auto;
-            max-height: 600px;
-            object-fit: contain;
-            image-rendering: pixelated;
-            transition: var(--transition-smooth);
+        .feature-visual:hover {
+            border-color: rgba(0, 229, 255, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 229, 255, 0.12);
+        }
+
+        .feature-icon {
+            font-size: 80px;
+            margin-bottom: 16px;
             display: block;
         }
 
-        /* Prevent image glow that can cause artifacts on some gifs */
-        .feature-asset img.glow-orange,
-        .feature-asset img.glow-cyan {
-            filter: none;
+        /* ════════════════════════════════════════════════
+           CARDS GRID
+           ════════════════════════════════════════════════ */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 80px;
         }
 
-        /* Add the glow to the container instead for better performance and look */
-        .feature-section:nth-child(odd) .feature-asset {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: fadeInUp 0.55s ease-out backwards;
         }
 
-        .feature-section:nth-child(even) .feature-asset {
-            border-color: var(--neon-orange);
-            box-shadow: 0 0 25px rgba(255, 152, 0, 0.15);
-        }
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.18s; }
+        .card:nth-child(3) { animation-delay: 0.26s; }
 
-        .feature-asset::after {
+        .card::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.05), transparent);
-            transform: translateX(-100%);
-            transition: 0.8s;
+            inset: 0;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.03), transparent 60%);
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        .feature-section:hover .feature-asset::after {
-            transform: translateX(100%);
+        .card:hover {
+            border-color: rgba(0, 229, 255, 0.35);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 32px rgba(0, 229, 255, 0.12);
         }
 
-        /* Corporate Footer */
-        .corporate-footer {
-            padding: 100px 20px 50px;
-            background: #000;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: var(--section-spacing);
+        .card:hover::before {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), transparent 60%);
         }
 
-        .footer-grid {
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* ════════════════════════════════════════════════
+           CTA SECTION
+           ════════════════════════════════════════════════ */
+        .cta-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 60px;
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .cta-section h2 {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            color: var(--muted);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ════════════════════════════════════════════════
+           FOOTER
+           ════════════════════════════════════════════════ */
+        footer {
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid var(--border);
+            padding: 60px 0 30px;
+            margin-top: 100px;
+        }
+
+        .footer-content {
             display: grid;
             grid-template-columns: 2fr repeat(3, 1fr);
-            gap: 60px;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
-        .footer-brand h4 {
-            font-family: var(--font-pixel);
-            color: var(--neon-yellow);
-            font-size: 20px;
-            margin-bottom: 20px;
+        .footer-brand h3 {
+            font-family: var(--font-display);
+            font-size: 16px;
+            color: var(--cyan);
+            margin-bottom: 12px;
         }
 
         .footer-brand p {
-            color: var(--text-muted);
-            font-family: var(--font-retro);
+            font-size: 13px;
+            color: var(--muted);
             line-height: 1.6;
-            max-width: 300px;
         }
 
-        .footer-col h5 {
-            font-family: var(--font-pixel);
-            font-size: 14px;
-            color: #fff;
-            margin-bottom: 25px;
+        .footer-col h4 {
+            font-family: var(--font-display);
+            font-size: 12px;
             text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
         }
 
         .footer-col ul {
             list-style: none;
-            padding: 0;
         }
 
         .footer-col ul li {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .footer-col ul li a {
-            text-decoration: none;
-            color: var(--text-dim);
-            font-family: var(--font-retro);
-            font-size: 16px;
-            transition: 0.3s;
+            font-size: 13px;
+            color: var(--muted);
+            transition: all 0.3s ease;
         }
 
         .footer-col ul li a:hover {
-            color: var(--neon-cyan);
+            color: var(--cyan);
             padding-left: 5px;
         }
 
         .footer-bottom {
-            margin-top: 80px;
+            border-top: 1px solid var(--border);
             padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            color: var(--text-muted);
-            font-family: var(--font-retro);
-            font-size: 14px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
         }
 
-        /* Buttons Enhancement */
-        .btn {
-            padding: 18px 32px !important;
-            font-family: var(--font-pixel) !important;
-            font-size: 12px !important;
-            border-radius: 12px !important;
-            transition: var(--transition-smooth) !important;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-start {
-            background: var(--neon-cyan) !important;
-            color: #000 !important;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3) !important;
-        }
-
-        .btn-start:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.6) !important;
-        }
-
-        .btn-guest {
-            background: transparent !important;
-            border: 2px solid rgba(255, 255, 255, 0.1) !important;
-            color: #fff !important;
-        }
-
-        .btn-guest:hover {
-            border-color: #fff !important;
-            background: rgba(255, 255, 255, 0.05) !important;
-        }
-
-        @media (max-width: 992px) {
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
+        /* ════════════════════════════════════════════════
+           KEYFRAMES
+           ════════════════════════════════════════════════ */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
             }
-            .feature-section {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                text-align: center;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleInCubic {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes floatUp {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ════════════════════════════════════════════════
+           RESPONSIVE
+           ════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 14px;
+                justify-content: flex-start;
+            }
+
+            .logo {
+                flex: 1;
+            }
+
+            .logo-text {
+                font-size: 15px;
+            }
+
+            .logo-tag {
+                font-size: 8px;
+            }
+
+            nav {
+                width: 100%;
+                gap: 6px;
+                justify-content: flex-end;
+            }
+
+            .btn {
+                font-size: 9px;
+                padding: 6px 12px;
+            }
+
+            .feature-section,
             .feature-section:nth-child(even) {
                 direction: ltr;
+                grid-template-columns: 1fr;
+                gap: 40px;
             }
-            .stats-bar {
-                flex-wrap: wrap;
+
+            .feature-section:nth-child(even) > * {
+                direction: ltr;
+            }
+
+            .cta-section {
+                padding: 40px 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
                 gap: 30px;
             }
         }
 
-        @media (max-width: 600px) {
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            .footer-bottom {
+        @media (max-width: 640px) {
+            header {
+                padding: 10px 12px;
                 flex-direction: column;
-                text-align: center;
+                align-items: stretch;
+                gap: 10px;
             }
+
+            .logo {
+                width: 100%;
+                order: 1;
+            }
+
+            nav {
+                width: 100%;
+                order: 2;
+                justify-content: space-between;
+            }
+
+            .btn {
+                flex: 1;
+                font-size: 7px;
+                padding: 5px 8px;
+                min-height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .hero {
+                padding: 40px 14px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .cta-section {
+                padding: 30px 16px;
+            }
+
+            .cta-section h2 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 13px;
+            }
+
+            .logo-tag {
+                font-size: 7px;
+            }
+
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .stats-grid {
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+        }
+
+        .hamburger {
+            display: none !important;
         }
     </style>
 </head>
-<body class="home">
+<body>
 
+
+<!-- Animated Background -->
 <div class="grid-bg"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
 
-<header class="header">
-    <h1>🎮 LC-ADVANCE</h1>
-    <button class="hamburger" type="button" aria-label="Menu">☰</button>
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <span class="logo-text">LC-ADVANCE</span>
+        <span class="logo-tag">// HOME</span>
+    </div>
     <nav>
         <?php if ($usuario_logueado): ?>
-            <button class="btn btn-dashboard" onclick="window.location='mapa/index.php'">Panel de Control</button>
-            <button class="btn btn-logout" onclick="window.location='logout.php'">Cerrar Sesión</button>
+            <button class="btn btn-primary" onclick="window.location='dashboard.php'">Dashboard</button>
+            <button class="btn" onclick="window.location='logout.php'">Cerrar Sesión</button>
         <?php else: ?>
-            <button class="btn btn-login" onclick="window.location='login.php'">Iniciar Sesión</button>
-            <button class="btn btn-register" onclick="window.location='register.php'">Registrarse</button>
+            <button class="btn" onclick="window.location='login.php'">Iniciar Sesión</button>
+            <button class="btn btn-primary" onclick="window.location='register.php'">Registrarse</button>
         <?php endif; ?>
     </nav>
 </header>
 
+<!-- MAIN -->
 <main class="container">
-    <?php if (!empty($_GET['seleccionar_materia']) && (!empty($_GET['from']) && $_GET['from'] === 'dashboard')): 
-        require_once 'src/content.php';
-        $materias = [];
-        foreach ($lecciones as $l) $materias[] = $l['materia'] ?? 'Sin Materia';
-        $materias = array_values(array_unique($materias));
-    ?>
-    <!-- Modal select-materia -->
-    <div id="selectMateriaModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="selectMateriaTitle">
-      <div class="modal-card">
-        <button class="modal-close" aria-label="Cerrar">✖</button>
-        <h2 id="selectMateriaTitle">📚 Elige una materia para continuar</h2>
-        <p>Selecciona la materia que deseas estudiar hoy — esto configurará tu panel de estudio.</p>
-        <div class="materias-grid">
-          <?php foreach ($materias as $m): ?>
-            <a class="btn btn-primary btn-small" href="dashboard.php?materia=<?php echo urlencode($m); ?>"><?php echo htmlspecialchars($m); ?></a>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function(){
-      const modal = document.getElementById('selectMateriaModal');
-      if (!modal) return;
-      // Auto-show the modal
-      modal.style.display = 'flex';
-      // Close handlers
-      modal.querySelector('.modal-close').addEventListener('click', ()=> modal.style.display = 'none');
-      modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display = 'none';});
-    });
-    </script>
-    <?php endif; ?>
 
     <!-- HERO SECTION -->
     <section class="hero">
-        <?php if (!$usuario_logueado): ?>
-            <h2>DOMINA EL CÓDIGO</h2>
-            <p>La plataforma educativa que convierte el aprendizaje de programación en una aventura legendaria. Basado en estándares DGETI 2025.</p>
-            <div class="hero-btns">
-                <button class="btn btn-start" onclick="window.location='register.php'">Empezar Ahora</button>
-                <button class="btn btn-guest" onclick="window.location='guest_login.php'">Acceso Invitado</button>
-            </div>
-        <?php else: ?>
-            <h2>BIENVENIDO, <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?></h2>
-            <p>Tu progreso está guardado y listo. Continúa dominando los lenguajes del futuro.</p>
-            <div class="hero-btns">
-                <button class="btn btn-start" onclick="window.location='mapa/index.php'">Ir al Dashboard</button>
-            </div>
-        <?php endif; ?>
-
-        <div class="stats-bar">
-            <div class="stat-item">
-                <span class="stat-value">200+</span>
-                <span class="stat-label">Lecciones</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">15k+</span>
-                <span class="stat-label">Preguntas</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">24/7</span>
-                <span class="stat-label">Acceso</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">100%</span>
-                <span class="stat-label">Gratis</span>
-            </div>
+        <h1><?php echo $usuario_logueado ? 'Bienvenido de vuelta' : 'Domina todas tus materias'; ?></h1>
+        <p><?php echo $usuario_logueado 
+            ? 'Tu progreso está guardado. Continúa tu aventura educativa.' 
+            : 'La plataforma educativa gamificada que transforma el aprendizaje en una experiencia épica.'; 
+        ?></p>
+        <div class="hero-buttons">
+            <?php if ($usuario_logueado): ?>
+                <button class="btn btn-primary btn-hero" onclick="window.location='dashboard.php'">Ir al Dashboard</button>
+            <?php else: ?>
+                <button class="btn btn-primary btn-hero" onclick="window.location='register.php'">Comenzar Ahora</button>
+                <button class="btn btn-hero" onclick="window.location='guest_login.php'">Acceso Invitado</button>
+            <?php endif; ?>
         </div>
     </section>
 
-    <!-- MAP SECTION -->
-    <section class="feature-section">
+    <!-- STATS SECTION -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">200+</div>
+            <div class="stat-label">Lecciones</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">15k+</div>
+            <div class="stat-label">Preguntas</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">24/7</div>
+            <div class="stat-label">Acceso</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Gratis</div>
+        </div>
+    </section>
+
+    <!-- FEATURE 1: MAPA -->
+    <section class="feature-section" style="animation-delay: 0.15s">
         <div class="feature-text">
-            <h3>Explora el Campus Virtual</h3>
-            <p>Navega por un mundo pixelado donde cada edificio representa un área del conocimiento. Habla con maestros, interactúa con el entorno y desbloquea secretos.</p>
+            <h2>Explora el Campus Virtual</h2>
+            <p>Navega por un mundo pixelado donde cada zona representa un área del conocimiento. Interactúa con maestros, descubre secretos y desbloquea contenido oculto.</p>
             <p>Un entorno inmersivo diseñado para que el aprendizaje se sienta como un RPG clásico.</p>
         </div>
-        <div class="feature-asset">
-            <img src="assets/img/map.gif" alt="Exploración en el mapa" class="glow-cyan">
+        <div class="feature-visual">
+            <span class="feature-icon">🗺️</span>
+            <p style="color: var(--muted);">Exploración Interactiva</p>
         </div>
     </section>
 
-    <!-- LESSONS SECTION -->
-    <section class="feature-section">
+    <!-- FEATURE 2: LECCIONES -->
+    <section class="feature-section" style="animation-delay: 0.25s">
         <div class="feature-text">
-            <h3>Aprendizaje Adaptativo</h3>
-            <p>Desde C# y Python hasta desarrollo web moderno con PHP y JavaScript. Nuestras lecciones se adaptan a tu ritmo, con retroalimentación en tiempo real.</p>
-            <p>Contenido estructurado por semestres, facilitando el seguimiento del plan de estudios oficial.</p>
+            <h2>Aprendizaje Estructurado</h2>
+            <p>Desde las materias más difíciles como química, matemáticas, hasta el dominio de la programación con lenguajes como Python y JavaScript. Lecciones adaptativas con retroalimentación en tiempo real y contenido estructurado por semestres.</p>
+            <p>Sigue el plan de estudios oficial DGETI 2025 con herramientas modernas.</p>
         </div>
-        <div class="feature-asset">
-            <img src="assets/img/lecciones.png" alt="Aprendizaje Adaptativo" class="glow-cyan">
+        <div class="feature-visual">
+            <span class="feature-icon">📚</span>
+            <p style="color: var(--muted);">Contenido Premium</p>
         </div>
     </section>
 
-    <!-- COMBAT SYSTEM SECTION -->
-    <section class="feature-section">
+    <!-- FEATURE 3: COMBATE -->
+    <section class="feature-section" style="animation-delay: 0.35s">
         <div class="feature-text">
-            <h3>Duelos de Conocimiento</h3>
-            <p>Los exámenes ya no son aburridos. Enfrenta a los maestros en un sistema de combate por turnos donde tu arma es el código correcto.</p>
-            <p>Gana experiencia, sube de nivel y colecciona medallas que demuestren tu valía ante la comunidad.</p>
+            <h2>Duelos de Conocimiento</h2>
+            <p>Los exámenes se transforman en épicos enfrentamientos. Enfrenta a los maestros en un sistema de combate por turnos donde tu arma es el código correcto.</p>
+            <p>Gana experiencia, sube de nivel y colecciona insignias que demuestren tu valía.</p>
         </div>
-        <div class="feature-asset">
-            <img src="assets/img/systemC.gif" alt="Maestro de Programación" class="glow-orange">
+        <div class="feature-visual">
+            <span class="feature-icon">⚔️</span>
+            <p style="color: var(--muted);">Gamificación Avanzada</p>
         </div>
     </section>
+
+    <!-- FEATURES GRID -->
+    <section class="cards-grid" style="margin-top: 100px;">
+        <div class="card">
+            <div class="card-icon">🏆</div>
+            <h3>Sistema de Ranking</h3>
+            <p>Compite globalmente con otros estudiantes. Sube en el ranking, gana insignias y demuestra tu dominio en cada materia.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">⚡</div>
+            <h3>Progreso Guardado</h3>
+            <p>Tu avance se sincroniza automáticamente. Retoma desde donde dejaste en cualquier dispositivo, en cualquier momento.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🎯</div>
+            <h3>Análisis Detallado</h3>
+            <p>Dashboard interactivo con métricas de tu desempeño, áreas de mejora y estadísticas visuales en tiempo real.</p>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="cta-section">
+        <h2><?php echo $usuario_logueado ? '¡Sigue Aprendiendo!' : '¿Listo para comenzar?'; ?></h2>
+        <p><?php echo $usuario_logueado 
+            ? 'Tu jornada educativa te espera. Accede a todas las lecciones y domina las tecnologías del futuro.'
+            : 'Únete a miles de estudiantes que ya están transformando su educación con LC-ADVANCE.'; 
+        ?></p>
+        <div class="hero-buttons">
+            <?php if ($usuario_logueado): ?>
+                <button class="btn btn-primary btn-hero" onclick="window.location='mapa/index.php'">Ir al Mapa</button>
+            <?php else: ?>
+                <button class="btn btn-primary btn-hero" onclick="window.location='register.php'">Registrarse Gratis</button>
+            <?php endif; ?>
+        </div>
+    </section>
+
 </main>
 
-<footer class="corporate-footer">
-    <div class="footer-grid">
-        <div class="footer-brand">
-            <h4>LC-ADVANCE</h4>
-            <p>Transformando la educación tecnológica mediante la gamificación y el diseño retro-futurista.</p>
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>🎮 LC-ADVANCE</h3>
+                <p>Transformando la educación tecnológica mediante gamificación y diseño moderno.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Producto</h4>
+                <ul>
+                    <li><a href="<?php echo $usuario_logueado ? 'mapa/index.php' : 'gatekeeper.php?redirect=mapa/index.php'; ?>">Mapa Interactivo</a></li>
+                    <li><a href="<?php echo $usuario_logueado ? 'dashboard.php' : 'gatekeeper.php?redirect=dashboard.php'; ?>">Dashboard</a></li>
+                    <li><a href="<?php echo $usuario_logueado ? 'ranking.php' : 'gatekeeper.php?redirect=ranking.php'; ?>">Ranking</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Recursos</h4>
+                <ul>
+                    <li><a href="docs.php?file=README.md">Documentación</a></li>
+                    <li><a href="docs.php?file=DEVELOPMENT.md">Guía de Desarrollo</a></li>
+                    <li><a href="docs.php?file=API.md">API Reference</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Comunidad</h4>
+                <ul>
+                    <li><a href="https://github.com" target="_blank">GitHub</a></li>
+                    <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
+                    <li><a href="register.php">Unirse</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="footer-col">
-            <h5>Producto</h5>
-            <ul>
-                <?php if ($usuario_logueado): ?>
-                    <li><a href="mapa/index.php">Mapa Interactivo</a></li>
-                    <li><a href="dashboard.php">Dashboard</a></li>
-                    <li><a href="ranking.php">Ranking Global</a></li>
-                <?php else: ?>
-                    <li><a href="gatekeeper.php?redirect=mapa/index.php">Mapa Interactivo</a></li>
-                    <li><a href="gatekeeper.php?redirect=dashboard.php">Dashboard</a></li>
-                    <li><a href="gatekeeper.php?redirect=ranking.php">Ranking Global</a></li>
-                <?php endif; ?>
-            </ul>
-        </div>
-        <div class="footer-col">
-            <h5>Recursos</h5>
-            <ul>
-                <li><a href="docs.php?file=README.md">Documentación</a></li>
-                <li><a href="docs.php?file=DEVELOPMENT.md">Guía de Desarrollo</a></li>
-                <li><a href="docs.php?file=API.md">API Reference</a></li>
-            </ul>
-        </div>
-        <div class="footer-col">
-            <h5>Comunidad</h5>
-            <ul>
-                <li><a href="https://github.com/cervanlfc7/LC-ADVANCE" target="_blank">GitHub</a></li>
-                <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
-                <li><a href="register.php">Registrarse</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <p>© 2025-2026 LC-ADVANCE. Todos los derechos reservados.</p>
-        <div class="footer-links">
-            <span style="margin-left: 20px;">Hecho con 💚 para estudiantes de DGETI</span>
+        <div class="footer-bottom">
+            <p>© 2025-2026 LC-ADVANCE. Todos los derechos reservados. | Hecho con 💚 para estudiantes DGETI.</p>
         </div>
     </div>
 </footer>
 
 <script>
-    // Advanced Intersection Observer
-    const observerOptions = {
-        threshold: 0.15,
-        rootMargin: "0px 0px -50px 0px"
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = "1";
-                entry.target.style.transform = "translateY(0)";
-                observer.unobserve(entry.target);
+// Smooth scroll behavior
+document.querySelectorAll('a[href*="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
             }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll('.feature-section').forEach(section => {
-        section.style.opacity = "0";
-        section.style.transform = "translateY(50px)";
-        section.style.transition = "var(--transition-smooth)";
-        observer.observe(section);
-    });
-
-    // Header effect on scroll
-    window.addEventListener('scroll', () => {
-        const header = document.querySelector('.header');
-        if (window.scrollY > 50) {
-            header.style.padding = "10px 20px";
-            header.style.background = "rgba(0, 0, 0, 0.8) !important";
-        } else {
-            header.style.padding = "15px 20px";
-            header.style.background = "rgba(0, 0, 0, 0.6) !important";
         }
     });
+});
+
+// Header sticky effect
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('header');
+    if (window.scrollY > 50) {
+        header.style.background = 'rgba(6, 10, 18, 0.95)';
+    } else {
+        header.style.background = 'rgba(6, 10, 18, 0.88)';
+    }
+});
 </script>
 
 </body>
-</html>
 </html>

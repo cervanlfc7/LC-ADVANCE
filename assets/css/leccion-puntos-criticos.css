@@ -1,1045 +1,2594 @@
 /* ============================================================
-   ESTILOS ÚNICOS: PUNTOS CRÍTICOS — MÁXIMOS Y MÍNIMOS
-   Cyberpunk Educational Design — Pensamiento Matemático III
-   Namespace: .leccion-matematicas-criticos
-   ============================================================ */
+         VARIABLES CYBERPUNK — PUNTOS CRÍTICOS
+         ============================================================ */
+:root {
+  --bg: #04060f;
+  --surface: #080c1a;
+  --surface2: #0c1228;
+  --surface3: #101830;
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0, 229, 255, 0.08);
+  --pink: #ff3cac;
+  --pink-dim: rgba(255, 60, 172, 0.08);
+  --green: #00ff87;
+  --green-dim: rgba(0, 255, 135, 0.08);
+  --yellow: #ffd23f;
+  --yellow-dim: rgba(255, 210, 63, 0.08);
+  --red: #ff4757;
+  --purple: #a855f7;
+  --orange: #ff6b35;
+  --text: #e8f4ff;
+  --muted: rgba(200, 230, 255, 0.45);
+  --border: rgba(0, 229, 255, 0.1);
+  --border2: rgba(0, 229, 255, 0.22);
+  --border3: rgba(0, 229, 255, 0.38);
+  --font-display: "Orbitron", monospace;
+  --font-mono: "Share Tech Mono", monospace;
+  --font-body: "Rajdhani", sans-serif;
+  --transition: all 0.22s ease;
+  --radius: 12px;
+  --glow-cyan: 0 0 24px rgba(0, 229, 255, 0.25);
+  --glow-pink: 0 0 24px rgba(255, 60, 172, 0.25);
+  --glow-green: 0 0 24px rgba(0, 255, 135, 0.25);
+}
 
-.leccion-matematicas-criticos {
-    /* Paleta neon — Máximos/Mínimos */
-    --neon-max:    #ff00ff;   /* Magenta — máximos */
-    --neon-min:    #39ff14;   /* Verde   — mínimos */
-    --neon-crit:   #ffff00;   /* Amarillo — puntos críticos */
-    --neon-curva:  #00ffff;   /* Cian     — curva/tema */
-    --neon-alerta: #ff3366;   /* Rojo     — errores */
-    --neon-info:   #00ff9d;   /* Verde-agua — info/curricular */
+/* RESET */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-    --bg-main:   #07071a;
-    --bg-sec:    rgba(0, 10, 30, 0.55);
-    --bg-card:   rgba(5, 5, 22, 0.88);
-    --bg-sim:    #050510;
+/* BACKGROUND FX */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.012) 1px, transparent 1px);
+  background-size: 52px 52px;
+  animation: gridScroll 40s linear infinite;
+}
+@keyframes gridScroll {
+  to {
+    background-position: 0 52px;
+  }
+}
 
-    --font-mono: 'Roboto Mono', 'Courier New', monospace;
-    --font-disp: 'Orbitron', 'Segoe UI', sans-serif;
-    --fs-sm: 0.875rem;
-    --fs-base: 1rem;
-    --fs-md: 1.0625rem;
-    --fs-lg: 1.25rem;
-    --fs-xl: 1.5rem;
-    --fs-2xl: 2rem;
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(110px);
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-orb-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.06), transparent 70%);
+  top: -180px;
+  right: -120px;
+  animation: orbPulse 10s ease-in-out infinite;
+}
+.bg-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 60, 172, 0.05),
+    transparent 70%
+  );
+  bottom: 100px;
+  left: -100px;
+  animation: orbPulse 13s ease-in-out infinite reverse;
+}
+.bg-orb-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 255, 135, 0.04), transparent 70%);
+  top: 50%;
+  right: -80px;
+  animation: orbPulse 8s ease-in-out infinite;
+}
+@keyframes orbPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
 
-    --sp-xs: 4px;
-    --sp-sm: 8px;
-    --sp-md: 16px;
-    --sp-lg: 24px;
-    --sp-xl: 32px;
-
-    --tr: all 0.25s cubic-bezier(0.4,0,0.2,1);
-    --r-sm: 6px;
-    --r-md: 10px;
-    --r-lg: 16px;
+/* SCANLINES */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.015) 51%);
+  background-size: 100% 3px;
 }
 
 /* ============================================================
-   CONTENEDOR PRINCIPAL
-   ============================================================ */
-.leccion-matematicas-criticos {
-    position: relative;
-    background: linear-gradient(150deg, #07071a 0%, #0b0d24 55%, #080718 100%);
-    color: #dde9f7;
-    font-family: var(--font-mono);
-    font-size: var(--fs-base);
-    line-height: 1.7;
-    padding: var(--sp-xl) var(--sp-lg);
-    border-radius: var(--r-lg);
-    box-shadow: 0 0 40px rgba(0,255,255,0.1), inset 0 1px 0 rgba(0,255,255,0.07);
-    max-width: 1200px;
-    margin: 1.5rem auto;
-    overflow-x: hidden;
+         HEADER NAV
+         ============================================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: rgba(4, 6, 15, 0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+}
+.header-nav {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.nav-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.nav-badge:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+}
+.nav-badge.active {
+  color: var(--bg);
+  background: var(--cyan);
+  border-color: var(--cyan);
+  font-weight: 700;
 }
 
-.leccion-matematicas-criticos::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(0,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,255,0.02) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    border-radius: var(--r-lg);
-    z-index: 0;
+/* PROGRESS BAR */
+.progress-bar-wrap {
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.04);
 }
-
-.leccion-matematicas-criticos > * { position: relative; z-index: 1; }
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  transition: width 0.1s linear;
+}
 
 /* ============================================================
-   CABECERA
-   ============================================================ */
-.leccion-matematicas-criticos .leccion-header {
-    text-align: center;
-    margin-bottom: var(--sp-xl);
-    padding: var(--sp-xl) var(--sp-lg);
-    border-bottom: 1px solid rgba(0,255,255,0.18);
+         LAYOUT
+         ============================================================ */
+.leccion-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 22px 80px;
 }
 
-.leccion-matematicas-criticos .header-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-sm);
-    justify-content: center;
-    margin-bottom: var(--sp-md);
+/* ============================================================
+         HERO
+         ============================================================ */
+.leccion-hero {
+  position: relative;
+  text-align: center;
+  padding: 48px 32px 42px;
+  margin-bottom: 36px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.leccion-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 229, 255, 0.06) 0%,
+    transparent 50%,
+    rgba(255, 60, 172, 0.04) 100%
+  );
+  pointer-events: none;
+}
+.leccion-hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--cyan),
+    var(--pink),
+    transparent
+  );
+}
+.hero-badges {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.hero-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.badge-mat {
+  color: var(--cyan);
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+}
+.badge-lvl {
+  color: var(--purple);
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+.badge-time {
+  color: var(--yellow);
+  background: var(--yellow-dim);
+  border: 1px solid rgba(255, 210, 63, 0.25);
 }
 
-.leccion-matematicas-criticos .materia-badge,
-.leccion-matematicas-criticos .nivel-badge,
-.leccion-matematicas-criticos .tiempo-badge {
-    display: inline-block;
-    padding: 5px 14px;
-    background: rgba(0,255,255,0.08);
-    border: 1px solid var(--neon-curva);
-    border-radius: 20px;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    color: var(--neon-curva);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 4.5vw, 36px);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 14px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    var(--cyan) 50%,
+    var(--pink) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleGlow 4s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.6));
+  }
+}
+.hero-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+}
+.hero-stats {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.hero-stat {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 20px;
+  text-align: center;
+}
+.hero-stat-num {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--cyan);
+  display: block;
+}
+.hero-stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ============================================================
+         OBJETIVOS
+         ============================================================ */
+.obj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.obj-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: var(--transition);
+  cursor: default;
+}
+.obj-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-cyan);
+}
+.obj-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.obj-text h4 {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--cyan);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.obj-text p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ============================================================
+         SECTION CARD
+         ============================================================ */
+.seccion {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+.seccion::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity: 0.4;
+}
+.seccion:hover {
+  border-color: var(--border2);
+}
+
+.seccion-titulo {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.seccion-titulo .titulo-icon {
+  font-size: 18px;
+}
+
+.seccion p {
+  color: rgba(220, 240, 255, 0.82);
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+.seccion p:last-child {
+  margin-bottom: 0;
+}
+.seccion strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.seccion em {
+  color: var(--cyan);
+  font-style: normal;
+}
+
+/* ============================================================
+         CONCEPT GRID
+         ============================================================ */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (max-width: 620px) {
+  .concept-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.concept-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  transition: var(--transition);
+}
+.concept-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+}
+.concept-card h3 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 12px;
+}
+.concept-card.alerta {
+  border-left: 3px solid var(--yellow);
+}
+.concept-card.minimo {
+  border-left: 3px solid var(--green);
+}
+.concept-card.maximo {
+  border-left: 3px solid var(--pink);
+}
+.concept-card ul {
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 2;
+  color: var(--muted);
+}
+.concept-card p {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* BLOCKQUOTE */
+.definicion {
+  border-left: 3px solid var(--cyan);
+  background: var(--cyan-dim);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 14px;
+  color: rgba(200, 240, 255, 0.9);
+}
+.importante {
+  background: rgba(255, 210, 63, 0.08);
+  border: 1px solid rgba(255, 210, 63, 0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--yellow);
+  margin-top: 12px;
+}
+
+/* ============================================================
+         SIGN TABLE
+         ============================================================ */
+.tabla-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  margin: 16px 0;
+}
+.tabla-signos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tabla-signos th {
+  background: var(--surface2);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.tabla-signos td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: rgba(210, 235, 255, 0.82);
+  font-size: 13px;
+}
+.tabla-signos tr:last-child td {
+  border-bottom: none;
+}
+.tabla-signos tr:hover td {
+  background: rgba(0, 229, 255, 0.04);
+}
+.tabla-signos tr.max td {
+  color: var(--pink);
+  font-weight: 600;
+}
+.tabla-signos tr.min td {
+  color: var(--green);
+  font-weight: 600;
+}
+.tabla-signos tr.infl td {
+  color: var(--yellow);
+}
+
+/* ============================================================
+         CONTEXT CARD
+         ============================================================ */
+.context-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 12px 0;
+}
+.real-data {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.data-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  color: var(--cyan);
+  background: var(--cyan-dim);
+}
+os .tiempo-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  background: rgba(0, 255, 255, 0.08);
+  border: 1px solid var(--neon-curva);
+  border-radius: 20px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--neon-curva);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .leccion-matematicas-criticos .nivel-badge {
-    background: rgba(255,255,0,0.08);
-    border-color: var(--neon-crit);
-    color: var(--neon-crit);
+  background: rgba(255, 255, 0, 0.08);
+  border-color: var(--neon-crit);
+  color: var(--neon-crit);
 }
 
 .leccion-matematicas-criticos .tiempo-badge {
-    background: rgba(57,255,20,0.08);
-    border-color: var(--neon-min);
-    color: var(--neon-min);
+  background: rgba(57, 255, 20, 0.08);
+  border-color: var(--neon-min);
+  color: var(--neon-min);
 }
 
 .leccion-matematicas-criticos .titulo-leccion {
-    font-family: var(--font-disp);
-    font-size: clamp(var(--fs-xl), 5vw, var(--fs-2xl));
-    font-weight: 700;
-    color: var(--neon-curva);
-    margin: var(--sp-md) 0 var(--sp-sm);
-    line-height: 1.2;
-    text-shadow: 0 0 10px rgba(0,255,255,0.5);
-    animation: pcGlow 3.5s ease-in-out infinite;
+  font-family: var(--font-disp);
+  font-size: clamp(var(--fs-xl), 5vw, var(--fs-2xl));
+  font-weight: 700;
+  color: var(--neon-curva);
+  margin: var(--sp-md) 0 var(--sp-sm);
+  line-height: 1.2;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  animation: pcGlow 3.5s ease-in-out infinite;
 }
 
 @keyframes pcGlow {
-    0%, 100% { text-shadow: 0 0 6px rgba(0,255,255,0.5); }
-    50%       { text-shadow: 0 0 16px rgba(0,255,255,0.85), 0 0 30px rgba(0,255,255,0.25); }
+  0%,
+  100% {
+    text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 16px rgba(0, 255, 255, 0.85),
+      0 0 30px rgba(0, 255, 255, 0.25);
+  }
 }
 
 .leccion-matematicas-criticos .leccion-subtitulo {
-    font-size: var(--fs-md);
-    color: rgba(200,220,240,0.65);
-    margin: 0;
-    letter-spacing: 0.5px;
+  font-size: var(--fs-md);
+  color: rgba(200, 220, 240, 0.65);
+  margin: 0;
+  letter-spacing: 0.5px;
 }
 
 /* ============================================================
    OBJETIVOS
    ============================================================ */
 .leccion-matematicas-criticos .objetivos-rapidos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--sp-md);
-    margin-bottom: var(--sp-xl);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--sp-md);
+  margin-bottom: var(--sp-xl);
 }
 
 .leccion-matematicas-criticos .objetivo-card {
-    display: flex;
-    gap: var(--sp-md);
-    align-items: flex-start;
-    background: rgba(0,255,255,0.05);
-    border: 1px solid rgba(0,255,255,0.22);
-    border-left: 4px solid var(--neon-curva);
-    padding: var(--sp-md) var(--sp-lg);
-    border-radius: var(--r-md);
-    transition: var(--tr);
+  display: flex;
+  gap: var(--sp-md);
+  align-items: flex-start;
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.22);
+  border-left: 4px solid var(--neon-curva);
+  padding: var(--sp-md) var(--sp-lg);
+  border-radius: var(--r-md);
+  transition: var(--tr);
 }
 
 .leccion-matematicas-criticos .objetivo-card:hover {
-    background: rgba(0,255,255,0.09);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 16px rgba(0,255,255,0.15);
+  background: rgba(0, 255, 255, 0.09);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(0, 255, 255, 0.15);
 }
 
 .leccion-matematicas-criticos .obj-icon {
-    font-size: 1.6rem;
-    min-width: 34px;
-    text-align: center;
-    margin-top: 2px;
+  font-size: 1.6rem;
+  min-width: 34px;
+  text-align: center;
+  margin-top: 2px;
 }
 
 .leccion-matematicas-criticos .obj-text h4 {
-    margin: 0 0 var(--sp-xs) 0;
-    color: var(--neon-curva);
-    font-size: var(--fs-md);
-    font-family: var(--font-disp);
+  margin: 0 0 var(--sp-xs) 0;
+  color: var(--neon-curva);
+  font-size: var(--fs-md);
+  font-family: var(--font-disp);
 }
 
 .leccion-matematicas-criticos .obj-text p {
-    margin: 0;
-    color: rgba(180,200,230,0.7);
-    font-size: var(--fs-sm);
+  margin: 0;
+  color: rgba(180, 200, 230, 0.7);
+  font-size: var(--fs-sm);
 }
 
 /* ============================================================
    SECCIONES GENÉRICAS
    ============================================================ */
 .leccion-matematicas-criticos section {
-    margin: var(--sp-xl) 0;
-    padding: var(--sp-lg) var(--sp-xl);
-    background: var(--bg-sec);
-    border: 1px solid rgba(0,255,255,0.16);
-    border-radius: var(--r-lg);
-    transition: border-color 0.3s;
+  margin: var(--sp-xl) 0;
+  padding: var(--sp-lg) var(--sp-xl);
+  background: var(--bg-sec);
+  border: 1px solid rgba(0, 255, 255, 0.16);
+  border-radius: var(--r-lg);
+  transition: border-color 0.3s;
 }
 
 .leccion-matematicas-criticos section:hover {
-    border-color: rgba(0,255,255,0.3);
+  border-color: rgba(0, 255, 255, 0.3);
 }
 
 .leccion-matematicas-criticos .seccion-titulo {
-    font-family: var(--font-disp);
-    font-size: var(--fs-lg);
-    color: var(--neon-curva);
-    margin: 0 0 var(--sp-lg) 0;
-    padding-bottom: var(--sp-sm);
-    border-bottom: 1px solid rgba(0,255,255,0.18);
-    display: flex;
-    align-items: center;
-    gap: var(--sp-sm);
-    flex-wrap: wrap;
+  font-family: var(--font-disp);
+  font-size: var(--fs-lg);
+  color: var(--neon-curva);
+  margin: 0 0 var(--sp-lg) 0;
+  padding-bottom: var(--sp-sm);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  flex-wrap: wrap;
 }
 
 .leccion-matematicas-criticos section p {
-    color: rgba(220,235,250,0.85);
-    margin-bottom: var(--sp-md);
+  color: rgba(220, 235, 250, 0.85);
+  margin-bottom: var(--sp-md);
 }
 
 /* ============================================================
    CONTEXTO REAL
    ============================================================ */
 .leccion-matematicas-criticos .context-card {
-    padding: var(--sp-lg);
-    background: rgba(0,136,255,0.07);
-    border: 2px solid rgba(0,136,255,0.35);
-    border-radius: var(--r-md);
+  padding: var(--sp-lg);
+  background: rgba(0, 136, 255, 0.07);
+  border: 2px solid rgba(0, 136, 255, 0.35);
+  border-radius: var(--r-md);
 }
 
 .leccion-matematicas-criticos .real-data {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-sm);
-    margin-top: var(--sp-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+  margin-top: var(--sp-md);
 }
 
 .leccion-matematicas-criticos .data-tag {
-    padding: 5px 14px;
-    background: rgba(0,255,157,0.08);
-    border: 1px solid rgba(0,255,157,0.4);
-    border-radius: 20px;
-    color: var(--neon-info);
-    font-size: var(--fs-sm);
-    font-weight: 700;
+  padding: 5px 14px;
+  background: rgba(0, 255, 157, 0.08);
+  border: 1px solid rgba(0, 255, 157, 0.4);
+  border-radius: 20px;
+  color: var(--neon-info);
+  font-size: var(--fs-sm);
+  font-weight: 700;
 }
 
 /* ============================================================
    GRID CONCEPTUAL
    ============================================================ */
 .leccion-matematicas-criticos .concept-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--sp-lg);
-    margin: var(--sp-lg) 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sp-lg);
+  margin: var(--sp-lg) 0;
 }
 
 .leccion-matematicas-criticos .concept-card {
-    background: var(--bg-card);
-    border: 1px solid rgba(0,255,255,0.25);
-    border-left: 4px solid var(--neon-curva);
-    padding: var(--sp-lg);
-    border-radius: var(--r-md);
-    transition: var(--tr);
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 255, 255, 0.25);
+  border-left: 4px solid var(--neon-curva);
+  padding: var(--sp-lg);
+  border-radius: var(--r-md);
+  transition: var(--tr);
 }
 
 .leccion-matematicas-criticos .concept-card:hover {
-    border-color: var(--neon-curva);
-    box-shadow: 0 4px 16px rgba(0,255,255,0.15);
-    transform: translateY(-2px);
+  border-color: var(--neon-curva);
+  box-shadow: 0 4px 16px rgba(0, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 .leccion-matematicas-criticos .concept-card h3 {
-    font-family: var(--font-disp);
-    color: var(--neon-curva);
-    font-size: var(--fs-md);
-    margin: 0 0 var(--sp-md) 0;
+  font-family: var(--font-disp);
+  color: var(--neon-curva);
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-md) 0;
 }
 
 .leccion-matematicas-criticos .concept-card ul {
-    padding-left: var(--sp-md);
-    margin: var(--sp-sm) 0;
+  padding-left: var(--sp-md);
+  margin: var(--sp-sm) 0;
 }
 
 .leccion-matematicas-criticos .concept-card ul li {
-    margin: var(--sp-sm) 0;
-    color: rgba(220,235,250,0.85);
-    font-size: var(--fs-sm);
+  margin: var(--sp-sm) 0;
+  color: rgba(220, 235, 250, 0.85);
+  font-size: var(--fs-sm);
 }
 
 .leccion-matematicas-criticos .importante {
-    margin-top: var(--sp-md);
-    padding: var(--sp-sm) var(--sp-md);
-    background: rgba(255,255,0,0.06);
-    border-left: 3px solid var(--neon-crit);
-    border-radius: var(--r-sm);
-    color: var(--neon-crit);
-    font-size: var(--fs-sm);
-    font-weight: 600;
+  margin-top: var(--sp-md);
+  padding: var(--sp-sm) var(--sp-md);
+  background: rgba(255, 255, 0, 0.06);
+  border-left: 3px solid var(--neon-crit);
+  border-radius: var(--r-sm);
+  color: var(--neon-crit);
+  font-size: var(--fs-sm);
+  font-weight: 600;
 }
 
 /* ============================================================
    TABLA DE SIGNOS
    ============================================================ */
 .leccion-matematicas-criticos .tabla-signos {
-    width: 100%;
-    border-collapse: collapse;
-    margin: var(--sp-lg) 0;
-    font-size: var(--fs-sm);
-    overflow: hidden;
-    border-radius: var(--r-md);
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--sp-lg) 0;
+  font-size: var(--fs-sm);
+  overflow: hidden;
+  border-radius: var(--r-md);
 }
 
 .leccion-matematicas-criticos .tabla-signos thead tr {
-    background: rgba(0,255,255,0.1);
+  background: rgba(0, 255, 255, 0.1);
 }
 
 .leccion-matematicas-criticos .tabla-signos th {
-    padding: var(--sp-md);
-    text-align: center;
-    color: var(--neon-curva);
-    font-family: var(--font-disp);
-    font-size: var(--fs-sm);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border: 1px solid rgba(0,255,255,0.25);
+  padding: var(--sp-md);
+  text-align: center;
+  color: var(--neon-curva);
+  font-family: var(--font-disp);
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid rgba(0, 255, 255, 0.25);
 }
 
 .leccion-matematicas-criticos .tabla-signos td {
-    padding: var(--sp-md);
-    text-align: center;
-    border: 1px solid rgba(0,255,255,0.12);
-    color: rgba(220,235,250,0.85);
-    font-size: var(--fs-sm);
-    transition: var(--tr);
+  padding: var(--sp-md);
+  text-align: center;
+  border: 1px solid rgba(0, 255, 255, 0.12);
+  color: rgba(220, 235, 250, 0.85);
+  font-size: var(--fs-sm);
+  transition: var(--tr);
 }
 
 .leccion-matematicas-criticos .tabla-signos tbody tr {
-    transition: var(--tr);
+  transition: var(--tr);
 }
 
 .leccion-matematicas-criticos .tabla-signos tbody tr:hover {
-    background: rgba(0,255,255,0.04);
+  background: rgba(0, 255, 255, 0.04);
 }
 
 .leccion-matematicas-criticos .tabla-signos .max {
-    background: rgba(255,0,255,0.08);
+  background: rgba(255, 0, 255, 0.08);
 }
 .leccion-matematicas-criticos .tabla-signos .max td:last-child {
-    color: var(--neon-max);
-    font-weight: 700;
+  color: var(--neon-max);
+  font-weight: 700;
 }
 
 .leccion-matematicas-criticos .tabla-signos .min {
-    background: rgba(57,255,20,0.07);
+  background: rgba(57, 255, 20, 0.07);
 }
 .leccion-matematicas-criticos .tabla-signos .min td:last-child {
-    color: var(--neon-min);
-    font-weight: 700;
+  color: var(--neon-min);
+  font-weight: 700;
 }
 
 /* ============================================================
    EJEMPLO PASO A PASO
    ============================================================ */
 .leccion-matematicas-criticos .ejemplo-paso {
-    margin: var(--sp-lg) 0;
-    padding: var(--sp-lg);
-    background: rgba(0,255,157,0.05);
-    border: 1px solid rgba(0,255,157,0.25);
-    border-left: 4px solid var(--neon-info);
-    border-radius: var(--r-md);
+  margin: var(--sp-lg) 0;
+  padding: var(--sp-lg);
+  background: rgba(0, 255, 157, 0.05);
+  border: 1px solid rgba(0, 255, 157, 0.25);
+  border-left: 4px solid var(--neon-info);
+  border-radius: var(--r-md);
 }
 
 .leccion-matematicas-criticos .ejemplo-paso h3 {
-    font-family: var(--font-disp);
-    color: var(--neon-info);
-    font-size: var(--fs-md);
-    margin: 0 0 var(--sp-md) 0;
+  font-family: var(--font-disp);
+  color: var(--neon-info);
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-md) 0;
 }
 
 .leccion-matematicas-criticos .ejemplo-paso ol {
-    padding-left: var(--sp-lg);
-    margin: 0;
+  padding-left: var(--sp-lg);
+  margin: 0;
 }
 
 .leccion-matematicas-criticos .ejemplo-paso ol li {
-    margin: var(--sp-md) 0;
-    color: rgba(220,235,250,0.88);
-    font-size: var(--fs-sm);
-    line-height: 1.8;
+  margin: var(--sp-md) 0;
+  color: rgba(220, 235, 250, 0.88);
+  font-size: var(--fs-sm);
+  line-height: 1.8;
 }
 
 .leccion-matematicas-criticos .ejemplo-paso ol li ul {
-    padding-left: var(--sp-md);
-    margin-top: var(--sp-sm);
+  padding-left: var(--sp-md);
+  margin-top: var(--sp-sm);
 }
 
 .leccion-matematicas-criticos .ejemplo-paso ol li ul li {
-    margin: var(--sp-xs) 0;
+  margin: var(--sp-xs) 0;
 }
 
 /* ============================================================
    SEGUNDA DERIVADA — TARJETA EXTRA
    ============================================================ */
 .leccion-matematicas-criticos .segunda-deriv-box {
-    padding: var(--sp-lg);
-    background: rgba(255,0,255,0.05);
-    border: 2px solid rgba(255,0,255,0.3);
-    border-radius: var(--r-md);
-    margin: var(--sp-lg) 0;
+  padding: var(--sp-lg);
+  background: rgba(255, 0, 255, 0.05);
+  border: 2px solid rgba(255, 0, 255, 0.3);
+  border-radius: var(--r-md);
+  margin: var(--sp-lg) 0;
 }
 
 .leccion-matematicas-criticos .segunda-deriv-box h3 {
-    font-family: var(--font-disp);
-    color: var(--neon-max);
-    margin: 0 0 var(--sp-md) 0;
-    font-size: var(--fs-md);
+  font-family: var(--font-disp);
+  color: var(--neon-max);
+  margin: 0 0 var(--sp-md) 0;
+  font-size: var(--fs-md);
 }
 
 /* ============================================================
    SIMULADOR
    ============================================================ */
 .leccion-matematicas-criticos .simulator-container {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    grid-template-rows: auto auto;
-    gap: var(--sp-lg);
-    background: var(--bg-sim);
-    border: 1px solid var(--neon-curva);
-    border-radius: var(--r-lg);
-    padding: var(--sp-lg);
-    box-shadow: 0 0 20px rgba(0,255,255,0.1);
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: auto auto;
+  gap: var(--sp-lg);
+  background: var(--bg-sim);
+  border: 1px solid var(--neon-curva);
+  border-radius: var(--r-lg);
+  padding: var(--sp-lg);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
 }
 
 .leccion-matematicas-criticos .simulator-controls {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-md);
-    grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+  grid-row: 1 / span 2;
 }
 
 .leccion-matematicas-criticos .simulator-controls label {
-    color: var(--neon-curva);
-    font-weight: 700;
-    font-size: var(--fs-sm);
+  color: var(--neon-curva);
+  font-weight: 700;
+  font-size: var(--fs-sm);
 }
 
 .leccion-matematicas-criticos .simulator-controls input[type="text"] {
-    width: 100%;
-    background: #000;
-    color: var(--neon-curva);
-    border: 1px solid var(--neon-curva);
-    padding: 0.55rem 0.8rem;
-    font-family: var(--font-mono);
-    font-size: var(--fs-sm);
-    border-radius: var(--r-sm);
-    outline: none;
-    transition: var(--tr);
-    box-sizing: border-box;
+  width: 100%;
+  background: #000;
+  color: var(--neon-curva);
+  border: 1px solid var(--neon-curva);
+  padding: 0.55rem 0.8rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: var(--tr);
+  box-sizing: border-box;
 }
 
 .leccion-matematicas-criticos .simulator-controls input[type="text"]:focus {
-    box-shadow: 0 0 0 2px rgba(0,255,255,0.25);
+  box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.25);
 }
 
 .leccion-matematicas-criticos .keypad-mini {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-xs);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-xs);
 }
 
 .leccion-matematicas-criticos .keypad-mini button {
-    background: rgba(0,255,255,0.08);
-    border: 1px solid rgba(0,255,255,0.4);
-    color: var(--neon-curva);
-    padding: 0.3rem 0.65rem;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 700;
-    border-radius: var(--r-sm);
-    cursor: pointer;
-    transition: var(--tr);
-    min-width: 36px;
-    min-height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  background: rgba(0, 255, 255, 0.08);
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  color: var(--neon-curva);
+  padding: 0.3rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: var(--tr);
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .leccion-matematicas-criticos .keypad-mini button:hover {
-    background: var(--neon-curva);
-    color: #000;
-    box-shadow: 0 0 8px rgba(0,255,255,0.4);
+  background: var(--neon-curva);
+  color: #000;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
 }
 
 .leccion-matematicas-criticos .simulator-visualization {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .leccion-matematicas-criticos .simulator-visualization svg {
-    width: 100%;
-    height: auto;
-    border-radius: var(--r-sm);
-    border: 1px solid rgba(0,255,255,0.2);
-    cursor: crosshair;
-    display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-sm);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  cursor: crosshair;
+  display: block;
 }
 
 .leccion-matematicas-criticos .simulator-data {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--sp-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-md);
 }
 
 .leccion-matematicas-criticos .data-panel {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(0,255,255,0.15);
-    border-radius: var(--r-md);
-    padding: var(--sp-md);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
 }
 
 .leccion-matematicas-criticos .data-panel h4 {
-    font-family: var(--font-disp);
-    color: var(--neon-curva);
-    font-size: var(--fs-sm);
-    margin: 0 0 var(--sp-sm) 0;
-    padding-bottom: var(--sp-xs);
-    border-bottom: 1px solid rgba(0,255,255,0.15);
+  font-family: var(--font-disp);
+  color: var(--neon-curva);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-sm) 0;
+  padding-bottom: var(--sp-xs);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.15);
 }
 
 .leccion-matematicas-criticos .data-panel #listaCriticos ul {
-    padding-left: var(--sp-md);
-    margin: 0;
+  padding-left: var(--sp-md);
+  margin: 0;
 }
 
 .leccion-matematicas-criticos .data-panel #listaCriticos li {
-    margin: var(--sp-xs) 0;
-    font-size: var(--fs-sm);
-    color: rgba(220,235,250,0.85);
+  margin: var(--sp-xs) 0;
+  font-size: var(--fs-sm);
+  color: rgba(220, 235, 250, 0.85);
 }
 
 .leccion-matematicas-criticos .data-panel #listaCriticos .tipo-max {
-    color: var(--neon-max);
-    font-weight: 700;
+  color: var(--neon-max);
+  font-weight: 700;
 }
 
 .leccion-matematicas-criticos .data-panel #listaCriticos .tipo-min {
-    color: var(--neon-min);
-    font-weight: 700;
+  color: var(--neon-min);
+  font-weight: 700;
 }
 
 .leccion-matematicas-criticos .data-panel #listaCriticos .tipo-infl {
-    color: var(--neon-crit);
-    font-weight: 700;
+  color: var(--neon-crit);
+  font-weight: 700;
 }
 
 /* Botón principal simulador */
 .leccion-matematicas-criticos .btn-actualizar {
-    background: linear-gradient(135deg, rgba(0,255,255,0.15), rgba(0,136,255,0.1));
-    border: 1px solid var(--neon-curva);
-    color: var(--neon-curva);
-    padding: 0.6rem 1.2rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    transition: var(--tr);
-    width: 100%;
-    min-height: 40px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 255, 0.15),
+    rgba(0, 136, 255, 0.1)
+  );
+  border: 1px solid var(--neon-curva);
+  color: var(--neon-curva);
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  transition: var(--tr);
+  width: 100%;
+  min-height: 40px;
 }
 
 .leccion-matematicas-criticos .btn-actualizar:hover {
-    background: var(--neon-curva);
-    color: #000;
-    box-shadow: 0 0 14px rgba(0,255,255,0.4);
-    transform: translateY(-1px);
+  background: var(--neon-curva);
+  color: #000;
+  box-shadow: 0 0 14px rgba(0, 255, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 /* ============================================================
    LEGEND DEL SIMULADOR
    ============================================================ */
 .leccion-matematicas-criticos .sim-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-sm);
-    margin-top: var(--sp-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+  margin-top: var(--sp-sm);
 }
 
 .leccion-matematicas-criticos .legend-item {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-xs);
-    font-size: var(--fs-sm);
-    color: rgba(200,220,240,0.8);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  font-size: var(--fs-sm);
+  color: rgba(200, 220, 240, 0.8);
 }
 
 .leccion-matematicas-criticos .legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 /* ============================================================
    ERRORES COMUNES
    ============================================================ */
 .leccion-matematicas-criticos .errores-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--sp-md);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-md);
 }
 
 .leccion-matematicas-criticos .error-card {
-    background: rgba(26,10,10,0.7);
-    border: 1px solid rgba(255,51,102,0.25);
-    border-left: 4px solid var(--neon-alerta);
-    padding: var(--sp-md) var(--sp-lg);
-    border-radius: var(--r-md);
-    cursor: pointer;
-    transition: var(--tr);
-    user-select: none;
+  background: rgba(26, 10, 10, 0.7);
+  border: 1px solid rgba(255, 51, 102, 0.25);
+  border-left: 4px solid var(--neon-alerta);
+  padding: var(--sp-md) var(--sp-lg);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: var(--tr);
+  user-select: none;
 }
 
 .leccion-matematicas-criticos .error-card:hover {
-    background: rgba(255,51,102,0.07);
-    transform: translateX(4px);
+  background: rgba(255, 51, 102, 0.07);
+  transform: translateX(4px);
 }
 
 .leccion-matematicas-criticos .error-card strong {
-    color: var(--neon-alerta);
-    font-size: var(--fs-sm);
-    display: flex;
-    align-items: center;
-    gap: var(--sp-sm);
+  color: var(--neon-alerta);
+  font-size: var(--fs-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
 }
 
 .leccion-matematicas-criticos .error-card strong::before {
-    content: '▶';
-    font-size: 0.55rem;
-    transition: transform 0.25s;
+  content: "▶";
+  font-size: 0.55rem;
+  transition: transform 0.25s;
 }
 
 .leccion-matematicas-criticos .error-card.expandido strong::before {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .leccion-matematicas-criticos .error-detail {
-    display: none;
-    margin-top: var(--sp-md);
-    padding: var(--sp-md);
-    background: rgba(255,51,102,0.05);
-    border-left: 3px solid rgba(255,102,153,0.4);
-    border-radius: var(--r-sm);
-    color: #ff9bb5;
-    font-size: var(--fs-sm);
-    line-height: 1.8;
-    animation: pcSlideIn 0.25s ease;
+  display: none;
+  margin-top: var(--sp-md);
+  padding: var(--sp-md);
+  background: rgba(255, 51, 102, 0.05);
+  border-left: 3px solid rgba(255, 102, 153, 0.4);
+  border-radius: var(--r-sm);
+  color: #ff9bb5;
+  font-size: var(--fs-sm);
+  line-height: 1.8;
+  animation: pcSlideIn 0.25s ease;
 }
 
 .leccion-matematicas-criticos .error-card.expandido .error-detail {
-    display: block;
+  display: block;
 }
 
 @keyframes pcSlideIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ============================================================
    CONEXIÓN CURRICULAR
    ============================================================ */
 .leccion-matematicas-criticos .curricular .curricular-content p {
-    margin: var(--sp-sm) 0;
-    color: rgba(220,235,250,0.85);
-    font-size: var(--fs-sm);
+  margin: var(--sp-sm) 0;
+  color: rgba(220, 235, 250, 0.85);
+  font-size: var(--fs-sm);
 }
 
 .leccion-matematicas-criticos .curricular .curricular-content strong {
-    color: var(--neon-info);
+  color: var(--neon-info);
 }
 
 .leccion-matematicas-criticos .competencias-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-sm);
-    margin-top: var(--sp-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+  margin-top: var(--sp-md);
 }
 
 .leccion-matematicas-criticos .competencia-badge {
-    padding: 5px 14px;
-    background: rgba(0,255,157,0.06);
-    border: 1px solid rgba(0,255,157,0.35);
-    border-radius: 20px;
-    color: var(--neon-info);
-    font-size: var(--fs-sm);
-    font-weight: 600;
+  padding: 5px 14px;
+  background: rgba(0, 255, 157, 0.06);
+  border: 1px solid rgba(0, 255, 157, 0.35);
+  border-radius: 20px;
+  color: var(--neon-info);
+  font-size: var(--fs-sm);
+  font-weight: 600;
 }
 
 /* ============================================================
    PROBLEMAS TIPO EXAMEN
    ============================================================ */
 .leccion-matematicas-criticos .problema-lista {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-lg);
 }
 
 .leccion-matematicas-criticos .problema-item {
-    background: rgba(0,0,0,0.45);
-    border: 1px solid rgba(0,255,255,0.18);
-    border-radius: var(--r-md);
-    padding: var(--sp-lg);
-    transition: var(--tr);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 255, 255, 0.18);
+  border-radius: var(--r-md);
+  padding: var(--sp-lg);
+  transition: var(--tr);
 }
 
 .leccion-matematicas-criticos .problema-item:hover {
-    border-color: rgba(0,255,255,0.35);
+  border-color: rgba(0, 255, 255, 0.35);
 }
 
 .leccion-matematicas-criticos .problema-item h3 {
-    font-family: var(--font-disp);
-    color: var(--neon-curva);
-    font-size: var(--fs-md);
-    margin: 0 0 var(--sp-sm) 0;
+  font-family: var(--font-disp);
+  color: var(--neon-curva);
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-sm) 0;
 }
 
 .leccion-matematicas-criticos .problema-item p {
-    color: rgba(220,235,250,0.88);
-    font-size: var(--fs-sm);
-    margin-bottom: var(--sp-md);
+  color: rgba(220, 235, 250, 0.88);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--sp-md);
 }
 
 .leccion-matematicas-criticos .btn-solucion {
-    background: transparent;
-    border: 1px solid rgba(0,255,255,0.5);
-    color: var(--neon-curva);
-    padding: 0.4rem 1rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: var(--fs-sm);
-    font-weight: 600;
-    transition: var(--tr);
-    min-height: 36px;
+  background: transparent;
+  border: 1px solid rgba(0, 255, 255, 0.5);
+  color: var(--neon-curva);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: var(--tr);
+  min-height: 36px;
 }
 
 .leccion-matematicas-criticos .btn-solucion:hover {
-    background: var(--neon-curva);
-    color: #000;
-    box-shadow: 0 0 10px rgba(0,255,255,0.35);
+  background: var(--neon-curva);
+  color: #000;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.35);
 }
 
 .leccion-matematicas-criticos .solucion-box {
-    display: none;
-    margin-top: var(--sp-md);
-    padding: var(--sp-md) var(--sp-lg);
-    background: rgba(0,255,157,0.05);
-    border-left: 4px solid var(--neon-info);
-    border-radius: var(--r-sm);
-    font-size: var(--fs-sm);
-    line-height: 1.9;
-    color: rgba(220,235,250,0.9);
-    animation: pcSlideIn 0.3s ease;
+  display: none;
+  margin-top: var(--sp-md);
+  padding: var(--sp-md) var(--sp-lg);
+  background: rgba(0, 255, 157, 0.05);
+  border-left: 4px solid var(--neon-info);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+  color: rgba(220, 235, 250, 0.9);
+  animation: pcSlideIn 0.3s ease;
 }
 
 .leccion-matematicas-criticos .solucion-box.visible {
-    display: block;
+  display: block;
 }
 
 /* ============================================================
    QUIZ
    ============================================================ */
 .leccion-matematicas-criticos .quiz-container {
-    background: rgba(10,10,26,0.85);
-    padding: var(--sp-xl);
-    border-radius: var(--r-lg);
-    border: 1px solid rgba(0,255,255,0.25);
-    box-shadow: 0 0 20px rgba(0,255,255,0.06);
+  background: rgba(10, 10, 26, 0.85);
+  padding: var(--sp-xl);
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(0, 255, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.06);
 }
 
 .leccion-matematicas-criticos .quiz-pregunta {
-    margin: var(--sp-lg) 0;
-    padding: var(--sp-md) var(--sp-lg);
-    background: rgba(0,0,0,0.35);
-    border-radius: var(--r-md);
-    border-bottom: 1px solid rgba(0,255,255,0.12);
-    transition: var(--tr);
+  margin: var(--sp-lg) 0;
+  padding: var(--sp-md) var(--sp-lg);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--r-md);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.12);
+  transition: var(--tr);
 }
 
 .leccion-matematicas-criticos .quiz-pregunta:hover {
-    background: rgba(0,255,255,0.03);
-    transform: translateX(3px);
+  background: rgba(0, 255, 255, 0.03);
+  transform: translateX(3px);
 }
 
 .leccion-matematicas-criticos .quiz-pregunta p {
-    font-weight: 700;
-    color: var(--neon-curva);
-    font-size: var(--fs-sm);
-    margin: 0 0 var(--sp-md) 0;
+  font-weight: 700;
+  color: var(--neon-curva);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-md) 0;
 }
 
 .leccion-matematicas-criticos .quiz-pregunta label {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-sm);
-    margin: var(--sp-sm) 0;
-    padding: var(--sp-sm) var(--sp-md);
-    border-radius: var(--r-sm);
-    cursor: pointer;
-    transition: var(--tr);
-    font-size: var(--fs-sm);
-    color: rgba(220,235,250,0.85);
-    min-height: 40px;
-    user-select: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  margin: var(--sp-sm) 0;
+  padding: var(--sp-sm) var(--sp-md);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: var(--tr);
+  font-size: var(--fs-sm);
+  color: rgba(220, 235, 250, 0.85);
+  min-height: 40px;
+  user-select: none;
 }
 
 .leccion-matematicas-criticos .quiz-pregunta label:hover {
-    background: rgba(0,255,255,0.07);
+  background: rgba(0, 255, 255, 0.07);
 }
 
 .leccion-matematicas-criticos .quiz-pregunta input[type="radio"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--neon-curva);
-    cursor: pointer;
-    flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--neon-curva);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .leccion-matematicas-criticos .btn-evaluar {
-    margin-top: var(--sp-lg);
-    background: linear-gradient(135deg, var(--neon-curva), var(--neon-max));
-    color: #000;
-    border: none;
-    padding: 0.75rem 1.8rem;
-    font-weight: 700;
-    font-family: var(--font-mono);
-    font-size: var(--fs-sm);
-    cursor: pointer;
-    border-radius: 24px;
-    transition: var(--tr);
-    letter-spacing: 0.5px;
-    min-height: 44px;
+  margin-top: var(--sp-lg);
+  background: linear-gradient(135deg, var(--neon-curva), var(--neon-max));
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  border-radius: 24px;
+  transition: var(--tr);
+  letter-spacing: 0.5px;
+  min-height: 44px;
 }
 
 .leccion-matematicas-criticos .btn-evaluar:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 20px rgba(0,255,255,0.4), 0 0 20px rgba(255,0,255,0.25);
+  transform: scale(1.03);
+  box-shadow:
+    0 0 20px rgba(0, 255, 255, 0.4),
+    0 0 20px rgba(255, 0, 255, 0.25);
 }
 
 .leccion-matematicas-criticos .quiz-feedback {
-    margin-top: var(--sp-lg);
-    padding: var(--sp-lg);
-    border-radius: var(--r-md);
-    background: rgba(0,0,0,0.5);
-    border-left: 4px solid var(--neon-curva);
-    font-size: var(--fs-sm);
-    line-height: 1.9;
-    animation: pcSlideIn 0.3s ease;
+  margin-top: var(--sp-lg);
+  padding: var(--sp-lg);
+  border-radius: var(--r-md);
+  background: rgba(0, 0, 0, 0.5);
+  border-left: 4px solid var(--neon-curva);
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+  animation: pcSlideIn 0.3s ease;
 }
 
 .leccion-matematicas-criticos .quiz-feedback h4 {
-    color: var(--neon-curva);
-    font-family: var(--font-disp);
-    margin: 0 0 var(--sp-md) 0;
+  color: var(--neon-curva);
+  font-family: var(--font-disp);
+  margin: 0 0 var(--sp-md) 0;
 }
 
 .leccion-matematicas-criticos .quiz-feedback ul {
-    padding-left: var(--sp-lg);
-    margin: 0;
+  padding-left: var(--sp-lg);
+  margin: 0;
 }
 
 .leccion-matematicas-criticos .quiz-feedback ul li {
-    margin: var(--sp-sm) 0;
-    color: rgba(220,235,250,0.85);
+  margin: var(--sp-sm) 0;
+  color: rgba(220, 235, 250, 0.85);
 }
 
-.leccion-matematicas-criticos .quiz-feedback .correct { color: var(--neon-min); font-weight: 700; }
-.leccion-matematicas-criticos .quiz-feedback .incorrect { color: var(--neon-alerta); font-weight: 700; }
+.leccion-matematicas-criticos .quiz-feedback .correct {
+  color: var(--neon-min);
+  font-weight: 700;
+}
+.leccion-matematicas-criticos .quiz-feedback .incorrect {
+  color: var(--neon-alerta);
+  font-weight: 700;
+}
 
 /* Label highlight */
 .leccion-matematicas-criticos .quiz-pregunta label.correct-ans {
-    background: rgba(57,255,20,0.08);
-    border-left: 3px solid var(--neon-min);
+  background: rgba(57, 255, 20, 0.08);
+  border-left: 3px solid var(--neon-min);
 }
 
 .leccion-matematicas-criticos .quiz-pregunta label.wrong-ans {
-    background: rgba(255,51,102,0.08);
-    border-left: 3px solid var(--neon-alerta);
+  background: rgba(255, 51, 102, 0.08);
+  border-left: 3px solid var(--neon-alerta);
 }
 
 /* ============================================================
    CIERRE METACOGNITIVO
    ============================================================ */
 .leccion-matematicas-criticos .reflexion-box {
-    background: rgba(0,0,0,0.35);
-    padding: var(--sp-lg);
-    border-radius: var(--r-md);
-    border: 1px solid rgba(57,255,20,0.2);
-    margin-bottom: var(--sp-lg);
+  background: rgba(0, 0, 0, 0.35);
+  padding: var(--sp-lg);
+  border-radius: var(--r-md);
+  border: 1px solid rgba(57, 255, 20, 0.2);
+  margin-bottom: var(--sp-lg);
 }
 
 .leccion-matematicas-criticos .reflexion-box > p {
-    color: var(--neon-min);
-    font-weight: 600;
-    margin-bottom: var(--sp-md);
+  color: var(--neon-min);
+  font-weight: 600;
+  margin-bottom: var(--sp-md);
 }
 
 .leccion-matematicas-criticos .reflexion-box textarea {
-    width: 100%;
-    background: rgba(0,0,0,0.65);
-    color: #dde9f7;
-    border: 1px solid rgba(57,255,20,0.3);
-    border-radius: var(--r-md);
-    padding: var(--sp-md);
-    font-family: var(--font-mono);
-    font-size: var(--fs-sm);
-    line-height: 1.7;
-    resize: vertical;
-    transition: var(--tr);
-    min-height: 110px;
-    box-sizing: border-box;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #dde9f7;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  resize: vertical;
+  transition: var(--tr);
+  min-height: 110px;
+  box-sizing: border-box;
 }
 
 .leccion-matematicas-criticos .reflexion-box textarea:focus {
-    outline: none;
-    border-color: var(--neon-min);
-    box-shadow: 0 0 8px rgba(57,255,20,0.2);
+  outline: none;
+  border-color: var(--neon-min);
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.2);
 }
 
 .leccion-matematicas-criticos .reflexion-box textarea::placeholder {
-    color: rgba(180,200,220,0.4);
+  color: rgba(180, 200, 220, 0.4);
 }
 
 .leccion-matematicas-criticos .sugerencia {
-    margin-top: var(--sp-md);
-    font-size: var(--fs-sm);
-    color: rgba(200,220,240,0.6);
-    font-style: italic;
+  margin-top: var(--sp-md);
+  font-size: var(--fs-sm);
+  color: rgba(200, 220, 240, 0.6);
+  font-style: italic;
 }
 
 .leccion-matematicas-criticos .recursos {
-    padding: var(--sp-lg);
-    background: rgba(0,0,0,0.3);
-    border-radius: var(--r-md);
-    border: 1px solid rgba(0,255,255,0.12);
+  padding: var(--sp-lg);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--r-md);
+  border: 1px solid rgba(0, 255, 255, 0.12);
 }
 
 .leccion-matematicas-criticos .recursos h3 {
-    font-family: var(--font-disp);
-    color: var(--neon-curva);
-    font-size: var(--fs-md);
-    margin: 0 0 var(--sp-md) 0;
+  font-family: var(--font-disp);
+  color: var(--neon-curva);
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-md) 0;
 }
 
 .leccion-matematicas-criticos .recursos ul {
-    padding-left: var(--sp-lg);
-    margin: 0;
+  padding-left: var(--sp-lg);
+  margin: 0;
 }
 
 .leccion-matematicas-criticos .recursos ul li {
-    margin: var(--sp-sm) 0;
-    font-size: var(--fs-sm);
+  margin: var(--sp-sm) 0;
+  font-size: var(--fs-sm);
 }
 
 .leccion-matematicas-criticos .recursos ul li a {
-    color: var(--neon-curva);
-    text-decoration: none;
-    transition: var(--tr);
+  color: var(--neon-curva);
+  text-decoration: none;
+  transition: var(--tr);
 }
 
 .leccion-matematicas-criticos .recursos ul li a:hover {
-    text-decoration: underline;
-    color: #fff;
+  text-decoration: underline;
+  color: #fff;
 }
 
 /* ============================================================
    RESPONSIVE — TABLET
    ============================================================ */
 @media (max-width: 992px) {
-    .leccion-matematicas-criticos .simulator-container {
-        grid-template-columns: 1fr;
-    }
+  .leccion-matematicas-criticos .simulator-container {
+    grid-template-columns: 1fr;
+  }
 
-    .leccion-matematicas-criticos .simulator-controls {
-        grid-row: auto;
-    }
+  .leccion-matematicas-criticos .simulator-controls {
+    grid-row: auto;
+  }
 
-    .leccion-matematicas-criticos .simulator-data {
-        grid-template-columns: 1fr;
-    }
+  .leccion-matematicas-criticos .simulator-data {
+    grid-template-columns: 1fr;
+  }
 
-    .leccion-matematicas-criticos {
-        padding: var(--sp-lg) var(--sp-md);
-    }
+  .leccion-matematicas-criticos {
+    padding: var(--sp-lg) var(--sp-md);
+  }
 
-    .leccion-matematicas-criticos section {
-        padding: var(--sp-md) var(--sp-lg);
-    }
+  .leccion-matematicas-criticos section {
+    padding: var(--sp-md) var(--sp-lg);
+  }
 }
 
 /* ============================================================
    RESPONSIVE — MÓVIL
    ============================================================ */
 @media (max-width: 640px) {
-    .leccion-matematicas-criticos {
-        padding: var(--sp-md) var(--sp-sm);
-        margin: 0.75rem auto;
-        border-radius: var(--r-md);
-    }
+  .leccion-matematicas-criticos {
+    padding: var(--sp-md) var(--sp-sm);
+    margin: 0.75rem auto;
+    border-radius: var(--r-md);
+  }
 
-    .leccion-matematicas-criticos .titulo-leccion {
-        font-size: 1.3rem;
-    }
+  .leccion-matematicas-criticos .titulo-leccion {
+    font-size: 1.3rem;
+  }
 
-    .leccion-matematicas-criticos section {
-        padding: var(--sp-md);
-        margin: var(--sp-md) 0;
-    }
+  .leccion-matematicas-criticos section {
+    padding: var(--sp-md);
+    margin: var(--sp-md) 0;
+  }
 
-    .leccion-matematicas-criticos .concept-grid {
-        grid-template-columns: 1fr;
-    }
+  .leccion-matematicas-criticos .concept-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .leccion-matematicas-criticos .errores-grid {
-        grid-template-columns: 1fr;
-    }
+  .leccion-matematicas-criticos .errores-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .leccion-matematicas-criticos .simulator-data {
-        grid-template-columns: 1fr;
-    }
+  .leccion-matematicas-criticos .simulator-data {
+    grid-template-columns: 1fr;
+  }
 
-    .leccion-matematicas-criticos .quiz-container {
-        padding: var(--sp-md);
-    }
+  .leccion-matematicas-criticos .quiz-container {
+    padding: var(--sp-md);
+  }
 
-    .leccion-matematicas-criticos .quiz-pregunta {
-        padding: var(--sp-md);
-    }
+  .leccion-matematicas-criticos .quiz-pregunta {
+    padding: var(--sp-md);
+  }
+}
+
+/* ============================================================
+         SIMULADOR
+         ============================================================ */
+.simulator-shell {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.sim-toolbar {
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.sim-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sim-dots {
+  display: flex;
+  gap: 6px;
+}
+.sim-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-red {
+  background: #ff5f56;
+}
+.dot-yellow {
+  background: #ffbd2e;
+}
+.dot-green {
+  background: #27c93f;
+}
+.sim-filename {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.sim-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: var(--green-dim);
+  border: 1px solid rgba(0, 255, 135, 0.2);
+  padding: 4px 10px;
+  border-radius: 999px;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.sim-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 420px;
+}
+@media (max-width: 700px) {
+  .sim-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-controls {
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.2);
+}
+.sim-controls label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+.sim-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  transition: var(--transition);
+}
+.sim-input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  background: rgba(0, 229, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.08);
+}
+.keypad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.keypad button {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.keypad button:hover {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+.keypad button.key-clear {
+  color: var(--red);
+  border-color: rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.08);
+}
+.keypad button.key-clear:hover {
+  background: rgba(255, 71, 87, 0.18);
+}
+.btn-run {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--cyan);
+  color: var(--bg);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--transition);
+  width: 100%;
+}
+.btn-run:hover {
+  background: #33eeff;
+  box-shadow: var(--glow-cyan);
+  transform: translateY(-1px);
+}
+.sim-range-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sim-range-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--cyan);
+  height: 4px;
+  cursor: pointer;
+}
+.sim-range-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--cyan);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* SVG CANVAS */
+.sim-canvas-wrap {
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.sim-canvas-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+.sim-info-bar {
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid var(--border);
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.sim-info-bar span {
+  color: var(--cyan);
+}
+
+/* Legend */
+.sim-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.3);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+.legend-dot.maximo {
+  background: var(--pink);
+}
+.legend-dot.minimo {
+  background: var(--green);
+}
+.legend-dot.infl {
+  background: var(--yellow);
+}
+
+/* Analysis panel */
+.sim-analysis {
+  border-top: 1px solid var(--border);
+  padding: 16px 18px;
+  background: rgba(0, 0, 0, 0.2);
+}
+.analysis-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.crit-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.crit-list li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.crit-badge {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.badge-max {
+  background: rgba(255, 60, 172, 0.15);
+  color: var(--pink);
+  border: 1px solid rgba(255, 60, 172, 0.3);
+}
+.badge-min {
+  background: rgba(0, 255, 135, 0.12);
+  color: var(--green);
+  border: 1px solid rgba(0, 255, 135, 0.3);
+}
+.badge-infl {
+  background: rgba(255, 210, 63, 0.12);
+  color: var(--yellow);
+  border: 1px solid rgba(255, 210, 63, 0.3);
+}
+
+/* ============================================================
+         SEGUNDA DERIVADA MÓDULO
+         ============================================================ */
+.dualtest-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+@media (max-width: 580px) {
+  .dualtest-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.dualtest-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.dualtest-card h4 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.dualtest-card.max h4 {
+  color: var(--pink);
+}
+.dualtest-card.min h4 {
+  color: var(--green);
+}
+
+/* ============================================================
+         SIGN CHART INTERACTIVO
+         ============================================================ */
+.sign-chart-wrap {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 16px;
+}
+.sign-chart-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.sign-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sign-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.sign-row-label {
+  width: 50px;
+  color: var(--muted);
+  flex-shrink: 0;
+  text-align: right;
+}
+.sign-segment {
+  flex: 1;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent;
+}
+.sign-segment.pos {
+  background: rgba(0, 255, 135, 0.12);
+  color: var(--green);
+}
+.sign-segment.neg {
+  background: rgba(255, 71, 87, 0.12);
+  color: var(--red);
+}
+.sign-segment.zero {
+  background: rgba(255, 210, 63, 0.12);
+  color: var(--yellow);
+  border-color: rgba(255, 210, 63, 0.3);
+  animation: zeroGlow 2s ease-in-out infinite;
+}
+@keyframes zeroGlow {
+  0%,
+  100% {
+    box-shadow: none;
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 210, 63, 0.3);
+  }
+}
+.sign-segment:hover {
+  transform: scale(1.05);
+}
+.sign-point {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.sign-point.max-pt {
+  background: var(--pink);
+}
+.sign-point.min-pt {
+  background: var(--green);
+}
+.sign-point.infl-pt {
+  background: var(--yellow);
+}
+.sign-point:hover {
+  transform: scale(1.2);
+}
+
+/* ============================================================
+         STEP RESOLVER (paso a paso)
+         ============================================================ */
+.step-resolver {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.step-item {
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.step-item:first-child {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.step-item:last-child {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.step-item + .step-item {
+  border-top: none;
+}
+
+.step-header {
+  padding: 14px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface2);
+  transition: var(--transition);
+  user-select: none;
+}
+.step-header:hover {
+  background: rgba(0, 229, 255, 0.05);
+}
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--cyan);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-title {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+}
+.step-arrow {
+  font-size: 12px;
+  color: var(--muted);
+  transition: var(--transition);
+}
+.step-item.open .step-arrow {
+  transform: rotate(180deg);
+  color: var(--cyan);
+}
+.step-body {
+  display: none;
+  padding: 16px 18px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: rgba(210, 235, 255, 0.82);
+  background: var(--surface);
+  line-height: 1.8;
+}
+.step-item.open .step-body {
+  display: block;
+}
+.step-result {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--cyan-dim);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+}
+
+/* ============================================================
+         ERRORES
+         ============================================================ */
+.errores-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.error-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--yellow);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.error-card:hover {
+  background: rgba(255, 210, 63, 0.04);
+  border-color: rgba(255, 210, 63, 0.3);
+}
+.error-card strong {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--yellow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.error-card strong::after {
+  content: "▼";
+  font-size: 10px;
+  opacity: 0.5;
+  transition: var(--transition);
+}
+.error-card.expandido strong::after {
+  content: "▲";
+  opacity: 0.9;
+}
+.error-detail {
+  display: none;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.error-card.expandido .error-detail {
+  display: block;
+}
+
+/* ============================================================
+         PROBLEMAS
+         ============================================================ */
+.problema-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.problema-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  overflow: hidden;
+}
+.problema-item h3 {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 10px;
+}
+.problema-item p {
+  font-size: 14px;
+  color: rgba(210, 235, 255, 0.82);
+  margin-bottom: 14px;
+}
+.btn-solucion {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--cyan);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+.btn-solucion:hover {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+}
+.solucion-box {
+  display: none;
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 2;
+  color: rgba(210, 235, 255, 0.82);
+}
+.solucion-box.visible {
+  display: block;
+}
+.solucion-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.solucion-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cyan);
+  min-width: 24px;
+}
+
+/* ============================================================
+         QUIZ
+         ============================================================ */
+.quiz-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.quiz-pregunta {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quiz-pregunta p.q-text {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.quiz-pregunta label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.quiz-pregunta label:hover {
+  background: var(--cyan-dim);
+  border-color: rgba(0, 229, 255, 0.15);
+}
+.quiz-pregunta label input[type="radio"] {
+  accent-color: var(--cyan);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.quiz-pregunta label.correct-ans {
+  background: rgba(0, 255, 135, 0.1);
+  border-color: rgba(0, 255, 135, 0.3);
+  color: var(--green);
+}
+.quiz-pregunta label.wrong-ans {
+  background: rgba(255, 71, 87, 0.1);
+  border-color: rgba(255, 71, 87, 0.3);
+  color: var(--red);
+}
+
+.btn-evaluar {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  background: var(--pink);
+  color: white;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--transition);
+  align-self: flex-start;
+}
+.btn-evaluar:hover {
+  box-shadow: var(--glow-pink);
+  transform: translateY(-2px);
+}
+
+.quiz-feedback {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  font-size: 14px;
+}
+.quiz-feedback.hidden {
+  display: none;
+}
+.quiz-score {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.quiz-feedback ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quiz-feedback li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ============================================================
+         REFLEXIÓN
+         ============================================================ */
+.reflexion-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.reflexion-box p {
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.reflexion-box textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  resize: vertical;
+  min-height: 100px;
+  transition: var(--transition);
+}
+.reflexion-box textarea:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.08);
+}
+.reflexion-box textarea::placeholder {
+  color: var(--muted);
+}
+.sugerencia {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px !important;
+  font-style: italic;
+}
+
+/* RECURSOS */
+.recursos {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.recursos h3 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.recursos ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.recursos li a {
+  font-size: 13px;
+  color: var(--cyan);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  transition: var(--transition);
+}
+.recursos li a:hover {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+}
+.recursos li a::before {
+  content: "→";
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* ============================================================
+         UTILITY
+         ============================================================ */
+.mt-auto {
+  margin-top: auto;
+}
+.h3-section {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 0 12px;
+}
+
+/* MINIAPP: SECOND DERIVATIVE TESTER */
+.sd-tester {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-top: 16px;
+}
+.sd-tester h4 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.sd-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.sd-row label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.sd-input {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  width: 120px;
+}
+.sd-input:focus {
+  outline: none;
+  border-color: var(--cyan);
+}
+.btn-sd-test {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--cyan);
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+.btn-sd-test:hover {
+  background: var(--cyan);
+  color: var(--bg);
+}
+.sd-result {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* FUNCTION PRESETS */
+.presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.preset-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.preset-btn:hover {
+  background: var(--pink-dim);
+  border-color: var(--pink);
+  color: var(--pink);
+}
+.preset-btn.active {
+  background: var(--pink-dim);
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+/* ============================================================
+         REVEAL ANIMATIONS
+         ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+         SCROLLBAR
+         ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.5);
+}
+
+/* ============================================================
+         RESPONSIVE
+         ============================================================ */
+@media (max-width: 640px) {
+  .site-header {
+    padding: 0 14px;
+  }
+  .leccion-wrap {
+    padding: 20px 14px 60px;
+  }
+  .seccion {
+    padding: 18px;
+  }
+  .sim-body {
+    grid-template-columns: 1fr;
+  }
+  .sim-controls {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-stats {
+    gap: 8px;
+  }
 }

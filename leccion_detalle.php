@@ -1,80 +1,60 @@
 <?php
 // ==========================================
-// LC-ADVANCE - leccion_detalle.php (Con Sidebar de Progreso)
+// LC-ADVANCE - leccion_detalle.php (Rediseño Premium v2)
 // ==========================================
 require_once 'config/config.php';
 requireLogin(true);
 require_once 'src/content.php';
 
 $user_id = $_SESSION['usuario_id'] ?? null;
-$slug = $_GET['slug'] ?? '';
+$slug    = $_GET['slug'] ?? '';
 
 $leccion = null;
 foreach ($lecciones as $l) {
-    if ($l['slug'] === $slug) {
-        $leccion = $l;
-        break;
-    }
+    if ($l['slug'] === $slug) { $leccion = $l; break; }
 }
 
 if (!$leccion) {
-    if (!empty($_GET['materia'])) {
-        header('Location: dashboard.php?materia=' . urlencode($_GET['materia']) . '&error=leccion_no_encontrada');
-    }
-    else {
-        header('Location: dashboard.php?error=leccion_no_encontrada');
-    }
+    $redir = !empty($_GET['materia'])
+        ? 'dashboard.php?materia=' . urlencode($_GET['materia']) . '&error=leccion_no_encontrada'
+        : 'dashboard.php?error=leccion_no_encontrada';
+    header('Location: ' . $redir);
     exit;
 }
 
 $stmt = $pdo->prepare("SELECT * FROM user_progress WHERE user_id = ? AND slug = ?");
 $stmt->execute([$user_id, $slug]);
-$progress = $stmt->fetch(PDO::FETCH_ASSOC);
+$progress  = $stmt->fetch(PDO::FETCH_ASSOC);
 $completed = $progress ? (bool)$progress['completed'] : false;
 $old_score = $progress ? $progress['score'] : 0;
 
 $NUM_PREGUNTAS_QUIZ = 10;
 $quiz_pool = $leccion['quiz'] ?? [];
-if (count($quiz_pool) > $NUM_PREGUNTAS_QUIZ) {
-    shuffle($quiz_pool);
-    $quiz_selected = array_slice($quiz_pool, 0, $NUM_PREGUNTAS_QUIZ);
-}
-else {
-    $quiz_selected = $quiz_pool;
-}
+if (count($quiz_pool) > $NUM_PREGUNTAS_QUIZ) { shuffle($quiz_pool); $quiz_selected = array_slice($quiz_pool, 0, $NUM_PREGUNTAS_QUIZ); }
+else { $quiz_selected = $quiz_pool; }
 $NUM_PREGUNTAS_QUIZ_FINAL = count($quiz_selected);
 
-$_SESSION['current_quiz'] = [
-    'slug' => $slug,
-    'preguntas' => $quiz_selected,
-    'num_preguntas' => $NUM_PREGUNTAS_QUIZ_FINAL
-];
+$_SESSION['current_quiz'] = ['slug' => $slug, 'preguntas' => $quiz_selected, 'num_preguntas' => $NUM_PREGUNTAS_QUIZ_FINAL];
 
 $progress_percent = $NUM_PREGUNTAS_QUIZ_FINAL ? round(($old_score / $NUM_PREGUNTAS_QUIZ_FINAL) * 100) : 0;
 
 $return_params = '';
-if (!empty($_GET['profesor'])) {
-    $return_params = '?profesor=' . urlencode($_GET['profesor']);
-}
-elseif (isset($_GET['materia']) && $_GET['materia'] !== '') {
-    $return_params = '?materia=' . urlencode($_GET['materia']);
-}
+if (!empty($_GET['profesor']))       $return_params = '?profesor=' . urlencode($_GET['profesor']);
+elseif (isset($_GET['materia']) && $_GET['materia'] !== '') $return_params = '?materia=' . urlencode($_GET['materia']);
 
-// Datos del usuario para la sidebar
 $user_data = ['puntos' => 0, 'nivel' => 1, 'nombre' => 'Estudiante', 'progreso' => 0];
 if ($user_id) {
     $stmt2 = $pdo->prepare("SELECT nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
     $stmt2->execute([$user_id]);
     $row = $stmt2->fetch(PDO::FETCH_ASSOC);
     if ($row) {
-        $user_data['nombre'] = $row['nombre_usuario'] ?? 'Estudiante';
-        $user_data['puntos'] = (int)($row['puntos'] ?? 0);
-        $user_data['nivel'] = (int)($row['nivel'] ?? 1);
+        $user_data['nombre']   = $row['nombre_usuario'] ?? 'Estudiante';
+        $user_data['puntos']   = (int)($row['puntos'] ?? 0);
+        $user_data['nivel']    = (int)($row['nivel'] ?? 1);
         $user_data['progreso'] = min(100, round(($user_data['puntos'] % 500) / 5));
     }
 }
 
-// Lecciones completadas (para lista de progreso en sidebar)
 $completed_slugs = [];
 if ($user_id) {
     $stmt3 = $pdo->prepare("SELECT slug FROM user_progress WHERE user_id = ? AND completed = 1");
@@ -82,1437 +62,1298 @@ if ($user_id) {
     $completed_slugs = array_column($stmt3->fetchAll(PDO::FETCH_ASSOC), 'slug');
 }
 
-// Lecciones de la misma materia (para navegación en sidebar)
-$materia_actual = $leccion['materia'] ?? '';
+$materia_actual   = $leccion['materia'] ?? '';
 $lecciones_materia = array_filter($lecciones, fn($l) => ($l['materia'] ?? '') === $materia_actual);
+
+$materia_a_profesor_id = [
+    'Temas Selectos de Matemáticas I y II' => '1Le',
+    'Inglés'                               => '1Go',
+    'Pensamiento Matemático III'           => '1Es',
+    'Programación'                         => '1Ma',
+    'Física I'                             => '1He',
+    'Química I'                            => '1He',
+    'Ecosistemas'                          => '1Ca',
+    'Ciencias Sociales'                    => '1Pa',
+    'Historia de México'                   => '1Ar',
+];
+$prof_id     = $materia_a_profesor_id[$materia_actual] ?? '1Cu';
+$current_url = urlencode($_SERVER['REQUEST_URI']);
+$examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actual));
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title><?php echo htmlspecialchars($leccion['titulo']); ?> | LC-ADVANCE</title>
-    
-    <!-- Fuentes premium -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- MathJax y Chart.js -->
-    <script>
-      MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($leccion['titulo']) ?> | LC-ADVANCE</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <script>MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']] } };</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
+
+    <!-- Existing lesson CSS (content styles) -->
     <link rel="stylesheet" href="assets/css/style.css">
     <?php
-    // Cargar automáticamente todos los estilos de lecciones y evitar import list manual.
-    $lessonCssFolder = 'assets/css';
-    $cssFiles = glob($lessonCssFolder . '/leccion-*.css');
-    foreach ($cssFiles as $cssFile) {
-        $cssUrl = str_replace('\\', '/', $cssFile);
-        echo '<link rel="stylesheet" href="' . htmlspecialchars($cssUrl) . '">' . "\n";
-    }
+    $cssFiles = glob('assets/css/leccion-*.css');
+    foreach ($cssFiles as $f) echo '<link rel="stylesheet" href="' . htmlspecialchars(str_replace('\\','/',$f)) . '">' . "\n";
     ?>
+
     <style>
-        /* ======= LAYOUT CON SIDEBAR ======= */
-        :root {
-            --sidebar-w: 320px;
-            --header-h: 70px;
-            --accent-glow: 0 0 30px rgba(0, 255, 255, 0.3);
-            --card-bg: rgba(20, 20, 25, 0.7);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --border-glass: rgba(255, 255, 255, 0.1);
-            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            --neon-cyan: #00ffff;
-            --neon-pink: #ff00ff;
-            --neon-yellow: #ffff00;
-            --neon-green: #39ff14;
-            --bg-dark: #0a0a0f;
-            --bg-panel: rgba(0,255,255,0.04);
-            --border-glow: rgba(0,255,255,0.25);
-        }
+    /* ══════════════════════════════════════════
+       LC-ADVANCE — leccion_detalle PREMIUM v2
+       Sistema de variables del dashboard.css
+       ══════════════════════════════════════════ */
+    :root {
+        --bg:        #060a12;
+        --surface:   #0c1220;
+        --surface2:  #101828;
+        --border:    rgba(0,230,255,0.12);
+        --border2:   rgba(0,230,255,0.22);
+        --cyan:      #00e5ff;
+        --cyan-dim:  rgba(0,229,255,0.1);
+        --pink:      #ff3cac;
+        --green:     #00ff87;
+        --yellow:    #ffd23f;
+        --text:      #e8f4ff;
+        --muted:     rgba(200,230,255,0.45);
+        --font-display: "Syne", sans-serif;
+        --font-mono:    "JetBrains Mono", monospace;
+        --font-body:    "Space Grotesk", sans-serif;
+        --sidebar-w:    288px;
+        --header-h:     58px;
+        --ease:         cubic-bezier(0.23,1,0.32,1);
+    }
 
-        body {
-            background-color: #050508;
-            color: #fff;
-            overflow-x: hidden;
-            font-family: 'Roboto Mono', monospace;
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Animated Grid Background */
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: -1;
-            mask-image: radial-gradient(circle at center, black, transparent 85%);
-            animation: gridMove 25s linear infinite;
-        }
+    html { scroll-behavior: smooth; }
 
-        @keyframes gridMove {
-            from { background-position: 0 0; }
-            to { background-position: 0 60px; }
-        }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 14px;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
 
-        /* Layout */
-        .page-wrapper {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            height: 100vh;
-            overflow: hidden;
-            transition: var(--transition-smooth);
-        }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: var(--font-body); cursor: pointer; }
 
-        .main-header {
-            height: var(--header-h);
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-glass);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            flex-shrink: 0;
-            z-index: 100;
-        }
+    /* ── GRID BG ── */
+    .grid-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image:
+            linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,229,255,0.018) 1px, transparent 1px);
+        background-size: 48px 48px;
+        animation: gridScroll 30s linear infinite;
+    }
+    @keyframes gridScroll { to { background-position: 0 48px; } }
 
-        .content-container {
-            display: flex;
-            flex: 1;
-            gap: 0;
-            align-items: stretch;
-            width: 100%;
-            height: calc(100vh - var(--header-h));
-            overflow: hidden;
-        }
+    /* Orb decorativo */
+    .bg-orb {
+        position: fixed; border-radius: 50%;
+        filter: blur(90px); pointer-events: none; z-index: 0;
+    }
+    .bg-orb-1 {
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(0,229,255,0.06), transparent 70%);
+        top: -100px; right: -100px;
+        animation: orbPulse 9s ease-in-out infinite;
+    }
+    .bg-orb-2 {
+        width: 350px; height: 350px;
+        background: radial-gradient(circle, rgba(255,60,172,0.05), transparent 70%);
+        bottom: 0; left: -80px;
+        animation: orbPulse 11s ease-in-out infinite reverse;
+    }
+    @keyframes orbPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.14); } }
 
-        .lesson-main-content {
-            flex: 1;
-            min-height: calc(100vh - var(--header-h));
-            overflow-y: auto;
-            padding: 30px;
-            background: linear-gradient(180deg, rgba(2,2,15,0.9), rgba(8,12,25,0.98));
-        }
+    /* ════════════ HEADER ════════════ */
+    .lc-header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: var(--header-h);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        background: rgba(6,10,18,0.92);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border2);
+        gap: 12px;
+    }
 
-        .lesson-main-content > .leccion-ecosistemas-rem,
-        .lesson-main-content > .leccion-ecosistemas-movimientos-tierra,
-        .lesson-main-content > .leccion-ecosistemas-carbono,
-        .lesson-main-content > .leccion-biomas,
-        .lesson-main-content > .leccion-quimica-equilibrio,
-        .lesson-main-content > .leccion-biologia-niveles-v6,
-        .lesson-main-content > .leccion-fisica-energia {
-            max-width: 100%;
-            margin: 0 auto;
-        }
+    .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-        .lesson-sidebar, .lesson-main-content { -webkit-overflow-scrolling: touch; }
+    .brand-logo {
+        font-family: var(--font-display);
+        font-size: 16px;
+        font-weight: 800;
+        background: linear-gradient(90deg, var(--cyan), var(--pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.3px;
+    }
 
+    .brand-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 8px var(--cyan);
+        animation: dotPulse 2s ease-in-out infinite;
+    }
+    @keyframes dotPulse { 0%,100%{opacity:1;} 50%{opacity:0.25;} }
 
-        /* ======= SIDEBAR ======= */
-        .lesson-sidebar {
-            width: var(--sidebar-w);
-            min-width: var(--sidebar-w);
-            max-width: var(--sidebar-w);
-            background: linear-gradient(180deg, rgba(7, 7, 18, 0.95) 0%, rgba(14, 24, 42, 0.96));
-            backdrop-filter: blur(18px);
-            border-right: 1px solid rgba(0, 255, 255, 0.15);
-            padding: 1.2rem 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            max-height: calc(100vh - var(--header-h));
-            overflow-y: auto;
-            overflow-x: hidden;
-            z-index: 110;
-            scrollbar-width: thin;
-            scrollbar-color: var(--neon-cyan) transparent;
-            transition: transform 0.3s ease, width 0.3s ease, padding 0.3s ease;
-            position: fixed;
-            top: var(--header-h);
-            bottom: 0;
+    .header-crumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--muted);
+    }
+    .crumb-sep { opacity: 0.3; }
+    .crumb-active { color: var(--cyan); }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mobile-menu-btn {
+        display: none !important;
+        width: 36px; height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--border2);
+        background: transparent;
+        color: var(--cyan);
+        font-size: 16px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ── Shared button base ── */
+    .btn {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        border-radius: 8px;
+        padding: 7px 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.25s var(--ease);
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+    .btn-ghost {
+        border-color: var(--border2);
+        color: var(--muted);
+        background: transparent;
+    }
+    .btn-ghost:hover { color: var(--cyan); border-color: rgba(0,229,255,0.4); background: var(--cyan-dim); transform: translateY(-1px); }
+
+    .btn-danger {
+        border-color: rgba(255,60,172,0.3);
+        color: rgba(255,60,172,0.8);
+        background: transparent;
+    }
+    .btn-danger:hover { border-color: var(--pink); color: var(--pink); background: rgba(255,60,172,0.07); transform: translateY(-1px); }
+
+    .btn-primary {
+        background: var(--cyan);
+        color: var(--bg);
+        border-color: var(--cyan);
+        font-weight: 700;
+    }
+    .btn-primary:hover { background: #33eeff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,229,255,0.3); }
+
+    .btn-yellow {
+        background: transparent;
+        border-color: rgba(255,210,63,0.4);
+        color: var(--yellow);
+    }
+    .btn-yellow:hover { background: rgba(255,210,63,0.08); border-color: var(--yellow); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,210,63,0.15); }
+
+    /* ════════════ LAYOUT ════════════ */
+    .page-body {
+        display: flex;
+        padding-top: var(--header-h);
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ════════════ SIDEBAR ════════════ */
+    .lc-sidebar {
+        position: fixed;
+        top: var(--header-h);
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        background: rgba(6,10,18,0.94);
+        backdrop-filter: blur(24px);
+        border-right: 1px solid var(--border2);
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 150;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0,229,255,0.2) transparent;
+        transition: transform 0.35s var(--ease);
+    }
+    .lc-sidebar::-webkit-scrollbar { width: 3px; }
+    .lc-sidebar::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.2); border-radius: 99px; }
+
+    /* Sidebar sections */
+    .sb-section {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+    }
+    .sb-section:last-child { border-bottom: none; margin-top: auto; }
+
+    .sb-label {
+        font-family: var(--font-mono);
+        font-size: 8px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sb-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+    /* User card */
+    .sb-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .sb-avatar {
+        width: 42px; height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(0,229,255,0.25), rgba(255,60,172,0.2));
+        border: 1px solid var(--border2);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+        box-shadow: 0 0 16px rgba(0,229,255,0.15);
+        animation: glowPulse 4s ease-in-out infinite;
+    }
+    @keyframes glowPulse { 0%,100%{box-shadow:0 0 10px rgba(0,229,255,0.1);} 50%{box-shadow:0 0 22px rgba(0,229,255,0.28);} }
+
+    .sb-user-info { min-width: 0; }
+    .sb-username {
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .sb-level {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--yellow);
+        margin-top: 2px;
+    }
+
+    /* XP bar */
+    .xp-row {
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--font-mono);
+        font-size: 8px;
+        color: var(--muted);
+        margin-bottom: 5px;
+        margin-top: 12px;
+    }
+    .xp-track {
+        height: 3px;
+        background: rgba(255,255,255,0.07);
+        border-radius: 99px;
+        overflow: hidden;
+    }
+    .xp-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--cyan), var(--pink));
+        border-radius: 99px;
+        box-shadow: 0 0 8px rgba(0,229,255,0.4);
+        transition: width 1s var(--ease);
+    }
+    .sb-points {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--muted);
+        margin-top: 8px;
+        text-align: center;
+    }
+    .sb-points strong { color: var(--green); }
+
+    /* Current lesson info */
+    .sb-lesson-title {
+        font-family: var(--font-display);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--cyan);
+        line-height: 1.4;
+        margin-bottom: 4px;
+    }
+    .sb-lesson-sub {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Score card inside sidebar */
+    .sb-score-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+    }
+    .sb-score-row {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        margin-bottom: 8px;
+    }
+    .sb-score-val {
+        font-family: var(--font-display);
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--yellow);
+        line-height: 1;
+    }
+    .sb-score-max {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--muted);
+    }
+    .sb-score-track {
+        height: 3px;
+        background: rgba(255,255,255,0.07);
+        border-radius: 99px;
+        overflow: hidden;
+        margin-bottom: 6px;
+    }
+    .sb-score-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--yellow), var(--green));
+        border-radius: 99px;
+        box-shadow: 0 0 8px rgba(255,210,63,0.4);
+        transition: width 1s var(--ease);
+    }
+    .sb-status {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: <?= $completed ? 'var(--green)' : 'var(--muted)' ?>;
+    }
+
+    /* Nav list */
+    .sb-nav { display: flex; flex-direction: column; gap: 2px; }
+    .sb-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--muted);
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        line-height: 1.3;
+    }
+    .sb-nav-item:hover { color: var(--cyan); background: var(--cyan-dim); border-color: var(--border); }
+    .sb-nav-item.active { color: var(--cyan); background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.2); }
+    .sb-nav-item.done { color: rgba(0,255,135,0.7); }
+    .sb-nav-item.done:hover { color: var(--green); background: rgba(0,255,135,0.05); border-color: rgba(0,255,135,0.15); }
+
+    .nav-pip {
+        width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+        background: rgba(255,255,255,0.15);
+        transition: all 0.2s;
+    }
+    .sb-nav-item.active .nav-pip { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+    .sb-nav-item.done .nav-pip  { background: var(--green); box-shadow: 0 0 6px rgba(0,255,135,0.5); }
+
+    /* Sidebar CTA */
+    .sb-cta-quiz {
+        width: 100%;
+        padding: 11px 0;
+        border-radius: 10px;
+        border: 1px solid var(--cyan);
+        background: rgba(0,229,255,0.07);
+        color: var(--cyan);
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.25s var(--ease);
+        margin-bottom: 8px;
+    }
+    .sb-cta-quiz:hover { background: rgba(0,229,255,0.16); box-shadow: 0 0 20px rgba(0,229,255,0.18); transform: translateY(-1px); }
+
+    .sb-back {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 9px 0;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+    }
+    .sb-back:hover { color: var(--cyan); border-color: var(--border2); background: var(--cyan-dim); }
+
+    /* Sidebar overlay (mobile) */
+    .sb-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        backdrop-filter: blur(4px);
+        z-index: 140;
+        top: var(--header-h);
+    }
+    .sb-overlay.active { display: block; }
+
+    /* ════════════ MAIN CONTENT ════════════ */
+    .lc-main {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        min-height: calc(100vh - var(--header-h));
+        display: flex;
+        flex-direction: column;
+        transition: margin-left 0.35s var(--ease);
+    }
+
+    .content-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 32px 28px 60px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+    .content-scroll::-webkit-scrollbar { width: 4px; }
+    .content-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+
+    .lesson-card {
+        max-width: 900px;
+        margin: 0 auto;
+        background: rgba(12,18,32,0.85);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        overflow: hidden;
+        animation: fadeInUp 0.6s var(--ease) both;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Lesson card header band */
+    .lesson-card-head {
+        padding: 28px 36px 24px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+    .lesson-card-head::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--cyan), var(--pink), var(--yellow));
+    }
+    .lesson-card-head::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 300px; height: 100%;
+        background: radial-gradient(ellipse at right top, rgba(0,229,255,0.05), transparent 70%);
+        pointer-events: none;
+    }
+
+    .lh-materia {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--pink);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .lh-materia::before { content:''; width:3px; height:3px; border-radius:50%; background: var(--pink); box-shadow: 0 0 6px var(--pink); }
+
+    .lh-title {
+        font-family: var(--font-display);
+        font-size: clamp(20px, 3vw, 30px);
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+        margin-bottom: 16px;
+    }
+
+    .lh-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .meta-chip {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .meta-chip.status-done  { background: rgba(0,255,135,0.08); border: 1px solid rgba(0,255,135,0.2); color: var(--green); }
+    .meta-chip.status-pend  { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); }
+    .meta-chip.score        { background: rgba(255,210,63,0.07); border: 1px solid rgba(255,210,63,0.2); color: var(--yellow); }
+
+    /* Lesson body */
+    .lesson-card-body {
+        padding: 32px 36px;
+    }
+
+    /* Override lesson content typography */
+    .lesson-content {
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.75;
+        color: rgba(232,244,255,0.85);
+    }
+    .lesson-content h1,
+    .lesson-content h2 {
+        font-family: var(--font-display);
+        font-size: clamp(18px, 2.5vw, 24px);
+        font-weight: 700;
+        color: var(--cyan);
+        margin: 36px 0 14px;
+        letter-spacing: -0.3px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+    }
+    .lesson-content h3 {
+        font-family: var(--font-display);
+        font-size: 16px;
+        color: var(--yellow);
+        margin: 28px 0 10px;
+    }
+    .lesson-content p { margin-bottom: 20px; }
+    .lesson-content strong { color: var(--text); font-weight: 600; }
+    .lesson-content em { color: var(--cyan); font-style: normal; font-weight: 500; }
+    .lesson-content ul, .lesson-content ol { margin: 0 0 20px 20px; }
+    .lesson-content li { margin-bottom: 8px; }
+    .lesson-content a { color: var(--cyan); border-bottom: 1px solid rgba(0,229,255,0.3); transition: border-color 0.2s; }
+    .lesson-content a:hover { border-color: var(--cyan); }
+    .lesson-content code {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        background: rgba(0,229,255,0.07);
+        border: 1px solid rgba(0,229,255,0.15);
+        padding: 2px 7px;
+        border-radius: 5px;
+        color: var(--cyan);
+    }
+    .lesson-content pre {
+        background: rgba(3,5,10,0.8);
+        border: 1px solid var(--border2);
+        border-radius: 12px;
+        padding: 20px;
+        overflow-x: auto;
+        margin: 24px 0;
+    }
+    .lesson-content pre code { background: none; border: none; padding: 0; font-size: 13px; }
+    .lesson-content table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px; }
+    .lesson-content th {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border2);
+        text-align: left;
+    }
+    .lesson-content td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: rgba(232,244,255,0.8); }
+    .lesson-content tr:hover td { background: rgba(0,229,255,0.03); }
+    .lesson-content blockquote {
+        margin: 24px 0;
+        padding: 16px 20px;
+        border-left: 3px solid var(--cyan);
+        background: rgba(0,229,255,0.04);
+        border-radius: 0 8px 8px 0;
+        font-style: italic;
+        color: rgba(232,244,255,0.7);
+    }
+    .lesson-content img { max-width: 100%; border-radius: 10px; margin: 16px 0; }
+
+    /* ── ACTION FOOTER ── */
+    .lesson-actions {
+        padding: 20px 36px 30px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        flex: 1;
+        min-width: 200px;
+        padding: 13px 20px;
+        border-radius: 12px;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s var(--ease);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+        text-decoration: none;
+    }
+    .action-quiz {
+        background: var(--cyan);
+        color: var(--bg);
+        box-shadow: 0 0 20px rgba(0,229,255,0.2);
+    }
+    .action-quiz:hover { background: #33eeff; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,229,255,0.35); }
+
+    .action-exam {
+        background: transparent;
+        border: 1px solid rgba(255,210,63,0.35);
+        color: var(--yellow);
+    }
+    .action-exam:hover { background: rgba(255,210,63,0.08); border-color: var(--yellow); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,210,63,0.15); }
+
+    /* ════════════ QUIZ MODAL ════════════ */
+    .quiz-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(3,5,10,0.85);
+        backdrop-filter: blur(16px);
+        z-index: 500;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .quiz-overlay.open { display: flex; }
+
+    .quiz-modal {
+        width: 100%;
+        max-width: 720px;
+        max-height: 85vh;
+        overflow-y: auto;
+        background: rgba(10,16,28,0.98);
+        border: 1px solid var(--border2);
+        border-radius: 20px;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,229,255,0.05);
+        animation: modalIn 0.3s var(--ease) both;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0,229,255,0.2) transparent;
+    }
+    .quiz-modal::-webkit-scrollbar { width: 3px; }
+    .quiz-modal::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.2); }
+    @keyframes modalIn { from { opacity:0; transform:scale(0.96) translateY(16px); } to { opacity:1; transform:scale(1) translateY(0); } }
+
+    /* Modal header */
+    .qm-head {
+        padding: 22px 28px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        background: rgba(10,16,28,0.98);
+        backdrop-filter: blur(8px);
+        z-index: 2;
+    }
+    .qm-title {
+        font-family: var(--font-display);
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--cyan);
+    }
+    .qm-close {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--muted);
+        font-size: 16px;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s;
+    }
+    .qm-close:hover { border-color: var(--pink); color: var(--pink); background: rgba(255,60,172,0.07); }
+
+    .qm-body { padding: 20px 28px 28px; }
+
+    /* Question card */
+    .q-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 14px;
+        transition: border-color 0.2s;
+    }
+    .q-card:hover { border-color: var(--border2); }
+
+    .q-num {
+        font-family: var(--font-mono);
+        font-size: 8px;
+        color: var(--muted);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+    .q-text {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.45;
+        margin-bottom: 16px;
+    }
+
+    .q-options { display: flex; flex-direction: column; gap: 6px; }
+
+    .q-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 9px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 13px;
+        color: rgba(232,244,255,0.8);
+    }
+    .q-option:hover { border-color: rgba(0,229,255,0.3); background: var(--cyan-dim); color: var(--text); }
+    .q-option input[type="radio"] { display: none; }
+    .q-radio {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(0,229,255,0.3);
+        flex-shrink: 0;
+        transition: all 0.2s;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .q-option input:checked ~ .q-radio { border-color: var(--cyan); background: var(--cyan); box-shadow: 0 0 8px rgba(0,229,255,0.4); }
+    .q-option input:checked ~ .q-radio::after { content:''; width:5px; height:5px; border-radius:50%; background: var(--bg); }
+    .q-option:has(input:checked) { border-color: rgba(0,229,255,0.35); background: rgba(0,229,255,0.05); color: var(--text); }
+
+    .qm-submit {
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        border: none;
+        background: var(--cyan);
+        color: var(--bg);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.25s var(--ease);
+        margin-top: 8px;
+        box-shadow: 0 0 20px rgba(0,229,255,0.2);
+    }
+    .qm-submit:hover { background: #33eeff; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,229,255,0.3); }
+
+    /* ── RESULT PANEL ── */
+    .result-card {
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 12px;
+    }
+    .result-score-big {
+        font-family: var(--font-display);
+        font-size: 48px;
+        font-weight: 800;
+        color: var(--yellow);
+        line-height: 1;
+    }
+    .result-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 4px; }
+    .result-meta { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+    .result-meta-item { font-family: var(--font-mono); font-size: 11px; }
+    .result-meta-item strong { color: var(--green); }
+
+    .detail-list { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .detail-item {
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 12px;
+    }
+    .detail-item.correct { border-color: rgba(0,255,135,0.2); background: rgba(0,255,135,0.03); }
+    .detail-item.wrong   { border-color: rgba(255,60,172,0.2); background: rgba(255,60,172,0.03); }
+    .detail-q { color: rgba(232,244,255,0.8); margin-bottom: 5px; line-height: 1.4; }
+    .detail-a { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+    .detail-ok   { font-family: var(--font-mono); font-size: 10px; color: var(--green); margin-top: 4px; }
+    .detail-wrong-txt { font-family: var(--font-mono); font-size: 10px; color: var(--pink); margin-top: 4px; }
+
+    /* XP fly animation */
+    .xp-fly {
+        position: fixed;
+        bottom: 80px;
+        right: 32px;
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--yellow);
+        pointer-events: none;
+        z-index: 9999;
+        animation: xpFloat 2s var(--ease) forwards;
+        text-shadow: 0 0 20px rgba(255,210,63,0.6);
+    }
+    @keyframes xpFloat {
+        0%   { opacity: 0; transform: translateY(0) scale(0.8); }
+        20%  { opacity: 1; transform: translateY(-10px) scale(1.1); }
+        80%  { opacity: 1; transform: translateY(-50px) scale(1); }
+        100% { opacity: 0; transform: translateY(-80px) scale(0.9); }
+    }
+
+    /* Toast */
+    .toast-wrap {
+        position: fixed; bottom: 24px; right: 24px;
+        z-index: 9000; display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+        background: rgba(10,16,28,0.97);
+        border: 1px solid var(--border2);
+        border-left: 3px solid var(--cyan);
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        animation: toastIn 0.35s var(--ease) both;
+    }
+    .toast.hide { animation: toastOut 0.35s var(--ease) both; }
+    @keyframes toastIn  { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes toastOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(20px); } }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+        .lc-header {
             left: 0;
-            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.5);
-            transform: translateX(0);
-        }
-
-        .lesson-sidebar.collapsed {
-            width: 85px;
-            min-width: 85px;
-            max-width: 85px;
-            padding: 1.2rem 0.6rem;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-arrow-btn {
-            transform: rotate(180deg);
-        }
-
-        .lesson-sidebar.hidden {
-            transform: translateX(-105%);
-            opacity: 0.97;
-            pointer-events: none;
-        }
-
-        .lesson-sidebar.open {
-            transform: translateX(0);
-            pointer-events: auto;
-        }
-
-        .content-container {
-            margin-left: var(--sidebar-w);
-            width: calc(100% - var(--sidebar-w));
-            transition: margin-left 0.3s ease, width 0.3s ease;
-        }
-
-        body.sidebar-collapsed .content-container {
-            margin-left: 85px;
-            width: calc(100% - 85px);
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 105;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-            pointer-events: auto;
-            opacity: 1;
-        }
-
-        .main-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 120;
-        }
-
-        .page-wrapper { padding-top: var(--header-h); }
-
-        .sidebar-collapse-btn {
-            position: absolute;
-            top: 12px;
-            right: -12px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 1px solid rgba(0,255,255,0.35);
-            background: rgba(0, 0, 0, 0.9);
-            color: #00ffff;
-            cursor: pointer;
-            font-size: 0.8rem;
-            line-height: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 1px 8px rgba(0,255,255,0.35);
-            transition: transform 0.2s ease;
-            z-index: 111;
-        }
-
-        .sidebar-collapse-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .mobile-sidebar-toggle {
-            display: none;
-            border: 1px solid rgba(0,255,255,0.45);
-            background: rgba(0, 0, 0, 0.7);
-            color: #00ffff;
-            padding: 8px 10px;
-            border-radius: 8px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-
-        @media (max-width: 1024px) {
-            .lesson-sidebar {
-                width: min(84vw, 320px);
-                min-width: 0;
-                max-width: min(84vw, 320px);
-                transform: translateX(-105%);
-                position: fixed;
-                top: var(--header-h);
-                left: 0;
-                height: calc(100vh - var(--header-h));
-            }
-            .lesson-sidebar.collapsed {
-                width: min(84vw, 320px);
-            }
-            .content-container {
-                margin-left: 0;
-                width: 100%;
-            }
-            .sidebar-collapse-btn { top: 8px; right: -16px; }
-            .mobile-sidebar-toggle { display: inline-flex; }
-        }
-
-        @media (max-width: 768px) {
-            .lesson-sidebar { width: 86vw; }
-            .lesson-sidebar.collapsed { width: 86vw; }
-            .lesson-sidebar.hidden { transform: translateX(-110%); }
-            .mobile-sidebar-toggle { position: absolute; top: 12px; left: 16px; }
-            .lesson-main-content { padding: 20px; }
-        }
-
-        .lesson-sidebar.collapsed .sidebar-logo,
-        .lesson-sidebar.collapsed .sidebar-title,
-        .lesson-sidebar.collapsed .sidebar-section-title {
-            display: none;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-nav-item {
-            justify-content: center;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-nav-item span:not(.nav-dot),
-        .lesson-sidebar.collapsed .sidebar-username,
-        .lesson-sidebar.collapsed .sidebar-level-badge,
-        .lesson-sidebar.collapsed .sidebar-xp-label,
-        .lesson-sidebar.collapsed .sidebar-points,
-        .lesson-sidebar.collapsed .sidebar-current-lesson,
-        .lesson-sidebar.collapsed .sidebar-score-display,
-        .lesson-sidebar.collapsed .sidebar-quiz-btn span,
-        .lesson-sidebar.collapsed .sidebar-back-btn {
-            display: none;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-avatar {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 0;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-username,
-        .lesson-sidebar.collapsed .sidebar-level-badge,
-        .lesson-sidebar.collapsed .sidebar-xp-label,
-        .lesson-sidebar.collapsed .sidebar-xp-bar,
-        .lesson-sidebar.collapsed .sidebar-points,
-        .lesson-sidebar.collapsed .sidebar-current-lesson,
-        .lesson-sidebar.collapsed .sidebar-score-display,
-        .lesson-sidebar.collapsed .sidebar-nav-item span:not(.nav-dot),
-        .lesson-sidebar.collapsed .sidebar-quiz-btn span,
-        .lesson-sidebar.collapsed .sidebar-back-btn {
-            display: none;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-section-title {
-            display: block;
-            font-size: 0.45rem;
-            color: rgba(0,255,255,0.4);
-            padding: 0.25rem 0.35rem;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-nav-item {
-            justify-content: center;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-avatar {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 0;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-section {
-            border: none;
-            background: transparent;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-nav-item {
-            justify-content: center;
-            padding: 0.8rem 0;
-        }
-        
-        .lesson-sidebar.collapsed .nav-dot { width: 12px; height: 12px; }
-
-        .lesson-sidebar::-webkit-scrollbar { width: 4px; }
-        .lesson-sidebar::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 2px; }
-
-        /* Tarjeta de usuario */
-        .sidebar-user-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-glow);
-            border-radius: 12px;
-            padding: 0.7rem;
-            text-align: center;
-            position: relative;
-        }
-
-        .sidebar-avatar {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            margin: 0 auto 0.4rem;
-            box-shadow: 0 0 16px rgba(0,255,255,0.4);
-        }
-
-        .sidebar-username {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.6rem;
-            color: var(--neon-cyan);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-bottom: 0.15rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-level-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(255, 255, 0, 0.1);
-            border: 1px solid var(--neon-yellow);
-            color: var(--neon-yellow);
-            font-size: 10px;
-            font-family: 'Press Start 2P', cursive;
-            border-radius: 4px;
-            margin-bottom: 5px;
-        }
-
-        /* XP Bar */
-        .sidebar-xp-block {
-            margin-top: 0.5rem;
-        }
-        .sidebar-xp-label {
-            display: flex;
-            justify-content: space-between;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.55rem;
-            color: rgba(0,255,255,0.6);
-            margin-bottom: 0.2rem;
-        }
-        .sidebar-xp-bar {
-            height: 6px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .sidebar-xp-fill {
-            height: 100%;
-            border-radius: 3px;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-            transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-            box-shadow: 0 0 8px rgba(0,255,255,0.5);
-        }
-
-        /* Puntos totales */
-        .sidebar-points {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.6rem;
-            color: rgba(255,255,255,0.5);
-            text-align: center;
-            margin-top: 0.3rem;
-        }
-        .sidebar-points strong {
-            color: var(--neon-green);
-        }
-
-        /* ======= SECCIONES SIDEBAR ======= */
-        .sidebar-section {
-            border: 1px solid var(--border-glow);
-            background: var(--bg-panel);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .sidebar-section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.5rem;
-            letter-spacing: 0.12em;
-            color: rgba(0,255,255,0.5);
-            text-transform: uppercase;
-            padding: 0.4rem 0.6rem;
-            border-bottom: 1px solid var(--border-glow);
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        /* Esta lección */
-        .sidebar-current-lesson {
-            padding: 0.5rem 0.6rem;
-        }
-        .sidebar-current-lesson .lesson-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.55rem;
-            color: var(--neon-cyan);
-            line-height: 1.3;
-            margin-bottom: 0.3rem;
-        }
-        .sidebar-current-lesson .lesson-subject {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.5rem;
-            color: rgba(255,255,255,0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        /* Puntuación actual */
-        .sidebar-score-display {
-            padding: 0.5rem 0.6rem;
-        }
-        .score-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.4rem;
-        }
-        .score-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 10px rgba(255,255,0,0.4);
-        }
-        .score-max {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.55rem;
-            color: rgba(255,255,255,0.3);
-        }
-        .score-pct-bar {
-            height: 4px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 2px;
-            margin-top: 0.4rem;
-            overflow: hidden;
-        }
-        .score-pct-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-yellow), var(--neon-green));
-            border-radius: 2px;
-            box-shadow: 0 0 6px rgba(255,255,0,0.4);
-            transition: width 0.8s ease;
-        }
-        .score-status {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.5rem;
-            margin-top: 0.3rem;
-            color: <?php echo $completed ? 'var(--neon-green)' : 'rgba(255,255,255,0.3)'; ?>;
-        }
-
-        /* Navegación de lecciones de la materia */
-        .sidebar-nav-list {
-            padding: 0.3rem 0;
-            max-height: 200px;
-            overflow-y: auto;
-            scrollbar-width: none;
-        }
-        .sidebar-nav-list::-webkit-scrollbar { display: none; }
-
-        .sidebar-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.35rem 0.6rem;
-            text-decoration: none;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.52rem;
-            color: rgba(255,255,255,0.45);
-            border-left: 2px solid transparent;
-            transition: all 0.18s;
-            line-height: 1.25;
-        }
-        .sidebar-nav-item:hover {
-            color: var(--neon-cyan);
-            border-left-color: var(--neon-cyan);
-            background: rgba(0,255,255,0.04);
-        }
-        .sidebar-nav-item.active {
-            color: var(--neon-cyan);
-            border-left-color: var(--neon-cyan);
-            background: rgba(0,255,255,0.07);
-        }
-        .nav-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            flex-shrink: 0;
-        }
-        .nav-dot.active-dot {
-            background: var(--neon-cyan);
-            box-shadow: 0 0 6px var(--neon-cyan);
-        }
-        .sidebar-nav-item.done .nav-dot {
-            background: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-
-        /* Tooltips cuando colapsado */
-        .lesson-sidebar.collapsed .sidebar-nav-item {
-            position: relative;
-        }
-        
-        .lesson-sidebar.collapsed .sidebar-nav-item::after {
-            content: attr(data-title);
-            position: absolute;
-            left: 100%;
-            top: 50%;
-            transform: translateY(-50%) translateX(10px);
-            background: rgba(0, 0, 0, 0.9);
-            color: var(--neon-cyan);
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 10px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.2s;
-            border: 1px solid var(--neon-cyan);
-            z-index: 1001;
-        }
-
-        .lesson-sidebar.collapsed .sidebar-nav-item:hover::after {
-            opacity: 1;
-            transform: translateY(-50%) translateX(20px);
-        }
-
-        /* Botón quiz en sidebar */
-        .sidebar-quiz-btn {
             width: 100%;
-            background: linear-gradient(135deg, rgba(0,255,255,0.08), rgba(255,0,255,0.08));
-            border: 1px solid var(--neon-cyan);
-            border-radius: 12px;
-            color: var(--neon-cyan);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.55rem;
-            letter-spacing: 0.08em;
-            padding: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
         }
-        .sidebar-quiz-btn:hover {
-            background: rgba(0,255,255,0.15);
-            box-shadow: 0 0 16px rgba(0,255,255,0.25);
-            transform: translateY(-1px);
+        .lc-sidebar {
+            transform: translateX(-100%);
+            z-index: 160;
+            width: min(var(--sidebar-w), 84vw);
         }
-
-        /* Botón volver en sidebar */
-        .sidebar-back-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            width: 100%;
-            background: transparent;
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            text-decoration: none;
-            color: rgba(255,255,255,0.5);
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.6rem;
-            padding: 0.7rem;
-            transition: all 0.2s;
-            margin-top: auto;
-        }
-        .sidebar-back-btn:hover {
-            background: rgba(255,255,255,0.05);
-            color: var(--neon-cyan);
-            border-color: var(--neon-cyan);
-        }
-
-        /* ======= ÁREA DE CONTENIDO ======= */
-        .lesson-main-content {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            position: relative;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.2) transparent;
-        }
-        .lesson-main-content::-webkit-scrollbar { width: 6px; }
-        .lesson-main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-
-        .lesson-content-inner {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .lesson-header {
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--border-glass);
-            padding-bottom: 30px;
-        }
-
-        .lesson-materia {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: var(--neon-pink);
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .lesson-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 32px;
-            font-weight: 700;
-            color: #fff;
-            margin: 0 0 10px;
-            letter-spacing: -1px;
-        }
-
-        .lesson-content {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.52rem;
-            color: rgba(255,255,255,0.45);
-            line-height: 1.25;
-            font-size: 18px;
-            line-height: 1.7;
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .lesson-content h2, .lesson-content h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--neon-cyan);
-            margin-top: 40px;
-        }
-
-        .lesson-content p {
-            margin-bottom: 25px;
-        }
-
-        .lesson-content code {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: var(--neon-yellow);
-            font-family: 'VT323', monospace;
-            font-size: 1.2em;
-        }
-
-        .lesson-content pre {
-            background: #0a0a0f;
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 20px;
-            overflow-x: auto;
-            margin: 25px 0;
-        }
-
-        /* Botones Premium */
-        .btn-premium {
-            padding: 16px 30px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            text-transform: uppercase;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--border-glass);
-            color: #fff;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: #fff;
-        }
-
-        /* Modal Quiz Premium */
-        .quiz-modal {
-            background: rgba(10, 10, 15, 0.95);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--neon-cyan);
-            width: 90%;
-            max-width: 800px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 40px;
-            position: relative;
-            border-radius: 24px;
-        }
-
-        .question-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .question-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-glass);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .option-label:hover {
-            background: rgba(0, 255, 255, 0.05);
-            border-color: var(--neon-cyan);
-        }
-
-        .option-label input:checked + .radio-custom {
-            background: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .radio-custom {
-            width: 18px; height: 18px;
-            border: 2px solid var(--neon-cyan);
-            border-radius: 50%;
-        }
-
-        /* Sidebar toggle - Integrado en la barra lateral */
-        .sidebar-collapse-btn {
-            position: absolute;
-            right: -20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background: var(--bg-dark);
-            border: 2px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1002;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-            transition: var(--transition-smooth);
-            font-size: 1.2rem;
-        }
-
-        .sidebar-collapse-btn:hover {
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 25px var(--neon-cyan);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .lesson-sidebar.collapsed .sidebar-collapse-btn {
-            right: -20px;
-        }
-
-        @media (max-width: 992px) {
-            .sidebar-collapse-btn { display: none; }
-        }
-
-        .sidebar-toggle-mobile {
-            display: none;
-        }
-
-        @media (max-width: 992px) {
-            .sidebar-toggle-mobile {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                width: 44px;
-                height: 44px;
-                border-radius: 50%;
-                background: var(--bg-dark);
-                border: 2px solid var(--neon-cyan);
-                color: var(--neon-cyan);
-                font-size: 1.2rem;
-                box-shadow: 0 0 12px var(--neon-cyan);
-                z-index: 110;
-                cursor: pointer;
-            }
-
-            .lesson-sidebar {
-                left: -320px;
-            }
-
-            .lesson-sidebar.open {
-                left: 0;
-            }
-        }
-
-        .sidebar-toggle:hover {
-            transform: scale(1.1);
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 25px var(--neon-cyan);
-        }
-
-        .lesson-sidebar.collapsed ~ .sidebar-toggle {
-            left: 95px;
-        }
-
-        .lesson-sidebar.collapsed ~ .lesson-main-content {
-            padding-left: 20px;
-        }
-
-        /* Mobile Adjustments */
-        @media (max-width: 992px) {
-            .lesson-sidebar {
-                position: fixed;
-                left: -320px;
-                top: var(--header-h);
-                transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                box-shadow: 10px 0 50px rgba(0,0,0,0.9);
-                width: 300px;
-                max-width: 85vw;
-            }
-            .lesson-sidebar.open { left: 0; }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,0.7);
-                backdrop-filter: blur(4px);
-                z-index: 99;
-                top: var(--header-h);
-            }
-            .sidebar-overlay.active { display: block; }
-            .lesson-main-content { padding: 20px; }
-        }
-
-        /* ORIENTACIÓN HORIZONTAL */
-        @media screen and (orientation: portrait) {
-            body::before {
-                content: "🔄 POR FAVOR, GIRA TU DISPOSITIVO PARA UNA MEJOR EXPERIENCIA (MODO HORIZONTAL)";
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: #000; color: #0ff; display: flex;
-                justify-content: center; align-items: center;
-                z-index: 99999; text-align: center; padding: 2rem;
-                font-family: 'Orbitron', sans-serif; font-size: 1.5rem;
-                border: 4px solid #f0f;
-            }
-            .page-wrapper { display: none !important; }
-        }
-
-        /* Toast / Result Panels */
-        .result-panel {
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid var(--neon-cyan);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-top: 1rem;
-            font-family: 'Roboto Mono', monospace;
-            color: #fff;
-        }
-        .toast-container {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .toast {
-            background: rgba(0, 0, 0, 0.9);
-            border-left: 4px solid var(--neon-cyan);
-            padding: 1rem 1.5rem;
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 12px rgba(0,255,255,0.2);
-            animation: slideInRight 0.4s ease forwards;
-        }
-        .toast.hide {
-            animation: slideOutRight 0.4s ease forwards;
-        }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-
-        .detail-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-glass); }
-        .detail-item.correct .detail-ok { color: var(--neon-green); font-weight: bold; margin-top: 5px; }
-        .detail-item.wrong .detail-wrong { color: var(--neon-pink); font-weight: bold; margin-top: 5px; }
-        .detail-q { margin-bottom: 5px; }
-        .detail-a { color: rgba(255,255,255,0.7); font-size: 0.9em; }
+        .lc-sidebar.open { transform: translateX(0); }
+        .lc-main { margin-left: 0; }
+        .mobile-menu-btn { display: flex !important; }
+        .header-crumb { display: none; }
+    }
+    @media (max-width: 640px) {
+        .content-scroll { padding: 16px 14px 60px; }
+        .lesson-card-head, .lesson-card-body, .lesson-actions { padding-left: 18px; padding-right: 18px; }
+        .lesson-actions { flex-direction: column; }
+        .action-btn { min-width: auto; }
+        .qm-body { padding: 16px 16px 20px; }
+        .qm-head { padding: 16px 18px; }
+    }
     </style>
 </head>
-<body class="<?php echo($slug === 'contaminacion-ambiental') ? 'page-lesson-contaminacion' : ''; ?>">
-
+<body>
 <div class="grid-bg"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
 
-<div class="page-wrapper">
+<script>window.LC_CSRF_TOKEN = '<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>';</script>
 
-    <header class="main-header">
-        <div class="header-title">
-            <h1>LC-ADVANCE <span class="access">ACCESS: ONLINE</span></h1>
+<!-- ════ HEADER ════ -->
+<header class="lc-header">
+    <div class="header-brand">
+        <button class="mobile-menu-btn btn" id="mobileMenuBtn" aria-label="Menú">☰</button>
+        <span class="brand-logo">LC-ADVANCE</span>
+        <div class="brand-dot"></div>
+    </div>
+
+    <nav class="header-crumb">
+        <span class="crumb-sep"><?= htmlspecialchars($materia_actual) ?></span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-active"><?= htmlspecialchars($leccion['titulo']) ?></span>
+    </nav>
+
+    <div class="header-actions">
+        <a href="dashboard.php<?= $return_params ?>" class="btn btn-ghost">← Dashboard</a>
+        <a href="logout.php" class="btn btn-danger">Salir</a>
+    </div>
+</header>
+
+<!-- ════ PAGE BODY ════ -->
+<div class="page-body">
+
+    <!-- Sidebar overlay -->
+    <div class="sb-overlay" id="sbOverlay"></div>
+
+    <!-- ════ SIDEBAR ════ -->
+    <aside class="lc-sidebar" id="lcSidebar">
+
+        <!-- User -->
+        <div class="sb-section">
+            <div class="sb-user">
+                <div class="sb-avatar">🎮</div>
+                <div class="sb-user-info">
+                    <div class="sb-username"><?= htmlspecialchars($user_data['nombre']) ?></div>
+                    <div class="sb-level">⚡ Nivel <?= $user_data['nivel'] ?></div>
+                </div>
+            </div>
+            <div class="xp-row">
+                <span>XP</span>
+                <span id="xpPct"><?= $user_data['progreso'] ?>%</span>
+            </div>
+            <div class="xp-track">
+                <div class="xp-fill" id="xpFill" style="width:<?= $user_data['progreso'] ?>%"></div>
+            </div>
+            <div class="sb-points">Puntos totales: <strong id="totalPts"><?= number_format($user_data['puntos']) ?></strong></div>
         </div>
-        <div style="display:flex; align-items:center; gap: 0.8rem;">
-            <button class="mobile-sidebar-toggle" id="mobileSidebarToggleBtn" aria-label="Abrir menú">☰ Menú</button>
-            <div class="header-nav" style="display: flex; gap: 10px;">
-                <a href="dashboard.php<?php echo $return_params; ?>" class="btn-premium btn-secondary" style="padding: 10px 20px;">Dashboard</a>
-                <a href="logout.php" class="btn-premium btn-secondary" style="padding: 10px 20px; border-color: var(--neon-pink); color: var(--neon-pink);">Salir</a>
+
+        <!-- Current lesson -->
+        <div class="sb-section">
+            <div class="sb-label">📍 Lección Actual</div>
+            <div class="sb-lesson-title"><?= htmlspecialchars($leccion['titulo']) ?></div>
+            <div class="sb-lesson-sub"><?= htmlspecialchars($materia_actual) ?></div>
+        </div>
+
+        <!-- Score -->
+        <div class="sb-section">
+            <div class="sb-label">🏅 Tu Puntuación</div>
+            <div class="sb-score-card">
+                <div class="sb-score-row">
+                    <span class="sb-score-val" id="sbScoreVal"><?= $old_score ?></span>
+                    <span class="sb-score-max">/ <?= $NUM_PREGUNTAS_QUIZ_FINAL ?></span>
+                </div>
+                <div class="sb-score-track">
+                    <div class="sb-score-fill" id="sbScoreFill" style="width:<?= $progress_percent ?>%"></div>
+                </div>
+                <div class="sb-status" id="sbStatus">
+                    <?= $completed ? '✔ Completada' : '○ Pendiente' ?>
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- Overlay para cerrar sidebar en móvil -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <div class="content-container">
-
-        <!-- ======= SIDEBAR ======= -->
-        <aside class="lesson-sidebar" id="lessonSidebar">
-            <!-- Botón colapsar (escritorio) -->
-            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Contraer/Expandir">◀</button>
-
-            <!-- Tarjeta de usuario -->
-            <div class="sidebar-user-card">
-                <div class="sidebar-avatar">🎮</div>
-                <div class="sidebar-username"><?php echo htmlspecialchars($user_data['nombre']); ?></div>
-                <div class="sidebar-level-badge">
-                    ⚡ NIV <?php echo $user_data['nivel']; ?>
-                </div>
-                <div class="sidebar-xp-block">
-                    <div class="sidebar-xp-label">
-                        <span>XP</span>
-                        <span class="percent"><?php echo $user_data['progreso']; ?>%</span>
-                    </div>
-                    <div class="sidebar-xp-bar">
-                        <div class="sidebar-xp-fill progress-fill" style="width: <?php echo $user_data['progreso']; ?>%"></div>
-                    </div>
-                </div>
-                <div class="sidebar-points">
-                    PUNTOS TOTALES: <strong><?php echo number_format($user_data['puntos']); ?></strong>
-                </div>
-            </div>
-
-            <!-- Lección actual -->
-            <div class="sidebar-section">
-                <div class="sidebar-section-title">📍 LECCIÓN ACTUAL</div>
-                <div class="sidebar-current-lesson">
-                    <div class="lesson-name"><?php echo htmlspecialchars($leccion['titulo']); ?></div>
-                    <div class="lesson-subject"><?php echo htmlspecialchars($materia_actual); ?></div>
-                </div>
-            </div>
-
-            <!-- Puntuación de esta lección -->
-            <div class="sidebar-section">
-                <div class="sidebar-section-title">🏅 TU PUNTUACIÓN</div>
-                <div class="sidebar-score-display">
-                    <div class="score-row">
-                        <span class="score-value" id="sidebar-score"><?php echo $old_score; ?></span>
-                        <span class="score-max">/ <?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?></span>
-                    </div>
-                    <div class="score-pct-bar">
-                        <div class="score-pct-fill" style="width: <?php echo $progress_percent; ?>%"></div>
-                    </div>
-                    <div class="score-status">
-                        <?php echo $completed ? '✔ COMPLETADA' : '○ PENDIENTE'; ?>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Botón quiz -->
-            <button class="sidebar-quiz-btn open-quiz-btn">
-                🧠 <?php echo $completed ? 'REPETIR QUIZ' : 'INICIAR QUIZ'; ?>
+        <!-- Quiz CTA -->
+        <div class="sb-section">
+            <button class="sb-cta-quiz open-quiz-btn">
+                🧠 <?= $completed ? 'Repetir Quiz' : 'Iniciar Quiz' ?>
             </button>
+            <a href="dashboard.php<?= $return_params ?>" class="sb-back">← Volver al Dashboard</a>
+        </div>
 
-            <!-- Otras lecciones de la misma materia -->
-            <?php if (count($lecciones_materia) > 1): ?>
-            <div class="sidebar-section">
-                <div class="sidebar-section-title">📚 <?php echo htmlspecialchars(strtoupper($materia_actual)); ?></div>
-                <div class="sidebar-nav-list">
-                    <?php foreach ($lecciones_materia as $lm):
-        $is_current = $lm['slug'] === $slug;
-        $is_done = in_array($lm['slug'], $completed_slugs);
-        $classes = 'sidebar-nav-item' . ($is_current ? ' active' : '') . ($is_done ? ' done' : '');
-        $nav_params = $return_params ?: '';
-        $href = "leccion_detalle.php?slug=" . urlencode($lm['slug']) . ($nav_params ? '&' . ltrim($nav_params, '?') : '');
-?>
-                    <a href="<?php echo $is_current ? '#' : htmlspecialchars($href); ?>"
-                       class="<?php echo $classes; ?>"
-                       data-title="<?php echo htmlspecialchars($lm['titulo']); ?>">
-                        <span class="nav-dot <?php echo $is_current ? 'active-dot' : ''; ?>"></span>
-                        <span><?php echo htmlspecialchars($lm['titulo']); ?></span>
-                    </a>
-                    <?php
-    endforeach; ?>
-                </div>
-            </div>
-            <?php endif; ?>
+        <!-- Lesson nav -->
+        <?php if (count($lecciones_materia) > 1): ?>
+        <div class="sb-section">
+            <div class="sb-label">📚 <?= htmlspecialchars(strtoupper($materia_actual)) ?></div>
+            <nav class="sb-nav">
+                <?php foreach ($lecciones_materia as $lm):
+                    $is_current = $lm['slug'] === $slug;
+                    $is_done    = in_array($lm['slug'], $completed_slugs);
+                    $cls = 'sb-nav-item' . ($is_current ? ' active' : '') . ($is_done ? ' done' : '');
+                    $nav_p = $return_params ? '&' . ltrim($return_params, '?') : '';
+                    $href  = "leccion_detalle.php?slug=" . urlencode($lm['slug']) . $nav_p;
+                ?>
+                <a href="<?= $is_current ? '#' : htmlspecialchars($href) ?>"
+                   class="<?= $cls ?>">
+                    <span class="nav-pip"></span>
+                    <?= htmlspecialchars($lm['titulo']) ?>
+                </a>
+                <?php endforeach; ?>
+            </nav>
+        </div>
+        <?php endif; ?>
 
-            <!-- Volver al dashboard -->
-            <a href="dashboard.php<?php echo $return_params; ?>" class="sidebar-back-btn back-dashboard-btn">
-                ← VOLVER AL DASHBOARD
-            </a>
+    </aside><!-- /sidebar -->
 
-        </aside><!-- /sidebar -->
+    <!-- ════ MAIN ════ -->
+    <main class="lc-main">
+        <div class="content-scroll">
+            <div class="lesson-card">
 
-        <!-- ======= ÁREA DE CONTENIDO ======= -->
-        <main class="lesson-main-content">
-            <section class="lesson-content-inner">
-                <div class="lesson-header">
-                    <span class="lesson-materia"><?php echo htmlspecialchars($materia_actual); ?></span>
-                    <h2 class="lesson-title"><?php echo htmlspecialchars($leccion['titulo']); ?></h2>
-                    <div style="display: flex; gap: 20px; margin-top: 15px; font-size: 12px; color: rgba(255,255,255,0.5);">
-                        <span>Status: <?php echo $completed ? '<span style="color:var(--neon-green)">Completado</span>' : 'Pendiente'; ?></span>
-                        <span>Score: <span style="color:var(--neon-yellow)"><?php echo $old_score; ?>/<?php echo $NUM_PREGUNTAS_QUIZ_FINAL; ?></span></span>
+                <!-- Lesson head -->
+                <div class="lesson-card-head">
+                    <div class="lh-materia"><?= htmlspecialchars($materia_actual) ?></div>
+                    <h1 class="lh-title"><?= htmlspecialchars($leccion['titulo']) ?></h1>
+                    <div class="lh-meta">
+                        <span class="meta-chip <?= $completed ? 'status-done' : 'status-pend' ?>">
+                            <?= $completed ? '✔ Completada' : '○ Pendiente' ?>
+                        </span>
+                        <span class="meta-chip score">
+                            Score: <?= $old_score ?>/<?= $NUM_PREGUNTAS_QUIZ_FINAL ?>
+                        </span>
+                        <?php if ($materia_actual): ?>
+                        <span class="meta-chip status-pend"><?= htmlspecialchars($materia_actual) ?></span>
+                        <?php endif; ?>
                     </div>
                 </div>
 
-                <div class="lesson-content">
-                    <?php echo trim($leccion['contenido']); ?>
+                <!-- Lesson body -->
+                <div class="lesson-card-body">
+                    <div class="lesson-content">
+                        <?= trim($leccion['contenido']) ?>
+                    </div>
                 </div>
 
-                <div style="margin-top: 50px; display: flex; gap: 20px; flex-wrap: wrap; padding-bottom: 60px;">
-                    <button class="btn-premium btn-primary open-quiz-btn" style="flex:1; min-width: 250px;">
-                        🧠 <?php echo $completed ? 'REPETIR QUIZ' : 'INICIAR QUIZ'; ?>
+                <!-- Actions -->
+                <div class="lesson-actions">
+                    <button class="action-btn action-quiz open-quiz-btn">
+                        🧠 <?= $completed ? 'Repetir Quiz' : 'Iniciar Quiz' ?>
                     </button>
-                    
-                    <?php
-                    // Mapeo para el examen final
-                    $materia_a_profesor_id = [
-                        'Temas Selectos de Matemáticas I y II' => '1Le',
-                        'Inglés'                               => '1Go',
-                        'Pensamiento Matemático III'           => '1Es',
-                        'Programación'                         => '1Ma',
-                        'Física I'                             => '1He',
-                        'Química I'                            => '1He',
-                        'Ecosistemas'                          => '1Ca',
-                        'Ciencias Sociales'                    => '1Pa',
-                        'Historia de México'                   => '1Ar',
-                    ];
-                    $prof_id = $materia_a_profesor_id[$materia_actual] ?? '1Cu';
-                    $current_url = urlencode($_SERVER['REQUEST_URI']);
-                    $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actual));
-                    ?>
-                    <a href="Examen/sistemC.php?personaje=<?= $prof_id ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>" class="btn-premium btn-secondary" style="border-color: var(--neon-yellow); color: var(--neon-yellow); flex:1; min-width: 250px;">
-                        ⚔️ EXAMEN FINAL
+                    <a href="Examen/sistemC.php?personaje=<?= $prof_id ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>"
+                       class="action-btn action-exam">
+                        ⚔️ Examen Final
                     </a>
                 </div>
-            </section>
-        </main><!-- /lesson-area -->
 
-    </div><!-- /content-wrapper -->
+            </div><!-- /lesson-card -->
+        </div><!-- /content-scroll -->
+    </main>
 
-    <!-- El toggle móvil ahora es manejado por el hamburger del header si existe, 
-         o podemos dejar un botón flotante solo para móvil más pequeño -->
-    <button class="sidebar-toggle-mobile" id="sidebarToggleMobile" style="display:none; position:fixed; bottom:20px; left:20px; z-index:100; background:var(--bg-dark); border:1px solid var(--neon-cyan); color:var(--neon-cyan); width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer; align-items:center; justify-content:center; box-shadow:0 0 10px var(--neon-cyan);">☰</button>
+</div><!-- /page-body -->
 
-</div><!-- /page-wrapper -->
-
-<!-- Modal Quiz -->
-<div id="quiz-overlay" class="overlay hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; display:none;">
+<!-- ════ QUIZ MODAL ════ -->
+<div id="quizOverlay" class="quiz-overlay">
     <div class="quiz-modal">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h3 style="font-family:'Orbitron',sans-serif; margin:0; color:var(--neon-cyan);">QUIZ: <?php echo htmlspecialchars($leccion['titulo']); ?></h3>
-            <button class="close-btn" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+        <div class="qm-head">
+            <span class="qm-title">Quiz — <?= htmlspecialchars($leccion['titulo']) ?></span>
+            <button class="qm-close" id="quizClose">✕</button>
         </div>
-        <div id="quiz-content">
-            <div class="loading">Cargando preguntas...</div>
+        <div class="qm-body" id="quizBody">
+            <p style="color:var(--muted); font-family:var(--font-mono); font-size:11px;">Cargando preguntas...</p>
         </div>
     </div>
 </div>
 
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const quizOverlay    = document.getElementById('quiz-overlay');
-    const quizContent    = document.getElementById('quiz-content');
-    const openQuizBtns   = document.querySelectorAll('.open-quiz-btn');
-    const closeBtn       = document.querySelector('.close-btn');
-    const sidebar        = document.getElementById('lessonSidebar');
-    const sidebarToggle  = document.getElementById('sidebarToggle');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    // ── Sidebar Toggle Logic ──
-    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
-    const mobileToggle       = document.getElementById('sidebarToggleMobile');
-    const headerHamburger    = document.querySelector('.main-header .hamburger');
-    
-    // Cargar estado escritorio
-    const sidebarState = localStorage.getItem('sidebarCollapsed');
-    if (sidebarState === 'true' && window.innerWidth > 992) {
-        sidebar.classList.add('collapsed');
-        if(sidebarCollapseBtn) sidebarCollapseBtn.textContent = '▶';
-    }
+    // ── Sidebar mobile ──
+    const sidebar   = document.getElementById('lcSidebar');
+    const overlay   = document.getElementById('sbOverlay');
+    const menuBtn   = document.getElementById('mobileMenuBtn');
 
-    function toggleDesktopCollapse() {
-        sidebar.classList.toggle('collapsed');
-        const isCollapsed = sidebar.classList.contains('collapsed');
-        if(sidebarCollapseBtn) sidebarCollapseBtn.textContent = isCollapsed ? '▶' : '◀';
-        localStorage.setItem('sidebarCollapsed', isCollapsed);
-    }
+    function openSidebar()  { sidebar.classList.add('open');  overlay.classList.add('active'); }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); }
+    menuBtn.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+    overlay.addEventListener('click', closeSidebar);
 
-    function openSidebarMobile() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('active');
-    }
+    // ── Quiz ──
+    const quizOverlay  = document.getElementById('quizOverlay');
+    const quizBody     = document.getElementById('quizBody');
+    const quizClose    = document.getElementById('quizClose');
+    const openBtns     = document.querySelectorAll('.open-quiz-btn');
+    const quizData     = <?= json_encode($quiz_selected) ?>;
 
-    function closeSidebarMobile() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('active');
-    }
+    openBtns.forEach(b => b.addEventListener('click', openQuiz));
+    quizClose.addEventListener('click', closeQuiz);
+    quizOverlay.addEventListener('click', e => { if (e.target === quizOverlay) closeQuiz(); });
 
-    function toggleMobileMenu() {
-        if (sidebar.classList.contains('open')) {
-            closeSidebarMobile();
-        } else {
-            openSidebarMobile();
-        }
-    }
-
-    if(sidebarCollapseBtn) sidebarCollapseBtn.addEventListener('click', toggleDesktopCollapse);
-    if(mobileToggle) mobileToggle.addEventListener('click', toggleMobileMenu);
-    
-    // Sincronizar con el hamburger del header si existe
-    if(headerHamburger) {
-        headerHamburger.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleMobileMenu();
-        });
-    }
-
-    if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebarMobile);
-    
-    // Mostrar/Ocultar toggle móvil solo en pantallas pequeñas si no hay hamburger
-    function adjustToggles() {
-        if (window.innerWidth <= 992) {
-            sidebar.classList.remove('collapsed');
-            sidebar.classList.remove('open');
-            closeSidebarMobile();
-            if(!headerHamburger && mobileToggle) {
-                mobileToggle.style.display = 'flex';
-            }
-        } else {
-            if(mobileToggle) mobileToggle.style.display = 'none';
-            closeSidebarMobile();
-            // restaurar estado de colapso fijo para escritorio
-            const sidebarState = localStorage.getItem('sidebarCollapsed');
-            if (sidebarState === 'true') {
-                sidebar.classList.add('collapsed');
-            } else {
-                sidebar.classList.remove('collapsed');
-            }
-        }
-    }
-    window.addEventListener('resize', adjustToggles);
-    adjustToggles();
-
-    // ── Hover effects para sidebar icons (cuando está colapsado) ──
-    const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
-    sidebarItems.forEach(item => {
-        item.addEventListener('mouseenter', () => {
-            if (sidebar.classList.contains('collapsed')) {
-                // Podríamos mostrar tooltips aquí
-            }
-        });
-    });
-
-    const quizData = <?php echo json_encode($quiz_selected); ?>;
-
-    // ── Abrir quiz ──
-    openQuizBtns.forEach(btn => btn.addEventListener('click', openQuiz));
-
-    function openQuiz() {
-        quizOverlay.classList.remove('hidden');
-        quizOverlay.style.display = 'flex';
-        renderQuiz();
-    }
-
-    // ── Cerrar quiz ──
-    if (closeBtn) closeBtn.addEventListener('click', closeQuiz);
-    quizOverlay.addEventListener('click', (e) => { if (e.target === quizOverlay) closeQuiz(); });
-    
+    function openQuiz()  { quizOverlay.classList.add('open'); renderQuiz(); }
     function closeQuiz() {
-        quizOverlay.classList.add('hidden');
-        quizOverlay.style.display = 'none';
-        if (quizData.length > 0) {
-            quizContent.innerHTML = '<div class="loading">Cargando preguntas...</div>';
-        }
+        quizOverlay.classList.remove('open');
+        quizBody.innerHTML = '<p style="color:var(--muted);font-family:var(--font-mono);font-size:11px;">Cargando preguntas...</p>';
     }
 
-    // ── Renderizar quiz ──
+    function esc(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
     function renderQuiz() {
-        if (quizData.length === 0) {
-            quizContent.innerHTML = '<p class="no-questions">No hay preguntas disponibles.</p>';
+        if (!quizData.length) {
+            quizBody.innerHTML = '<p style="color:var(--muted);font-family:var(--font-mono);font-size:11px;">No hay preguntas disponibles.</p>';
             return;
         }
-        function escapeHtml(str) {
-            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-        }
 
-        let html = '<form id="quiz-form" class="quiz-form">';
+        let html = '<form id="quizForm">';
         quizData.forEach((q, i) => {
             const name = `q${i}`;
             const shuffled = [...q.opciones].sort(() => Math.random() - 0.5);
-            html += `<div class="question-card"><p class="question-text"><strong>${i+1}.</strong> ${escapeHtml(q.pregunta)}</p><div class="options">`;
-            shuffled.forEach((op, idx) => {
-                html += `<label class="option-label"><input type="radio" style="display:none;" name="${name}" value="${escapeHtml(op)}" ${idx===0?'required':''}><span class="radio-custom"></span><span class="option-text">${escapeHtml(op)}</span></label>`;
+            html += `<div class="q-card">
+                <div class="q-num">Pregunta ${i+1} de ${quizData.length}</div>
+                <div class="q-text">${esc(q.pregunta)}</div>
+                <div class="q-options">`;
+            shuffled.forEach(op => {
+                html += `<label class="q-option">
+                    <input type="radio" name="${name}" value="${esc(op)}" required>
+                    <span class="q-radio"></span>
+                    <span>${esc(op)}</span>
+                </label>`;
             });
             html += `</div></div>`;
         });
-        html += `<div style="text-align:center; margin-top:30px;"><button type="submit" class="btn-premium btn-primary">✅ ENVIAR RESPUESTAS</button></div></form>`;
-        
-        quizContent.innerHTML = html;
+        html += `<button type="submit" class="qm-submit">✅ Enviar Respuestas</button></form>`;
+        quizBody.innerHTML = html;
 
-        document.getElementById('quiz-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            let oldState = { puntos: 0, nivel: 1 };
-            try {
-                const s = await fetch('src/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
-                oldState = await s.json();
-            } catch (ex) { console.warn('No se pudo obtener estado previo', ex); }
+        document.getElementById('quizForm').addEventListener('submit', submitQuiz);
 
-            const formData = new FormData(form);
-            formData.append('accion', 'calificar_quiz');
-            formData.append('slug', '<?php echo addslashes($slug); ?>');
+        if (window.MathJax?.typesetPromise) MathJax.typesetPromise([quizBody]);
+    }
 
-            try {
-                const resp  = await fetch('src/funciones.php', { method: 'POST', body: formData });
-                const data  = await resp.json();
+    async function submitQuiz(e) {
+        e.preventDefault();
+        let oldPuntos = 0, oldNivel = 1;
+        try {
+            const s = await fetch('src/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
+            const d = await s.json();
+            oldPuntos = d.puntos || 0;
+            oldNivel  = d.nivel  || 1;
+        } catch(ex) {}
 
-                if (!data.ok) {
-                    quizContent.innerHTML = `<div class="result-panel"><strong>Error:</strong> ${escapeHtml(data.mensaje || data.error || 'Error al calificar')}</div>`;
-                    return;
-                }
+        const fd = new FormData(e.target);
+        fd.append('accion', 'calificar_quiz');
+        fd.append('slug', '<?= addslashes($slug) ?>');
 
-                const score = data.score || 0;
-                const xp    = data.xp_ganado || 0;
+        try {
+            const r    = await fetch('src/funciones.php', { method: 'POST', body: fd });
+            const data = await r.json();
 
-                const stateResp = await fetch('src/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
-                const state = await stateResp.json();
-
-                // Actualizar sidebar en tiempo real
-                updateSidebar(state, score);
-
-                let detailHtml = '<div class="result-panel">';
-                detailHtml += `<h4>Resultado</h4><p>Puntos correctos: <strong>${score}</strong> / ${quizData.length}</p>`;
-                detailHtml += `<p>XP ganado: <strong>${xp}</strong></p>`;
-                detailHtml += `<p>Nuevo total de puntos: <strong>${state.puntos ?? '—'}</strong></p>`;
-                detailHtml += `<p>Nivel actual: <strong>${state.nivel ?? '—'}</strong></p>`;
-
-                if (Array.isArray(data.details)) {
-                    detailHtml += '<hr style="margin:0.6rem 0"><div class="details-list">';
-                    data.details.forEach((d, idx) => {
-                        const ok = d.acertada ? 'correct' : 'wrong';
-                        detailHtml += `<div class="detail-item ${ok}">
-                            <div class="detail-q"><strong>${idx+1}.</strong> ${escapeHtml(d.pregunta)}</div>
-                            <div class="detail-a">Tu respuesta: <span class="user-answer">${escapeHtml(d.respuesta||'—')}</span></div>
-                            ${d.acertada ? '<div class="detail-ok">✔ Correcto</div>' : `<div class="detail-wrong">✖ Incorrecto — Respuesta correcta: <strong>${escapeHtml(d.correcta)}</strong></div>`}
-                        </div>`;
-                    });
-                    detailHtml += '</div>';
-                }
-                detailHtml += `<div style="margin-top:0.6rem"><button class="btn-premium btn-primary" onclick="location.reload()">Cerrar y Continuar</button></div></div>`;
-                quizContent.innerHTML = detailHtml;
-
-                if (xp > 0) {
-                    const xpEl = document.createElement('div');
-                    xpEl.className = 'xp-fly';
-                    xpEl.textContent = `+${xp} XP`;
-                    document.body.appendChild(xpEl);
-                    setTimeout(() => xpEl.remove(), 2100);
-                }
-
-                if (state.nivel > (oldState.nivel || 1)) showToast(`¡Subiste al nivel ${state.nivel}! 🎉`);
-
-            } catch (err) {
-                console.error(err);
-                quizContent.innerHTML = `<div class="result-panel"><strong>Error:</strong> No se pudo conectar con el servidor.</div>`;
+            if (!data.ok) {
+                quizBody.innerHTML = `<div class="result-card"><p style="color:var(--pink);font-family:var(--font-mono);font-size:11px;">Error: ${esc(data.mensaje || data.error || 'Error al calificar')}</p></div>`;
+                return;
             }
-        });
 
-        if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([quizContent]);
-    }
+            const score = data.score || 0;
+            const xp    = data.xp_ganado || 0;
 
-    // ── Actualizar sidebar tras calificar ──
-    function updateSidebar(state, score) {
-        // XP bar
-        const fill    = document.querySelector('.progress-fill');
-        const percent = document.querySelector('.percent');
-        if (fill && state.puntos !== undefined) {
-            const pct = Math.round(state.progreso || ((state.puntos % 500) / 5));
-            fill.style.width = pct + '%';
-            if (percent) percent.textContent = pct + '%';
+            const sr    = await fetch('src/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
+            const state = await sr.json();
+
+            updateSidebar(state, score);
+
+            let html = `<div class="result-card">
+                <div class="sb-score-row">
+                    <span class="result-score-big">${score}</span>
+                    <span class="sb-score-max" style="font-size:14px; margin-left:6px;">/ ${quizData.length}</span>
+                </div>
+                <div class="result-sub">Preguntas correctas</div>
+                <div class="result-meta">
+                    <div class="result-meta-item">XP ganado: <strong>+${xp}</strong></div>
+                    <div class="result-meta-item">Puntos totales: <strong>${(state.puntos||0).toLocaleString()}</strong></div>
+                    <div class="result-meta-item">Nivel: <strong>${state.nivel||1}</strong></div>
+                </div>
+            </div>`;
+
+            if (Array.isArray(data.details)) {
+                html += '<div class="detail-list">';
+                data.details.forEach((d, idx) => {
+                    const cls = d.acertada ? 'correct' : 'wrong';
+                    html += `<div class="detail-item ${cls}">
+                        <div class="detail-q"><strong>${idx+1}.</strong> ${esc(d.pregunta)}</div>
+                        <div class="detail-a">Tu respuesta: ${esc(d.respuesta || '—')}</div>
+                        ${d.acertada
+                            ? '<div class="detail-ok">✔ Correcto</div>'
+                            : `<div class="detail-wrong-txt">✖ Incorrecto — Correcta: <strong>${esc(d.correcta)}</strong></div>`}
+                    </div>`;
+                });
+                html += '</div>';
+            }
+
+            html += `<button class="qm-submit" style="margin-top:20px;" onclick="location.reload()">Cerrar y Continuar</button>`;
+            quizBody.innerHTML = html;
+
+            if (xp > 0) {
+                const el = document.createElement('div');
+                el.className = 'xp-fly';
+                el.textContent = `+${xp} XP`;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2200);
+            }
+
+            if (state.nivel > oldNivel) showToast(`¡Subiste al nivel ${state.nivel}! 🎉`);
+
+        } catch (err) {
+            console.error(err);
+            quizBody.innerHTML = `<div class="result-card"><p style="color:var(--pink);font-family:var(--font-mono);font-size:11px;">Error de conexión con el servidor.</p></div>`;
         }
-        // Puntos totales
-        const ptEl = document.querySelector('.sidebar-points strong');
-        if (ptEl && state.puntos !== undefined) ptEl.textContent = state.puntos.toLocaleString();
-        // Nivel
-        const lvlEl = document.querySelector('.sidebar-level-badge');
-        if (lvlEl && state.nivel) lvlEl.innerHTML = `⚡ NIV ${state.nivel}`;
-        // Puntuación de esta lección
-        const scoreEl = document.getElementById('sidebar-score');
-        if (scoreEl) scoreEl.textContent = score;
-        const pctFill = document.querySelector('.score-pct-fill');
-        if (pctFill) pctFill.style.width = Math.round((score / <?php echo $NUM_PREGUNTAS_QUIZ_FINAL ?: 1; ?>) * 100) + '%';
-        const statusEl = document.querySelector('.score-status');
-        if (statusEl && score > 0) { statusEl.textContent = '✔ COMPLETADA'; statusEl.style.color = 'var(--neon-green)'; }
     }
 
-    function showToast(message, timeout = 3000) {
-        let container = document.querySelector('.toast-container');
-        if (!container) { container = document.createElement('div'); container.className = 'toast-container'; document.body.appendChild(container); }
+    function updateSidebar(state, score) {
+        const pct = Math.round(state.progreso || Math.min(100, ((state.puntos||0) % 500) / 5));
+        const xpFill = document.getElementById('xpFill');
+        const xpPct  = document.getElementById('xpPct');
+        if (xpFill) xpFill.style.width = pct + '%';
+        if (xpPct)  xpPct.textContent  = pct + '%';
+
+        const ptEl = document.getElementById('totalPts');
+        if (ptEl && state.puntos != null) ptEl.textContent = state.puntos.toLocaleString();
+
+        const sbVal  = document.getElementById('sbScoreVal');
+        const sbFill = document.getElementById('sbScoreFill');
+        const sbStat = document.getElementById('sbStatus');
+        if (sbVal)  sbVal.textContent  = score;
+        if (sbFill) sbFill.style.width = Math.round((score / <?= $NUM_PREGUNTAS_QUIZ_FINAL ?: 1 ?>) * 100) + '%';
+        if (sbStat && score > 0) { sbStat.textContent = '✔ Completada'; sbStat.style.color = 'var(--green)'; }
+    }
+
+    function showToast(msg, ms = 3500) {
+        const wrap = document.getElementById('toastWrap');
         const t = document.createElement('div');
-        t.className = 'toast'; t.textContent = message; container.appendChild(t);
-        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 420); }, timeout);
+        t.className = 'toast';
+        t.textContent = msg;
+        wrap.appendChild(t);
+        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 400); }, ms);
     }
 
-    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([document.querySelector('.lesson-content')]);
+    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([document.querySelector('.lesson-content')]);
 });
 </script>
 

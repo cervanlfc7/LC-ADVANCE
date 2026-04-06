@@ -1,99 +1,67 @@
-<?php
+﻿<?php
 // ==========================================
-// LC-ADVANCE - dashboard.php (Rediseño Premium)
+// LC-ADVANCE - dashboard.php (Rediseño 2025)
 // ==========================================
 require_once 'config/config.php';
 requireLogin(true);
 require_once 'src/content.php';
 
-
-// Determinar profesor/materia por defecto según usuario si no hay filtro
 $filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
-$filter_materia = null;
-
-if (!$filter_profesor && !$filter_materia) {
-    // Si el usuario tiene materia/profesor asignado, usarlo
-    // Ejemplo: por nivel, asignar materia/profesor
-    $nivel = $usuario['nivel'] ?? 1;
-    $materia_por_nivel = [
-        1 => 'Temas Selectos de Matemáticas I y II',
-        2 => 'Inglés',
-        3 => 'Pensamiento Matemático III',
-        4 => 'Programación',
-        5 => 'Física I',
-        6 => 'Química I',
-        7 => 'Ecosistemas',
-        8 => 'Ciencias Sociales',
-        9 => 'Historia de México'
-    ];
-    $profesor_por_nivel = [
-        1 => 'Miguel Marquez',
-        2 => 'Enrique',
-        3 => 'Espindola',
-        4 => 'Manuel',
-        5 => 'Herson',
-        6 => 'Herson',
-        7 => 'Carolina',
-        8 => 'Refugio & Padilla',
-        9 => 'Armando'
-    ];
-    $filter_materia = $materia_por_nivel[$nivel] ?? null;
-    $filter_profesor = $profesor_por_nivel[$nivel] ?? null;
-}
-
-if ($filter_profesor) {
-    $filter_materia = isset($_GET['materia']) ? trim($_GET['materia']) : null;
-}
+$filter_materia  = isset($_GET['materia'])  ? trim($_GET['materia'])  : null;
 
 // ------------------ USUARIO ------------------
 if (!empty($_SESSION['usuario_es_invitado'])) {
     $usuario = [
-        'id' => 0,
+        'id'             => 0,
         'nombre_usuario' => $_SESSION['usuario_nombre'] ?? 'Invitado',
-        'puntos' => $_SESSION['usuario_puntos'] ?? 0,
-        'nivel' => $_SESSION['usuario_nivel'] ?? 1,
-        'avatar' => 'default.png'
+        'puntos'         => $_SESSION['usuario_puntos'] ?? 0,
+        'nivel'          => $_SESSION['usuario_nivel']  ?? 1,
     ];
 } else {
     $stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel FROM usuarios WHERE id = ?");
     $stmt->execute([(int)($_SESSION['usuario_id'] ?? 0)]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$usuario) {
-        session_destroy();
-        header('Location: login.php');
-        exit;
-    }
+    if (!$usuario) { session_destroy(); header('Location: login.php'); exit; }
 }
 
-$puntos_por_nivel = 500;
+$puntos_por_nivel  = 500;
 $puntos_necesarios = ($usuario['nivel'] + 1) * $puntos_por_nivel;
-$puntos_base = $usuario['nivel'] * $puntos_por_nivel;
-$progreso = max(0, min(100, (($usuario['puntos'] - $puntos_base) / $puntos_por_nivel) * 100));
+$puntos_base       = $usuario['nivel'] * $puntos_por_nivel;
+$progreso          = max(0, min(100, (($usuario['puntos'] - $puntos_base) / $puntos_por_nivel) * 100));
 
 $badges = [];
-if ($usuario['puntos'] >= 500) $badges[] = ['nombre'=>'Novato','tipo'=>'bronze', 'icon' => '🥉'];
-if ($usuario['puntos'] >= 1000) $badges[] = ['nombre'=>'Explorador','tipo'=>'silver', 'icon' => '🥈'];
-if ($usuario['puntos'] >= 2000) $badges[] = ['nombre'=>'Élite','tipo'=>'gold', 'icon' => '🥇'];
+if ($usuario['puntos'] >= 500)  $badges[] = ['nombre'=>'Novato',    'tipo'=>'bronze', 'icon'=>'🏅'];
+if ($usuario['puntos'] >= 1000) $badges[] = ['nombre'=>'Explorador','tipo'=>'silver', 'icon'=>'🥈'];
+if ($usuario['puntos'] >= 2000) $badges[] = ['nombre'=>'Élite',     'tipo'=>'gold',   'icon'=>'🥇'];
 
-// ------------------ FILTRADO POR PROFESOR ------------------
+// ------------------ FILTRADO ------------------
 function norm($s){
     return mb_strtolower(trim(strtr($s,[
-        'á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ñ'=>'n','&'=>'y'
+        'Ã¡'=>'a','Ã©'=>'e','Ã­'=>'i','Ã³'=>'o','Ãº'=>'u','Ã±'=>'n','&'=>'y'
     ])), 'UTF-8');
 }
 
 $profesor_materia_map = [
-    'Miguel Marquez' => ['Temas Selectos de Matemáticas I y II'],
-    'Enrique' => ['Inglés'],
-    'Espindola' => ['Pensamiento Matemático III'],
-    'Manuel' => ['Programación'],
-    'Meza' => ['Programación'],
-    'Herson' => ['Física I','Química I'],
-    'Carolina' => ['Ecosistemas'],
+    'Miguel Marquez'    => ['Temas Selectos de Matemáticas I y II'],
+    'Enrique'           => ['Inglés'],
+    'Espindola'         => ['Pensamiento Matemático III'],
+    'Manuel'            => ['Programación'],
+    'Meza'              => ['Programación'],
+    'Herson'            => ['Física I','Química I'],
+    'Carolina'          => ['Ecosistemas'],
     'Refugio & Padilla' => ['Ciencias Sociales'],
-    'Armando' => ['Historia de México']
+    'Armando'           => ['Historia de México']
 ];
+
+if ($filter_profesor && empty($filter_materia)) {
+    $nf = norm($filter_profesor);
+    foreach ($profesor_materia_map as $prof => $mats) {
+        if (norm($prof) === $nf || strpos(norm($prof), $nf) !== false || strpos($nf, norm($prof)) !== false) {
+            $filter_materia = $mats[0] ?? null;
+            break;
+        }
+    }
+}
 
 $materia_a_profesor_id = [
     'Temas Selectos de Matemáticas I y II' => '1Le',
@@ -143,20 +111,22 @@ foreach ($lecciones as $le) {
         $seen_slugs[$slug] = true;
     }
     $m = $le['materia'] ?? 'Sin Materia';
-    
-    // Aplicar filtro si existe
     if (!empty($filter_materias)) {
         $match = false;
         foreach ($filter_materias as $fm) {
-            if (norm($m) === norm($fm)) {
-                $match = true;
-                break;
-            }
+            if (norm($m) === norm($fm)) { $match = true; break; }
         }
         if (!$match) continue;
     }
-    
     $lecciones_agrupadas[$m][] = $le;
+}
+
+$filter_activo = !empty($filter_profesor) || !empty($filter_materia) || !empty($filter_materias);
+if (empty($lecciones_agrupadas) && !$filter_activo) {
+    foreach ($lecciones as $le) {
+        $m = $le['materia'] ?? 'Sin Materia';
+        $lecciones_agrupadas[$m][] = $le;
+    }
 }
 
 $completadas = [];
@@ -167,6 +137,66 @@ if (empty($_SESSION['usuario_es_invitado'])) {
         $completadas = $stmt->fetchAll(PDO::FETCH_COLUMN);
     } catch(Exception $e){}
 }
+
+// Métricas docentes
+$total_usuarios              = (int)($pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn() ?: 0);
+$total_lecciones             = (int)($pdo->query("SELECT COUNT(DISTINCT slug) FROM user_progress")->fetchColumn() ?: 0);
+$lecciones_completadas_total = (int)($pdo->query("SELECT COUNT(*) FROM user_progress WHERE completed=1")->fetchColumn() ?: 0);
+$media_completado = $total_lecciones > 0
+    ? round(($lecciones_completadas_total / ($total_usuarios * $total_lecciones)) * 100, 1) : 0;
+
+$top_alumnos = $pdo->query("SELECT nombre_usuario, puntos, nivel,
+    (SELECT COUNT(*) FROM user_progress up2 WHERE up2.user_id=u.id AND up2.completed=1) as lecciones_completas
+    FROM usuarios u ORDER BY lecciones_completas DESC, puntos DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+
+$slugMateriaMap = [];
+foreach ($lecciones as $le)
+    if (!empty($le['slug']) && !empty($le['materia']))
+        $slugMateriaMap[$le['slug']] = $le['materia'];
+
+$materiaStats   = [];
+$progressBySlug = $pdo->query("SELECT slug, COUNT(*) as intentos, SUM(completed=1) as completadas FROM user_progress GROUP BY slug")->fetchAll(PDO::FETCH_ASSOC);
+foreach ($progressBySlug as $r) {
+    $slug      = $r['slug'];
+    $intentos  = (int)$r['intentos'];
+    $comp_slug = (int)$r['completadas'];
+    $materia   = $slugMateriaMap[$slug] ?? 'Sin Materia';
+    if (!isset($materiaStats[$materia]))
+        $materiaStats[$materia] = ['materia'=>$materia,'intentos'=>0,'completadas'=>0];
+    $materiaStats[$materia]['intentos']    += $intentos;
+    $materiaStats[$materia]['completadas'] += $comp_slug;
+}
+
+$materia_rezagada = [];
+foreach ($materiaStats as $stat) {
+    $tasaFallo = $stat['intentos'] > 0
+        ? (($stat['intentos'] - $stat['completadas']) / $stat['intentos']) * 100 : 0;
+    $materia_rezagada[] = ['materia' => $stat['materia'], 'tasa_fallo' => round($tasaFallo, 1)];
+}
+usort($materia_rezagada, fn($a,$b) => $b['tasa_fallo'] <=> $a['tasa_fallo']);
+$materia_rezagada = array_slice($materia_rezagada, 0, 5);
+
+$fecha_desde = !empty($_GET['desde']) ? $_GET['desde'] : date('Y-m-01');
+$fecha_hasta = !empty($_GET['hasta']) ? $_GET['hasta'] : date('Y-m-d');
+
+$reportQuery = $pdo->prepare("SELECT up.user_id, u.nombre_usuario, up.slug, up.score, up.lesson_xp, up.completed, up.updated_at
+    FROM user_progress up JOIN usuarios u ON u.id = up.user_id
+    WHERE up.updated_at BETWEEN ? AND ?
+    ORDER BY up.updated_at DESC LIMIT 500");
+$reportQuery->execute(["{$fecha_desde} 00:00:00", "{$fecha_hasta} 23:59:59"]);
+$reportRows = $reportQuery->fetchAll(PDO::FETCH_ASSOC);
+foreach ($reportRows as &$row) $row['materia'] = $slugMateriaMap[$row['slug']] ?? 'Sin Materia';
+unset($row);
+
+if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=dashboard_report_'.date('Ymd').'.csv');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['Usuario','Materia','Lección','Score','XP','Completado','Actualizado en']);
+    foreach ($reportRows as $row)
+        fputcsv($out, [$row['nombre_usuario'],$row['materia'],$row['slug'],$row['score'],$row['lesson_xp'],$row['completed'],$row['updated_at']]);
+    fclose($out); exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -174,619 +204,392 @@ if (empty($_SESSION['usuario_es_invitado'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | LC-ADVANCE</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
-    
-    <style>
-        :root {
-            --accent-glow: 0 0 30px rgba(0, 255, 255, 0.3);
-            --card-bg: rgba(20, 20, 25, 0.7);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --border-glass: rgba(255, 255, 255, 0.1);
-            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            --neon-cyan: #00ffff;
-            --neon-pink: #ff00ff;
-            --neon-yellow: #ffff00;
-            --neon-green: #39ff14;
-        }
-
-        body {
-            background-color: #050508;
-            color: #fff;
-            font-family: 'Roboto Mono', monospace;
-            overflow-x: hidden;
-        }
-
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: -1;
-            mask-image: radial-gradient(circle at center, black, transparent 85%);
-            animation: gridMove 25s linear infinite;
-        }
-
-        @keyframes gridMove {
-            from { background-position: 0 0; }
-            to { background-position: 0 60px; }
-        }
-
-        .header {
-            background: rgba(0, 0, 0, 0.8) !important;
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-glass) !important;
-            padding: 15px 30px !important;
-        }
-
-        .header h1 {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 14px;
-            color: #fff;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 30px;
-        }
-
-        /* Profile Section */
-        .profile-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 30px;
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-            max-height: calc(100vh - 140px);
-            overflow-y: auto;
-        }
-
-        /* Estilo de scrollbar para la sidebar */
-        .profile-card::-webkit-scrollbar {
-            width: 4px;
-        }
-        .profile-card::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .profile-card::-webkit-scrollbar-thumb {
-            background: var(--border-glass);
-            border-radius: 10px;
-        }
-        .profile-card::-webkit-scrollbar-thumb:hover {
-            background: var(--neon-cyan);
-        }
-
-        .profile-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .avatar-glow {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 32px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-        }
-
-        .username-premium {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
-            color: var(--neon-cyan);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-box {
-            background: var(--glass-bg);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .stat-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 24px;
-            color: #fff;
-        }
-
-        .progress-container {
-            margin-top: 25px;
-        }
-
-        .progress-bar-premium {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .progress-fill-premium {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-            box-shadow: 0 0 15px var(--neon-cyan);
-            transition: width 1s ease;
-        }
-
-        /* Search Bar */
-        .search-container {
-            margin-bottom: 30px;
-            position: relative;
-            animation: fadeInDown 0.8s ease-out;
-        }
-
-        .search-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 15px 20px 15px 50px;
-            color: #fff;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .search-input:focus {
-            border-color: var(--neon-cyan);
-            background: rgba(0, 255, 255, 0.05);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            color: var(--neon-cyan);
-            font-size: 18px;
-            pointer-events: none;
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Área de Lecciones */
-        .lessons-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        .materia-group {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 30px;
-        }
-
-        .materia-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 20px;
-            color: var(--neon-pink);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .materia-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, var(--neon-pink), transparent);
-        }
-
-        .leccion-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-
-        .leccion-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            gap: 20px;
-            transition: var(--transition-smooth);
-            text-decoration: none;
-            color: inherit;
-            min-height: 120px;
-            height: auto;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .leccion-info {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            min-width: 0; /* Crucial para evitar desbordamiento en grid/flex */
-        }
-
-        .leccion-status {
-            font-size: 20px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .leccion-name {
-            font-family: 'Orbitron', sans-serif; /* Cambiado a una fuente más legible y moderna */
-            font-size: 15px;
-            font-weight: 600;
-            color: #fff;
-            line-height: 1.5;
-            margin: 0;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            display: block;
-        }
-
-        .leccion-action {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            color: var(--neon-cyan);
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid var(--neon-cyan);
-            padding: 10px 15px;
-            border-radius: 8px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .leccion-card:hover {
-            border-color: var(--neon-cyan);
-            transform: translateY(-5px);
-            background: rgba(0, 255, 255, 0.05);
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1);
-        }
-
-        .leccion-card:hover .leccion-action {
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 20px var(--neon-cyan);
-        }
-
-        .leccion-card.completed {
-            border-color: rgba(57, 255, 20, 0.2);
-        }
-
-        .leccion-card.completed .leccion-name {
-            color: var(--neon-green);
-        }
-
-        .btn-premium {
-            padding: 12px 24px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 9px;
-            border-radius: 10px;
-            text-transform: uppercase;
-            transition: var(--transition-smooth);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-cyan {
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-        }
-
-        .btn-cyan:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
-        }
-
-        .badge-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .badge-item {
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            border-radius: 8px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .badge-item.gold { border-color: var(--neon-yellow); color: var(--neon-yellow); }
-        .badge-item.silver { border-color: #ccc; color: #ccc; }
-        .badge-item.bronze { border-color: #cd7f32; color: #cd7f32; }
-
-        @media (max-width: 992px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .profile-card {
-                position: relative;
-                top: 0;
-            }
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
+<!-- Fondo animado -->
 <div class="grid-bg"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
 
+<!-- ===== HEADER ===== -->
 <header class="header">
-    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
-        <h1>LC-ADVANCE <span style="color: var(--neon-green); font-size: 10px; margin-left: 10px;">// SYSTEM_DASHBOARD</span></h1>
-        <nav style="display: flex; gap: 15px;">
-            <a href="index.php" class="btn-premium" style="color: #fff; font-size: 8px;">Inicio</a>
-            <a href="mapa/index.php" class="btn-premium btn-cyan">Ir al Mapa</a>
-            <a href="logout.php" class="btn-premium" style="color: var(--neon-pink); font-size: 8px;">Cerrar Sesión</a>
-        </nav>
+    <div>
+        <span class="logo-text">LC-ADVANCE</span>
+        <span class="logo-tag">// SYSTEM_DASHBOARD</span>
     </div>
+    <nav>
+        <a href="index.php"      class="btn-nav">Inicio</a>
+        <a href="mapa/index.php" class="btn-nav primary">Ir al Mapa</a>
+        <a href="logout.php"     class="btn-nav">Cerrar Sesión</a>
+    </nav>
 </header>
 
+<!-- ===== MAIN ===== -->
 <main class="container">
     <div class="dashboard-grid">
-        
-        <!-- Sidebar Perfil -->
-        <aside class="profile-card">
-            <div class="profile-header">
-                <div class="avatar-glow">🎮</div>
-                <h2 class="username-premium"><?php echo htmlspecialchars($usuario['nombre_usuario']); ?></h2>
-            </div>
 
-            <div class="stat-box">
-                <span class="stat-label">NIVEL ACTUAL</span>
-                <span class="stat-value"><?php echo $usuario['nivel']; ?></span>
-            </div>
+        <!-- ══════════════════════════
+             COLUMNA IZQUIERDA
+        ══════════════════════════ -->
+        <div class="profile-sidebar">
 
-            <div class="stat-box">
-                <span class="stat-label">PUNTOS XP</span>
-                <span class="stat-value"><?php echo number_format($usuario['puntos']); ?></span>
-            </div>
+            <!-- Perfil -->
+            <div class="card reveal">
+                <div class="card-label">Perfil del jugador</div>
 
-            <div class="progress-container">
-                <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5);">
-                    <span>PROGRESO NIVEL <?php echo $usuario['nivel'] + 1; ?></span>
-                    <span><?php echo round($progreso); ?>%</span>
+                <div class="profile-head">
+                    <div class="avatar-glow">🎮</div>
+                    <div>
+                        <h2 class="username-premium"><?= htmlspecialchars($usuario['nombre_usuario']) ?></h2>
+                        <div class="profile-status">// CONECTADO</div>
+                    </div>
                 </div>
-                <div class="progress-bar-premium">
-                    <div class="progress-fill-premium" style="width: <?php echo $progreso; ?>%;"></div>
-                </div>
-                <div style="text-align: center; font-size: 11px; color: var(--neon-yellow); margin-top: 10px;">
-                    <?php echo $puntos_necesarios - $usuario['puntos']; ?> XP para subir
-                </div>
-            </div>
 
-            <div style="margin-top: 30px;">
-                <span class="stat-label" style="text-align: left;">LOGROS DESBLOQUEADOS</span>
+                <div class="chips">
+                    <div class="chip">
+                        <div class="chip-label">Nivel</div>
+                        <div class="chip-val cyan"><?= $usuario['nivel'] ?></div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">Puntos XP</div>
+                        <div class="chip-val pink"><?= number_format($usuario['puntos']) ?></div>
+                    </div>
+                </div>
+
+                <div class="progress-block">
+                    <div class="progress-top">
+                        <span>Progreso → Nivel <?= $usuario['nivel'] + 1 ?></span>
+                        <span><?= round($progreso) ?>%</span>
+                    </div>
+                    <div class="progress-bar-premium">
+                        <div class="progress-fill-premium" style="width: <?= $progreso ?>%;"></div>
+                    </div>
+                    <div class="progress-note"><?= $puntos_necesarios - $usuario['puntos'] ?> XP para subir</div>
+                </div>
+
+                <div class="card-label">Logros desbloqueados</div>
                 <div class="badge-list">
                     <?php if (empty($badges)): ?>
-                        <p style="font-size: 11px; color: rgba(255,255,255,0.3);">No hay insignias aún.</p>
+                        <span class="badge-item empty">Sin insignias aún</span>
                     <?php else: ?>
                         <?php foreach ($badges as $b): ?>
-                            <div class="badge-item <?php echo $b['tipo']; ?>">
-                                <span><?php echo $b['icon']; ?></span>
-                                <span><?php echo $b['nombre']; ?></span>
+                            <div class="badge-item <?= $b['tipo'] ?>">
+                                <span><?= $b['icon'] ?></span><span><?= $b['nombre'] ?></span>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-            </div>
-            
-            <div style="margin-top: 30px;">
-                <a href="ranking.php" class="btn-premium btn-secondary" style="width: 100%; border: 1px solid var(--border-glass); color: #fff; box-sizing: border-box;">Ver Ranking Global</a>
-            </div>
-        </aside>
 
-        <!-- Área de Lecciones -->
-        <section class="lessons-container">
-            <div class="search-container">
-                <div class="search-wrapper">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="lessonSearch" class="search-input" placeholder="Buscar lección por título o tema..." autocomplete="off">
+                <a href="ranking.php" class="btn-full">Ver Ranking Global</a>
+            </div>
+
+            <!-- Panel Docente -->
+            <div class="card reveal">
+                <div class="card-label">Panel Docente</div>
+
+                <div class="doc-stats">
+                    <div class="doc-chip">
+                        <div class="doc-chip-n"><?= $total_usuarios ?></div>
+                        <div class="doc-chip-l">Usuarios</div>
+                    </div>
+                    <div class="doc-chip">
+                        <div class="doc-chip-n pink"><?= $lecciones_completadas_total ?></div>
+                        <div class="doc-chip-l">Completadas</div>
+                    </div>
+                    <div class="doc-chip full">
+                        <div class="doc-chip-n green"><?= $media_completado ?>%</div>
+                        <div class="doc-chip-l">Tasa media completado</div>
+                    </div>
+                </div>
+
+                <div class="small-title">⭐ Top Alumnos</div>
+                <ul class="top-alumnos-list">
+                    <?php foreach ($top_alumnos as $alumno): ?>
+                        <li class="top-item">
+                            <span class="top-user"><?= htmlspecialchars($alumno['nombre_usuario']) ?></span>
+                            <span class="top-meta"><?= $alumno['lecciones_completas'] ?> lec · <?= number_format($alumno['puntos']) ?> pts</span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
+        </div><!-- /profile-sidebar -->
+
+
+        <!-- ══════════════════════════
+             COLUMNA DERECHA
+        ══════════════════════════ -->
+        <div class="main-dashboard">
+
+            <!-- Gráfica de rendimiento -->
+            <div class="card section-card reveal">
+                <div class="card-label">Indicadores de rendimiento — Tasa de rezago por materia</div>
+                <div class="chart-wrapper">
+                    <canvas id="teacherProgressChart"></canvas>
                 </div>
             </div>
 
-            <div id="filter-and-combat-area">
-                <?php if ($filter_profesor): ?>
-                    <div class="materia-group" style="border-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); padding: 15px 25px;">
-                        <p style="margin: 0; font-family: 'Press Start 2P', cursive; font-size: 10px; color: var(--neon-cyan);">
-                            👨‍🏫 Filtrado por Profesor: <?php echo htmlspecialchars($filter_profesor); ?>
-                            <a href="dashboard.php" style="margin-left: 20px; color: #fff; text-decoration: underline; font-size: 8px;">Quitar filtro</a>
-                        </p>
-                    </div>
-                <?php endif; ?>
+            <!-- Reportes por fecha -->
+            <div class="card section-card reveal">
+                <div class="card-label">Reportes por rango de fecha</div>
+                <form method="get" class="date-filter-row">
+                    <label>
+                        Desde
+                        <input type="date" name="desde" value="<?= htmlspecialchars($fecha_desde) ?>" required>
+                    </label>
+                    <label>
+                        Hasta
+                        <input type="date" name="hasta" value="<?= htmlspecialchars($fecha_hasta) ?>" required>
+                    </label>
+                    <button type="submit" class="btn-sm cyan">Filtrar</button>
+                    <button type="submit" name="export" value="csv" class="btn-sm muted">Exportar CSV</button>
+                </form>
 
-                <?php if ($filter_materia || !empty($filter_materias)): ?>
+                <div class="report-table-wrapper">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th style="width:16%">Usuario</th>
+                                <th style="width:20%">Materia</th>
+                                <th style="width:22%">Lección</th>
+                                <th style="width:8%">Score</th>
+                                <th style="width:8%">XP</th>
+                                <th style="width:5%">✓</th>
+                                <th style="width:21%">Actualizado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($reportRows as $row): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($row['nombre_usuario']) ?></td>
+                                    <td><?= htmlspecialchars($row['materia'] ?: '—') ?></td>
+                                    <td><?= htmlspecialchars($row['slug']) ?></td>
+                                    <td class="center"><?= htmlspecialchars($row['score']) ?></td>
+                                    <td class="center"><?= htmlspecialchars($row['lesson_xp']) ?></td>
+                                    <td class="<?= $row['completed'] ? 'done' : 'fail' ?>"><?= $row['completed'] ? '✓' : '✗' ?></td>
+                                    <td><?= htmlspecialchars($row['updated_at']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <?php if (empty($reportRows)): ?>
+                                <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px 0;">Sin registros en este rango</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Buscador -->
+            <div class="search-wrapper reveal">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="lessonSearch" class="search-input"
+                       placeholder="Buscar lección por título o tema..." autocomplete="off">
+            </div>
+
+            <!-- Filtros + combate + lecciones -->
+            <div class="card section-card reveal" id="filter-and-combat-area">
+                <div class="card-label">Controles de filtro</div>
+
+                <form class="dashboard-filter-form" method="get">
+                    <select name="profesor">
+                        <option value="">Todos los profesores</option>
+                        <?php foreach ($profesor_materia_map as $prof => $mats): ?>
+                            <option value="<?= htmlspecialchars($prof) ?>"
+                                <?= $filter_profesor && norm($filter_profesor) === norm($prof) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($prof) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <select name="materia">
+                        <option value="">Todas las materias</option>
+                        <?php foreach ($materia_a_profesor_id as $materia => $pid): ?>
+                            <option value="<?= htmlspecialchars($materia) ?>"
+                                <?= $filter_materia && norm($filter_materia) === norm($materia) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($materia) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <button type="submit" class="btn-sm cyan">Aplicar filtro</button>
+                    <a href="dashboard.php" class="btn-sm danger">Limpiar</a>
+                </form>
+
+                <div class="lecciones-filtros-mensajes">
+                    <span class="filter-status">
+                        filtro: <strong><?= $filter_activo
+                            ? htmlspecialchars($filter_profesor ?: $filter_materia ?: implode(', ', $filter_materias))
+                            : 'ninguno' ?></strong>
+                    </span>
+                </div>
+
+                <!-- Sistema de combate (solo cuando hay filtro) -->
+                <?php if ($filter_materia || !empty($filter_materias) || $filter_profesor): ?>
                     <?php
-                    $id_profesor_final = '1Cu'; // fallback
-                    $materia_usada = $filter_materia ?: ($filter_materias[0] ?? 'General');
-
+                    $id_profesor_final = '1Cu';
+                    $materia_usada     = $filter_materia ?: ($filter_materias[0] ?? 'General');
                     if ($filter_profesor) {
                         $nf = norm($filter_profesor);
-                        foreach ($profesor_a_id as $prof => $id) {
+                        foreach ($profesor_a_id as $prof => $id)
                             if (norm($prof) === $nf || strpos(norm($prof), $nf) !== false || strpos($nf, norm($prof)) !== false) {
-                                $id_profesor_final = $id;
-                                break;
+                                $id_profesor_final = $id; break;
                             }
-                        }
                     } else {
-                        $materia_norm = norm($materia_usada);
-                        foreach ($materia_a_profesor_id as $mat_map => $id) {
-                            if (norm($mat_map) === $materia_norm || str_contains($materia_norm, norm($mat_map))) {
-                                $id_profesor_final = $id;
-                                break;
+                        $mn = norm($materia_usada);
+                        foreach ($materia_a_profesor_id as $mm => $id)
+                            if (norm($mm) === $mn || str_contains($mn, norm($mm))) {
+                                $id_profesor_final = $id; break;
                             }
-                        }
                     }
+                    $current_url = urlencode($_SERVER['REQUEST_URI']);
+                    $examen_slug = "examen_final_" . norm($materia_usada);
                     ?>
-                    <div class="materia-group" style="text-align: center; border-color: var(--neon-yellow); background: rgba(255, 255, 0, 0.05);">
-                        <h3 class="materia-title" style="color: var(--neon-yellow); justify-content: center;">⚔️ SISTEMA DE COMBATE</h3>
-                        <p style="margin-bottom: 20px; font-size: 14px;">¿Estás listo para el examen? Enfrenta al profesor y demuestra tus conocimientos.</p>
-                        <?php 
-                            $current_url = urlencode($_SERVER['REQUEST_URI']);
-                            $examen_slug = "examen_final_" . norm($materia_usada);
-                        ?>
-                        <a href="Examen/sistemC.php?personaje=<?= $id_profesor_final ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>" class="btn-premium btn-cyan" style="background: var(--neon-yellow); box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);">
+                    <div class="combat-card">
+                        <div class="combat-title">⚔️ SISTEMA DE COMBATE</div>
+                        <div class="combat-sub">
+                            Enfócate en <strong style="color:var(--yellow)"><?= htmlspecialchars($materia_usada) ?></strong> y genera dominio total.
+                        </div>
+                        <a href="Examen/sistemC.php?personaje=<?= $id_profesor_final ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>"
+                           class="combat-btn">
                             INICIAR EXAMEN
                         </a>
                     </div>
                 <?php endif; ?>
             </div>
 
+            <!-- ── LECCIONES POR MATERIA ── -->
             <?php if (empty($lecciones_agrupadas)): ?>
-                <div class="materia-group">
-                    <p style="text-align: center; color: rgba(255,255,255,0.5);">No hay módulos disponibles para esta selección.</p>
+                <div class="card reveal">
+                    <p class="empty-state">
+                        <?= $filter_activo
+                            ? 'No se encontraron lecciones con ese filtro. Prueba otro profesor o materia.'
+                            : 'No hay módulos disponibles.' ?>
+                    </p>
                 </div>
             <?php else: ?>
                 <?php foreach ($lecciones_agrupadas as $materia => $temas): ?>
-                    <div class="materia-group">
-                        <h3 class="materia-title"><?php echo htmlspecialchars($materia); ?></h3>
+                    <div class="card leccion-materia-block reveal">
+                        <div class="materia-title"><?= htmlspecialchars($materia) ?></div>
                         <div class="leccion-grid">
-                            <?php foreach ($temas as $tema): 
+                            <?php foreach ($temas as $tema):
                                 $es_completada = in_array($tema['slug'], $completadas);
                                 $href = 'leccion_detalle.php?slug=' . urlencode($tema['slug']) . '&materia=' . urlencode($materia);
                                 if ($filter_profesor) $href .= '&profesor=' . urlencode($filter_profesor);
                             ?>
-                                <a href="<?php echo $href; ?>" class="leccion-card <?php echo $es_completada ? 'completed' : ''; ?>">
+                                <a href="<?= $href ?>" class="leccion-card <?= $es_completada ? 'completed' : '' ?>">
                                     <div class="leccion-info">
-                                        <span class="leccion-status"><?php echo $es_completada ? '✅' : '▶️'; ?></span>
-                                        <span class="leccion-name"><?php echo htmlspecialchars($tema['titulo']); ?></span>
+                                        <span class="leccion-status"><?= $es_completada ? '✓' : '▶' ?></span>
+                                        <span class="leccion-name"><?= htmlspecialchars($tema['titulo']) ?></span>
                                     </div>
-                                    <span class="leccion-action">
-                                        <?php echo $es_completada ? 'REPETIR' : 'ENTRAR'; ?>
-                                    </span>
+                                    <span class="leccion-action"><?= $es_completada ? 'REPETIR' : 'ENTRAR' ?></span>
                                 </a>
                             <?php endforeach; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
-        </section>
 
+        </div><!-- /main-dashboard -->
     </div>
 </main>
 
 <script src="assets/js/app.js"></script>
+
 <script>
-    // Scroll reveal logic
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px"
-    };
+// ── Buscador ──────────────────────────────────────────────────────────
+const searchInput   = document.getElementById('lessonSearch');
+const combatArea    = document.getElementById('filter-and-combat-area');
+const leccionBlocks = document.querySelectorAll('.leccion-materia-block');
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = "1";
-                entry.target.style.transform = "translateY(0)";
-                observer.unobserve(entry.target);
-            }
+searchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase().trim();
+    combatArea.style.opacity       = term ? '0.35' : '1';
+    combatArea.style.pointerEvents = term ? 'none'  : 'all';
+    combatArea.style.transition    = 'opacity 0.3s';
+
+    leccionBlocks.forEach(block => {
+        const cards = block.querySelectorAll('.leccion-card');
+        let visible = 0;
+        cards.forEach(card => {
+            const title   = card.querySelector('.leccion-name').textContent.toLowerCase();
+            const matches = !term || title.includes(term);
+            card.style.display = matches ? 'flex' : 'none';
+            if (matches) visible++;
         });
-    }, observerOptions);
-
-    document.querySelectorAll('.materia-group').forEach(el => {
-        el.style.opacity = "0";
-        el.style.transform = "translateY(30px)";
-        el.style.transition = "var(--transition-smooth)";
-        observer.observe(el);
+        block.style.display = visible > 0 ? 'block' : 'none';
     });
+});
 
-    // Search functionality
-    const searchInput = document.getElementById('lessonSearch');
-    const materiaGroups = document.querySelectorAll('.materia-group');
-    const combatArea = document.getElementById('filter-and-combat-area');
-
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        
-        // El área de combate y filtros NO debe desaparecer si hay un término de búsqueda,
-        // a menos que el usuario lo prefiera. Según tu petición, debe mantenerse.
-        if (term !== "") {
-            combatArea.style.opacity = "0.5"; // Lo atenuamos un poco para dar foco a los resultados
-            combatArea.style.pointerEvents = "none"; // Evitamos clics accidentales durante búsqueda
-        } else {
-            combatArea.style.opacity = "1";
-            combatArea.style.pointerEvents = "all";
+// ── Scroll reveal ─────────────────────────────────────────────────────
+const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObs.unobserve(entry.target);
         }
-
-        materiaGroups.forEach(group => {
-            // Ignorar el área de combate en el filtrado de lecciones
-            if (group.closest('#filter-and-combat-area')) return;
-
-            const leccionCards = group.querySelectorAll('.leccion-card');
-            let hasVisibleLecciones = false;
-
-            leccionCards.forEach(card => {
-                const title = card.querySelector('.leccion-name').textContent.toLowerCase();
-                const isMatch = title.includes(term);
-                
-                card.style.display = isMatch ? 'grid' : 'none';
-                if (isMatch) hasVisibleLecciones = true;
-            });
-
-            // Hide/Show the entire materia group based on results
-            group.style.display = hasVisibleLecciones ? 'block' : 'none';
-            
-            // Re-trigger observer for visible elements
-            if (hasVisibleLecciones) {
-                group.style.opacity = "1";
-                group.style.transform = "translateY(0)";
-            }
-        });
     });
+}, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+</script>
+
+<script>
+// ── Chart.js ──────────────────────────────────────────────────────────
+(function () {
+    const canvas = document.getElementById('teacherProgressChart');
+    if (!canvas) return;
+
+    const materias = <?= json_encode(array_column($materia_rezagada, 'materia')) ?>;
+    const tasa     = <?= json_encode(array_map(fn($m) => round($m['tasa_fallo'], 1), $materia_rezagada)) ?>;
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: materias,
+            datasets: [{
+                label: 'Tasa de fallo (%)',
+                data: tasa,
+                backgroundColor: 'rgba(255, 60, 172, 0.2)',
+                borderColor:     'rgba(255, 60, 172, 0.75)',
+                borderWidth: 1,
+                borderRadius: 5,
+                hoverBackgroundColor: 'rgba(255, 60, 172, 0.38)',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { color: 'rgba(200,230,255,0.45)', font: { size: 11, family: "'JetBrains Mono'" } },
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    border: { color: 'rgba(255,255,255,0.06)' }
+                },
+                x: {
+                    ticks: { color: 'rgba(200,230,255,0.45)', font: { size: 10, family: "'JetBrains Mono'" } },
+                    grid:  { color: 'rgba(255,255,255,0.03)' },
+                    border: { color: 'rgba(255,255,255,0.06)' }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: 'rgba(200,230,255,0.6)', font: { size: 11, family: "'JetBrains Mono'" } } },
+                title:  {
+                    display: true,
+                    text: 'Materias con más rezago',
+                    color: 'rgba(200,230,255,0.7)',
+                    font: { size: 12, family: "'JetBrains Mono'", weight: '500' },
+                    padding: { bottom: 12 }
+                }
+            }
+        }
+    });
+})();
 </script>
 
 </body>

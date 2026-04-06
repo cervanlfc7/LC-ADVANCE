@@ -12,6 +12,13 @@ $user_id = $_SESSION['usuario_id'];
 $slug = $_POST['slug'] ?? '';
 $correctas = (int)($_POST['correctas'] ?? 0);
 $xp = (int)($_POST['xp'] ?? 0);
+$csrf_token = $_POST['csrf_token'] ?? '';
+
+if (!validarCsrfToken($csrf_token)) {
+    logSeguridadEvento('CSRF_FAIL', 'Token inválido en update_progress', $user_id);
+    http_response_code(403);
+    die('CSRF inválido');
+}
 
 if (empty($slug) || $correctas < 0) {
     die('Datos inválidos');
