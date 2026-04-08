@@ -20,6 +20,11 @@ $code = $_GET['code'] ?? '';
 $state = $_GET['state'] ?? '';
 $saved_state = $_SESSION['oauth_state'] ?? '';
 
+if (!empty($_GET['error'])) {
+    $errorDescription = $_GET['error_description'] ?? '';
+    die('Error OAuth: ' . htmlspecialchars($_GET['error']) . '. ' . htmlspecialchars($errorDescription));
+}
+
 // 1. Validar estado para prevenir CSRF
 if (empty($code) || empty($state) || $state !== $saved_state) {
     // Si falla, intentamos una validación menos estricta solo para depurar si es por el state
@@ -35,14 +40,36 @@ if (empty($code) || empty($state) || $state !== $saved_state) {
 }
 unset($_SESSION['oauth_state']);
 
+function oauth_curl_exec($ch) {
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+    // En desarrollo local, algunos entornos Windows pueden fallar por CA/SSL.
+    if (preg_match('/^http:\/\/localhost|^http:\/\/127\.0\.0\.1/', AUTH_CALLBACK_URL)) {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    }
+
+    $result = curl_exec($ch);
+    if ($result === false) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        return ['ok' => false, 'error' => $error];
+    }
+
+    $info = curl_getinfo($ch);
+    curl_close($ch);
+    return ['ok' => true, 'response' => $result, 'info' => $info];
+}
+
 $userData = [];
 
 // 2. Intercambiar código por Token y obtener datos
 if ($provider === 'google') {
     // Intercambio de Token Google
     $ch = curl_init("https://oauth2.googleapis.com/token");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
         'code'          => $code,
         'client_id'     => GOOGLE_CLIENT_ID,
@@ -50,69 +77,88 @@ if ($provider === 'google') {
         'redirect_uri'  => AUTH_CALLBACK_URL,
         'grant_type'    => 'authorization_code'
     ]));
-    $response = json_decode(curl_exec($ch), true);
-    curl_close($ch);
-
-    if (isset($response['access_token'])) {
-        // Obtener perfil
-        $ch = curl_init("https://www.googleapis.com/oauth2/v3/userinfo");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $response['access_token']]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $profile = json_decode(curl_exec($ch), true);
-        curl_close($ch);
-
-        $userData = [
-            'id'    => $profile['sub'],
-            'email' => $profile['email'],
-            'name'  => $profile['name'] ?? explode('@', $profile['email'])[0]
-        ];
+    $result = oauth_curl_exec($ch);
+    if (!$result['ok']) {
+        die('No se pudieron obtener los datos del usuario desde Google. Error de conexión: ' . htmlspecialchars($result['error']));
     }
+    $response = json_decode($result['response'], true);
+    if (empty($response['access_token'])) {
+        $error = $response['error_description'] ?? $response['error'] ?? 'Token no recibido desde Google.';
+        die('No se pudieron obtener los datos del usuario desde Google. ' . htmlspecialchars($error));
+    }
+
+    // Obtener perfil
+    $ch = curl_init("https://www.googleapis.com/oauth2/v3/userinfo");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $response['access_token']]);
+    $profileResult = oauth_curl_exec($ch);
+    if (!$profileResult['ok']) {
+        die('No se pudieron obtener los datos del usuario desde Google. Error de conexión: ' . htmlspecialchars($profileResult['error']));
+    }
+    $profile = json_decode($profileResult['response'], true);
+
+    $userData = [
+        'id'    => $profile['sub'] ?? '',
+        'email' => $profile['email'] ?? '',
+        'name'  => $profile['name'] ?? explode('@', $profile['email'] ?? 'usuario')[0]
+    ];
 } elseif ($provider === 'github') {
     // Intercambio de Token GitHub
     $ch = curl_init("https://github.com/login/oauth/access_token");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Accept: application/json',
+        'Content-Type: application/x-www-form-urlencoded'
+    ]);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
         'code'          => $code,
         'client_id'     => GITHUB_CLIENT_ID,
         'client_secret' => GITHUB_CLIENT_SECRET,
         'redirect_uri'  => AUTH_CALLBACK_URL
     ]));
-    $response = json_decode(curl_exec($ch), true);
-    curl_close($ch);
+    $result = oauth_curl_exec($ch);
+    if (!$result['ok']) {
+        die('No se pudieron obtener los datos del usuario desde GitHub. Error de conexión: ' . htmlspecialchars($result['error']));
+    }
+    $response = json_decode($result['response'], true);
+    if (empty($response['access_token'])) {
+        $error = $response['error_description'] ?? $response['error'] ?? 'Token no recibido desde GitHub.';
+        die('No se pudieron obtener los datos del usuario desde GitHub. ' . htmlspecialchars($error));
+    }
 
-    if (isset($response['access_token'])) {
-        // Obtener perfil GitHub
-        $ch = curl_init("https://api.github.com/user");
+    $accessToken = $response['access_token'];
+    // Obtener perfil GitHub
+    $ch = curl_init("https://api.github.com/user");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: token ' . $accessToken,
+        'User-Agent: LC-ADVANCE-APP'
+    ]);
+    $profileResult = oauth_curl_exec($ch);
+    if (!$profileResult['ok']) {
+        die('No se pudieron obtener los datos del usuario desde GitHub. Error de conexión: ' . htmlspecialchars($profileResult['error']));
+    }
+    $profile = json_decode($profileResult['response'], true);
+
+    // GitHub a veces no da el email público, hay que pedirlo aparte
+    $email = $profile['email'] ?? '';
+    if (empty($email)) {
+        $ch = curl_init("https://api.github.com/user/emails");
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: token ' . $response['access_token'],
+            'Authorization: token ' . $accessToken,
             'User-Agent: LC-ADVANCE-APP'
         ]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $profile = json_decode(curl_exec($ch), true);
-        curl_close($ch);
-
-        // GitHub a veces no da el email público, hay que pedirlo aparte
-        $email = $profile['email'] ?? '';
-        if (empty($email)) {
-            $ch = curl_init("https://api.github.com/user/emails");
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Authorization: token ' . $response['access_token'],
-                'User-Agent: LC-ADVANCE-APP'
-            ]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $emails = json_decode(curl_exec($ch), true);
-            curl_close($ch);
-            foreach ($emails as $e) { if ($e['primary']) { $email = $e['email']; break; } }
+        $emailsResult = oauth_curl_exec($ch);
+        if (!$emailsResult['ok']) {
+            die('No se pudieron obtener los datos del usuario desde GitHub. Error de conexión: ' . htmlspecialchars($emailsResult['error']));
         }
-
-        $userData = [
-            'id'    => $profile['id'],
-            'email' => $email,
-            'name'  => $profile['login']
-        ];
+        $emails = json_decode($emailsResult['response'], true);
+        foreach ($emails as $e) { if (!empty($e['primary'])) { $email = $e['email']; break; } }
     }
+
+    $userData = [
+        'id'    => $profile['id'] ?? '',
+        'email' => $email,
+        'name'  => $profile['login'] ?? 'github_user'
+    ];
 }
 
 // 3. Procesar en Base de Datos

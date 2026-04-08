@@ -35,14 +35,14 @@ try {
 
     if ($progress) {
         // Siempre actualizar el progreso y sumar XP
-        $pdo->prepare("UPDATE user_progress SET score = ?, lesson_xp = ?, completed = 1 WHERE user_id = ? AND slug = ?")
+        $pdo->prepare("UPDATE user_progress SET score = ?, lesson_xp = ?, completed = 1, completed_at = NOW() WHERE user_id = ? AND slug = ?")
             ->execute([$correctas, $xp, $user_id, $slug]);
         
         $pdo->prepare("UPDATE usuarios SET puntos = puntos + ? WHERE id = ?")
             ->execute([$xp, $user_id]);
     } else {
         // Primera vez
-        $pdo->prepare("INSERT INTO user_progress (user_id, slug, score, lesson_xp, completed) VALUES (?, ?, ?, ?, 1)")
+        $pdo->prepare("INSERT INTO user_progress (user_id, slug, score, lesson_xp, completed, completed_at) VALUES (?, ?, ?, ?, 1, NOW())")
             ->execute([$user_id, $slug, $correctas, $xp]);
         
         $pdo->prepare("UPDATE usuarios SET puntos = puntos + ? WHERE id = ?")

@@ -31,6 +31,16 @@ define('DB_NAME', getenv('DB_NAME') ?: 'lc_advance');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: ''); // Cambia si tu usuario tiene contraseña
 
+define('OLLAMA_API_URL', rtrim(getenv('OLLAMA_API_URL') ?: 'http://localhost:11434/v1', '/'));
+define('OLLAMA_MODEL', getenv('OLLAMA_MODEL') ?: 'llama3.2:3b');
+define('OLLAMA_API_KEY', getenv('OLLAMA_API_KEY') ?: '');
+define('OLLAMA_REQUEST_TIMEOUT', 30);
+
+define('OPENROUTER_API_KEY', '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');
+define('OPENROUTER_MODEL', 'google/gemini-2.0-flash-001'); // gratuito, o cambia por otro
+define('OPENROUTER_TIMEOUT', 20);
+define('APP_URL', 'https://tu-dominio.com'); // tu dominio real
+
 // ================================
 // CONEXIÓN PDO SEGURA
 // ================================
@@ -256,16 +266,22 @@ function calcularNivel($puntos) {
 // ================================
 
 // Google
-define('GOOGLE_CLIENT_ID', '683843517989-s9or7ddfusfl57nvqcllm09kkebd7vvc.apps.googleusercontent.com');
-define('GOOGLE_CLIENT_SECRET', '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'); // Necesitas copiar el Secreto que te dio Google y pegarlo aquí
+define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: '683843517989-s9or7ddfusfl57nvqcllm09kkebd7vvc.apps.googleusercontent.com');
+define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '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'); // Necesitas copiar el Secreto que te dio Google y pegarlo aquí
 
 // GitHub
-define('GITHUB_CLIENT_ID', 'Ov23lipzxi8W4UooK4C3');
-define('GITHUB_CLIENT_SECRET', 'b605fbe1ba5e3b91fba7de7186cd6bd2ef9bb4ce');
+define('GITHUB_CLIENT_ID', getenv('GITHUB_CLIENT_ID') ?: 'Ov23lipzxi8W4UooK4C3');
+define('GITHUB_CLIENT_SECRET', getenv('GITHUB_CLIENT_SECRET') ?: 'b605fbe1ba5e3b91fba7de7186cd6bd2ef9bb4ce');
 
 // URL de retorno (Callback)
 // Asegúrate de que esta URL esté registrada en tus consolas de desarrollador
-define('AUTH_CALLBACK_URL', 'http://localhost:8080/LC-ADVANCE/auth_callback.php');
+$defaultAuthCallback = 'http://localhost:8080/LC-ADVANCE/auth_callback.php';
+if (empty(getenv('AUTH_CALLBACK_URL')) && !empty($_SERVER['HTTP_HOST'])) {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+    $defaultAuthCallback = $scheme . '://' . $_SERVER['HTTP_HOST'] . $scriptDir . '/auth_callback.php';
+}
+define('AUTH_CALLBACK_URL', getenv('AUTH_CALLBACK_URL') ?: $defaultAuthCallback);
 
 // ================================
 // SISTEMA DE BADGES
