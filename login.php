@@ -224,6 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 10px;
             margin-bottom: 16px;
             animation: fadeInLeft 0.7s ease-out;
+            flex-wrap: wrap;
         }
 
         .btn-social {
@@ -249,6 +250,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-color: rgba(0, 229, 255, 0.45);
             transform: translateY(-1px);
             box-shadow: 0 8px 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .divider {
@@ -403,8 +412,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <div class="social-auth">
-            <button class="btn-social" onclick="window.location='auth_provider.php?provider=google&redirect=<?php echo urlencode($redirect_param); ?>'">Google</button>
-            <button class="btn-social" onclick="window.location='auth_provider.php?provider=github&redirect=<?php echo urlencode($redirect_param); ?>'">GitHub</button>
+            <button type="button" class="btn-social" onclick="window.location='auth_provider.php?provider=google&redirect=<?php echo urlencode($redirect_param); ?>'">
+                <span class="btn-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path fill="#4285F4" d="M21.35 11.1h-9.33v2.8h5.34c-.23 1.24-1.04 2.29-2.22 2.99v2.48h3.6c2.11-1.94 3.32-4.8 3.32-8.29 0-.59-.06-1.17-.16-1.74z"/>
+                        <path fill="#34A853" d="M12.02 22c2.97 0 5.47-1 7.29-2.71l-3.6-2.48c-.99.66-2.25 1.05-3.69 1.05-2.84 0-5.25-1.92-6.11-4.5H2.14v2.82C3.94 19.98 7.76 22 12.02 22z"/>
+                        <path fill="#FBBC05" d="M5.91 13.86A7.6 7.6 0 0 1 5.5 12c0-.66.11-1.31.41-1.86V7.32H2.14A11.98 11.98 0 0 0 0 12c0 1.94.47 3.77 1.3 5.34l4.61-3.48z"/>
+                        <path fill="#EA4335" d="M12.02 4.54c1.62 0 3.08.56 4.23 1.65l3.18-3.18C17.48 1.2 14.98 0 12.02 0 7.76 0 3.94 2.02 2.14 5.32l4.61 3.48c.86-2.58 3.27-4.5 6.11-4.5z"/>
+                    </svg>
+                </span>
+                Google
+            </button>
+            <button type="button" class="btn-social" onclick="window.location='auth_provider.php?provider=github&redirect=<?php echo urlencode($redirect_param); ?>'">
+                <span class="btn-icon">
+                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path fill="currentColor" fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.64 7.64 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                </span>
+                GitHub
+            </button>
         </div>
 
         <div class="divider">Ó</div>

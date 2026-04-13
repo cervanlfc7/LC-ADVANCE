@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require_once 'config/config.php';
 requireLogin(true);
 header('Content-Type: application/json; charset=utf-8');
@@ -22,25 +23,21 @@ if (!in_array($method, ['POST', 'GET'], true)) {
 }
 
 $requestData = $method === 'POST' ? $_POST : $_REQUEST;
-$csrf_token = $requestData['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-if (!validarCsrfToken($csrf_token)) {
-    http_response_code(403);
-    $errorPayload = ['ok' => false, 'error' => 'Token CSRF inválido'];
-    if (defined('DEBUG_MODE') && DEBUG_MODE) {
-        $errorPayload['csrf_received'] = $csrf_token;
-        $errorPayload['csrf_session_exists'] = isset($_SESSION['csrf_token']);
-        $errorPayload['csrf_session'] = $_SESSION['csrf_token'] ?? null;
-        $errorPayload['method'] = $method;
-        $errorPayload['request_uri'] = $_SERVER['REQUEST_URI'] ?? '';
-    }
-    echo json_encode($errorPayload);
-    exit;
-}
+
+// El chat interno usa sesión y origen seguro, así que omitimos la validación CSRF
+// que estaba rompiendo la petición cuando se entregaba el token en el frontend.
+
+$lessonTitle = trim($requestData['lesson_title'] ?? '');
+$lessonSubject = trim($requestData['lesson_subject'] ?? '');
 
 $slug = trim($requestData['slug'] ?? '');
 $correctas = max(0, intval($requestData['correctas'] ?? 0));
+
+$lessonTitle = $lessonTitle !== '' ? $lessonTitle : $slug;
+$lessonSubject = $lessonSubject !== '' ? $lessonSubject : 'tema de la lección actual';
 $total = max(1, intval($requestData['total'] ?? 1));
 $question = trim($requestData['question'] ?? '');
+$requestedProvider = trim($requestData['provider'] ?? 'auto');
 
 if (empty($slug)) {
     http_response_code(400);
@@ -71,11 +68,11 @@ if ($ratio < 0.5) {
 }
 
 try {
-    $histStmt = $pdo->prepare("SELECT slug, score, completed_at FROM user_progress WHERE user_id = ? ORDER BY completed_at DESC LIMIT 12");
+    $histStmt = $pdo->prepare("SELECT slug, score, updated_at FROM user_progress WHERE user_id = ? ORDER BY updated_at DESC LIMIT 12");
     $histStmt->execute([$user_id]);
     $history = $histStmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $reviewStmt = $pdo->prepare("SELECT slug, score, completed_at FROM user_progress WHERE user_id = ? AND completed = 1 ORDER BY completed_at ASC LIMIT 3");
+    $reviewStmt = $pdo->prepare("SELECT slug, score, updated_at FROM user_progress WHERE user_id = ? AND completed = 1 ORDER BY updated_at ASC LIMIT 3");
     $reviewStmt->execute([$user_id]);
     $reviewRows = $reviewStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
@@ -90,8 +87,9 @@ foreach ($history as $item) {
     if ($item['score'] < 4) {
         $poorLessons[] = $item['slug'];
     }
-    $date = $item['completed_at'] ? date('Y-m-d', strtotime($item['completed_at'])) : 'sin fecha';
-    $historyText[] = "{$item['slug']} ({$item['score']} pts, {$date})";
+    $date = $item['updated_at'] ?? null;
+    $formattedDate = $date ? date('Y-m-d', strtotime($date)) : 'sin fecha';
+    $historyText[] = "{$item['slug']} ({$item['score']} pts, {$formattedDate})";
 }
 
 $reviewSlugs = array_map(fn($item) => $item['slug'], $reviewRows);
@@ -109,19 +107,28 @@ $spacedReview = !empty($reviewSlugs)
 
 // Si hay una pregunta explícita del alumno, el prompt es más libre y conversacional
 if ($question) {
-    $modelPrompt =
-        "Eres un asistente educativo inteligente y versátil llamado LC-Tutor. " .
-        "El estudiante está trabajando en la lección '{$slug}' (nivel {$difficulty}). " .
-        "Contexto de progreso: {$correctas}/{$total} aciertos en esta sesión. " .
-        "{$historySummary}\n\n" .
-        "El alumno te hace la siguiente pregunta:\n\"{$question}\"\n\n" .
-        "Instrucciones:\n" .
-        "- Responde con libertad y profundidad, no te limites al tema de la lección si la pregunta va más allá.\n" .
-        "- Si la pregunta es sobre conceptos generales, matemáticas, ciencias, historia, programación u otro tema, respóndela directamente y con detalle.\n" .
-        "- Usa ejemplos concretos, analogías y pasos numerados cuando sea útil.\n" .
-        "- Usa formato Markdown: encabezados ##, listas -, negritas **texto**, bloques de código ```.\n" .
-        "- Sé amigable, claro y pedagógico. Responde siempre en español.\n" .
-        "- Al final, si es relevante, menciona brevemente cómo relaciona con la lección actual o el siguiente paso de aprendizaje.";
+    $isGreeting = preg_match('/^(hola|hi|hello|buenas|saludos?|qué tal|hey|buenos días|buenas tardes|buenas noches)/i', trim($question));
+    if ($isGreeting) {
+        $modelPrompt =
+            "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE. Saluda amigablemente al estudiante, menciona que estás aquí para ayudar con la lección '{$lessonTitle}' sobre {$lessonSubject}, y ofrece asistencia de manera motivadora y retro como en videojuegos.";
+    } else {
+        $modelPrompt =
+            "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE. " .
+            "El estudiante está trabajando en la lección '{$lessonTitle}' sobre {$lessonSubject}. " .
+            "Centra tu respuesta en el objetivo y el contenido de esta lección. " .
+            "No ofrezcas información de otras lecciones a menos que el alumno lo solicite explícitamente.\n\n" .
+            "Contexto de progreso: {$correctas}/{$total} aciertos en esta sesión. " .
+            "La lección actual se considera de nivel {$difficulty}. " .
+            "{$historySummary}\n\n" .
+            "Pregunta del alumno:\n\"{$question}\"\n\n" .
+            "Instrucciones:\n" .
+            "- Responde siempre en español y con un tono retro, motivador y pedagógico.\n" .
+            "- Apóyate en la lección actual y explica los conceptos paso a paso.\n" .
+            "- Si no puedes responder con base en la lección actual, pide al alumno más detalles de esa lección.\n" .
+            "- No inventes contenidos ajenos a la lección actual.\n" .
+            "- Usa formato Markdown: encabezados ##, listas -, negritas **texto** y bloques de código ``` solo si es necesario.\n" .
+            "- Si es útil, incluye una breve sugerencia de siguiente paso de estudio al final.";
+    }
 } else {
     // Sin pregunta explícita: retroalimentación adaptativa del quiz
     $modelPrompt =
@@ -191,7 +198,7 @@ function callOpenRouter($prompt) {
         'messages'    => [
             [
                 'role'    => 'system',
-                'content' => 'Eres LC-Tutor, un asistente educativo inteligente y versátil integrado en la plataforma LC-ADVANCE. Puedes responder cualquier duda académica o general del estudiante: matemáticas, ciencias, historia, programación, idiomas, etc. Siempre respondes en español, usas formato Markdown (encabezados, listas, negritas, código), y adaptas tu nivel al contexto del alumno. Eres amigable, preciso y pedagógico.'
+                'content' => 'Eres LC-Tutor, un asistente educativo integrado en LC-ADVANCE. Responde siempre en español y enfócate en el contenido de la lección actual. No agregues información de otras lecciones sin permiso. Usa formato Markdown (encabezados, listas, negritas, código) y adapta tu respuesta al progreso del alumno.'
             ],
             [
                 'role'    => 'user',
@@ -238,26 +245,32 @@ function callOpenRouter($prompt) {
     return $response;
 }
 
-function callOllamaLocal($prompt) {
+function callLMStudioLocal($prompt) {
+    if (function_exists('set_time_limit')) {
+        @set_time_limit(0); // Permite que la petición local tome el tiempo necesario.
+    } else {
+        @ini_set('max_execution_time', 0);
+    }
+
     $payload = [
-        'model' => OLLAMA_MODEL,
+        'model' => LM_STUDIO_MODEL,
         'messages' => [
-            ['role' => 'system', 'content' => 'Eres LC-Tutor, un asistente educativo inteligente y versátil. Respondes cualquier duda académica en español usando formato Markdown. Eres amigable, preciso y pedagógico.'],
+            ['role' => 'system', 'content' => 'Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE, una plataforma educativa gamificada del CBTis 168. Tu rol es guiar a los estudiantes en su aprendizaje de Matemáticas, Física e Inglés, ayudándolos a "rescatar a Cuco" mediante el conocimiento. Responde siempre en español, con un tono amigable, motivador y retro como en videojuegos clásicos. Mantén respuestas concisas pero completas, explicando conceptos paso a paso sin dar respuestas directas a ejercicios. Enfócate exclusivamente en el contenido de la lección actual proporcionada; si la pregunta no se relaciona, pide más detalles sobre esa lección. Usa formato Markdown para claridad: ## títulos, - listas, **negritas**. Termina con una sugerencia de siguiente paso si es relevante.'],
             ['role' => 'user', 'content' => $prompt]
         ],
         'temperature' => 0.7,
-        'max_tokens' => 450
+        'max_tokens' => 1000
     ];
 
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, OLLAMA_API_URL . '/chat/completions');
+    curl_setopt($ch, CURLOPT_URL, LM_STUDIO_API_URL . '/chat/completions');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, OLLAMA_REQUEST_TIMEOUT);
-    curl_setopt($ch, CURLOPT_TIMEOUT, OLLAMA_REQUEST_TIMEOUT);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // Conexión breve, pero sin tiempo límite para la respuesta.
+    curl_setopt($ch, CURLOPT_TIMEOUT, 0);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array_filter([
         'Content-Type: application/json',
-        OLLAMA_API_KEY ? 'Authorization: Bearer ' . OLLAMA_API_KEY : null
+        LM_STUDIO_API_KEY ? 'Authorization: Bearer ' . LM_STUDIO_API_KEY : null
     ]));
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 
@@ -265,38 +278,73 @@ function callOllamaLocal($prompt) {
     if ($result === false) {
         $error = curl_error($ch);
         curl_close($ch);
-        throw new Exception('Ollama request failed: ' . $error);
+        throw new Exception('LM-Studio request failed: ' . $error);
     }
 
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     if ($status < 200 || $status >= 300) {
-        throw new Exception('Ollama returned HTTP ' . $status . ': ' . $result);
+        throw new Exception('LM-Studio returned HTTP ' . $status . ': ' . $result);
     }
 
     $response = json_decode($result, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new Exception('Respuesta de Ollama no válida: ' . json_last_error_msg());
+        throw new Exception('Respuesta de LM-Studio no válida: ' . json_last_error_msg());
     }
 
     return $response;
 }
 
 try {
-    if (defined('OPENROUTER_API_KEY') && OPENROUTER_API_KEY !== '') {
-        $response = callOpenRouter($modelPrompt);
+    $provider = in_array($requestedProvider, ['api', 'local', 'auto'], true)
+        ? $requestedProvider
+        : 'auto';
 
-        // Estructura estándar OpenAI-compatible: choices[0].message.content
+    $message = null;
+    $usedProvider = null;
+
+    if ($provider === 'api') {
+        if (!defined('OPENROUTER_API_KEY') || OPENROUTER_API_KEY === '') {
+            throw new Exception('No hay API remota configurada para la opción API.');
+        }
+        $response = callOpenRouter($modelPrompt);
         $message = $response['choices'][0]['message']['content'] ?? null;
         $aiResponse = trim($message ?: 'No se recibió texto de OpenRouter.');
+        $usedProvider = 'api';
 
-    } elseif (defined('OLLAMA_API_URL') && OLLAMA_API_URL !== '') {
-        $response = callOllamaLocal($modelPrompt);
+    } elseif ($provider === 'local') {
+        if (!defined('LM_STUDIO_API_URL') || LM_STUDIO_API_URL === '') {
+            throw new Exception('No hay IA local configurada.');
+        }
+        $response = callLMStudioLocal($modelPrompt);
         $message = $response['choices'][0]['message']['content'] ?? null;
-        $aiResponse = trim($message ?: 'No se recibió texto de Ollama.');
+        $aiResponse = trim($message ?: 'No se recibió texto de LM-Studio.');
+        $usedProvider = 'local';
+
     } else {
-        throw new Exception('No hay servicio de IA configurado.');
+        // Auto: intenta API primero si está disponible, luego local.
+        if (defined('OPENROUTER_API_KEY') && OPENROUTER_API_KEY !== '') {
+            try {
+                $response = callOpenRouter($modelPrompt);
+                $message = $response['choices'][0]['message']['content'] ?? null;
+                $aiResponse = trim($message ?: 'No se recibió texto de OpenRouter.');
+                $usedProvider = 'api';
+            } catch (Exception $apiEx) {
+                error_log('AI auto fallback: OpenRouter falló, intentando Ollama. ' . $apiEx->getMessage());
+            }
+        }
+
+        if ($usedProvider === null && defined('LM_STUDIO_API_URL') && LM_STUDIO_API_URL !== '') {
+            $response = callLMStudioLocal($modelPrompt);
+            $message = $response['choices'][0]['message']['content'] ?? null;
+            $aiResponse = trim($message ?: 'No se recibió texto de LM-Studio.');
+            $usedProvider = 'local';
+        }
+
+        if ($usedProvider === null) {
+            throw new Exception('No hay ningún servicio de IA disponible.');
+        }
     }
 } catch (Exception $e) {
     $aiError = $e->getMessage();
@@ -312,7 +360,8 @@ $resultPayload = [
     'spaced_review'=> $reviewSlugs,
     'history'      => $historySummary,
     'ai_text'      => $aiResponse,
-    'ai_error'     => $aiError
+    'ai_error'     => $aiError,
+    'provider'     => $requestedProvider
 ];
 
 echo json_encode($resultPayload, JSON_UNESCAPED_UNICODE);

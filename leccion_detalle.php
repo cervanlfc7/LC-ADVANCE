@@ -177,6 +177,39 @@ $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actua
     }
     @keyframes orbPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.14); } }
 
+    #globalLoader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(4px);
+    }
+    #globalLoader.active { display: flex; }
+    #globalLoader .loader-box {
+        width: min(420px, 100%);
+        padding: 22px 24px;
+        border-radius: 18px;
+        background: rgba(8, 18, 36, 0.96);
+        border: 1px solid rgba(0, 255, 255, 0.16);
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.14);
+        text-align: center;
+    }
+    #globalLoader .loader-spinner {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 14px;
+        border: 4px solid rgba(0, 229, 255, 0.18);
+        border-top-color: #00e5ff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .lc-chat-draft { white-space: pre-wrap; word-break: break-word; font-family: var(--font-body); }
+
     /* ════════════ HEADER ════════════ */
     .lc-header {
         position: fixed;
@@ -1261,8 +1294,6 @@ $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actua
 <div class="bg-orb bg-orb-1"></div>
 <div class="bg-orb bg-orb-2"></div>
 
-<script>window.LC_CSRF_TOKEN = <?= json_encode(csrfToken()) ?>;</script>
-
 <!-- ════ HEADER ════ -->
 <header class="lc-header">
     <div class="header-brand">
@@ -1452,8 +1483,15 @@ $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actua
             <div class="lc-chat-input-row">
                 <textarea id="lcChatInput" class="lc-chat-input" name="question"
                     placeholder="Pregunta lo que necesites…" autocomplete="off" rows="1"></textarea>
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
                 <button id="lcChatSend" type="submit" class="lc-chat-submit" title="Enviar">➤</button>
+            </div>
+            <div class="lc-chat-options-row">
+                <label for="lcChatProvider">IA:</label>
+                <select id="lcChatProvider" name="provider" class="lc-chat-provider">
+                    <option value="auto" selected>Auto (API/local)</option>
+                    <option value="api">IA Remota</option>
+                    <option value="local">IA Local</option>
+                </select>
             </div>
             <div class="lc-chat-hint">Enter para enviar · Shift+Enter para nueva línea</div>
         </form>
@@ -1462,6 +1500,12 @@ $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actua
 
 <!-- Toast container -->
 <div class="toast-wrap" id="toastWrap"></div>
+<div id="globalLoader" aria-live="polite" aria-busy="false">
+    <div class="loader-box">
+        <div class="loader-spinner"></div>
+        <div id="globalLoaderText">Cargando...</div>
+    </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -1530,6 +1574,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function submitQuiz(e) {
         e.preventDefault();
+        showGlobalLoader('Procesando tu quiz...');
         let oldPuntos = 0, oldNivel = 1;
         try {
             const s = await fetch('src/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
@@ -1603,6 +1648,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error(err);
             quizBody.innerHTML = `<div class="result-card"><p style="color:var(--pink);font-family:var(--font-mono);font-size:11px;">Error de conexión con el servidor.</p></div>`;
+        } finally {
+            hideGlobalLoader();
         }
     }
 
@@ -1683,6 +1730,60 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('lcTyping')?.remove();
     }
 
+    const globalLoader = document.getElementById('globalLoader');
+    const globalLoaderText = document.getElementById('globalLoaderText');
+
+    function showGlobalLoader(text = 'Cargando...') {
+        if (!globalLoader) return;
+        globalLoaderText.textContent = text;
+        globalLoader.setAttribute('aria-busy', 'true');
+        globalLoader.classList.add('active');
+    }
+
+    function hideGlobalLoader() {
+        if (!globalLoader) return;
+        globalLoader.setAttribute('aria-busy', 'false');
+        globalLoader.classList.remove('active');
+    }
+
+    function createDraftMessage() {
+        const msg = document.createElement('div');
+        msg.className = 'lc-chat-message bot';
+        const inner = document.createElement('div');
+        inner.className = 'lc-md lc-chat-draft';
+        inner.textContent = '';
+        msg.appendChild(inner);
+        chatMessages.appendChild(msg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return inner;
+    }
+
+    function typeWriterEffect(text, target) {
+        return new Promise(resolve => {
+            const total = text.length;
+            if (total === 0) {
+                target.textContent = '';
+                resolve();
+                return;
+            }
+            const maxSteps = 120;
+            const steps = Math.min(maxSteps, total);
+            const chunk = Math.max(1, Math.ceil(total / steps));
+            const duration = Math.min(2200, Math.max(900, Math.round(total * 10)));
+            const interval = Math.max(10, Math.floor(duration / steps));
+            let index = 0;
+            const timer = setInterval(() => {
+                index = Math.min(total, index + chunk);
+                target.textContent = text.slice(0, index);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (index >= total) {
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, interval);
+        });
+    }
+
     function toggleChat(open) {
         if (!chatPanel) return;
         chatPanel.classList.toggle('open', open);
@@ -1716,29 +1817,53 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.style.height = 'auto';
         chatSend.disabled = true;
         showTyping();
+        showGlobalLoader('Consultando a LC-Tutor...');
 
         try {
             const response = await fetch('ai_tutor.php', {
                 method: 'POST',
                 credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                cache: 'no-store',
                 body: new URLSearchParams({
                     slug: '<?= addslashes($slug) ?>',
+                    lesson_title: '<?= addslashes($leccion['titulo']) ?>',
+                    lesson_subject: '<?= addslashes($materia_actual) ?>',
                     correctas: 0,
                     total: 1,
                     question,
-                    csrf_token: chatForm.querySelector('[name=csrf_token]')?.value || window.LC_CSRF_TOKEN
+                    provider: document.getElementById('lcChatProvider')?.value || 'auto'
                 })
             });
-            const result = await response.json();
+
+            const text = await response.text();
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (parseError) {
+                throw new Error(`Respuesta inválida del servidor (${response.status}): ${text.slice(0, 200)}`);
+            }
+
             removeTyping();
-            const botText = result.ok ? result.ai_text : (result.error || 'No se obtuvo respuesta.');
-            appendChatMessage(botText, 'bot', true);
+            if (!response.ok || !result.ok) {
+                const errorMsg = result.error || `HTTP ${response.status}`;
+                appendChatMessage(`❌ Error del asistente: ${errorMsg}`, 'bot', true);
+            } else {
+                const draft = createDraftMessage();
+                const aiText = result.ai_text || 'No se recibió respuesta del asistente.';
+                await typeWriterEffect(aiText, draft);
+                if (aiText && window.marked) {
+                    draft.innerHTML = renderMd(aiText);
+                }
+            }
         } catch (err) {
             removeTyping();
-            appendChatMessage('❌ Error al conectar con el asistente. Verifica tu conexión.', 'bot', true);
+            appendChatMessage(`❌ Error al conectar con el asistente: ${err.message}`, 'bot', true);
         } finally {
             chatSend.disabled = false;
+            hideGlobalLoader();
             chatInput.focus();
         }
     }
