@@ -321,7 +321,9 @@ if (!empty(getenv('AUTH_CALLBACK_URL'))) {
     $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
     $defaultAuthCallback = $scheme . '://' . $_SERVER['HTTP_HOST'] . $scriptDir . '/auth_callback.php';
 } else {
-    $defaultAuthCallback = 'http://localhost:8080/LC-ADVANCE/auth_callback.php';
+    // Valor predeterminado local usado solo si no hay host disponible.
+    // Usa el mismo host y puerto que ves en el navegador cuando accedes a la app.
+    $defaultAuthCallback = 'http://localhost:8080/LC-Advance/auth_callback.php';
 }
 define('AUTH_CALLBACK_URL', $defaultAuthCallback);
 

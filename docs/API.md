@@ -98,6 +98,53 @@ curl -X POST http://localhost:8000/register.php \
 Acceso como invitado (sin crear cuenta).
 
 **Respuesta:**
+- HTTP 302 Redirect → `/dashboard.php` (si OK)
+
+---
+
+### 5. GET `/auth_provider.php`
+
+**NUEVO:** Inicia el flujo de autenticación OAuth con proveedores externos (Google o GitHub).
+
+| Parámetro | Tipo | Requerido | Descripción |
+|-----------|------|----------|-----------|
+| `provider` | string | Sí | 'google' o 'github' |
+| `redirect` | string | No | URL a redirigir después del login (por defecto `mapa/index.php`) |
+
+**Respuesta:**
+- HTTP 302 Redirect → URL de autorización del proveedor elegido.
+
+**Ejemplo:**
+```bash
+curl -I "http://localhost:8000/auth_provider.php?provider=google"
+```
+
+---
+
+### 6. POST `/ai_tutor.php`
+
+**NUEVO:** Endpoint del Tutor Inteligente para asistencia en lecciones.
+
+| Parámetro | Tipo | Requerido | Descripción |
+|-----------|------|----------|-----------|
+| `lesson_title` | string | Sí | Título de la lección actual |
+| `lesson_subject` | string | Sí | Materia de la lección |
+| `slug` | string | Sí | Slug de la lección |
+| `correctas` | int | No | Número de respuestas correctas en el quiz (por defecto 0) |
+| `total` | int | No | Número total de preguntas (por defecto 1) |
+| `question` | string | No | Pregunta específica para el tutor |
+| `provider` | string | No | Proveedor IA a usar ('auto', 'gemini', 'openai', etc.) |
+
+**Respuesta (JSON):**
+- HTTP 200: Objeto JSON con el mensaje del tutor IA.
+
+**Ejemplo:**
+```bash
+curl -b cookies.txt -X POST http://localhost:8000/ai_tutor.php \
+  -d "slug=past-simple-2025&lesson_title=PAST SIMPLE DOMINATION 2025&lesson_subject=Inglés&question=¿Qué significa did?"
+```
+
+---
 - HTTP 302 Redirect → `/dashboard.php` (sesión de invitado)
 
 **Características invitado:**

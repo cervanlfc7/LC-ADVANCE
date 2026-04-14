@@ -20,25 +20,31 @@ $code = $_GET['code'] ?? '';
 $state = $_GET['state'] ?? '';
 $saved_state = $_SESSION['oauth_state'] ?? '';
 
+// Si la sesión se perdió, intentamos restaurar el state desde la cookie temporal.
+if (empty($saved_state) && !empty($_COOKIE['oauth_state'])) {
+    $saved_state = $_COOKIE['oauth_state'];
+    $_SESSION['oauth_state'] = $saved_state;
+    if (empty($_SESSION['oauth_redirect']) && !empty($_COOKIE['oauth_redirect'])) {
+        $_SESSION['oauth_redirect'] = $_COOKIE['oauth_redirect'];
+    }
+}
+
 if (!empty($_GET['error'])) {
     $errorDescription = $_GET['error_description'] ?? '';
     die('Error OAuth: ' . htmlspecialchars($_GET['error']) . '. ' . htmlspecialchars($errorDescription));
 }
 
 // 1. Validar estado para prevenir CSRF
-if (empty($code) || empty($state) || $state !== $saved_state) {
-    // Si falla, intentamos una validación menos estricta solo para depurar si es por el state
-    if (!empty($code) && !empty($state) && empty($saved_state)) {
-        // Esto suele pasar si la sesión se pierde entre el provider y el callback
-        // Vamos a permitirlo SOLO SI el state tiene el prefijo correcto para poder avanzar mientras arreglas la sesión
-        $provider = strpos($state, 'google_') === 0 ? 'google' : 'github';
-    } else {
-        die("Error de validación OAuth o sesión expirada. (State mismatch)");
-    }
-} else {
-    $provider = strpos($state, 'google_') === 0 ? 'google' : 'github';
+if (empty($code) || empty($state) || empty($saved_state) || $state !== $saved_state) {
+    logSeguridadEvento('OAUTH_STATE_MISMATCH', "Callback state mismatch. returned={$state}; saved={$saved_state}");
+    die('Error de validación OAuth o sesión expirada. (State mismatch). Asegúrate de permitir cookies de sesión y usa el mismo navegador para iniciar sesión.');
 }
+
+$provider = strpos($state, 'google_') === 0 ? 'google' : 'github';
 unset($_SESSION['oauth_state']);
+setcookie('oauth_state', '', time() - 3600, '/');
+setcookie('oauth_provider', '', time() - 3600, '/');
+setcookie('oauth_redirect', '', time() - 3600, '/');
 
 function oauth_curl_exec($ch) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

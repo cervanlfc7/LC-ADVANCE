@@ -9,6 +9,7 @@
 - **[Requisitos](#requisitos)** | **[Instalación](#instalación-rápida)** | **[Getting Started](#getting-started)** | **[Agregar Lecciones](#cómo-agregar-lecciones)** | **[Troubleshooting](#troubleshooting)**
 
 **Documentación complementaria:**
+
 - [DEVELOPMENT.md](docs.php?file=DEVELOPMENT.md) - Arquitectura y desarrollo
 - [API.md](docs.php?file=API.md) - Endpoints y referencias
 - [TROUBLESHOOTING.md](docs.php?file=TROUBLESHOOTING.md) - Soluciones a problemas
@@ -18,12 +19,14 @@
 ## ✨ Características Principales
 
 ### 🎓 Lecciones Interactivas
+
 - ✅ 200+ lecciones en múltiples materias
 - ✅ Contenido estructurado con quizzes integrados
 - ✅ Progreso guardado automáticamente
 - ✅ Acceso invitado (lectura sin guardar)
 
 ### 🏆 Sistema de Puntos y Ranking
+
 - ✅ **Top 10 Ranking en vivo** - Se actualiza automáticamente cada 15 segundos
 - ✅ Puntos por respuesta correcta
 - ✅ Cálculo automático de niveles
@@ -31,22 +34,32 @@
 - ✅ Solo usuarios logueados aparecen en ranking
 
 ### 🗺️ Mapa Interactivo
+
 - ✅ Combate educativo con maestros
 - ✅ Selección dinámica de personajes
 - ✅ Sistema de diálogos inmersivo
 
 ### 🔐 Autenticación y Seguridad
+
 - ✅ Login/Register con hashing bcrypt
+- ✅ **NUEVO:** Autenticación social (Google y GitHub) mediante OAuth
+- ✅ **NUEVO:** Gatekeeper - Sistema de acceso dual (Login o Invitado)
 - ✅ Sesiones seguras
 - ✅ Protección CSRF
 - ✅ Validación de entrada
 
+### 🤖 Inteligencia Artificial Integrada
+
+- ✅ **NUEVO:** Tutor AI - Asistencia contextual basada en IA directamente en las lecciones y quizzes.
+
 ### 📱 Responsive Design
+
 - ✅ Funciona en desktop y mobile
 - ✅ Diseño retro 8-bit moderno
 - ✅ Efectos visuales y animaciones
 
 ### 🚀 Performance
+
 - ✅ Tests automatizados
 - ✅ CI/CD con GitHub Actions
 - ✅ Carga rápida de contenido
@@ -63,6 +76,7 @@
 - **Navegador moderno** (Chrome, Firefox, Safari, Edge)
 
 **Instalación local (XAMPP):**
+
 - Windows: XAMPP (https://www.apachefriends.org)
 - macOS/Linux: XAMPP o docker
 
@@ -90,6 +104,7 @@ mysql -u root -p < db/lc_advance.sql
 ```
 
 **Nota:** El archivo `db/lc_advance.sql` incluye automáticamente:
+
 - Tabla `usuarios` (login y progreso)
 - Tabla `user_progress` (puntos y lecciones completadas)
 - Tabla `lecciones_completadas` (tracking)
@@ -114,11 +129,13 @@ define('DB_PASS', '');              // Contraseña MySQL (vacía si no hay)
 **Con XAMPP:** Abre XAMPP Control Panel → Apache + MySQL "Start"
 
 **O usa PHP built-in:**
+
 ```bash
 php -S localhost:8000 -t .
 ```
 
 **Abre en navegador:**
+
 - 🏠 Landing: http://localhost/LC-ADVANCE/index.php
 - 🗺️ Mapa: http://localhost/LC-ADVANCE/mapa/index.html
 - 📊 Dashboard: http://localhost/LC-ADVANCE/dashboard.php (requiere login)
@@ -171,9 +188,9 @@ USE lc_advance;
 SELECT nombre_usuario, puntos, nivel FROM usuarios ORDER BY puntos DESC;
 
 -- Ver progreso de un usuario específico
-SELECT u.nombre_usuario, up.slug, up.score, up.completed 
-FROM user_progress up 
-JOIN usuarios u ON u.id = up.user_id 
+SELECT u.nombre_usuario, up.slug, up.score, up.completed
+FROM user_progress up
+JOIN usuarios u ON u.id = up.user_id
 WHERE u.nombre_usuario = 'estudiante_prueba';
 
 -- Top 10 ranking
@@ -189,6 +206,10 @@ LC-ADVANCE/
 ├── index.php                 # Landing page
 ├── login.php                 # Formulario login
 ├── register.php              # Formulario registro
+├── auth_provider.php         # 🔐 Proveedor OAuth (Google/GitHub)
+├── auth_callback.php         # 🔐 Callback OAuth
+├── ai_tutor.php              # 🤖 Endpoint del Tutor IA
+├── gatekeeper.php            # 🚪 Intersticial para acceso Login/Invitado
 ├── dashboard.php             # Panel principal (después de login)
 ├── leccion_detalle.php       # Vista de lección + quiz
 ├── guest_login.php           # Acceso como invitado (lectura)
@@ -237,6 +258,7 @@ LC-ADVANCE/
 **Ver documentación completa en [API.md](API.md)**
 
 **Endpoints principales:**
+
 - `POST /login.php` - Autenticación
 - `GET /leccion_detalle.php?slug=...&materia=...` - Ver lección
 - `POST /src/funciones.php` - Calificar quiz (accion=calificar_quiz)
@@ -281,14 +303,14 @@ EOT,
 
 ### 2️⃣ Estructura de cada lección
 
-| Campo | Tipo | Descripción | Ejemplo |
-|-------|------|-------------|---------|
-| `materia` | string | Nombre de la materia | `'Inglés'` |
-| `slug` | string | ID único (sin espacios) | `'past-simple-2025'` |
-| `titulo` | string | Título visible | `'PAST SIMPLE DOMINATION 2025'` |
-| `icon` | string | Emoji o HTML | `'📖'` o `'<span class="icon">📖</span>'` |
-| `contenido` | string (HTML) | Contenido de la lección | `'<h2>...</h2><p>...</p>'` |
-| `quiz` | array | Preguntas del quiz | `[['pregunta'=>'...', ...], ...]` |
+| Campo       | Tipo          | Descripción             | Ejemplo                                   |
+| ----------- | ------------- | ----------------------- | ----------------------------------------- |
+| `materia`   | string        | Nombre de la materia    | `'Inglés'`                                |
+| `slug`      | string        | ID único (sin espacios) | `'past-simple-2025'`                      |
+| `titulo`    | string        | Título visible          | `'PAST SIMPLE DOMINATION 2025'`           |
+| `icon`      | string        | Emoji o HTML            | `'📖'` o `'<span class="icon">📖</span>'` |
+| `contenido` | string (HTML) | Contenido de la lección | `'<h2>...</h2><p>...</p>'`                |
+| `quiz`      | array         | Preguntas del quiz      | `[['pregunta'=>'...', ...], ...]`         |
 
 ### 3️⃣ Estructura de cada pregunta
 
@@ -361,6 +383,7 @@ php tests/test_e2e_simple.php
 ```
 
 **Salida esperada:**
+
 ```
 Running: tests/test_lessons.php
 OK: targeted lesson checks passed
@@ -376,6 +399,7 @@ ALL TESTS PASSED
 ### CI/CD con GitHub Actions
 
 Cada push a `main` o PR ejecuta automáticamente:
+
 - ✅ PHP 8.1 y 8.2
 - ✅ Importa BD (`sql/lc_advance.sql`)
 - ✅ Ejecuta suite de tests
@@ -391,13 +415,13 @@ Ver estado en: https://github.com/cervanlfc7/LC-ADVANCE/actions
 
 **Problemas comunes rápidos:**
 
-| Problema | Solución |
-|----------|----------|
-| Error BD | Verifica `config/config.php` y que MySQL está activo |
-| "Tabla no existe" | Ejecuta: `mysql -u root -p < db/lc_advance.sql` |
-| Parse error en PHP | Ejecuta: `php -l src/content.php` |
-| Login no funciona | Verifica `session_start()` en el top de los archivos |
-| Puntos no se actualizan | Verifica respuesta del endpoint con curl |
+| Problema                | Solución                                             |
+| ----------------------- | ---------------------------------------------------- |
+| Error BD                | Verifica `config/config.php` y que MySQL está activo |
+| "Tabla no existe"       | Ejecuta: `mysql -u root -p < db/lc_advance.sql`      |
+| Parse error en PHP      | Ejecuta: `php -l src/content.php`                    |
+| Login no funciona       | Verifica `session_start()` en el top de los archivos |
+| Puntos no se actualizan | Verifica respuesta del endpoint con curl             |
 
 Ver [TROUBLESHOOTING.md](TROUBLESHOOTING.md) para soluciones completas.
 
@@ -415,13 +439,13 @@ Ver [DEVELOPMENT.md](DEVELOPMENT.md) para más detalles de arquitectura y deploy
 
 ## � Documentación Completa
 
-| Documento | Para Qué |
-|-----------|----------|
-| **README.md** (este archivo) | Instalación, instalación y uso básico |
-| **[DEVELOPMENT.md](DEVELOPMENT.md)** | Arquitectura, cómo agregar funcionalidades |
-| **[API.md](API.md)** | Endpoints, ejemplos curl, respuestas JSON |
-| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | Cheat sheet y comandos rápidos |
-| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Soluciones a problemas comunes |
+| Documento                                    | Para Qué                                   |
+| -------------------------------------------- | ------------------------------------------ |
+| **README.md** (este archivo)                 | Instalación, instalación y uso básico      |
+| **[DEVELOPMENT.md](DEVELOPMENT.md)**         | Arquitectura, cómo agregar funcionalidades |
+| **[API.md](API.md)**                         | Endpoints, ejemplos curl, respuestas JSON  |
+| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | Cheat sheet y comandos rápidos             |
+| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Soluciones a problemas comunes             |
 
 ---
 

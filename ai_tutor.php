@@ -105,45 +105,26 @@ $spacedReview = !empty($reviewSlugs)
     ? 'Revisa de nuevo: ' . implode(', ', $reviewSlugs) . '.'
     : 'No hay lecciones antiguas suficientes para una recomendación de repetición espaciada.';
 
-// Si hay una pregunta explícita del alumno, el prompt es más libre y conversacional
+// Si hay una pregunta explícita del alumno, el prompt es la pregunta misma
 if ($question) {
-    $isGreeting = preg_match('/^(hola|hi|hello|buenas|saludos?|qué tal|hey|buenos días|buenas tardes|buenas noches)/i', trim($question));
-    if ($isGreeting) {
-        $modelPrompt =
-            "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE. Saluda amigablemente al estudiante, menciona que estás aquí para ayudar con la lección '{$lessonTitle}' sobre {$lessonSubject}, y ofrece asistencia de manera motivadora y retro como en videojuegos.";
-    } else {
-        $modelPrompt =
-            "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE. " .
-            "El estudiante está trabajando en la lección '{$lessonTitle}' sobre {$lessonSubject}. " .
-            "Centra tu respuesta en el objetivo y el contenido de esta lección. " .
-            "No ofrezcas información de otras lecciones a menos que el alumno lo solicite explícitamente.\n\n" .
-            "Contexto de progreso: {$correctas}/{$total} aciertos en esta sesión. " .
-            "La lección actual se considera de nivel {$difficulty}. " .
-            "{$historySummary}\n\n" .
-            "Pregunta del alumno:\n\"{$question}\"\n\n" .
-            "Instrucciones:\n" .
-            "- Responde siempre en español y con un tono retro, motivador y pedagógico.\n" .
-            "- Apóyate en la lección actual y explica los conceptos paso a paso.\n" .
-            "- Si no puedes responder con base en la lección actual, pide al alumno más detalles de esa lección.\n" .
-            "- No inventes contenidos ajenos a la lección actual.\n" .
-            "- Usa formato Markdown: encabezados ##, listas -, negritas **texto** y bloques de código ``` solo si es necesario.\n" .
-            "- Si es útil, incluye una breve sugerencia de siguiente paso de estudio al final.";
-    }
+    $userMessage = $question;
 } else {
     // Sin pregunta explícita: retroalimentación adaptativa del quiz
-    $modelPrompt =
-        "Eres LC-Tutor, un mentor pedagógico adaptativo dentro de la plataforma LC-ADVANCE. " .
-        "El estudiante acaba de completar la lección '{$slug}' con {$correctas}/{$total} aciertos. " .
-        "Nivel detectado: {$difficulty} (modo: {$mode}).\n" .
-        "{$historySummary}\n" .
-        "{$spacedReview}\n\n" .
-        "Genera una retroalimentación personalizada en Markdown con:\n" .
-        "1. **Evaluación breve** del desempeño (1-2 líneas, motivadora y honesta).\n" .
-        "2. **Consejo práctico** específico para reforzar o avanzar.\n" .
-        "3. **Sugerencia de repaso** con temporización (ej: 'vuelve en 2 días').\n" .
-        "4. **Siguiente paso recomendado** concreto.\n" .
-        "Usa Markdown. Sé conciso pero útil. Responde en español.";
+    $userMessage = "He completado la lección '{$slug}' con {$correctas}/{$total} aciertos. Nivel: {$difficulty} (modo: {$mode}). Por favor dame una retroalimentación súper breve de 1-2 líneas, un consejo práctico y un siguiente paso recomendado.";
 }
+
+// Construimos el mensaje del sistema de manera unificada
+$systemMessage = "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE, una plataforma educativa gamificada. Tu rol es guiar a los estudiantes respondiendo de manera MUY CONCISA, conversacional y directa, como un ser humano real. \n\n" .
+                 "Contexto actual:\n" .
+                 "- Lección actual: '{$lessonTitle}' sobre {$lessonSubject}.\n" .
+                 "- Nivel del alumno: {$difficulty}.\n" .
+                 "- {$historySummary}\n" .
+                 (!empty($spacedReview) && !$question ? "- {$spacedReview}\n" : "") .
+                 "\nReglas:\n" .
+                 "1. Si el usuario te saluda, devuélvele el saludo amigablemente.\n" .
+                 "2. Responde EXACTAMENTE a lo que el usuario pregunte. NO generes resúmenes largos de toda la lección a menos que te lo pidan explícitamente.\n" .
+                 "3. Sé muy humano, directo y breve (1-3 párrafos máximo). Nada de estructuras robóticas repetitivas.\n" .
+                 "4. Usa formato Markdown solo cuando sea útil para resaltar algo clave.";
 
 $aiResponse = null;
 $aiError = null;
@@ -185,7 +166,7 @@ function localFallbackAnswer($question, $mode, $difficulty, $spacedReview) {
  * Modelo por defecto: google/gemini-2.0-flash-001 (gratuito en OpenRouter).
  * Se puede cambiar con la constante OPENROUTER_MODEL en config.php.
  */
-function callOpenRouter($prompt) {
+function callOpenRouter($systemPrompt, $userPrompt) {
     $apiKey = OPENROUTER_API_KEY;
     $model  = defined('OPENROUTER_MODEL') && OPENROUTER_MODEL !== ''
                 ? OPENROUTER_MODEL
@@ -198,11 +179,11 @@ function callOpenRouter($prompt) {
         'messages'    => [
             [
                 'role'    => 'system',
-                'content' => 'Eres LC-Tutor, un asistente educativo integrado en LC-ADVANCE. Responde siempre en español y enfócate en el contenido de la lección actual. No agregues información de otras lecciones sin permiso. Usa formato Markdown (encabezados, listas, negritas, código) y adapta tu respuesta al progreso del alumno.'
+                'content' => $systemPrompt
             ],
             [
                 'role'    => 'user',
-                'content' => $prompt
+                'content' => $userPrompt
             ]
         ]
     ];
@@ -245,7 +226,7 @@ function callOpenRouter($prompt) {
     return $response;
 }
 
-function callLMStudioLocal($prompt) {
+function callLMStudioLocal($systemPrompt, $userPrompt) {
     if (function_exists('set_time_limit')) {
         @set_time_limit(0); // Permite que la petición local tome el tiempo necesario.
     } else {
@@ -255,8 +236,8 @@ function callLMStudioLocal($prompt) {
     $payload = [
         'model' => LM_STUDIO_MODEL,
         'messages' => [
-            ['role' => 'system', 'content' => 'Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE, una plataforma educativa gamificada del CBTis 168. Tu rol es guiar a los estudiantes en su aprendizaje de Matemáticas, Física e Inglés, ayudándolos a "rescatar a Cuco" mediante el conocimiento. Responde siempre en español, con un tono amigable, motivador y retro como en videojuegos clásicos. Mantén respuestas concisas pero completas, explicando conceptos paso a paso sin dar respuestas directas a ejercicios. Enfócate exclusivamente en el contenido de la lección actual proporcionada; si la pregunta no se relaciona, pide más detalles sobre esa lección. Usa formato Markdown para claridad: ## títulos, - listas, **negritas**. Termina con una sugerencia de siguiente paso si es relevante.'],
-            ['role' => 'user', 'content' => $prompt]
+            ['role' => 'system', 'content' => $systemPrompt],
+            ['role' => 'user', 'content' => $userPrompt]
         ],
         'temperature' => 0.7,
         'max_tokens' => 1000
@@ -308,7 +289,7 @@ try {
         if (!defined('OPENROUTER_API_KEY') || OPENROUTER_API_KEY === '') {
             throw new Exception('No hay API remota configurada para la opción API.');
         }
-        $response = callOpenRouter($modelPrompt);
+        $response = callOpenRouter($systemMessage, $userMessage);
         $message = $response['choices'][0]['message']['content'] ?? null;
         $aiResponse = trim($message ?: 'No se recibió texto de OpenRouter.');
         $usedProvider = 'api';
@@ -317,7 +298,7 @@ try {
         if (!defined('LM_STUDIO_API_URL') || LM_STUDIO_API_URL === '') {
             throw new Exception('No hay IA local configurada.');
         }
-        $response = callLMStudioLocal($modelPrompt);
+        $response = callLMStudioLocal($systemMessage, $userMessage);
         $message = $response['choices'][0]['message']['content'] ?? null;
         $aiResponse = trim($message ?: 'No se recibió texto de LM-Studio.');
         $usedProvider = 'local';
@@ -326,7 +307,7 @@ try {
         // Auto: intenta API primero si está disponible, luego local.
         if (defined('OPENROUTER_API_KEY') && OPENROUTER_API_KEY !== '') {
             try {
-                $response = callOpenRouter($modelPrompt);
+                $response = callOpenRouter($systemMessage, $userMessage);
                 $message = $response['choices'][0]['message']['content'] ?? null;
                 $aiResponse = trim($message ?: 'No se recibió texto de OpenRouter.');
                 $usedProvider = 'api';
@@ -336,7 +317,7 @@ try {
         }
 
         if ($usedProvider === null && defined('LM_STUDIO_API_URL') && LM_STUDIO_API_URL !== '') {
-            $response = callLMStudioLocal($modelPrompt);
+            $response = callLMStudioLocal($systemMessage, $userMessage);
             $message = $response['choices'][0]['message']['content'] ?? null;
             $aiResponse = trim($message ?: 'No se recibió texto de LM-Studio.');
             $usedProvider = 'local';
