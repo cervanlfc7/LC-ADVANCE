@@ -224,7 +224,7 @@ header.header nav {
 
 .btn-nav.primary {
   border-color: var(--cyan);
-  color: var(--bg);
+  color: #041420;
   background: var(--cyan);
   font-weight: 700;
 }
@@ -331,7 +331,7 @@ header.header nav {
 
 .btn-sm.cyan {
   background: var(--cyan);
-  color: var(--bg);
+  color: #041420;
   border-color: var(--cyan);
   font-weight: 700;
 }
@@ -1066,6 +1066,94 @@ header.header nav {
 }
 .search-input::placeholder {
   color: var(--muted);
+}
+
+.search-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.search-filters select {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0 10px;
+  height: 36px;
+  font-size: 11px;
+}
+
+.search-filters select:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.08);
+}
+
+.learning-path-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.learning-path-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--surface2);
+  transition: all 0.28s ease;
+}
+
+.learning-path-card:hover {
+  border-color: rgba(0, 229, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.learning-path-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.learning-path-head h3 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: #fff;
+}
+
+.learning-path-head span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cyan);
+}
+
+.learning-path-card p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.learning-path-meta {
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  margin-bottom: 8px;
+}
+
+.learning-path-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.learning-path-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
 }
 
 /* ── FILTER FORM ─────────────────────────────── */
@@ -1988,6 +2076,10 @@ header.header {
     flex-direction: column;
     align-items: stretch;
     gap: 6px;
+  }
+
+  .search-filters {
+    grid-template-columns: 1fr;
   }
 }
 

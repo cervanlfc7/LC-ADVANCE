@@ -6,6 +6,111 @@ require_once 'config/config.php';
 requireLogin(true);
 require_once 'src/content.php';
 
+$supported_langs = ['es', 'en'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supported_langs, true)) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+$lang = $_SESSION['lang'] ?? 'es';
+if (!in_array($lang, $supported_langs, true)) {
+    $lang = 'es';
+}
+$t = [
+    'es' => [
+        'language' => 'Idioma',
+        'theme' => 'Tema',
+        'community' => 'Comunidad',
+        'daily_quests' => 'Quests diarias',
+        'completed' => 'completada',
+        'pending' => 'pendiente',
+        'home' => 'Inicio',
+        'go_map' => 'Ir al Mapa',
+        'logout' => 'Cerrar Sesión',
+        'coding_lab' => 'Laboratorio',
+        'player_profile' => 'Perfil del jugador',
+        'teacher_panel' => 'Panel Docente',
+        'date_reports' => 'Reportes por rango de fecha',
+        'no_records' => 'Sin registros en este rango',
+        'search_placeholder' => 'Buscar lección por título o tema...',
+        'all_subjects' => 'Todas las materias',
+        'all_states' => 'Todos los estados',
+        'done_plural' => 'Completadas',
+        'pending_plural' => 'Pendientes',
+        'learning_paths' => 'Rutas de aprendizaje',
+        'filter_controls' => 'Controles de filtro',
+        'all_teachers' => 'Todos los profesores',
+        'apply_filter' => 'Aplicar filtro',
+        'clear' => 'Limpiar',
+        'filter' => 'filtro',
+        'none' => 'ninguno',
+        'combat_system' => 'SISTEMA DE COMBATE',
+        'start_exam' => 'INICIAR EXAMEN',
+        'empty_filtered' => 'No se encontraron lecciones con ese filtro. Prueba otro profesor o materia.',
+        'empty_modules' => 'No hay módulos disponibles.',
+        'lessons_completed' => 'lecciones completadas',
+        'connected' => 'CONECTADO',
+        'performance_title' => 'Indicadores de rendimiento — Tasa de rezago por materia',
+        'from' => 'Desde',
+        'to' => 'Hasta',
+        'filter_btn' => 'Filtrar',
+        'export_csv' => 'Exportar CSV',
+        'combat_focus' => 'Enfócate en %s y genera dominio total.',
+        'repeat' => 'REPETIR',
+        'enter' => 'ENTRAR',
+        'chart_label' => 'Tasa de fallo (%)',
+        'chart_title' => 'Materias con más rezago',
+        'quest_lesson' => 'Completa 1 lección hoy',
+        'quest_xp' => 'Llega a 1,000 XP totales',
+        'quest_level' => 'Alcanza nivel 3',
+    ],
+    'en' => [
+        'language' => 'Language',
+        'theme' => 'Theme',
+        'community' => 'Community',
+        'daily_quests' => 'Daily quests',
+        'completed' => 'completed',
+        'pending' => 'pending',
+        'home' => 'Home',
+        'go_map' => 'Go to Map',
+        'logout' => 'Log Out',
+        'coding_lab' => 'Coding Lab',
+        'player_profile' => 'Player profile',
+        'teacher_panel' => 'Teacher panel',
+        'date_reports' => 'Date range reports',
+        'no_records' => 'No records found in this range',
+        'search_placeholder' => 'Search lesson by title or topic...',
+        'all_subjects' => 'All subjects',
+        'all_states' => 'All states',
+        'done_plural' => 'Completed',
+        'pending_plural' => 'Pending',
+        'learning_paths' => 'Learning paths',
+        'filter_controls' => 'Filter controls',
+        'all_teachers' => 'All teachers',
+        'apply_filter' => 'Apply filter',
+        'clear' => 'Clear',
+        'filter' => 'filter',
+        'none' => 'none',
+        'combat_system' => 'COMBAT SYSTEM',
+        'start_exam' => 'START EXAM',
+        'empty_filtered' => 'No lessons were found with this filter. Try another teacher or subject.',
+        'empty_modules' => 'No modules available.',
+        'lessons_completed' => 'lessons completed',
+        'connected' => 'CONNECTED',
+        'performance_title' => 'Performance indicators — Subject lag rate',
+        'from' => 'From',
+        'to' => 'To',
+        'filter_btn' => 'Filter',
+        'export_csv' => 'Export CSV',
+        'combat_focus' => 'Focus on %s and build full mastery.',
+        'repeat' => 'REPEAT',
+        'enter' => 'ENTER',
+        'chart_label' => 'Failure rate (%)',
+        'chart_title' => 'Subjects with highest lag',
+        'quest_lesson' => 'Complete 1 lesson today',
+        'quest_xp' => 'Reach 1,000 total XP',
+        'quest_level' => 'Reach level 3',
+    ],
+];
+
 $filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
 $filter_materia  = isset($_GET['materia'])  ? trim($_GET['materia'])  : null;
 
@@ -103,6 +208,7 @@ if ($filter_materia) {
 
 $lecciones_agrupadas = [];
 $seen_slugs = [];
+$all_materias = [];
 
 foreach ($lecciones as $le) {
     $slug = $le['slug'] ?? null;
@@ -111,6 +217,7 @@ foreach ($lecciones as $le) {
         $seen_slugs[$slug] = true;
     }
     $m = $le['materia'] ?? 'Sin Materia';
+    $all_materias[$m] = true;
     if (!empty($filter_materias)) {
         $match = false;
         foreach ($filter_materias as $fm) {
@@ -126,8 +233,10 @@ if (empty($lecciones_agrupadas) && !$filter_activo) {
     foreach ($lecciones as $le) {
         $m = $le['materia'] ?? 'Sin Materia';
         $lecciones_agrupadas[$m][] = $le;
+        $all_materias[$m] = true;
     }
 }
+ksort($all_materias, SORT_NATURAL | SORT_FLAG_CASE);
 
 $completadas = [];
 if (empty($_SESSION['usuario_es_invitado'])) {
@@ -136,6 +245,36 @@ if (empty($_SESSION['usuario_es_invitado'])) {
         $stmt->execute([$usuario['id']]);
         $completadas = $stmt->fetchAll(PDO::FETCH_COLUMN);
     } catch(Exception $e){}
+}
+
+$learning_paths_definition = [
+    'Ruta STEM Base' => ['Pensamiento Matemático III', 'Física I', 'Química I'],
+    'Ruta Tech' => ['Programación', 'Inglés'],
+    'Ruta Integral' => ['Temas Selectos de Matemáticas I y II', 'Historia de México', 'Ciencias Sociales', 'Ecosistemas'],
+];
+
+$learning_paths = [];
+foreach ($learning_paths_definition as $path_name => $materias_path) {
+    $total_lessons = 0;
+    $completed_lessons = 0;
+    foreach ($lecciones as $lesson) {
+        $lesson_materia = $lesson['materia'] ?? null;
+        if (!$lesson_materia || !in_array($lesson_materia, $materias_path, true)) {
+            continue;
+        }
+        $total_lessons++;
+        if (!empty($lesson['slug']) && in_array($lesson['slug'], $completadas, true)) {
+            $completed_lessons++;
+        }
+    }
+    $progress_percent = $total_lessons > 0 ? round(($completed_lessons / $total_lessons) * 100) : 0;
+    $learning_paths[] = [
+        'nombre' => $path_name,
+        'materias' => $materias_path,
+        'total' => $total_lessons,
+        'completadas' => $completed_lessons,
+        'progreso' => $progress_percent,
+    ];
 }
 
 // Métricas docentes
@@ -197,6 +336,22 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         fputcsv($out, [$row['nombre_usuario'],$row['materia'],$row['slug'],$row['score'],$row['lesson_xp'],$row['completed'],$row['updated_at']]);
     fclose($out); exit;
 }
+
+$completed_lessons_count = count(array_unique($completadas));
+$daily_quests = [
+    [
+        'titulo' => $t[$lang]['quest_lesson'],
+        'completada' => $completed_lessons_count >= 1,
+    ],
+    [
+        'titulo' => $t[$lang]['quest_xp'],
+        'completada' => (int)$usuario['puntos'] >= 1000,
+    ],
+    [
+        'titulo' => $t[$lang]['quest_level'],
+        'completada' => (int)$usuario['nivel'] >= 3,
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -208,6 +363,54 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        [data-theme="light"] {
+            --bg: #f4f8ff;
+            --surface: #ffffff;
+            --surface2: #eef4ff;
+            --text: #061523;
+            --muted: rgba(20, 35, 55, 0.65);
+            --border: rgba(0, 120, 170, 0.16);
+            --border2: rgba(0, 120, 170, 0.28);
+        }
+        .toolbar-controls { display:flex; align-items:center; gap:8px; margin-left:8px; }
+        .toolbar-controls select, .toolbar-controls button {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            color: var(--text);
+            border-radius: 7px;
+            height: 30px;
+            padding: 0 8px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+        }
+        .quest-list { display:grid; gap:8px; }
+        .quest-item {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface2);
+            padding: 10px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            font-size: 12px;
+        }
+        .quest-status {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--border2);
+            color: var(--cyan);
+        }
+        .quest-status.done {
+            color: var(--green);
+            border-color: rgba(0,255,135,0.25);
+            background: rgba(0,255,135,0.08);
+        }
+    </style>
 </head>
 <body>
 
@@ -223,9 +426,19 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         <span class="logo-tag">// SYSTEM_DASHBOARD</span>
     </div>
     <nav>
-        <a href="index.php"      class="btn-nav">Inicio</a>
-        <a href="mapa/index.php" class="btn-nav primary">Ir al Mapa</a>
-        <a href="logout.php"     class="btn-nav">Cerrar Sesión</a>
+        <a href="index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
+        <a href="mapa/index.php" class="btn-nav primary"><?= htmlspecialchars($t[$lang]['go_map']) ?></a>
+        <a href="lab.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></a>
+        <a href="community.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['community']) ?></a>
+        <a href="logout.php"     class="btn-nav"><?= htmlspecialchars($t[$lang]['logout']) ?></a>
+        <div class="toolbar-controls">
+            <label for="langSelector" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);"><?= htmlspecialchars($t[$lang]['language']) ?></label>
+            <select id="langSelector">
+                <option value="es" <?= $lang === 'es' ? 'selected' : '' ?>>ES</option>
+                <option value="en" <?= $lang === 'en' ? 'selected' : '' ?>>EN</option>
+            </select>
+            <button type="button" id="themeToggle"><?= htmlspecialchars($t[$lang]['theme']) ?></button>
+        </div>
     </nav>
 </header>
 
@@ -240,13 +453,13 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
             <!-- Perfil -->
             <div class="card reveal">
-                <div class="card-label">Perfil del jugador</div>
+                <div class="card-label"><?= htmlspecialchars($t[$lang]['player_profile']) ?></div>
 
                 <div class="profile-head">
                     <div class="avatar-glow">🎮</div>
                     <div>
                         <h2 class="username-premium"><?= htmlspecialchars($usuario['nombre_usuario']) ?></h2>
-                        <div class="profile-status">// CONECTADO</div>
+                        <div class="profile-status">// <?= htmlspecialchars($t[$lang]['connected']) ?></div>
                     </div>
                 </div>
 
@@ -290,7 +503,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
             <!-- Panel Docente -->
             <div class="card reveal">
-                <div class="card-label">Panel Docente</div>
+                <div class="card-label"><?= htmlspecialchars($t[$lang]['teacher_panel']) ?></div>
 
                 <div class="doc-stats">
                     <div class="doc-chip">
@@ -328,7 +541,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
             <!-- Gráfica de rendimiento -->
             <div class="card section-card reveal">
-                <div class="card-label">Indicadores de rendimiento — Tasa de rezago por materia</div>
+                <div class="card-label"><?= htmlspecialchars($t[$lang]['performance_title']) ?></div>
                 <div class="chart-wrapper">
                     <canvas id="teacherProgressChart"></canvas>
                 </div>
@@ -336,18 +549,18 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
             <!-- Reportes por fecha -->
             <div class="card section-card reveal">
-                <div class="card-label">Reportes por rango de fecha</div>
+                <div class="card-label"><?= htmlspecialchars($t[$lang]['date_reports']) ?></div>
                 <form method="get" class="date-filter-row">
                     <label>
-                        Desde
+                        <?= htmlspecialchars($t[$lang]['from']) ?>
                         <input type="date" name="desde" value="<?= htmlspecialchars($fecha_desde) ?>" required>
                     </label>
                     <label>
-                        Hasta
+                        <?= htmlspecialchars($t[$lang]['to']) ?>
                         <input type="date" name="hasta" value="<?= htmlspecialchars($fecha_hasta) ?>" required>
                     </label>
-                    <button type="submit" class="btn-sm cyan">Filtrar</button>
-                    <button type="submit" name="export" value="csv" class="btn-sm muted">Exportar CSV</button>
+                    <button type="submit" class="btn-sm cyan"><?= htmlspecialchars($t[$lang]['filter_btn']) ?></button>
+                    <button type="submit" name="export" value="csv" class="btn-sm muted"><?= htmlspecialchars($t[$lang]['export_csv']) ?></button>
                 </form>
 
                 <div class="report-table-wrapper">
@@ -376,7 +589,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                                 </tr>
                             <?php endforeach; ?>
                             <?php if (empty($reportRows)): ?>
-                                <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px 0;">Sin registros en este rango</td></tr>
+                                <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px 0;"><?= htmlspecialchars($t[$lang]['no_records']) ?></td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -387,16 +600,63 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             <div class="search-wrapper reveal">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="lessonSearch" class="search-input"
-                       placeholder="Buscar lección por título o tema..." autocomplete="off">
+                       placeholder="<?= htmlspecialchars($t[$lang]['search_placeholder']) ?>" autocomplete="off">
+            </div>
+            <div class="search-filters reveal">
+                <select id="searchMateria">
+                    <option value=""><?= htmlspecialchars($t[$lang]['all_subjects']) ?></option>
+                    <?php foreach (array_keys($all_materias) as $materiaOption): ?>
+                        <option value="<?= htmlspecialchars($materiaOption) ?>"><?= htmlspecialchars($materiaOption) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="searchEstado">
+                    <option value=""><?= htmlspecialchars($t[$lang]['all_states']) ?></option>
+                    <option value="completed"><?= htmlspecialchars($t[$lang]['done_plural']) ?></option>
+                    <option value="pending"><?= htmlspecialchars($t[$lang]['pending_plural']) ?></option>
+                </select>
+            </div>
+
+            <div class="card section-card reveal">
+                <div class="card-label"><?= htmlspecialchars($t[$lang]['learning_paths']) ?></div>
+                <div class="learning-path-grid">
+                    <?php foreach ($learning_paths as $path): ?>
+                        <article class="learning-path-card">
+                            <div class="learning-path-head">
+                                <h3><?= htmlspecialchars($path['nombre']) ?></h3>
+                                <span><?= $path['progreso'] ?>%</span>
+                            </div>
+                            <p><?= htmlspecialchars(implode(' · ', $path['materias'])) ?></p>
+                            <div class="learning-path-meta">
+                                <?= $path['completadas'] ?>/<?= $path['total'] ?> <?= htmlspecialchars($t[$lang]['lessons_completed']) ?>
+                            </div>
+                            <div class="learning-path-progress">
+                                <span style="width: <?= $path['progreso'] ?>%"></span>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="card section-card reveal">
+                <div class="card-label"><?= htmlspecialchars($t[$lang]['daily_quests']) ?></div>
+                <div class="quest-list">
+                    <?php foreach ($daily_quests as $quest): ?>
+                        <div class="quest-item">
+                            <span><?= htmlspecialchars($quest['titulo']) ?></span>
+                            <span class="quest-status <?= $quest['completada'] ? 'done' : '' ?>">
+                                <?= $quest['completada'] ? htmlspecialchars($t[$lang]['completed']) : htmlspecialchars($t[$lang]['pending']) ?>
+                            </span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
 
             <!-- Filtros + combate + lecciones -->
             <div class="card section-card reveal" id="filter-and-combat-area">
-                <div class="card-label">Controles de filtro</div>
+                <div class="card-label"><?= htmlspecialchars($t[$lang]['filter_controls']) ?></div>
 
                 <form class="dashboard-filter-form" method="get">
                     <select name="profesor">
-                        <option value="">Todos los profesores</option>
+                        <option value=""><?= htmlspecialchars($t[$lang]['all_teachers']) ?></option>
                         <?php foreach ($profesor_materia_map as $prof => $mats): ?>
                             <option value="<?= htmlspecialchars($prof) ?>"
                                 <?= $filter_profesor && norm($filter_profesor) === norm($prof) ? 'selected' : '' ?>>
@@ -406,7 +666,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                     </select>
 
                     <select name="materia">
-                        <option value="">Todas las materias</option>
+                        <option value=""><?= htmlspecialchars($t[$lang]['all_subjects']) ?></option>
                         <?php foreach ($materia_a_profesor_id as $materia => $pid): ?>
                             <option value="<?= htmlspecialchars($materia) ?>"
                                 <?= $filter_materia && norm($filter_materia) === norm($materia) ? 'selected' : '' ?>>
@@ -415,15 +675,15 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                         <?php endforeach; ?>
                     </select>
 
-                    <button type="submit" class="btn-sm cyan">Aplicar filtro</button>
-                    <a href="dashboard.php" class="btn-sm danger">Limpiar</a>
+                    <button type="submit" class="btn-sm cyan"><?= htmlspecialchars($t[$lang]['apply_filter']) ?></button>
+                    <a href="dashboard.php" class="btn-sm danger"><?= htmlspecialchars($t[$lang]['clear']) ?></a>
                 </form>
 
                 <div class="lecciones-filtros-mensajes">
                     <span class="filter-status">
-                        filtro: <strong><?= $filter_activo
+                        <?= htmlspecialchars($t[$lang]['filter']) ?>: <strong><?= $filter_activo
                             ? htmlspecialchars($filter_profesor ?: $filter_materia ?: implode(', ', $filter_materias))
-                            : 'ninguno' ?></strong>
+                            : htmlspecialchars($t[$lang]['none']) ?></strong>
                     </span>
                 </div>
 
@@ -449,13 +709,16 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                     $examen_slug = "examen_final_" . norm($materia_usada);
                     ?>
                     <div class="combat-card">
-                        <div class="combat-title">⚔️ SISTEMA DE COMBATE</div>
+                        <div class="combat-title">⚔️ <?= htmlspecialchars($t[$lang]['combat_system']) ?></div>
                         <div class="combat-sub">
-                            Enfócate en <strong style="color:var(--yellow)"><?= htmlspecialchars($materia_usada) ?></strong> y genera dominio total.
+                            <?php
+                            $combatMsg = sprintf($t[$lang]['combat_focus'], '<strong style="color:var(--yellow)">' . htmlspecialchars($materia_usada) . '</strong>');
+                            echo $combatMsg;
+                            ?>
                         </div>
                         <a href="Examen/sistemC.php?personaje=<?= $id_profesor_final ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>"
                            class="combat-btn">
-                            INICIAR EXAMEN
+                            <?= htmlspecialchars($t[$lang]['start_exam']) ?>
                         </a>
                     </div>
                 <?php endif; ?>
@@ -466,8 +729,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 <div class="card reveal">
                     <p class="empty-state">
                         <?= $filter_activo
-                            ? 'No se encontraron lecciones con ese filtro. Prueba otro profesor o materia.'
-                            : 'No hay módulos disponibles.' ?>
+                            ? htmlspecialchars($t[$lang]['empty_filtered'])
+                            : htmlspecialchars($t[$lang]['empty_modules']) ?>
                     </p>
                 </div>
             <?php else: ?>
@@ -485,7 +748,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                                         <span class="leccion-status"><?= $es_completada ? '✓' : '▶' ?></span>
                                         <span class="leccion-name"><?= htmlspecialchars($tema['titulo']) ?></span>
                                     </div>
-                                    <span class="leccion-action"><?= $es_completada ? 'REPETIR' : 'ENTRAR' ?></span>
+                                    <span class="leccion-action"><?= $es_completada ? htmlspecialchars($t[$lang]['repeat']) : htmlspecialchars($t[$lang]['enter']) ?></span>
                                 </a>
                             <?php endforeach; ?>
                         </div>
@@ -502,27 +765,42 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 <script>
 // ── Buscador ──────────────────────────────────────────────────────────
 const searchInput   = document.getElementById('lessonSearch');
+const searchMateria = document.getElementById('searchMateria');
+const searchEstado  = document.getElementById('searchEstado');
 const combatArea    = document.getElementById('filter-and-combat-area');
 const leccionBlocks = document.querySelectorAll('.leccion-materia-block');
 
-searchInput.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase().trim();
+function runDashboardSearch() {
+    const term = searchInput.value.toLowerCase().trim();
+    const materiaSeleccionada = (searchMateria.value || '').toLowerCase().trim();
+    const estadoSeleccionado = searchEstado.value;
+
     combatArea.style.opacity       = term ? '0.35' : '1';
     combatArea.style.pointerEvents = term ? 'none'  : 'all';
     combatArea.style.transition    = 'opacity 0.3s';
 
     leccionBlocks.forEach(block => {
+        const materiaActual = (block.querySelector('.materia-title')?.textContent || '').toLowerCase().trim();
+        const materiaMatch = !materiaSeleccionada || materiaActual === materiaSeleccionada;
         const cards = block.querySelectorAll('.leccion-card');
         let visible = 0;
         cards.forEach(card => {
             const title   = card.querySelector('.leccion-name').textContent.toLowerCase();
-            const matches = !term || title.includes(term);
+            const isCompleted = card.classList.contains('completed');
+            const estadoMatch = !estadoSeleccionado
+                || (estadoSeleccionado === 'completed' && isCompleted)
+                || (estadoSeleccionado === 'pending' && !isCompleted);
+            const matches = (!term || title.includes(term)) && materiaMatch && estadoMatch;
             card.style.display = matches ? 'flex' : 'none';
             if (matches) visible++;
         });
         block.style.display = visible > 0 ? 'block' : 'none';
     });
-});
+}
+
+searchInput.addEventListener('input', runDashboardSearch);
+searchMateria.addEventListener('change', runDashboardSearch);
+searchEstado.addEventListener('change', runDashboardSearch);
 
 // ── Scroll reveal ─────────────────────────────────────────────────────
 const revealObs = new IntersectionObserver((entries) => {
@@ -535,6 +813,28 @@ const revealObs = new IntersectionObserver((entries) => {
 }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
 
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('lc_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const toggle = document.getElementById('themeToggle');
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('lc_theme', next);
+        });
+    }
+    const langSelector = document.getElementById('langSelector');
+    if (langSelector) {
+        langSelector.addEventListener('change', (e) => {
+            const u = new URL(window.location.href);
+            u.searchParams.set('lang', e.target.value);
+            window.location.href = u.toString();
+        });
+    }
+});
 </script>
 
 <script>
@@ -551,7 +851,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
         data: {
             labels: materias,
             datasets: [{
-                label: 'Tasa de fallo (%)',
+                label: <?= json_encode($t[$lang]['chart_label']) ?>,
                 data: tasa,
                 backgroundColor: 'rgba(255, 60, 172, 0.2)',
                 borderColor:     'rgba(255, 60, 172, 0.75)',
@@ -581,7 +881,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
                 legend: { labels: { color: 'rgba(200,230,255,0.6)', font: { size: 11, family: "'JetBrains Mono'" } } },
                 title:  {
                     display: true,
-                    text: 'Materias con más rezago',
+                    text: <?= json_encode($t[$lang]['chart_title']) ?>,
                     color: 'rgba(200,230,255,0.7)',
                     font: { size: 12, family: "'JetBrains Mono'", weight: '500' },
                     padding: { bottom: 12 }
