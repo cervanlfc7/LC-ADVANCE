@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$url = getenv('TEST_BASE_URL') ? rtrim(getenv('TEST_BASE_URL'), '/') . '/mapa/updateDB.php' : 'http://127.0.0.1:8000/mapa/updateDB.php';
+$url = getenv('TEST_BASE_URL') ? rtrim(getenv('TEST_BASE_URL'), '/') . '/mapa/updateDB.php' : 'http://127.0.0.1:80/mapa/updateDB.php';
 $payload = ['maestro' => 'Miguel', 'materia' => 'Inglés'];
 
 $ch = curl_init($url);

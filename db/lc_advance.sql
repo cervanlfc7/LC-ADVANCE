@@ -67,8 +67,16 @@ CREATE TABLE IF NOT EXISTS user_progress (
     completed TINYINT(1) DEFAULT 0,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_lesson (user_id, slug)
+    UNIQUE KEY unique_user_lesson (user_id, slug),
+    INDEX idx_user_progress_user_id (user_id),
+    INDEX idx_user_progress_slug (slug)
 );
+
+-- =========================
+-- Índices de rendimiento
+-- =========================
+CREATE INDEX idx_usuarios_puntos ON usuarios(puntos DESC);
+CREATE INDEX idx_usuarios_nivel ON usuarios(nivel);
 
 -- =========================
 -- Tabla: lecciones_completadas (opcional, para compatibilidad)

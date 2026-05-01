@@ -9,10 +9,8 @@ require_once 'src/content.php';
 $user_id = $_SESSION['usuario_id'] ?? null;
 $slug    = $_GET['slug'] ?? '';
 
-$leccion = null;
-foreach ($lecciones as $l) {
-    if ($l['slug'] === $slug) { $leccion = $l; break; }
-}
+// Buscar lección por slug (usa caché de memoria)
+$leccion = buscarLeccion($slug);
 
 if (!$leccion) {
     $redir = !empty($_GET['materia'])

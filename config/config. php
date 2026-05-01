@@ -1,0 +1,62 @@
+
+// ================================
+// CACHE DE LECCIONES (compilado + precomputacion)
+// ================================
+$GLOBALS["__cached_lecciones"] = null;
+$GLOBALS["__cached_extra"] = null;
+
+function compileLecciones() {
+    $src = __DIR__ . "/../src/content.php";
+    $out = __DIR__ . "/../cache/lecciones_compiled.php";
+    if (!is_dir(dirname($out))) @mkdir(dirname($out), 0755, true);
+    $mtime = filemtime($src);
+    $cached = @json_decode(@file_get_contents($out), true);
+    $out_mtime = ($cached["_mtime"] ?? 0);
+    if ($out_mtime === $mtime && !empty($cached["data"])) {
+        $GLOBALS["__cached_lecciones"] = $cached["data"];
+        $GLOBALS["__cached_extra"] = ($cached["extra"] ?? null);
+        return $cached["data"];
+    }
+    if ($GLOBALS["__cached_lecciones"] === null) {
+        global $lecciones;
+        require_once $src;
+        $GLOBALS["__cached_lecciones"] = $lecciones;
+    }
+    $por_materia = [];
+    $slug_a_materia = [];
+    foreach ($GLOBALS["__cached_lecciones"] as $l) {
+        $m = $l["materia"] ?? "Sin Materia";
+        if (!isset($por_materia[$m])) $por_materia[$m] = [];
+        $por_materia[$m][] = $l;
+        if (!empty($l["slug"])) $slug_a_materia[$l["slug"]] = $m;
+    }
+    $extra = ["por_materia" => $por_materia, "slug_a_materia" => $slug_a_materia, "total" => count($GLOBALS["__cached_lecciones"])];
+    $GLOBALS["__cached_extra"] = $extra;
+    @file_put_contents($out, json_encode(["_mtime" => $mtime, "data" => $GLOBALS["__cached_lecciones"], "extra" => $extra]));
+    return $GLOBALS["__cached_lecciones"];
+}
+
+function obtenerLecciones() {
+    if ($GLOBALS["__cached_lecciones"] !== null) return $GLOBALS["__cached_lecciones"];
+    return compileLecciones();
+}
+
+function obtenerLeccionesPorMateria() {
+    if ($GLOBALS["__cached_extra"] !== null) return $GLOBALS["__cached_extra"]["por_materia"];
+    compileLecciones();
+    return $GLOBALS["__cached_extra"]["por_materia"];
+}
+
+function obtenerSlugAMateria() {
+    if ($GLOBALS["__cached_extra"] !== null) return $GLOBALS["__cached_extra"]["slug_a_materia"];
+    compileLecciones();
+    return $GLOBALS["__cached_extra"]["slug_a_materia"];
+}
+
+function buscarLeccion($slug) {
+    $lecciones = obtenerLecciones();
+    foreach ($lecciones as $l) {
+        if ($l["slug"] === $slug) return $l;
+    }
+    return null;
+}

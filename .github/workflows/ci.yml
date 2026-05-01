@@ -40,6 +40,24 @@ jobs:
             mysqladmin ping -h 127.0.0.1 -uroot -proot >/dev/null 2>&1 && break || sleep 1
           done
 
+      - name: PHPLint all PHP files
+        run: |
+          echo "=== PHPLint ==="
+          ERRORS=0
+          for f in $(find . -name "*.php" -not -path "./vendor/*" -not -path "./cache/*" -not -path "./tests/tmp/*" 2>/dev/null); do
+            if ! php -l "$f" >/dev/null 2>&1; then
+              echo "FAIL: $f"
+              php -l "$f"
+              ERRORS=$((ERRORS+1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            echo "PHPLINT FAILED: $ERRORS file(s) with errors"
+            exit 1
+          else
+            echo "PHPLINT PASSED: all files OK"
+          fi
+
       - name: Import SQL dump and seed test data
         env:
           DB_HOST: '127.0.0.1'
@@ -47,8 +65,8 @@ jobs:
           DB_USER: 'root'
           DB_PASS: 'root'
         run: |
-          if [ -f sql/lc_advance.sql ]; then
-            mysql -h127.0.0.1 -uroot -proot lc_advance < sql/lc_advance.sql
+          if [ -f db/lc_advance.sql ]; then
+            mysql -h127.0.0.1 -uroot -proot lc_advance < db/lc_advance.sql
             php scripts/seed_test_data.php
           else
             echo "No SQL dump found, skipping import"
@@ -61,11 +79,11 @@ jobs:
         run: |
           for i in {1..60}; do
             if curl -s -f http://127.0.0.1:8000/index.php >/dev/null 2>&1; then
-              echo "✓ Server ready at http://127.0.0.1:8000"
+              echo "Server ready at http://127.0.0.1:8000"
               break
             fi
             if [ $i -eq 60 ]; then
-              echo "✗ Server failed to start"
+              echo "Server failed to start"
               cat /tmp/php_server.log
               exit 1
             fi

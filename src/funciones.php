@@ -21,6 +21,29 @@ if ($is_guest && in_array($accion, ['completar', 'calificar_quiz'])) {
     exit;
 }
 
+// ================================
+// RATE LIMITING para API
+// ================================
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$api_limit_key = "api_rate_{$ip}";
+
+if (!isset($_SESSION[$api_limit_key])) {
+    $_SESSION[$api_limit_key] = ['count' => 0, 'first' => time()];
+}
+$_SESSION[$api_limit_key]['count']++;
+
+// Reset después de 60 segundos
+if (time() - $_SESSION[$api_limit_key]['first'] > 60) {
+    $_SESSION[$api_limit_key] = ['count' => 0, 'first' => time()];
+}
+
+// Limitar a 30 requests por minuto
+if ($_SESSION[$api_limit_key]['count'] > 30) {
+    error_log("Rate limit exceeded: IP {$ip}, accion {$accion}");
+    echo json_encode(['ok' => false, 'error' => 'Demasiadas solicitudes. Espera un momento.']);
+    exit;
+}
+
 if ($accion === 'obtener_estado') {
     if ($is_guest) {
         echo json_encode([
@@ -93,14 +116,8 @@ if ($accion === 'calificar_quiz') {
         echo json_encode(['ok' => false, 'mensaje' => 'Slug faltante']);
         exit;
     }
-    // Busca la lección por slug
-    $leccion = null;
-    foreach ($lecciones as $l) {
-        if ($l['slug'] === $slug) {
-            $leccion = $l;
-            break;
-        }
-    }
+    // Busca la lección por slug (usa caché de memoria)
+    $leccion = buscarLeccion($slug);
     if (!$leccion) {
         echo json_encode(['ok' => false, 'mensaje' => 'Lección no encontrada']);
         exit;

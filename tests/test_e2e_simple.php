@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 $envBase = getenv('TEST_BASE_URL');
-$base = $envBase ? rtrim($envBase, '/') . '/' : 'http://127.0.0.1:8000/';
+$base = $envBase ? rtrim($envBase, '/') . '/' : 'http://127.0.0.1:80/';
 $lessonUrl = $base . 'leccion_detalle.php?slug=b1-past-simple-2025&materia=Ingl%C3%A9s';
 $cookieFile = __DIR__ . '/e2e_cookies.txt';
 @unlink($cookieFile);

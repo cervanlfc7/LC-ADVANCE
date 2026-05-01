@@ -40,31 +40,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nombre_usuario) || empty($contrasena)) {
         $mensaje = '⚠️ Ingresa tu usuario y contraseña.';
     } else {
-        // Buscar usuario en la base de datos
-        $stmt = $pdo->prepare("SELECT id, nombre_usuario, contrasena_hash, puntos, nivel FROM usuarios WHERE nombre_usuario = ?");
-        $stmt->execute([$nombre_usuario]);
-        $usuario = $stmt->fetch();
-
-        if ($usuario && password_verify($contrasena, $usuario['contrasena_hash'])) {
-            // Login exitoso
-            session_regenerate_id(true);
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
-            $_SESSION['usuario_puntos'] = $usuario['puntos'];
-            $_SESSION['usuario_nivel'] = $usuario['nivel'];
-            $_SESSION['last_activity'] = time();
-
-            // Limpiar variables de sesión de invitado
-            unset($_SESSION['usuario_es_invitado']);
-
-            // Si el login incluye materia en la URL, guardarla
-            if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
-
-            // Redirige al destino final
-            redirigir($final_redirect);
+        // ================================
+        // RATE LIMITING
+        // ================================
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $intentos_key = "login_attempts_{$ip}";
+        $bloqueado_key = "login_blocked_{$ip}";
+        
+        if (isset($_SESSION[$bloqueado_key]) && time() < $_SESSION[$bloqueado_key]) {
+            $remaining = $_SESSION[$bloqueado_key] - time();
+            logSeguridadEvento('LOGIN_BLOCKED', "IP: {$ip} intentándolo durante bloqueo");
+            $mensaje = '⏳ Demasiados intentos. Intenta de nuevo en ' . ceil($remaining / 60) . ' minuto(s).';
+        } elseif (isset($_SESSION[$intentos_key]) && $_SESSION[$intentos_key]['count'] >= 5) {
+            $_SESSION[$bloqueado_key] = time() + 300; // 5 min lockout
+            unset($_SESSION[$intentos_key]);
+            logSeguridadEvento('LOGIN_BLOCKED', "IP: {$ip} bloqueado por demasiados intentos");
+            $mensaje = '⏳ Has excedido el límite de intentos. Intenta de nuevo en 5 minutos.';
         } else {
-            logSeguridadEvento('LOGIN_FAIL', "Usuario: {$nombre_usuario} intento de contraseña incorrecta");
-            $mensaje = '❌ Usuario o contraseña incorrectos.';
+            // Buscar usuario en la base de datos
+            $stmt = $pdo->prepare("SELECT id, nombre_usuario, contrasena_hash, puntos, nivel FROM usuarios WHERE nombre_usuario = ?");
+            $stmt->execute([$nombre_usuario]);
+            $usuario = $stmt->fetch();
+
+            if ($usuario && password_verify($contrasena, $usuario['contrasena_hash'])) {
+                // Login exitoso
+                session_regenerate_id(true);
+                $_SESSION['usuario_id'] = $usuario['id'];
+                $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
+                $_SESSION['usuario_puntos'] = $usuario['puntos'];
+                $_SESSION['usuario_nivel'] = $usuario['nivel'];
+                $_SESSION['last_activity'] = time();
+
+                // Limpiar variables de sesión de invitado
+                unset($_SESSION['usuario_es_invitado']);
+                unset($_SESSION[$intentos_key]);
+                unset($_SESSION[$bloqueado_key]);
+
+                // Si el login incluye materia en la URL, guardarla
+                if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
+
+                // Redirige al destino final
+                redirigir($final_redirect);
+            } else {
+                // Login fallido - contar intentos
+                $intentos = $_SESSION[$intentos_key] ?? ['count' => 0, 'first' => time()];
+                $intentos['count']++;
+                if ($intentos['count'] === 1) $intentos['first'] = time();
+                $_SESSION[$intentos_key] = $intentos;
+                
+                logSeguridadEvento('LOGIN_FAIL', "Usuario: {$nombre_usuario} intento de contraseña incorrecta");
+                $mensaje = '❌ Usuario o contraseña incorrectos.';
+            }
         }
     }
 }

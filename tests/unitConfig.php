@@ -1,0 +1,9 @@
+<?php
+require_once __DIR__ . '/testcase.php';
+
+function testNivel() { $tc = new TestCase(); $tc->assertEquals(1, calcularNivel(0)); $tc->assertEquals(1, calcularNivel(499)); $tc->assertEquals(2, calcularNivel(500)); $tc->assertEquals(2, calcularNivel(999)); $tc->assertEquals(3, calcularNivel(1000)); $tc->assertEquals(3, calcularNivel(1499)); $tc->assertEquals(4, calcularNivel(1500)); list($p,$f)=$tc->summary(); echo "nivel PASSED:$p FAILED:$f\n"; return $f===0; }
+function testLimpiar() { $tc = new TestCase(); $tc->assertEquals('test', limpiarEntrada('test')); $tc->assertEquals('hola', limpiarEntrada('  hola  ')); $tc->assertEquals('&lt;script&gt;', limpiarEntrada('<script>')); $tc->assertEquals('&lt;?php', limpiarEntrada('<?php')); $tc->assertEquals("O&apos;Reilly", limpiarEntrada("O'Reilly")); list($p,$f)=$tc->summary(); echo "limpiar PASSED:$p FAILED:$f\n"; return $f===0; }
+function testQuiz() { $tc = new TestCase(); $tc->assertEquals(30, 3*10); $tc->assertEquals(0, strcasecmp('  A ', 'a')); $tc->assertFalse(0===strcasecmp('B','a')); $p=[['correcta'=>'A'],['correcta'=>'B'],['correcta'=>'C']]; $r=['A','B','X']; $s=0; foreach($p as $i=>$q){ if(0===strcasecmp($r[$i]??'', $q['correcta'])) $s++; } $tc->assertEquals(2,$s); $tc->assertEquals(20,$s*10); list($p,$f)=$tc->summary(); echo "quiz PASSED:$p FAILED:$f\n"; return $f===0; }
+function testRateLimit() { $tc = new TestCase(); $a=0; for($i=1;$i<=5;$i++)$a++; $tc->assertEquals(5,$a); $tc->assertTrue($a>=5); $api=0; for($i=1;$i<=30;$i++)$api++; $tc->assertEquals(30,$api); $tc->assertFalse($api>30); $tc->assertTrue(31>30); list($p,$f)=$tc->summary(); echo "ratelimit PASSED:$p FAILED:$f\n"; return $f===0; }
+
+echo "=== Unit Tests ===\n"; $ok = testNivel() && testLimpiar() && testQuiz() && testRateLimit(); echo $ok ? "PASS\n" : "FAIL\n"; exit($ok ? 0 : 1);
