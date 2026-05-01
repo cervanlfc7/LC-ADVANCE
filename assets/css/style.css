@@ -11,7 +11,7 @@
 
 /* ===== VARIABLES GLOBALES ===== */
 :root {
-  /* Colores Neón */
+  /* Colores Neón (Dark Theme) */
   --neon-green: #00ff00;
   --neon-blue: #00ccff;
   --neon-cyan: #00ffff;
@@ -21,12 +21,12 @@
   --neon-orange: #ff9800;
   --neon-red: #ff3333;
 
-  /* Fondos */
+  /* Fondos (Dark Theme) */
   --bg-dark: #0a0a0a;
   --bg-card: #111111;
   --bg-panel: #1a1a1a;
 
-  /* Texto */
+  /* Texto (Dark Theme) */
   --text-light: #f0f0f0;
   --text-dim: #aaaaaa;
   --text-dark: #000000;
@@ -46,6 +46,35 @@
   --base-font-size: clamp(16px, 1.2vw, 20px);
   --line-height: 1.6;
   --padding-base: clamp(15px, 3vw, 25px);
+}
+
+/* ===== LIGHT THEME OVERRIDES ===== */
+body.theme-light {
+  /* Colores Neón (Light Theme - más suaves) */
+  --neon-green: #2e7d32;
+  --neon-blue: #1976d2;
+  --neon-cyan: #0097a7;
+  --neon-pink: #c2185b;
+  --neon-magenta: #c2185b;
+  --neon-yellow: #f57c00;
+  --neon-orange: #e65100;
+  --neon-red: #d32f2f;
+
+  /* Fondos (Light Theme) */
+  --bg-dark: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-panel: #f1f3f4;
+
+  /* Texto (Light Theme) */
+  --text-light: #1a1a1a;
+  --text-dim: #5f6368;
+  --text-dark: #000000;
+  --text-muted: #80868b;
+
+  /* Efectos (Light Theme - más sutiles) */
+  --glow-green: 0 0 12px rgba(46, 125, 50, 0.3);
+  --glow-cyan: 0 0 12px rgba(0, 151, 167, 0.3);
+  --glow-pink: 0 0 12px rgba(194, 24, 91, 0.3);
 }
 
 /* ===== RESET Y BASE ===== */
@@ -90,6 +119,16 @@ button {
   cursor: pointer;
 }
 
+/* Light theme form overrides */
+body.theme-light input,
+body.theme-light textarea,
+body.theme-light select,
+body.theme-light button {
+  background: var(--bg-panel); /* #f1f3f4 */
+  color: var(--text-light); /* #1a1a1a */
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -117,6 +156,20 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden; /* Evitar scroll horizontal accidental */
+}
+
+/* Light theme body overrides */
+body.theme-light {
+  background: var(--bg-dark); /* f8f9fa */
+  background-image:
+    radial-gradient(circle at center, rgba(25, 118, 210, 0.08) 1px, transparent 0),
+    repeating-linear-gradient(
+      0deg,
+      rgba(25, 118, 210, 0.04) 0px,
+      transparent 1px,
+      transparent 2px
+    );
+  color: var(--text-light); /* 1a1a1a */
 }
 
 /* ===== TIPOGRAFÍA RESPONSIVA ===== */
@@ -196,6 +249,20 @@ p {
   animation: neonGlow 2s ease-in-out infinite alternate;
 }
 
+/* Light theme container overrides */
+body.theme-light .lesson-container,
+body.theme-light .dashboard-container,
+body.theme-light .quiz-container,
+body.theme-light .ranking-container,
+body.theme-light .register-container,
+body.theme-light .login-container {
+  background: var(--bg-card); /* white */
+  border-color: var(--neon-green); /* #2e7d32 */
+  box-shadow:
+    var(--glow-green), /* subtle green glow */
+    inset 0 0 8px rgba(46, 125, 50, 0.1);
+}
+
 /* ===== HEADER Y NAVEGACIÓN (RESPONSIVE) ===== */
 .header,
 .main-header {
@@ -210,6 +277,14 @@ p {
   top: 0;
   z-index: 1200;
   box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4);
+}
+
+/* Light theme header overrides */
+body.theme-light .header,
+body.theme-light .main-header {
+  background: #ffffff;
+  border-bottom-color: var(--neon-yellow); /* #f57c00 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header h1,
@@ -229,12 +304,6 @@ p {
   gap: 10px;
   align-items: center;
 }
-
-/* Hamburger menu - compacto y táctil para móviles */
-.header .hamburger,
-.main-header .hamburger {
-  display: none;
-  background: rgba(0, 0, 0, 0.35);
   border: 1.5px solid var(--neon-yellow);
   color: var(--neon-yellow);
   font-size: 18px;

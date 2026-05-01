@@ -364,7 +364,7 @@ $daily_quests = [
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        [data-theme="light"] {
+        body.theme-light {
             --bg: #f4f8ff;
             --surface: #ffffff;
             --surface2: #eef4ff;
@@ -437,7 +437,6 @@ $daily_quests = [
                 <option value="es" <?= $lang === 'es' ? 'selected' : '' ?>>ES</option>
                 <option value="en" <?= $lang === 'en' ? 'selected' : '' ?>>EN</option>
             </select>
-            <button type="button" id="themeToggle"><?= htmlspecialchars($t[$lang]['theme']) ?></button>
         </div>
     </nav>
 </header>
@@ -815,17 +814,6 @@ const revealObs = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('lc_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    const toggle = document.getElementById('themeToggle');
-    if (toggle) {
-        toggle.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme') || 'dark';
-            const next = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('lc_theme', next);
-        });
-    }
     const langSelector = document.getElementById('langSelector');
     if (langSelector) {
         langSelector.addEventListener('change', (e) => {

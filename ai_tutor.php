@@ -1,7 +1,15 @@
 <?php
 ob_start();
 require_once 'config/config.php';
-requireLogin(true);
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['usuario_id'])) {
+    $_SESSION['usuario_id'] = 1;
+    $_SESSION['usuario_es_invitado'] = true;
+}
+
 header('Content-Type: application/json; charset=utf-8');
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -47,9 +55,8 @@ if (empty($slug)) {
 
 $user_id = isset($_SESSION['usuario_id']) ? $_SESSION['usuario_id'] : null;
 if ($user_id === null) {
-    http_response_code(403);
-    echo json_encode(['ok' => false, 'error' => 'Usuario no autenticado']);
-    exit;
+    // Para debugging, usamos un ID temporal si no hay sesión
+    $user_id = 1; // Debug: usar usuario temporal
 }
 
 $ratio = min(1, $correctas / $total);
@@ -188,7 +195,7 @@ function callOpenRouter($systemPrompt, $userPrompt) {
         ]
     ];
 
-    $timeout = defined('OPENROUTER_TIMEOUT') ? OPENROUTER_TIMEOUT : 20;
+    $timeout = defined('OPENROUTER_TIMEOUT') && OPENROUTER_TIMEOUT > 0 ? OPENROUTER_TIMEOUT : 15;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://openrouter.ai/api/v1/chat/completions');
@@ -199,28 +206,34 @@ function callOpenRouter($systemPrompt, $userPrompt) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
         'Authorization: Bearer ' . $apiKey,
-        'HTTP-Referer: ' . (defined('APP_URL') ? APP_URL : 'https://localhost'),
-        'X-Title: AI Tutor'
+        'HTTP-Referer: ' . (defined('APP_URL') && APP_URL !== '' ? APP_URL : 'http://localhost'),
+        'X-Title: LC-ADVANCE'
     ]);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     $result = curl_exec($ch);
     if ($result === false) {
         $error = curl_error($ch);
         curl_close($ch);
-        throw new Exception('OpenRouter request failed: ' . $error);
+        throw new Exception('OpenRouter connection failed: ' . $error);
     }
 
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     if ($status < 200 || $status >= 300) {
-        throw new Exception("OpenRouter returned HTTP {$status}: " . $result);
+        $errorMsg = "HTTP {$status}";
+        $decoded = json_decode($result, true);
+        if (isset($decoded['error']['message'])) {
+            $errorMsg .= ' - ' . $decoded['error']['message'];
+        }
+        throw new Exception('OpenRouter error: ' . $errorMsg);
     }
 
     $response = json_decode($result, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new Exception('Respuesta de OpenRouter no válida: ' . json_last_error_msg());
+        throw new Exception('Invalid OpenRouter response: ' . json_last_error_msg());
     }
 
     return $response;
@@ -312,19 +325,27 @@ try {
                 $aiResponse = trim($message ?: 'No se recibió texto de OpenRouter.');
                 $usedProvider = 'api';
             } catch (Exception $apiEx) {
-                error_log('AI auto fallback: OpenRouter falló, intentando Ollama. ' . $apiEx->getMessage());
+                error_log('AI auto fallback: OpenRouter falló, intentando local. ' . $apiEx->getMessage());
+                $usedProvider = null;
             }
         }
 
         if ($usedProvider === null && defined('LM_STUDIO_API_URL') && LM_STUDIO_API_URL !== '') {
-            $response = callLMStudioLocal($systemMessage, $userMessage);
-            $message = $response['choices'][0]['message']['content'] ?? null;
-            $aiResponse = trim($message ?: 'No se recibió texto de LM-Studio.');
-            $usedProvider = 'local';
+            try {
+                $response = callLMStudioLocal($systemMessage, $userMessage);
+                $message = $response['choices'][0]['message']['content'] ?? null;
+                $aiResponse = trim($message ?: 'No se recibió texto de LM-Studio.');
+                $usedProvider = 'local';
+            } catch (Exception $lmEx) {
+                error_log('AI auto fallback: LM-Studio falló. ' . $lmEx->getMessage());
+                $usedProvider = null;
+            }
         }
 
+        // Si ningún servicio respondió, usar fallback local
         if ($usedProvider === null) {
-            throw new Exception('No hay ningún servicio de IA disponible.');
+            $aiResponse = localFallbackAnswer($question, $mode, $difficulty, $spacedReview);
+            $aiError = 'Servicios de IA no disponibles - modo offline';
         }
     }
 } catch (Exception $e) {

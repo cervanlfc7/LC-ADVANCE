@@ -17,15 +17,21 @@ echo '<!DOCTYPE html><html><head><title>Saliendo...</title></head><body style="b
 echo '<div><p>Cerrando sesión y limpiando mapa...</p>';
 echo '<script>
     // Limpiar TODA posible clave de guardado del mapa
-    for (let i = 0; i < localStorage.length; i++) {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
         if (key && key.startsWith("map.player_pos")) {
             localStorage.removeItem(key);
-            i--; // Ajustar índice tras remover
         }
     }
-    // Redirigir
-    window.location.href = "login.php";
+    // Limpiar caché del service worker para evitar volver a cargar una página antigua
+    const destination = "login.php?logout=1&_=" + Date.now();
+    if (typeof caches !== "undefined") {
+        caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).finally(() => {
+            window.location.replace(destination);
+        });
+    } else {
+        window.location.replace(destination);
+    }
 </script></div></body></html>';
 exit;
 ?>

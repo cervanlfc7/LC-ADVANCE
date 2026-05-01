@@ -7,6 +7,9 @@
 
 require_once 'config/config.php';
 iniciarSesionSegura();
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 require_once 'config/csrf.php';
 
 $usuario_logueado = isset($_SESSION['usuario_id']);
@@ -679,6 +682,87 @@ $t = [
             padding: 10px;
             background: var(--surface2);
             font-size: 13px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .tour-steps li.active {
+            background: rgba(0, 230, 255, 0.12);
+            border-color: rgba(0, 230, 255, 0.4);
+        }
+
+        .tour-preview {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .tour-frame {
+            background: #080d18;
+            border: 1px solid rgba(0, 255, 255, 0.18);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.06);
+        }
+
+        .tour-screen {
+            min-height: 230px;
+            padding: 18px;
+            color: #e8f4ff;
+            font-family: var(--font-mono);
+            display: none;
+            gap: 14px;
+        }
+
+        .tour-screen.active {
+            display: grid;
+        }
+
+        .tour-screen h5 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tour-screen p {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.6;
+            color: rgba(232, 244, 255, 0.78);
+        }
+
+        .tour-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tour-chip {
+            background: rgba(0, 255, 255, 0.08);
+            border: 1px solid rgba(0, 255, 255, 0.12);
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            color: #c8f4ff;
+        }
+
+        .tour-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .tour-controls .btn {
+            min-width: 120px;
+        }
+
+        .tour-progress {
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: 0.6px;
         }
 
         .landing-section {
@@ -1383,7 +1467,6 @@ $t = [
                 <option value="es" <?= $lang === 'es' ? 'selected' : '' ?>>ES</option>
                 <option value="en" <?= $lang === 'en' ? 'selected' : '' ?>>EN</option>
             </select>
-            <button type="button" id="themeToggle"><?= htmlspecialchars($t[$lang]['theme']) ?></button>
         </div>
     </nav>
 </header>
@@ -1719,18 +1802,6 @@ document.querySelectorAll('a[href*="#"]').forEach(anchor => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('lc_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
-    const toggle = document.getElementById('themeToggle');
-    if (toggle) {
-        toggle.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme') || 'dark';
-            const next = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('lc_theme', next);
-        });
-    }
 
     const langSelector = document.getElementById('langSelector');
     if (langSelector) {
@@ -1821,15 +1892,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const tourModal = document.getElementById('tourModal');
     const openTourBtn = document.getElementById('openTourBtn');
     const closeTourBtn = document.getElementById('closeTourBtn');
-    if (!tourModal || !openTourBtn || !closeTourBtn) return;
+    const tourPrev = document.getElementById('tourPrev');
+    const tourNext = document.getElementById('tourNext');
+    const tourProgress = document.getElementById('tourProgress');
+    const tourScreens = Array.from(document.querySelectorAll('.tour-screen'));
+    const tourSteps = Array.from(document.querySelectorAll('.tour-steps li'));
+    let tourIndex = 0;
 
-    openTourBtn.addEventListener('click', () => tourModal.classList.add('open'));
+    if (!tourModal || !openTourBtn || !closeTourBtn || !tourPrev || !tourNext || !tourProgress) return;
+
+    const updateTourView = () => {
+        tourScreens.forEach((screen, index) => {
+            screen.classList.toggle('active', index === tourIndex);
+        });
+        tourSteps.forEach((step, index) => {
+            step.classList.toggle('active', index === tourIndex);
+        });
+        tourPrev.disabled = tourIndex === 0;
+        tourNext.textContent = tourIndex === tourScreens.length - 1 ? 'Cerrar' : 'Siguiente';
+        tourProgress.textContent = `${tourIndex + 1} / ${tourScreens.length}`;
+    };
+
+    openTourBtn.addEventListener('click', () => {
+        tourModal.classList.add('open');
+        tourIndex = 0;
+        updateTourView();
+    });
     closeTourBtn.addEventListener('click', () => tourModal.classList.remove('open'));
     tourModal.addEventListener('click', (event) => {
         if (event.target === tourModal) {
             tourModal.classList.remove('open');
         }
     });
+
+    tourPrev.addEventListener('click', () => {
+        if (tourIndex > 0) {
+            tourIndex -= 1;
+            updateTourView();
+        }
+    });
+
+    tourNext.addEventListener('click', () => {
+        if (tourIndex < tourScreens.length - 1) {
+            tourIndex += 1;
+            updateTourView();
+        } else {
+            tourModal.classList.remove('open');
+        }
+    });
+
+    updateTourView();
 });
 </script>
 
@@ -1837,12 +1949,53 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="tour-content">
         <h4><?= htmlspecialchars($t[$lang]['tour_modal_title']) ?></h4>
         <p><?= htmlspecialchars($t[$lang]['tour_modal_sub']) ?></p>
-        <ul class="tour-steps">
-            <li><?= htmlspecialchars($t[$lang]['tour_step_1']) ?></li>
+        <div class="tour-preview" id="tourPreview">
+            <div class="tour-frame">
+                <div class="tour-screen active" data-step="1">
+                    <h5>Mapa interactivo</h5>
+                    <div class="tour-status">
+                        <span class="tour-chip">Explora el campus</span>
+                        <span class="tour-chip">Habla con profesores</span>
+                    </div>
+                    <p>Visualiza la zona principal del mapa, los puntos de acceso y la guía para entrar desde el campus virtual directamente a lecciones y retos.</p>
+                </div>
+                <div class="tour-screen" data-step="2">
+                    <h5>Dashboard dinámico</h5>
+                    <div class="tour-status">
+                        <span class="tour-chip">Filtros por materia</span>
+                        <span class="tour-chip">Progreso guardado</span>
+                    </div>
+                    <p>El dashboard muestra tu progreso real, los objetivos del día y las métricas que te ayudan a avanzar con enfoque.</p>
+                </div>
+                <div class="tour-screen" data-step="3">
+                    <h5>Duelo y examen</h5>
+                    <div class="tour-status">
+                        <span class="tour-chip">Combates de conocimiento</span>
+                        <span class="tour-chip">XP y nivel</span>
+                    </div>
+                    <p>Cada evaluación funciona como un duelo: responde, acumula puntos y desbloquea nuevas rutas en el mapa.</p>
+                </div>
+                <div class="tour-screen" data-step="4">
+                    <h5>Ranking y logros</h5>
+                    <div class="tour-status">
+                        <span class="tour-chip">Posición global</span>
+                        <span class="tour-chip">Rutas recomendadas</span>
+                    </div>
+                    <p>Consulta tu posición frente a otros estudiantes y usa el ranking para mejorar punto por punto.</p>
+                </div>
+            </div>
+        </div>
+        <ul class="tour-steps" id="tourStepList">
+            <li class="active"><?= htmlspecialchars($t[$lang]['tour_step_1']) ?></li>
             <li><?= htmlspecialchars($t[$lang]['tour_step_2']) ?></li>
             <li><?= htmlspecialchars($t[$lang]['tour_step_3']) ?></li>
             <li><?= htmlspecialchars($t[$lang]['tour_step_4']) ?></li>
         </ul>
+        <div class="tour-controls">
+            <button class="btn" id="tourPrev" disabled>Anterior</button>
+            <span class="tour-progress" id="tourProgress">1 / 4</span>
+            <button class="btn btn-primary" id="tourNext">Siguiente</button>
+        </div>
         <button class="btn btn-primary" id="closeTourBtn"><?= htmlspecialchars($t[$lang]['tour_close']) ?></button>
     </div>
 </div>

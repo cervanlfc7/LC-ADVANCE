@@ -18,7 +18,7 @@ define('DEBUG_MODE', true);
 date_default_timezone_set('America/Mexico_City');
 
 // Nombre del sistema
-define('APP_NAME', 'CBTIS168 Study Game');
+define('APP_NAME', 'LC-ADVANCE');
 
 // ================================
 // CONFIGURACIÓN DE LA BASE DE DATOS
@@ -274,11 +274,29 @@ function cerrarSesionSegura() {
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000,
-            $params['path'], $params['domain'], $params['secure'] ?? false, $params['httponly'] ?? true
-        );
+        setcookie(session_name(), '', [
+            'expires' => time() - 42000,
+            'path' => $params['path'] ?: '/',
+            'domain' => $params['domain'] ?: '',
+            'secure' => $params['secure'] ?? false,
+            'httponly' => $params['httponly'] ?? true,
+            'samesite' => 'Lax'
+        ]);
     }
     session_destroy();
+    session_write_close();
+
+    // Additional cleanup for stubborn sessions
+    if (isset($_COOKIE[session_name()])) {
+        setcookie(session_name(), '', [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    }
 }
 
 
@@ -299,12 +317,12 @@ function calcularNivel($puntos) {
 // ================================
 
 // Google
-define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: '683843517989-s9or7ddfusfl57nvqcllm09kkebd7vvc.apps.googleusercontent.com');
-define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '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'); // Necesitas copiar el Secreto que te dio Google y pegarlo aquí
+define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: '683843517989-iiduvf35ngg455uai3tlvh1deovrhlob.apps.googleusercontent.com');
+define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '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'); // Secret de cliente proporcionado
 
 // GitHub
-define('GITHUB_CLIENT_ID', getenv('GITHUB_CLIENT_ID') ?: 'Ov23lipzxi8W4UooK4C3');
-define('GITHUB_CLIENT_SECRET', getenv('GITHUB_CLIENT_SECRET') ?: 'b605fbe1ba5e3b91fba7de7186cd6bd2ef9bb4ce');
+define('GITHUB_CLIENT_ID', getenv('GITHUB_CLIENT_ID') ?: 'Ov23li8ulSRf1UKXEl2S');
+define('GITHUB_CLIENT_SECRET', getenv('GITHUB_CLIENT_SECRET') ?: 'a562661b04a8277fa03a482194d839a5139d3d35');
 
 // URL de retorno (Callback)
 // Asegúrate de que esta URL esté registrada en tus consolas de desarrollador
@@ -323,7 +341,7 @@ if (!empty(getenv('AUTH_CALLBACK_URL'))) {
 } else {
     // Valor predeterminado local usado solo si no hay host disponible.
     // Usa el mismo host y puerto que ves en el navegador cuando accedes a la app.
-    $defaultAuthCallback = 'http://localhost:8080/LC-Advance/auth_callback.php';
+    $defaultAuthCallback = 'http://localhost/LC-Advance/auth_callback.php';
 }
 define('AUTH_CALLBACK_URL', $defaultAuthCallback);
 

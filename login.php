@@ -8,6 +8,9 @@
 
 require_once 'config/config.php';
 iniciarSesionSegura();
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 require_once 'config/csrf.php';
 
 // Si ya hay sesión activa, redirige
@@ -50,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['usuario_puntos'] = $usuario['puntos'];
             $_SESSION['usuario_nivel'] = $usuario['nivel'];
             $_SESSION['last_activity'] = time();
+
+            // Limpiar variables de sesión de invitado
+            unset($_SESSION['usuario_es_invitado']);
 
             // Si el login incluye materia en la URL, guardarla
             if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);

@@ -25,55 +25,91 @@ $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
 
     #pauseMenu {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: rgba(10, 10, 20, 0.98); border: 3px solid var(--neon-cyan); padding: 44px 32px 36px 32px;
-      text-align: center; z-index: 2000; backdrop-filter: blur(12px); box-shadow: 0 0 60px 0 var(--neon-cyan), 0 0 0 8px rgba(0,255,255,0.08);
-      border-radius: 22px;
-      min-width: 320px;
+      background: linear-gradient(145deg, rgba(8, 12, 24, 0.96), rgba(4, 6, 16, 0.98));
+      border: 2px solid var(--neon-cyan); padding: 36px 40px 32px 40px;
+      text-align: center; z-index: 2000; backdrop-filter: blur(16px);
+      box-shadow: 
+        0 0 40px rgba(0, 255, 255, 0.15),
+        0 0 80px rgba(0, 255, 255, 0.08),
+        inset 0 0 60px rgba(0, 255, 255, 0.03),
+        0 0 0 1px rgba(0, 255, 255, 0.1);
+      border-radius: 8px;
+      min-width: 340px;
+      animation: menuPulse 3s ease-in-out infinite;
+    }
+    @keyframes menuPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.15), 0 0 80px rgba(0, 255, 255, 0.08), inset 0 0 60px rgba(0, 255, 255, 0.03), 0 0 0 1px rgba(0, 255, 255, 0.1); }
+      50% { box-shadow: 0 0 50px rgba(0, 255, 255, 0.2), 0 0 100px rgba(0, 255, 255, 0.1), inset 0 0 80px rgba(0, 255, 255, 0.05), 0 0 0 1px rgba(0, 255, 255, 0.15); }
+    }
+    #pauseMenu::before {
+      content: ''; position: absolute; top: -1px; left: 20%; right: 20%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
     }
     #pauseMenu h2 {
-      color: var(--neon-cyan); margin-bottom: 32px; text-shadow: 0 0 16px var(--neon-cyan), 0 0 2px #fff;
-      font-size: 1.2em;
-      letter-spacing: 2px;
+      color: var(--neon-cyan); margin-bottom: 28px; margin-top: 0;
+      text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px rgba(0, 255, 255, 0.5);
+      font-size: 1em; letter-spacing: 3px; text-transform: uppercase;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2); padding-bottom: 16px;
     }
-    .menu-btns { display: flex; flex-direction: column; gap: 22px; }
+    .menu-btns { display: flex; flex-direction: column; gap: 16px; }
     .menu-btns button {
-      padding: 18px 0; background: #0a0a15; color: var(--neon-yellow); border: 2.5px solid var(--neon-yellow);
-      cursor: pointer; font-family: 'Press Start 2P', monospace; font-size: 15px; border-radius: 12px;
-      letter-spacing: 1px; text-shadow: 0 0 8px var(--neon-yellow), 0 0 2px #fff;
-      box-shadow: 0 0 18px 0 var(--neon-yellow), 0 0 0 4px rgba(255,255,0,0.08);
-      transition: background 0.18s, color 0.18s, box-shadow 0.18s, border-color 0.18s, transform 0.12s;
-      outline: none;
+      padding: 16px 0; background: linear-gradient(135deg, rgba(20, 20, 35, 0.9), rgba(10, 10, 20, 0.9));
+      color: var(--neon-yellow); border: 2px solid var(--neon-yellow);
+      cursor: pointer; font-family: 'Press Start 2P', monospace; font-size: 12px;
+      letter-spacing: 1px; text-shadow: 0 0 10px var(--neon-yellow);
+      box-shadow: 0 0 15px rgba(255, 255, 0, 0.2), inset 0 0 20px rgba(255, 255, 0, 0.05);
+      transition: all 0.2s ease; outline: none;
+      position: relative; overflow: hidden;
     }
+    .menu-btns button::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.4s ease;
+    }
+    .menu-btns button:hover::before, .menu-btns button:focus::before { left: 100%; }
     .menu-btns button:hover, .menu-btns button:focus {
-      background: var(--neon-yellow); color: #000; box-shadow: 0 0 32px var(--neon-yellow), 0 0 0 8px rgba(255,255,0,0.18);
-      border-color: #fff700;
-      transform: scale(1.04);
+      background: var(--neon-yellow); color: #000;
+      box-shadow: 0 0 30px var(--neon-yellow), 0 0 60px rgba(255, 255, 0, 0.3);
+      text-shadow: none; transform: translateY(-2px);
+      border-color: #fff;
     }
     .menu-btns button.exit {
-      border-color: var(--neon-pink); color: var(--neon-pink); background: #1a001a;
-      box-shadow: 0 0 18px 0 var(--neon-pink), 0 0 0 4px rgba(255,0,255,0.08);
-      text-shadow: 0 0 8px var(--neon-pink), 0 0 2px #fff;
+      border-color: var(--neon-pink); color: var(--neon-pink);
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.2), inset 0 0 20px rgba(255, 0, 255, 0.05);
+      text-shadow: 0 0 10px var(--neon-pink);
     }
     .menu-btns button.exit:hover, .menu-btns button.exit:focus {
-      background: var(--neon-pink); color: #fff; box-shadow: 0 0 32px var(--neon-pink), 0 0 0 8px rgba(255,0,255,0.18);
-      border-color: #fff;
+      background: var(--neon-pink); color: #fff;
+      box-shadow: 0 0 30px var(--neon-pink), 0 0 60px rgba(255, 0, 255, 0.3);
+      text-shadow: none; transform: translateY(-2px); border-color: #fff;
     }
     .menu-btns button.reset {
-      border-color: #39ff14; color: #39ff14; background: #0a1a0a;
-      box-shadow: 0 0 18px 0 #39ff14, 0 0 0 4px rgba(57,255,20,0.08);
-      text-shadow: 0 0 8px #39ff14, 0 0 2px #fff;
+      border-color: #39ff14; color: #39ff14;
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.2), inset 0 0 20px rgba(57, 255, 20, 0.05);
+      text-shadow: 0 0 10px #39ff14;
     }
     .menu-btns button.reset:hover, .menu-btns button.reset:focus {
-      background: #39ff14; color: #000; box-shadow: 0 0 32px #39ff14, 0 0 0 8px rgba(57,255,20,0.18);
-      border-color: #fff;
+      background: #39ff14; color: #000;
+      box-shadow: 0 0 30px #39ff14, 0 0 60px rgba(57, 255, 20, 0.3);
+      text-shadow: none; transform: translateY(-2px); border-color: #fff;
     }
     
     #interaction {
-      position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,0.8); color: white; border: 2px solid var(--neon-cyan);
-      padding: 15px 30px; font-size: 11px; z-index: 500; display: none;
-      box-shadow: 0 0 20px rgba(0,255,255,0.2); pointer-events: none;
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, rgba(0, 20, 30, 0.9), rgba(0, 10, 20, 0.95));
+      color: var(--neon-cyan); border: 1px solid var(--neon-cyan);
+      padding: 12px 24px; font-size: 10px; z-index: 500; display: block;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3), inset 0 0 30px rgba(0,255,255,0.05);
+      pointer-events: none; backdrop-filter: blur(8px);
+      border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;
+      text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0,255,255,0.5);
+      animation: interactPulse 2s ease-in-out infinite;
     }
+    @keyframes interactPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,255,255,0.3), inset 0 0 30px rgba(0,255,255,0.05); }
+      50% { box-shadow: 0 0 30px rgba(0,255,255,0.5), inset 0 0 40px rgba(0,255,255,0.08); }
+    }
+    
 
     .mobile-controls {
       position: fixed; bottom: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; z-index: 1000;
