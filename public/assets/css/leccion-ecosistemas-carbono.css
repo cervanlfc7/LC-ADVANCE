@@ -1,0 +1,1265 @@
+/* ============================================================
+   ESTILOS ÚNICOS PARA LECCIÓN: CICLO DEL CARBONO
+   Cyberpunk Educational Design - Ecosistemas
+   ============================================================ */
+
+:root {
+    /* PALETA NEON ECOSISTEMAS */
+    --neon-biosfera: #39ff14;     /* Verde vibrante - conceptos clave */
+    --neon-interactivo: #00ffff;  /* Cyan - simuladores */
+    --neon-oceano: #0088ff;       /* Azul - agua/océanos */
+    --neon-alerta: #ff3366;       /* Rosa/Rojo - impacto humano */
+    --neon-evaluacion: #ffff00;   /* Amarillo - evaluación/éxito */
+    
+    /* FONDOS JERÁRQUICOS */
+    --bg-leccion: #070714;        /* Fondo principal ultra oscuro */
+    --bg-seccion: rgba(0, 20, 40, 0.4);
+    --bg-card: rgba(10, 10, 26, 0.8);
+    
+    /* TIPOGRAFÍA ESCALABLE */
+    --font-base: 1rem;
+    --font-sm: 0.875rem;
+    --font-md: 1.125rem;
+    --font-lg: 1.25rem;
+    --font-xl: 1.5rem;
+    --font-2xl: 2rem;
+    
+    /* ESPACIADO CONSISTENTE */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.leccion-container.leccion-ecosistemas-carbono {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+    background: var(--bg-leccion);
+    color: #e0e0e0;
+    font-size: var(--font-base);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Grid background sutil */
+.leccion-container.leccion-ecosistemas-carbono::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(57, 255, 20, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 20, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ============================================================
+   CABECERA MEJORADA
+   ============================================================ */
+
+.leccion-header.compact {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 2px solid var(--neon-biosfera);
+}
+
+.header-top {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.materia-badge, .nivel-badge, .tiempo-badge {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(57, 255, 20, 0.1);
+    border: 1px solid var(--neon-biosfera);
+    border-radius: 20px;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--neon-biosfera);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nivel-badge {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: var(--neon-interactivo);
+    color: var(--neon-interactivo);
+}
+
+.tiempo-badge {
+    background: rgba(255, 255, 0, 0.1);
+    border-color: var(--neon-evaluacion);
+    color: var(--neon-evaluacion);
+}
+
+.titulo-leccion {
+    font-size: clamp(var(--font-xl), 5vw, var(--font-2xl));
+    margin: var(--space-md) 0;
+    color: #39ff14;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+    line-height: 1.2;
+}
+
+.neon-icon {
+    display: inline-block;
+    margin-right: var(--space-sm);
+    font-weight: 900;
+    opacity: 0.8;
+}
+
+.leccion-subtitulo {
+    font-size: var(--font-md);
+    color: #00ffff;
+    margin: var(--space-sm) 0 0;
+    font-weight: 500;
+}
+
+/* ============================================================
+   PANEL DE OBJETIVOS
+   ============================================================ */
+
+.objetivos-rapidos {
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    background: rgba(0, 40, 80, 0.3);
+    border-left: 4px solid var(--neon-biosfera);
+    border-radius: 8px;
+}
+
+.objetivos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+    margin: 0;
+}
+
+.objetivo-card {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(57, 255, 20, 0.05);
+    border: 1px solid var(--neon-biosfera);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.objetivo-card:hover {
+    background: rgba(57, 255, 20, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 255, 20, 0.15);
+}
+
+.obj-icon {
+    font-size: var(--font-xl);
+    min-width: 40px;
+    text-align: center;
+}
+
+.obj-text h4 {
+    margin: 0 0 var(--space-xs) 0;
+    color: var(--neon-biosfera);
+    font-size: var(--font-md);
+}
+
+.obj-text p {
+    margin: 0;
+    color: #a0a0a0;
+    font-size: var(--font-sm);
+}
+
+/* ============================================================
+   CONTEXTO Y REALIDAD
+   ============================================================ */
+
+.contexto-realidad {
+    margin: var(--space-xl) 0;
+}
+
+.contexto-card {
+    padding: var(--space-lg);
+    background: rgba(0, 136, 255, 0.08);
+    border: 2px solid var(--neon-oceano);
+    border-radius: 8px;
+}
+
+.contexto-card h3 {
+    margin: 0 0 var(--space-md) 0;
+    color: var(--neon-oceano);
+    font-size: var(--font-lg);
+}
+
+.dato-importante {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(57, 255, 20, 0.1);
+    border-left: 3px solid var(--neon-biosfera);
+    border-radius: 4px;
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.icono-dato {
+    font-size: var(--font-lg);
+    min-width: 30px;
+}
+
+/* ============================================================
+   SECCIONES PRINCIPALES
+   ============================================================ */
+
+.seccion-desarrollo, .seccion-visual, .simuladores-section, 
+.quiz-section, .errores-section, .curricular-section, 
+.exam-section, .metacognitive-section, .resources-section {
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    background: rgba(10, 10, 26, 0.6);
+    border: 1px solid rgba(57, 255, 20, 0.2);
+    border-radius: 8px;
+}
+
+.seccion-titulo {
+    font-size: var(--font-lg);
+    margin: 0 0 var(--space-lg) 0;
+    color: var(--neon-biosfera);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.neon-bullet {
+    font-weight: 900;
+    opacity: 0.8;
+}
+
+/* ============================================================
+   TABLAS NEON
+   ============================================================ */
+
+.neon-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-lg) 0;
+    font-size: var(--font-sm);
+}
+
+.neon-table thead {
+    background: rgba(57, 255, 20, 0.1);
+    border-bottom: 2px solid var(--neon-biosfera);
+}
+
+.neon-table th {
+    padding: var(--space-md);
+    text-align: left;
+    color: var(--neon-biosfera);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.neon-table tbody tr {
+    border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+    transition: background 0.2s ease;
+}
+
+.neon-table tbody tr:hover {
+    background: rgba(57, 255, 20, 0.05);
+}
+
+.neon-table td {
+    padding: var(--space-md);
+    color: #d0d0d0;
+}
+
+.neon-table td strong {
+    color: var(--neon-biosfera);
+}
+
+/* ============================================================
+   CAJAS DE CONCEPTO
+   ============================================================ */
+
+.concept-box {
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+    background: rgba(255, 255, 0, 0.05);
+    border: 2px solid var(--neon-evaluacion);
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: var(--font-sm);
+    line-height: 1.8;
+}
+
+.concept-box strong {
+    color: var(--neon-evaluacion);
+}
+
+/* ============================================================
+   FÓRMULAS NEON
+   ============================================================ */
+
+.formula-neon {
+    padding: var(--space-lg);
+    background: rgba(0, 136, 255, 0.08);
+    border-left: 4px solid var(--neon-oceano);
+    margin: var(--space-lg) 0;
+    border-radius: 4px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* ============================================================
+   SVG CONTAINER
+   ============================================================ */
+
+.svg-container {
+    margin: var(--space-lg) 0;
+    padding: var(--space-lg);
+    background: rgba(7, 7, 20, 0.8);
+    border: 1px solid rgba(57, 255, 20, 0.3);
+    border-radius: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.carbon-svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   SIMULADORES INTERACTIVOS
+   ============================================================ */
+
+.simulator-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.08) 0%, rgba(0, 136, 255, 0.05) 100%);
+    border: 2px solid var(--neon-interactivo);
+    border-radius: 12px;
+}
+
+.carbon-sim-advanced {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.08) 0%, rgba(0, 136, 255, 0.05) 100%) !important;
+    border-color: var(--neon-interactivo) !important;
+}
+
+.simulator-title {
+    margin: 0;
+    font-size: var(--font-lg);
+    color: var(--neon-interactivo);
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.simulator-desc {
+    margin: 0;
+    color: #a0a0a0;
+    font-size: var(--font-sm);
+    padding: 0 0 var(--space-sm) 0;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.simulator-controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-md);
+    align-items: flex-end;
+    padding: var(--space-md);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.control-item label {
+    color: #e0e0e0;
+    font-weight: 700;
+    font-size: var(--font-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.slider-display {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-md);
+    align-items: center;
+    width: 100%;
+}
+
+.slider-display input[type="range"] {
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #ff3366 0%, #ffff00 50%, #00ff88 100%);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.3) inset;
+}
+
+.slider-display input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--neon-interactivo);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(0, 255, 255, 0.3);
+    transition: all 0.2s ease;
+    border: 2px solid #070714;
+}
+
+.slider-display input[type="range"]::-webkit-slider-thumb:hover {
+    width: 26px;
+    height: 26px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+.slider-display input[type="range"]::-webkit-slider-thumb:active {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 1);
+}
+
+.slider-display input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--neon-interactivo);
+    cursor: pointer;
+    border: 2px solid #070714;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(0, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.slider-display input[type="range"]::-moz-range-thumb:hover {
+    width: 26px;
+    height: 26px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+.slider-display input[type="range"]::-moz-range-thumb:active {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 1);
+}
+
+.slider-display input[type="range"]::-moz-range-track {
+    background: transparent;
+    border: none;
+}
+
+.value-display {
+    min-width: 70px;
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(0, 255, 255, 0.15);
+    border: 2px solid var(--neon-interactivo);
+    border-radius: 6px;
+    color: var(--neon-interactivo);
+    font-weight: 700;
+    text-align: center;
+    font-size: var(--font-md);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+}
+
+.btn-reset {
+    padding: var(--space-sm) var(--space-lg);
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 136, 255, 0.1));
+    border: 2px solid var(--neon-interactivo);
+    color: var(--neon-interactivo);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    font-size: var(--font-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.btn-reset:hover {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 136, 255, 0.15));
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-reset:active {
+    transform: translateY(0);
+    box-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
+}
+
+.meter-track {
+    width: 100%;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid var(--neon-interactivo);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: var(--space-lg) 0 var(--space-lg) 0;
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.2) inset;
+}
+
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff3366 0%, #ffaa00 50%, #00ff88 100%);
+    width: 0%;
+    transition: width 0.2s ease, background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: var(--space-md);
+    color: #070714;
+    font-weight: 700;
+    font-size: var(--font-sm);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+.sim-result {
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 255, 136, 0.08) 100%);
+    border: 2px solid var(--neon-biosfera);
+    border-radius: 8px;
+    font-size: var(--font-sm);
+    line-height: 1.9;
+}
+
+.result-row {
+    margin: var(--space-md) 0;
+    color: #e0e0e0;
+}
+
+.result-row:first-child {
+    margin-top: 0;
+    font-size: var(--font-md);
+    color: var(--neon-biosfera);
+    font-weight: 700;
+}
+
+.result-row strong {
+    color: var(--neon-biosfera);
+}
+
+.result-row.feedback {
+    color: #ffff00;
+    font-weight: 700;
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(255, 255, 0, 0.08);
+    border-left: 3px solid var(--neon-evaluacion);
+    border-radius: 4px;
+}
+
+/* ============================================================
+   QUIZ INTERACTIVO
+   ============================================================ */
+
+.quiz-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.quiz-question {
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.05) 0%, rgba(255, 51, 102, 0.03) 100%);
+    border: 2px solid var(--neon-evaluacion);
+    border-left: 4px solid var(--neon-evaluacion);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+}
+
+.quiz-question:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.08) 0%, rgba(255, 51, 102, 0.05) 100%);
+    box-shadow: 0 4px 16px rgba(255, 255, 0, 0.1);
+}
+
+.quiz-text {
+    margin: 0;
+    color: #e0e0e0;
+    font-size: var(--font-md);
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.quiz-options {
+    display: grid;
+    grid-template-columns: auto;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+}
+
+.quiz-option {
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.05), rgba(255, 255, 0, 0.02));
+    border: 2px solid var(--neon-evaluacion);
+    color: #d0d0d0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+.quiz-option::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--neon-evaluacion);
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+}
+
+.quiz-option:hover:not(:disabled)::before {
+    transform: scaleY(1);
+}
+
+.quiz-option:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.1), rgba(255, 255, 0, 0.05));
+    transform: translateX(4px);
+    box-shadow: 0 0 12px rgba(255, 255, 0, 0.2);
+}
+
+.quiz-option:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.quiz-option.correct {
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.15) 0%, rgba(57, 255, 20, 0.08) 100%) !important;
+    border-color: var(--neon-biosfera) !important;
+    color: var(--neon-biosfera);
+    box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
+}
+
+.quiz-option.correct::before {
+    background: var(--neon-biosfera);
+    transform: scaleY(1);
+}
+
+.quiz-option.incorrect {
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.15) 0%, rgba(255, 51, 102, 0.08) 100%) !important;
+    border-color: var(--neon-alerta) !important;
+    color: #ff6b9d;
+    box-shadow: 0 0 12px rgba(255, 51, 102, 0.3);
+}
+
+.quiz-option.incorrect::before {
+    background: var(--neon-alerta);
+    transform: scaleY(1);
+}
+
+.quiz-feedback {
+    display: none;
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(57, 255, 20, 0.05) 100%);
+    border: 2px solid var(--neon-biosfera);
+    border-left: 4px solid var(--neon-biosfera);
+    border-radius: 6px;
+    font-size: var(--font-sm);
+    line-height: 1.8;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quiz-feedback.feedback-correct {
+    color: var(--neon-biosfera);
+}
+
+.quiz-feedback.feedback-incorrect {
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.1) 0%, rgba(255, 51, 102, 0.05) 100%);
+    border-color: var(--neon-alerta);
+    border-left-color: var(--neon-alerta);
+    color: #ff9bb5;
+}
+
+.score-display {
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.12) 0%, rgba(0, 136, 255, 0.08) 100%);
+    border: 3px solid var(--neon-evaluacion);
+    border-radius: 8px;
+    text-align: center;
+    font-size: var(--font-lg);
+    color: var(--neon-evaluacion);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 16px rgba(255, 255, 0, 0.15);
+}
+
+/* ============================================================
+   ERRORES COMUNES
+   ============================================================ */
+
+.errors-interactive {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.error-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.error-item input[type="checkbox"] {
+    display: none;
+}
+
+.error-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(255, 51, 102, 0.08);
+    border: 1px solid var(--neon-alerta);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    color: #d0d0d0;
+    font-weight: 600;
+    font-size: var(--font-sm);
+}
+
+.error-label:hover {
+    background: rgba(255, 51, 102, 0.12);
+    transform: translateX(4px);
+}
+
+.error-icon {
+    font-size: var(--font-lg);
+    min-width: 30px;
+}
+
+.error-explain {
+    display: none;
+    padding: var(--space-lg);
+    margin-left: var(--space-lg);
+    background: rgba(255, 51, 102, 0.05);
+    border-left: 3px solid var(--neon-alerta);
+    border-radius: 4px;
+    font-size: var(--font-sm);
+    line-height: 1.8;
+    color: #b0b0b0;
+}
+
+.error-explain p {
+    margin: var(--space-sm) 0;
+}
+
+.error-explain ul {
+    margin: var(--space-sm) 0;
+    padding-left: var(--space-lg);
+}
+
+.error-explain li {
+    margin: var(--space-xs) 0;
+}
+
+.error-explain strong {
+    color: var(--neon-alerta);
+}
+
+/* ============================================================
+   CURRÍCULO Y COMPETENCIAS
+   ============================================================ */
+
+.curriculum-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.curriculum-card {
+    padding: var(--space-lg);
+    background: rgba(0, 136, 255, 0.08);
+    border: 1px solid var(--neon-oceano);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.curriculum-card:hover {
+    background: rgba(0, 136, 255, 0.12);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 136, 255, 0.1);
+}
+
+.curriculum-card h4 {
+    margin: var(--space-md) 0 var(--space-sm) 0;
+    color: var(--neon-oceano);
+    font-size: var(--font-md);
+}
+
+.curriculum-card p, .curriculum-card small, .curriculum-card ul {
+    margin: var(--space-sm) 0;
+    font-size: var(--font-sm);
+    color: #b0b0b0;
+}
+
+.card-icon {
+    font-size: var(--font-xl);
+    margin-bottom: var(--space-sm);
+}
+
+/* ============================================================
+   PROBLEMAS TIPO EXAMEN
+   ============================================================ */
+
+.exam-problems-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.exam-problem {
+    padding: var(--space-lg);
+    background: rgba(51, 102, 0, 0.1);
+    border-left: 4px solid var(--neon-biosfera);
+    border-radius: 4px;
+}
+
+.problem-header {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.problem-num {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--neon-biosfera);
+    color: var(--bg-leccion);
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: var(--font-sm);
+}
+
+.problem-difficulty {
+    font-size: var(--font-sm);
+    color: var(--neon-evaluacion);
+    font-weight: 600;
+}
+
+.exam-problem p {
+    margin: var(--space-md) 0;
+    color: #d0d0d0;
+    font-size: var(--font-sm);
+}
+
+.exam-problem ol, .exam-problem ul {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-lg);
+    color: #b0b0b0;
+}
+
+.exam-problem li {
+    margin: var(--space-sm) 0;
+    font-size: var(--font-sm);
+}
+
+.solution-toggle {
+    display: block;
+    padding: var(--space-md);
+    background: rgba(57, 255, 20, 0.08);
+    border: 1px solid var(--neon-biosfera);
+    border-radius: 4px;
+    color: var(--neon-biosfera);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.solution-toggle:hover {
+    background: rgba(57, 255, 20, 0.12);
+}
+
+.solution-text {
+    margin-top: var(--space-md);
+    padding: var(--space-lg);
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--neon-biosfera);
+    border-radius: 4px;
+    font-size: var(--font-sm);
+    line-height: 1.8;
+    color: #d0d0d0;
+}
+
+.solution-text p {
+    margin: var(--space-md) 0;
+}
+
+.solution-text ul, .solution-text ol {
+    margin: var(--space-md) 0 var(--space-md) var(--space-lg);
+    padding-left: var(--space-lg);
+}
+
+/* ============================================================
+   REFLEXIÓN METACOGNITIVA
+   ============================================================ */
+
+.reflection-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.reflection-card {
+    padding: var(--space-lg);
+    background: rgba(255, 51, 102, 0.08);
+    border: 1px solid var(--neon-alerta);
+    border-radius: 6px;
+}
+
+.reflection-card h4 {
+    margin: 0 0 var(--space-md) 0;
+    color: var(--neon-alerta);
+    font-size: var(--font-md);
+}
+
+.reflection-card p {
+    margin: 0 0 var(--space-lg) 0;
+    color: #a0a0a0;
+    font-size: var(--font-sm);
+}
+
+.reflection-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: var(--space-md);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--neon-alerta);
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-family: inherit;
+    font-size: var(--font-sm);
+    resize: vertical;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.reflection-textarea:focus {
+    border-color: var(--neon-evaluacion);
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.2);
+}
+
+.reflection-textarea::placeholder {
+    color: #505050;
+}
+
+.conclusion-box {
+    margin-top: var(--space-xl);
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.08) 0%, rgba(0, 136, 255, 0.08) 100%);
+    border: 2px solid var(--neon-biosfera);
+    border-radius: 8px;
+}
+
+.conclusion {
+    margin: 0 0 var(--space-lg) 0;
+    font-size: var(--font-md);
+    color: #e0e0e0;
+    line-height: 1.8;
+}
+
+.neon-quote {
+    margin: var(--space-lg) 0 0;
+    padding: var(--space-lg);
+    border-left: 4px solid var(--neon-alerta);
+    font-size: var(--font-md);
+    font-weight: 600;
+    color: var(--neon-alerta);
+    font-style: italic;
+    line-height: 1.8;
+    background: rgba(255, 51, 102, 0.05);
+    border-radius: 4px;
+}
+
+/* ============================================================
+   RECURSOS
+   ============================================================ */
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.resource-card {
+    padding: var(--space-lg);
+    background: rgba(0, 255, 136, 0.05);
+    border: 1px solid var(--neon-biosfera);
+    border-radius: 6px;
+}
+
+.resource-card h4 {
+    margin: 0 0 var(--space-md) 0;
+    color: var(--neon-biosfera);
+    font-size: var(--font-md);
+}
+
+.resource-card ul {
+    margin: 0;
+    padding-left: var(--space-lg);
+}
+
+.resource-card li {
+    margin: var(--space-sm) 0;
+    font-size: var(--font-sm);
+    color: #b0b0b0;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN - TABLET
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .leccion-container.leccion-ecosistemas-carbono {
+        padding: var(--space-md);
+    }
+    
+    .titulo-leccion {
+        font-size: var(--font-xl);
+    }
+    
+    .header-top {
+        gap: var(--space-sm);
+    }
+    
+    .materia-badge, .nivel-badge, .tiempo-badge {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.75rem;
+    }
+    
+    .objetivos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .objective-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .obj-icon {
+        font-size: var(--font-lg);
+    }
+    
+    .neon-table {
+        font-size: 0.75rem;
+    }
+    
+    .neon-table th, .neon-table td {
+        padding: var(--space-sm);
+    }
+    
+    .simulator-controls {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .slider-display {
+        grid-template-columns: 1fr;
+    }
+    
+    .value-display {
+        width: 100%;
+    }
+    
+    .btn-reset {
+        width: 100%;
+    }
+    
+    .quiz-option {
+        padding: var(--space-md);
+    }
+    
+    .sql-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN - MÓVIL
+   ============================================================ */
+
+@media (max-width: 480px) {
+    .leccion-container.leccion-ecosistemas-carbono {
+        padding: var(--space-sm);
+    }
+    
+    .titulo-leccion {
+        font-size: var(--font-lg);
+    }
+    
+    .leccion-subtitulo {
+        font-size: var(--font-sm);
+    }
+    
+    .header-top {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+    
+    .materia-badge, .nivel-badge, .tiempo-badge {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .simulator-container {
+        padding: var(--space-md);
+        gap: var(--space-md);
+    }
+    
+    .simulator-title {
+        font-size: var(--font-md);
+    }
+    
+    .simulator-controls {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+    
+    .control-item label {
+        font-size: 0.75rem;
+    }
+    
+    .slider-display {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+    
+    .slider-display input[type="range"] {
+        width: 100%;
+    }
+    
+    .value-display {
+        width: 100%;
+        padding: var(--space-sm);
+    }
+    
+    .btn-reset {
+        width: 100%;
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .meter-track {
+        height: 36px;
+    }
+    
+    .quiz-option {
+        padding: var(--space-md);
+        font-size: 0.85rem;
+    }
+    
+    .error-explain {
+        margin-left: var(--space-sm);
+    }
+    
+    .reflection-container, .curriculum-grid, .resources-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   ACCESIBILIDAD - FOCUS STATES
+   ============================================================ */
+
+button:focus, input:focus, textarea:focus, [role="slider"]:focus {
+    outline: 2px solid var(--neon-evaluacion);
+    outline-offset: 2px;
+}
+
+/* Modo alto contraste (si está habilitado) */
+@media (prefers-contrast: more) {
+    .leccion-container.leccion-ecosistemas-carbono {
+        --neon-biosfera: #00ff00;
+        --neon-interactivo: #00ffff;
+        --neon-alerta: #ff0000;
+        --neon-evaluacion: #ffff00;
+    }
+    
+    .quiz-option, .btn-reset {
+        border-width: 2px;
+    }
+}
+
+/* Modo oscuro preferido (por defecto) */
+@media (prefers-color-scheme: dark) {
+    .leccion-container.leccion-ecosistemas-carbono {
+        background: var(--bg-leccion);
+        color: #e0e0e0;
+    }
+}
+
+/* ============================================================
+   ANIMACIONES SUAVES
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .leccion-container.leccion-ecosistemas-carbono *,
+    .leccion-container.leccion-ecosistemas-carbono *::before,
+    .leccion-container.leccion-ecosistemas-carbono *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,230 @@
+:root {
+  --mt-bg: #020819;
+  --mt-card: rgba(5, 12, 35, 0.85);
+  --mt-border: rgba(13, 162, 255, 0.5);
+  --mt-glow: #1fc8ff;
+  --mt-neon: #3bf4ff;
+  --mt-text: #e2f8ff;
+}
+
+.leccion-movimientos-tierra {
+  background: radial-gradient(circle at 10% 10%, #102349, #020819 55%);
+  color: var(--mt-text);
+  font-family: "Segoe UI", "Roboto", "Consolas", monospace;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  line-height: 1.65;
+}
+
+.leccion-movimientos-tierra::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(24, 102, 230, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 102, 230, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.earth-header {
+  background: rgba(2, 11, 31, 0.85);
+  border: 1px solid var(--mt-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 0 20px rgba(30, 180, 255, 0.35);
+}
+
+.header-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.materia-badge,
+.nivel-badge,
+.tiempo-badge {
+  background: rgba(0, 48, 95, 0.85);
+  border: 1px solid var(--mt-border);
+  border-radius: 12px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+.titulo-leccion {
+  font-size: 2.35rem;
+  margin: 0.2rem 0;
+  color: var(--mt-neon);
+  text-shadow: 0 0 12px rgba(63, 244, 255, 0.8);
+}
+
+.leccion-subtitulo {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  color: rgba(206, 244, 255, 0.9);
+}
+
+.objetivos-rapidos,
+.errores-grid,
+.eval-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.objetivo-card,
+.context-card,
+.simulador-orbital .control-panel,
+.quiz-container,
+.autoevaluacion,
+.errores-grid .error-card {
+  background: var(--mt-card);
+  border: 1px solid rgba(31, 200, 255, 0.25);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.objetivo-card:hover,
+.error-card:hover,
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(31, 200, 255, 0.4);
+}
+
+.seccion-titulo {
+  border-left: 4px solid var(--mt-neon);
+  padding-left: 0.9rem;
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.75rem;
+  color: var(--mt-neon);
+}
+
+.subsection-title {
+  margin-top: 1.1rem;
+  font-size: 1.25rem;
+  color: #b8f3ff;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.neon-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(0, 26, 44, 0.7);
+  border: 1px solid var(--mt-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0.75rem 0;
+}
+
+.neon-table th,
+.neon-table td {
+  border: 1px solid var(--mt-border);
+  padding: 0.7rem;
+  text-align: left;
+  font-size: 0.93rem;
+}
+
+.neon-table th {
+  background: rgba(14, 83, 126, 0.6);
+}
+
+.simulador-orbital .orbit-visual,
+.insolacion canvas,
+.spectrum-container {
+  background: #040d24;
+  border: 1px solid rgba(37, 173, 255, 0.5);
+  border-radius: 18px;
+  padding: 0.7rem;
+}
+
+#orbitSVG,
+#insolationCanvas {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  background: #000;
+}
+
+.control-panel label,
+.scenario-controls label,
+.auto-feedback,
+#simFeedback,
+#atmInfo {
+  color: rgba(198, 240, 255, 0.95);
+}
+
+.sim-feedback {
+  margin-top: 0.8rem;
+  min-height: 26px;
+  color: #d1f7ff;
+}
+
+.errores-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.error-card {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.error-detail {
+  display: none;
+  margin-top: 0.45rem;
+  font-size: 0.9rem;
+  color: #c2efff;
+}
+
+.error-card.expandido .error-detail {
+  display: block;
+}
+
+.reflexion-box textarea {
+  width: 100%;
+  background: rgba(5, 11, 24, 0.75);
+  color: #ddfaff;
+  border: 1px solid var(--mt-border);
+  border-radius: 10px;
+  padding: 0.6rem;
+  font-family: inherit;
+}
+
+button {
+  background: linear-gradient(45deg, #0ff, #2066ff);
+  border: none;
+  color: #0b2a4d;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:focus {
+  outline: 2px solid #9ef2ff;
+}
+
+@media (max-width: 992px) {
+  .leccion-movimientos-tierra {
+    padding: 1rem;
+  }
+  .objetivos-rapidos,
+  .errores-grid,
+  .autoevaluacion {
+    grid-template-columns: 1fr;
+  }
+  .control-panel,
+  .simulador-orbital .orbit-visual {
+    min-height: auto;
+  }
+}

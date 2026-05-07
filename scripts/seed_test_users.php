@@ -4,7 +4,7 @@
  * Uso: php scripts/seed_test_users.php
  */
 
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../src/Config/config.php';
 
 // Usuarios de prueba con sus puntos
 $test_users = [

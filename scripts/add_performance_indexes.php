@@ -2,7 +2,7 @@
 // Script para agregar índices de rendimiento a base de datos existente
 // Uso: php scripts/add_performance_indexes.php
 
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../src/Config/config.php';
 
 echo "Agregando índices de rendimiento...\n";
 

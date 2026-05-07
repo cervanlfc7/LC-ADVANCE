@@ -5,12 +5,12 @@
 // Diseño Responsivo con Animaciones del Dashboard
 // ==========================================
 
-require_once 'config/config.php';
+require_once __DIR__ . '/src/Config/config.php';
 iniciarSesionSegura();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
-require_once 'config/csrf.php';
+require_once __DIR__ . '/src/Config/csrf.php';
 
 $usuario_logueado = isset($_SESSION['usuario_id']);
 $supported_langs = ['es', 'en'];
@@ -1454,12 +1454,12 @@ $t = [
     </div>
     <nav>
         <?php if ($usuario_logueado): ?>
-            <button class="btn btn-primary" onclick="window.location='dashboard.php'"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></button>
-            <button class="btn" onclick="window.location='coding_challenges.php'"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></button>
-            <button class="btn" onclick="window.location='logout.php'"><?= htmlspecialchars($t[$lang]['nav_logout']) ?></button>
+            <button class="btn btn-primary" onclick="window.location='public/dashboard.php'"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></button>
+            <button class="btn" onclick="window.location='public/coding_challenges.php'"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></button>
+            <button class="btn" onclick="window.location='public/logout.php'"><?= htmlspecialchars($t[$lang]['nav_logout']) ?></button>
         <?php else: ?>
-            <button class="btn" onclick="window.location='login.php'"><?= htmlspecialchars($t[$lang]['nav_login']) ?></button>
-            <button class="btn btn-primary" onclick="window.location='register.php'"><?= htmlspecialchars($t[$lang]['nav_register']) ?></button>
+            <button class="btn" onclick="window.location='public/login.php'"><?= htmlspecialchars($t[$lang]['nav_login']) ?></button>
+            <button class="btn btn-primary" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['nav_register']) ?></button>
         <?php endif; ?>
         <div class="toolbar-controls">
             <label for="langSelector" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);"><?= htmlspecialchars($t[$lang]['language']) ?></label>
@@ -1483,10 +1483,10 @@ $t = [
         ?></p>
         <div class="hero-buttons">
             <?php if ($usuario_logueado): ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location='public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
             <?php else: ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='register.php'"><?= htmlspecialchars($t[$lang]['hero_start']) ?></button>
-                <button class="btn btn-hero" onclick="window.location='guest_login.php'"><?= htmlspecialchars($t[$lang]['hero_guest']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['hero_start']) ?></button>
+                <button class="btn btn-hero" onclick="window.location='public/guest_login.php'"><?= htmlspecialchars($t[$lang]['hero_guest']) ?></button>
             <?php endif; ?>
         </div>
     </section>
@@ -1543,7 +1543,7 @@ $t = [
             <p><?= htmlspecialchars($t[$lang]['feature_map_p2']) ?></p>
         </div>
         <div class="feature-visual">
-            <img src="assets/img/mapa.png" alt="Mapa Interactivo" style="width:100%; height:auto; border-radius:10px; display:block;">
+            <img src="public/assets/img/mapa.png" alt="Mapa Interactivo" style="width:100%; height:auto; border-radius:10px; display:block;">
         </div>
     </section>
 
@@ -1555,7 +1555,7 @@ $t = [
             <p><?= htmlspecialchars($t[$lang]['feature_learning_p2']) ?></p>
         </div>
         <div class="feature-visual">
-            <img src="assets/img/dashboard.png" alt="Lecciones Interactivas" style="width:100%; height:auto; border-radius:10px; display:block;">
+            <img src="public/assets/img/dashboard.png" alt="Lecciones Interactivas" style="width:100%; height:auto; border-radius:10px; display:block;">
         </div>
     </section>
 
@@ -1567,7 +1567,7 @@ $t = [
             <p><?= htmlspecialchars($t[$lang]['feature_duel_p2']) ?></p>
         </div>
         <div class="feature-visual">
-            <img src="assets/img/duelo.png" alt="Sistema de Duelos" style="width:100%; height:auto; border-radius:10px; display:block;">
+            <img src="public/assets/img/duelo.png" alt="Sistema de Duelos" style="width:100%; height:auto; border-radius:10px; display:block;">
         </div>
     </section>
 
@@ -1617,7 +1617,7 @@ $t = [
                 <strong style="display:block;margin-bottom:6px;"><?= htmlspecialchars($t[$lang]['daily_goal']) ?></strong>
                 <span class="countdown" id="dailyCountdown">23:59:59</span>
             </div>
-            <button class="btn btn-primary" onclick="window.location='<?= $usuario_logueado ? 'mapa/index.php' : 'register.php' ?>'"><?= htmlspecialchars($t[$lang]['daily_btn']) ?></button>
+            <button class="btn btn-primary" onclick="window.location='<?= $usuario_logueado ? 'public/mapa/index.php' : 'public/register.php' ?>'"><?= htmlspecialchars($t[$lang]['daily_btn']) ?></button>
         </div>
     </section>
 
@@ -1675,7 +1675,7 @@ $t = [
                     <span class="plan-badge">Dashboard</span>
                     <span class="plan-badge">Ranking</span>
                 </div>
-                <button class="btn btn-primary" onclick="window.location='register.php'"><?= htmlspecialchars($t[$lang]['plan_btn_free']) ?></button>
+                <button class="btn btn-primary" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['plan_btn_free']) ?></button>
             </article>
             <article class="plan-card">
                 <h4><?= htmlspecialchars($t[$lang]['plan_plus']) ?></h4>
@@ -1685,7 +1685,7 @@ $t = [
                     <span class="plan-badge">Eventos</span>
                     <span class="plan-badge">Labs</span>
                 </div>
-                <button class="btn" onclick="window.location='community.php'"><?= htmlspecialchars($t[$lang]['plan_btn_plus']) ?></button>
+                <button class="btn" onclick="window.location='public/community.php'"><?= htmlspecialchars($t[$lang]['plan_btn_plus']) ?></button>
             </article>
         </div>
     </section>
@@ -1733,9 +1733,9 @@ $t = [
         ?></p>
         <div class="hero-buttons">
             <?php if ($usuario_logueado): ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location='public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
             <?php else: ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='register.php'"><?= htmlspecialchars($t[$lang]['cta_register']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['cta_register']) ?></button>
             <?php endif; ?>
         </div>
     </section>
@@ -1753,17 +1753,17 @@ $t = [
             <div class="footer-col">
                 <h4><?= htmlspecialchars($t[$lang]['footer_product']) ?></h4>
                 <ul>
-                    <li><a href="<?php echo $usuario_logueado ? 'mapa/index.php' : 'gatekeeper.php?redirect=mapa/index.php'; ?>"><?= htmlspecialchars($t[$lang]['footer_map']) ?></a></li>
-                    <li><a href="<?php echo $usuario_logueado ? 'dashboard.php' : 'gatekeeper.php?redirect=dashboard.php'; ?>"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></a></li>
-                    <li><a href="<?php echo $usuario_logueado ? 'ranking.php' : 'gatekeeper.php?redirect=ranking.php'; ?>">Ranking</a></li>
+                    <li><a href="<?php echo $usuario_logueado ? 'public/mapa/index.php' : 'public/gatekeeper.php?redirect=mapa/index.php'; ?>"><?= htmlspecialchars($t[$lang]['footer_map']) ?></a></li>
+                    <li><a href="<?php echo $usuario_logueado ? 'public/dashboard.php' : 'public/gatekeeper.php?redirect=dashboard.php'; ?>"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></a></li>
+                    <li><a href="<?php echo $usuario_logueado ? 'public/ranking.php' : 'public/gatekeeper.php?redirect=ranking.php'; ?>">Ranking</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4><?= htmlspecialchars($t[$lang]['footer_resources']) ?></h4>
                 <ul>
-                    <li><a href="docs.php?file=README.md">Documentación</a></li>
-                    <li><a href="docs.php?file=DEVELOPMENT.md">Guía de Desarrollo</a></li>
-                    <li><a href="docs.php?file=API.md">API Reference</a></li>
+                    <li><a href="public/docs.php?file=README.md">Documentación</a></li>
+                    <li><a href="public/docs.php?file=DEVELOPMENT.md">Guía de Desarrollo</a></li>
+                    <li><a href="public/docs.php?file=API.md">API Reference</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -1771,8 +1771,8 @@ $t = [
                 <ul>
                     <li><a href="https://github.com" target="_blank">GitHub</a></li>
                     <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
-                    <li><a href="<?php echo $usuario_logueado ? 'community.php' : 'gatekeeper.php?redirect=community.php'; ?>"><?= htmlspecialchars($t[$lang]['community']) ?></a></li>
-                    <li><a href="register.php">Unirse</a></li>
+                    <li><a href="<?php echo $usuario_logueado ? 'public/community.php' : 'public/gatekeeper.php?redirect=community.php'; ?>"><?= htmlspecialchars($t[$lang]['community']) ?></a></li>
+                    <li><a href="public/register.php">Unirse</a></li>
                 </ul>
             </div>
         </div>
@@ -1782,7 +1782,7 @@ $t = [
     </div>
 </footer>
 
-<a class="mobile-sticky-cta" href="<?= $usuario_logueado ? 'dashboard.php' : 'register.php' ?>">
+<a class="mobile-sticky-cta" href="<?= $usuario_logueado ? 'public/dashboard.php' : 'public/register.php' ?>">
     <?= htmlspecialchars($t[$lang]['mobile_cta']) ?>
 </a>
 

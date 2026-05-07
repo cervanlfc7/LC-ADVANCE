@@ -3,8 +3,9 @@
 ## Run Commands
 
 ```bash
-# Start local server (XAMPP or PHP built-in)
-php -S localhost:8000 -t .
+# Start local server (XAMPP o PHP built-in en puerto 80)
+php -S localhost:80 -t .
+# O si usas XAMPP, simplemente inicia Apache en el Panel de Control
 
 # Run all tests
 php tests/run_all_tests.php
@@ -13,22 +14,75 @@ php tests/run_all_tests.php
 php tests/test_lessons.php
 
 # Verify PHP syntax
-php -l src/content.php
+php -l src/Content/content.php
 
 # Add performance indexes to existing DB
 php scripts/add_performance_indexes.php
+```
+
+## Project Structure
+
+```
+LC-ADVANCE/
+├── index.php                     # Landing page (root)
+├── public/                       # Web root
+│   ├── login.php, register.php, logout.php
+│   ├── dashboard.php, ranking.php, quiz.php
+│   ├── leccion_detalle.php, guest_login.php
+│   ├── gatekeeper.php, docs.php
+│   ├── ai_tutor.php, coding_challenges.php, lab.php, community.php
+│   ├── auth_provider.php, auth_callback.php
+│   ├── update_progress.php
+│   ├── assets/                   # CSS, JS, images
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── img/
+│   ├── api/
+│   │   └── ranking.php
+│   ├── mapa/                     # Interactive map
+│   │   ├── index.php, sistemC.php, updateDB.php
+│   │   ├── img/, tilesets/, *.gif, Mapa.json
+│   └── Examen/                   # Exam/combat system
+│       ├── sistemC.php, 1*.png
+│       └── sql/
+│
+├── src/                          # Server-side code
+│   ├── Config/                   # Configuration
+│   │   ├── config.php            # DB, OAuth, AI config
+│   │   ├── security_headers.php
+│   │   ├── csrf.php
+│   │   └── challenges.php
+│   ├── Core/                     # Core logic
+│   │   ├── funciones.php         # AJAX endpoints
+│   │   └── cache.php             # Lesson caching
+│   ├── Content/                  # Content
+│   │   └── content.php          # Lessons array
+│   └── Database/                 # SQL dumps
+│       ├── lc_advance.sql
+│       └── fix_maestros.sql
+│
+├── scripts/                      # Utility scripts
+│   ├── add_performance_indexes.php
+│   ├── seed_test_data.php, seed_test_users.php
+│   └── test_cache.php
+│
+├── tests/                        # Test suite
+│   ├── run_all_tests.php
+│   ├── test_lessons.php, test_integration.php
+│   └── test_e2e.php, test_e2e_simple.php
+│
+├── docs/                         # Documentation
+└── AGENTS.md, LICENSE, manifest.webmanifest
 ```
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `config/config.php` | DB credentials, OAuth, AI config (env vars preferred) |
-| `src/content.php` | Lessons array (127000+ lines) |
-| `src/funciones.php` | AJAX endpoints with rate limiting |
-| `db/lc_advance.sql` | Full database dump with indexes |
-| `assets/js/app.js` | Frontend logic |
-| `config/security_headers.php` | Security headers (CSP, X-Frame-Options) |
+| `src/Config/config.php` | DB credentials, OAuth, AI config (env vars preferred) |
+| `src/Content/content.php` | Lessons array - edit here to add lessons |
+| `src/Core/funciones.php` | AJAX endpoints with rate limiting |
+| `src/Database/lc_advance.sql` | Full database dump |
 
 ## Environment Variables (Production)
 
@@ -49,7 +103,23 @@ export GOOGLE_CLIENT_SECRET=your-client-secret
 export GITHUB_CLIENT_ID=your-client-id
 export GITHUB_CLIENT_SECRET=your-client-secret
 export OPENROUTER_API_KEY=your-key
+
+# OAuth Redirect URL (auto-detected or set explicitly)
+export AUTH_CALLBACK_URL=http://localhost/LC-Advance/public/auth_callback.php
 ```
+
+## Testing OAuth Locally
+
+Para probar OAuth en local, puedes hardcodear las credenciales temporalmente en `src/Config/config.php`:
+
+```php
+define('GOOGLE_CLIENT_ID', '317866808413-8odsje97n8j7k150j3ag1lr89ughotb7.apps.googleusercontent.com');
+define('GOOGLE_CLIENT_SECRET', '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');
+define('GITHUB_CLIENT_ID', 'Ov23liR2ex0RxXcrUfAz');
+define('GITHUB_CLIENT_SECRET', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d');
+```
+
+**Nota:** No hagas commit de secrets. En producción usa variables de entorno.
 
 ## Security Features
 
@@ -61,8 +131,8 @@ export OPENROUTER_API_KEY=your-key
 
 ## Development Flow
 
-1. Edit lesson in `src/content.php` → dashboard shows it automatically
-2. Add new endpoint in `src/funciones.php`
+1. Edit lesson in `src/Content/content.php` → dashboard shows it automatically
+2. Add new endpoint in `src/Core/funciones.php`
 3. Use `requireLogin(true)` for guest-friendly routes
 4. Test: `php tests/run_all_tests.php`
 
@@ -71,17 +141,27 @@ export OPENROUTER_API_KEY=your-key
 - **Lesson content**: Use `&lt;?php` (escaped) in HTML
 - **slug**: Must be unique per lesson
 - **Ranking**: Updates every 15s via `obtener_estado`
-- **DB Indexes**: Already in `lc_advance.sql`, script available for existing DB
+- **Lesson CSS**: Individual lesson styles in `public/assets/css/leccion-*.css`
 
-## Database Indexes
+## Common Path Issues
 
-Run `php scripts/add_performance_indexes.php` on existing DB for:
-- `user_progress(user_id, slug)`
-- `usuarios(puntos DESC)`
-- `usuarios(nivel)`
+- **funciones.php location**: The AJAX endpoint is at `src/Core/funciones.php` (NOT `src/funciones.php`). Always use the full path:
+  - From `public/*.php`: `'../src/Core/funciones.php'`
+  - From `public/mapa/*.php` or `public/Examen/*.php`: `'../src/Core/funciones.php'`
+  - From tests (HTTP): `src/Core/funciones.php`
+
+- **Redirect paths**: Always include `public/` prefix in redirect paths:
+  - Correct: `public/dashboard.php`, `public/mapa/index.php`
+  - Wrong: `dashboard.php`, `mapa/index.php` (missing `public/` prefix)
+  - The `redirigir()` function prepends the app root (e.g., `/LC-Advance/`), so paths must include `public/` when redirecting to pages inside the public folder
+
+- **OAuth redirects**: After Google/GitHub login, users should go to `public/dashboard.php`, not directly to `mapa/index.php`
+
+- **Timeout redirect**: When session expires in `public/mapa/` subfolder, the redirect uses `../login.php?timeout=1` which correctly resolves to `public/login.php?timeout=1`
 
 ## CI Pipeline
 
 - PHP 8.1 + 8.2
-- Imports `db/lc_advance.sql`
+- Imports `src/Database/lc_advance.sql`
 - Executes `tests/run_all_tests.php`
+- PHPLint all PHP files
