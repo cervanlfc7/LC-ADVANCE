@@ -26,6 +26,8 @@ $t = [
         'go_map' => 'Ir al Mapa',
         'logout' => 'Cerrar Sesión',
         'coding_lab' => 'Laboratorio',
+        'ask_teacher' => 'Preguntar al Maestro',
+        'ask_teacher_btn' => '💬 PREGUNTAR AL MAESTRO',
         'player_profile' => 'Perfil del jugador',
         'teacher_panel' => 'Panel Docente',
         'date_reports' => 'Reportes por rango de fecha',
@@ -73,6 +75,8 @@ $t = [
         'go_map' => 'Go to Map',
         'logout' => 'Log Out',
         'coding_lab' => 'Coding Lab',
+        'ask_teacher' => 'Ask the Teacher',
+        'ask_teacher_btn' => '💬 ASK THE TEACHER',
         'player_profile' => 'Player profile',
         'teacher_panel' => 'Teacher panel',
         'date_reports' => 'Date range reports',
@@ -718,6 +722,10 @@ $daily_quests = [
                         <a href="Examen/sistemC.php?personaje=<?= $id_profesor_final ?>&dialogo=1&pregunta=0&return_url=<?= $current_url ?>&slug=<?= $examen_slug ?>"
                            class="combat-btn">
                             <?= htmlspecialchars($t[$lang]['start_exam']) ?>
+                        </a>
+                        <a href="maestro_chat.php?materia=<?= urlencode($materia_usada) ?>"
+                           class="combat-btn" style="background:var(--cyan-dim);border-color:var(--cyan);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                            <?= htmlspecialchars($t[$lang]['ask_teacher_btn']) ?>
                         </a>
                     </div>
                 <?php endif; ?>

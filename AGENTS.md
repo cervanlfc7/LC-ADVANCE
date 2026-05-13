@@ -120,6 +120,7 @@ define('GITHUB_CLIENT_SECRET', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d');
 ```
 
 **Nota:** No hagas commit de secrets. En producción usa variables de entorno.
+- La API key de OpenRouter actual está hardcodeada en `src/Config/config.php` para desarrollo. En producción usar `OPENROUTER_API_KEY` env var.
 
 ## Security Features
 
@@ -142,6 +143,9 @@ define('GITHUB_CLIENT_SECRET', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d');
 - **slug**: Must be unique per lesson
 - **Ranking**: Updates every 15s via `obtener_estado`
 - **Lesson CSS**: Individual lesson styles in `public/assets/css/leccion-*.css`
+- **AI Tutor**: Use `public/ai_tutor.php` endpoint for AI chat; "Preguntar al Maestro" per-teacher chat at `public/maestro_chat.php?materia=XXX`
+- **Maestro Chat**: Each teacher has their own chat with materia-specific context, history stored per-materia in session (`$_SESSION['maestro_chat_'.$materia]`), and a salon image background (`public/assets/img/salon_*.png`)
+- **Maestro Chat access**: Via dashboard filter - select a subject/teacher → "Preguntar al Maestro" button appears in the combat card
 
 ## Common Path Issues
 

@@ -37,6 +37,7 @@ $requestData = $method === 'POST' ? $_POST : $_REQUEST;
 
 $lessonTitle = trim($requestData['lesson_title'] ?? '');
 $lessonSubject = trim($requestData['lesson_subject'] ?? '');
+$materia = trim($requestData['materia'] ?? '');
 
 $slug = trim($requestData['slug'] ?? '');
 $correctas = max(0, intval($requestData['correctas'] ?? 0));
@@ -47,9 +48,9 @@ $total = max(1, intval($requestData['total'] ?? 1));
 $question = trim($requestData['question'] ?? '');
 $requestedProvider = trim($requestData['provider'] ?? 'auto');
 
-if (empty($slug)) {
+if (empty($slug) && empty($materia)) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Falta slug']);
+    echo json_encode(['ok' => false, 'error' => 'Falta slug o materia']);
     exit;
 }
 
@@ -121,8 +122,10 @@ if ($question) {
 }
 
 // Construimos el mensaje del sistema de manera unificada
+$materiaContext = !empty($materia) ? "- Materia: {$materia}. Eres el maestro experto en esta materia.\n" : '';
 $systemMessage = "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE, una plataforma educativa gamificada. Tu rol es guiar a los estudiantes respondiendo de manera MUY CONCISA, conversacional y directa, como un ser humano real. \n\n" .
                  "Contexto actual:\n" .
+                 $materiaContext .
                  "- Lección actual: '{$lessonTitle}' sobre {$lessonSubject}.\n" .
                  "- Nivel del alumno: {$difficulty}.\n" .
                  "- {$historySummary}\n" .

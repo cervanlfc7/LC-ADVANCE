@@ -39,7 +39,7 @@ define('LM_STUDIO_MODEL', getenv('LM_STUDIO_MODEL') ?: 'qwen2.5-0.5b-instruct-gg
 define('LM_STUDIO_API_KEY', getenv('LM_STUDIO_API_KEY') ?: '');
 define('LM_STUDIO_REQUEST_TIMEOUT', 0);
 
-define('OPENROUTER_API_KEY', getenv('OPENROUTER_API_KEY') ?: '');
+define('OPENROUTER_API_KEY', getenv('OPENROUTER_API_KEY') ?: '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');
 define('OPENROUTER_MODEL', getenv('OPENROUTER_MODEL') ?: 'google/gemini-2.0-flash-001');
 define('OPENROUTER_TIMEOUT', 20);
 define('APP_URL', getenv('APP_URL') ?: '');
