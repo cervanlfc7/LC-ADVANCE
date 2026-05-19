@@ -25,6 +25,7 @@ $t = [
         'home' => 'Inicio',
         'go_map' => 'Ir al Mapa',
         'logout' => 'Cerrar Sesión',
+        'goteacher' => 'Ir al burdel Docente',
         'coding_lab' => 'Laboratorio',
         'ask_teacher' => 'Preguntar al Maestro',
         'ask_teacher_btn' => '💬 PREGUNTAR AL MAESTRO',
@@ -74,6 +75,7 @@ $t = [
         'home' => 'Home',
         'go_map' => 'Go to Map',
         'logout' => 'Log Out',
+        'goteacher' => 'Go to Teacher',
         'coding_lab' => 'Coding Lab',
         'ask_teacher' => 'Ask the Teacher',
         'ask_teacher_btn' => '💬 ASK THE TEACHER',
@@ -432,6 +434,7 @@ $daily_quests = [
     <nav>
         <a href="index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
         <a href="mapa/index.php" class="btn-nav primary"><?= htmlspecialchars($t[$lang]['go_map']) ?></a>
+        <a href="goteacher.php"     class="btn-nav"><?= htmlspecialchars($t[$lang]['goteacher']) ?></a>
         <a href="lab.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></a>
         <a href="community.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['community']) ?></a>
         <a href="logout.php"     class="btn-nav"><?= htmlspecialchars($t[$lang]['logout']) ?></a>
