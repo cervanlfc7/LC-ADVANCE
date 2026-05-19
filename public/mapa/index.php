@@ -157,6 +157,13 @@ $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
       border-color: #fff;
     }
     @media (min-width: 1025px) { .mobile-controls { display: none !important; } }
+    .volume-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(0,255,255,0.2); }
+    .volume-section h3 { color: var(--neon-cyan); font-size: 10px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .volume-control { margin-bottom: 12px; }
+    .volume-control label { display: block; color: var(--neon-yellow); font-size: 9px; margin-bottom: 6px; text-transform: uppercase; }
+    .volume-control input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: rgba(255,255,255,0.1); border-radius: 3px; outline: none; }
+    .volume-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; background: var(--neon-cyan); border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px var(--neon-cyan); }
+    .volume-control input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; background: var(--neon-cyan); border-radius: 50%; cursor: pointer; border: none; }
   </style>
 </head>
 <body onclick="window.focus();">
@@ -167,6 +174,21 @@ $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
         <button onclick="document.getElementById('pauseMenu').style.display='none'">▶ CONTINUAR</button>
         <button class="reset" onclick="localStorage.removeItem('<?php echo $session_key; ?>'); localStorage.removeItem('<?php echo $npc_key; ?>'); location.reload();">⟳ RESET POSICIÓN</button>
         <button class="exit" onclick="window.location.href='../../index.php'">⏻ SALIR</button>
+      </div>
+      <div class="volume-section">
+        <h3>// VOLUMEN</h3>
+        <div class="volume-control">
+          <label>Musica Principal</label>
+          <input type="range" id="volPrincipal" min="0" max="1" step="0.1" value="0.1">
+        </div>
+        <div class="volume-control">
+          <label>Musica Ambiental</label>
+          <input type="range" id="volAmbiental" min="0" max="1" step="0.1" value="0.8">
+        </div>
+        <div class="volume-control">
+          <label>Musica Examenes</label>
+          <input type="range" id="volExamenes" min="0" max="1" step="0.1" value="0.8">
+        </div>
       </div>
     </div>
     <div id="interaction">INTERACTUAR [E]</div>
@@ -719,5 +741,70 @@ bind("btnUp","arrowup"); bind("btnDown","arrowdown"); bind("btnLeft","arrowleft"
 init();
 </script>
 </div>
+<audio id="mapMusic1"></audio>
+<audio id="mapMusic2"></audio>
+<script>
+const STORAGE_KEY = 'lc_volume_settings';
+function getStoredVolumes() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
+function saveVolumes(v) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
+}
+const volumes = getStoredVolumes();
+const mapSongs = [
+  { src: '../assets/music/cuco_día_alt.mp3', vol: volumes.ambiental },
+  { src: '../assets/music/cuco_dia.mp3', vol: volumes.ambiental * 0.5 },
+  { src: '../assets/music/cuco-lost.mp3', vol: volumes.ambiental }
+];
+let currentTrack = 0;
+let activePlayer = 1;
+const audio1 = document.getElementById('mapMusic1');
+const audio2 = document.getElementById('mapMusic2');
+const CROSSFADE_TIME = 2000;
+
+document.getElementById('volAmbiental').value = volumes.ambiental;
+document.getElementById('volAmbiental').addEventListener('input', (e) => {
+  const v = parseFloat(e.target.value);
+  volumes.ambiental = v;
+  saveVolumes(volumes);
+  mapSongs.forEach((song, i) => { mapSongs[i].vol = i === 1 ? v * 0.5 : v; });
+  const currentPlayer = activePlayer === 1 ? audio1 : audio2;
+  currentPlayer.volume = v;
+});
+
+function crossfadePlay(trackIndex) {
+  const song = mapSongs[trackIndex];
+  const nextPlayer = activePlayer === 1 ? audio2 : audio1;
+  const currentPlayer = activePlayer === 1 ? audio1 : audio2;
+  
+  nextPlayer.src = song.src;
+  nextPlayer.volume = 0;
+  nextPlayer.play().then(() => console.log('Map music: ' + song.src)).catch(e => console.log('Audio error:', e));
+  
+  let start = null;
+  function fade(timestamp) {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / CROSSFADE_TIME, 1);
+    nextPlayer.volume = progress * song.vol;
+    currentPlayer.volume = (1 - progress) * song.vol;
+    if (progress < 1) requestAnimationFrame(fade);
+  }
+  requestAnimationFrame(fade);
+  
+  activePlayer = activePlayer === 1 ? 2 : 1;
+}
+
+function playNext() {
+  currentTrack = (currentTrack + 1) % mapSongs.length;
+  crossfadePlay(currentTrack);
+}
+
+audio1.addEventListener('ended', playNext);
+audio2.addEventListener('ended', playNext);
+crossfadePlay(0);
+</script>
 </body>
 </html>

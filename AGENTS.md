@@ -163,6 +163,23 @@ define('GITHUB_CLIENT_SECRET', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d');
 
 - **Timeout redirect**: When session expires in `public/mapa/` subfolder, the redirect uses `../login.php?timeout=1` which correctly resolves to `public/login.php?timeout=1`
 
+## Music System
+
+Music files are located in `public/assets/music/`. Each section uses specific tracks:
+
+| Section | Music Files | Behavior |
+|---------|-------------|----------|
+| `public/mapa/` (map) | `cuco_día_alt.mp3`, `cuco_dia.mp3`, `cuco-lost.mp3` | Alternating playback |
+| `public/quiz.php` (quiz per theme) | `cuco_examen.mp3` | Single track |
+| `public/Examen/` (combat system) | `cuco_examen_final.mp3` | Single track |
+| Rest of app (login, dashboard, etc.) | `cuco_pantalla_inicio.mp3` | Single track |
+
+**Implementation notes:**
+- Use HTML5 `<audio>` element with `loop` attribute for continuous playback
+- For map alternating music, use JavaScript to switch tracks or create a playlist
+- Consider using a shared JS file for audio control to avoid multiple audio elements playing simultaneously
+- Path to music: `assets/music/filename.mp3` (relative from public folder)
+
 ## CI Pipeline
 
 - PHP 8.1 + 8.2

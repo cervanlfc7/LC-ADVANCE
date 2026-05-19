@@ -888,5 +888,21 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 
+<audio id="dashboardMusic" loop>
+  <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
+</audio>
+<script>
+const STORAGE_KEY = 'lc_volume_settings';
+function getStoredVolumes() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
+const volumes = getStoredVolumes();
+const dAudio = document.getElementById('dashboardMusic');
+dAudio.volume = volumes.principal;
+dAudio.play().then(() => console.log('Dashboard music playing')).catch(e => console.log('Audio error:', e));
+</script>
+
 </body>
 </html>

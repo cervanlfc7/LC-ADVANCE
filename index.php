@@ -2000,5 +2000,22 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>
 
+<audio id="homeMusic" loop>
+  <source src="public/assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
+</audio>
+<script>
+const STORAGE_KEY = 'lc_volume_settings';
+function getStoredVolumes() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
+const volumes = getStoredVolumes();
+const hAudio = document.getElementById('homeMusic');
+hAudio.volume = volumes.principal;
+hAudio.play().then(() => console.log('Home music playing')).catch(e => console.log('Audio error:', e));
+document.getElementById('volPrincipal')?.addEventListener('input', (e) => { volumes.principal = parseFloat(e.target.value); localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes)); hAudio.volume = volumes.principal; });
+</script>
+
 </body>
 </html>

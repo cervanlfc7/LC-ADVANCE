@@ -109,5 +109,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script src="assets/js/app.js"></script>
+<audio id="quizMusic" loop>
+  <source src="assets/music/cuco_examen.mp3" type="audio/mpeg">
+</audio>
+<script>
+const STORAGE_KEY = 'lc_volume_settings';
+function getStoredVolumes() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
+const volumes = getStoredVolumes();
+const qAudio = document.getElementById('quizMusic');
+qAudio.volume = volumes.examenes;
+qAudio.play().then(() => console.log('Quiz music playing')).catch(e => console.log('Audio error:', e));
+</script>
 </body>
 </html>
