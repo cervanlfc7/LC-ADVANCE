@@ -23,9 +23,8 @@ $_SESSION['last_activity'] = time();
 // Guardar materia si se pasó por la URL
 if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
-// Redirigir al destino final
-$redirect = $_GET['redirect'] ?? 'public/mapa/index.php';
-// Si no tiene el prefijo public/, agregarlo
+// Redirigir al destino final - Invitados siempre pasan por selección de personaje
+$redirect = 'public/seleccionar_personaje.php';
 if (strpos($redirect, 'public/') !== 0 && strpos($redirect, '/') !== 0) {
     $redirect = 'public/' . $redirect;
 }

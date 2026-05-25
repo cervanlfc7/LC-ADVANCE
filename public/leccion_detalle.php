@@ -1307,6 +1307,12 @@ $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actua
     </nav>
 
     <div class="header-actions">
+        <div class="header-volume">
+            <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+            <div class="vol-slider" id="volSlider">
+                <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.1" value="0.5">
+            </div>
+        </div>
         <a href="dashboard.php<?= $return_params ?>" class="btn btn-ghost">← Dashboard</a>
         <a href="logout.php" class="btn btn-danger">Salir</a>
     </div>
@@ -1881,12 +1887,130 @@ const STORAGE_KEY = 'lc_volume_settings';
 function getStoredVolumes() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) return JSON.parse(stored);
-  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+  return { principal: 0.5, ambiental: 0.8, examenes: 0.8 };
 }
 const volumes = getStoredVolumes();
 const lAudio = document.getElementById('lessonMusic');
 lAudio.volume = volumes.principal;
 lAudio.play().then(() => console.log('Lesson music playing')).catch(e => console.log('Audio error:', e));
+</script>
+<style>
+.header-volume-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 9999;
+  background: rgba(0,0,0,0.7);
+  border: 2px solid #00e5ff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #00e5ff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-volume-btn:hover {
+  background: rgba(0,229,255,0.2);
+}
+.header-volume-slider {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid #00e5ff;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 5px;
+}
+.header-volume-slider.show {
+  display: block;
+}
+.header-volume-slider input {
+  width: 100px;
+  cursor: pointer;
+}
+</style>
+<style>
+.header-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 15px;
+}
+.vol-btn {
+  background: rgba(0,229,255,0.1);
+  border: 1px solid rgba(0,229,255,0.5);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: #00e5ff;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.vol-btn:hover {
+  background: rgba(0,229,255,0.2);
+  border-color: #00e5ff;
+}
+.vol-slider {
+  display: none;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid rgba(0,229,255,0.5);
+  border-radius: 1px;
+}
+.vol-slider.show {
+  display: block;
+}
+.vol-slider input {
+  width: 100px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: #222;
+  height: 12px;
+  border: 2px solid #00e5ff;
+  border-radius: 4px;
+}
+.vol-slider input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 20px;
+  background: #c9408a;
+  border: 2px solid #fff;
+  cursor: pointer;
+  border-radius: 4px;
+}
+@media (max-width: 768px) {
+  .vol-btn {
+    padding: 4px 6px;
+    font-size: 14px;
+  }
+  .vol-slider {
+    padding: 6px;
+  }
+  .vol-slider input {
+    width: 80px;
+    height: 10px;
+  }
+  .vol-slider input::-webkit-slider-thumb {
+    width: 14px;
+    height: 16px;
+  }
+}
+</style>
+<script>
+function toggleVolumeSlider() {
+  document.getElementById('volSlider').classList.toggle('show');
+}
+const volSlider = document.getElementById('volPrincipalSlider');
+volSlider.value = volumes.principal;
+volSlider.addEventListener('input', function(e) {
+  volumes.principal = parseFloat(e.target.value);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
+  lAudio.volume = volumes.principal;
+  document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+});
 </script>
 </body>
 </html>

@@ -399,6 +399,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .btn-social { font-size: 10px; padding: 8px; }
             .auth-footer { font-size: 12px; }
         }
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-wrapper .auth-input {
+            padding-right: 40px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .toggle-password:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="auth-page">
@@ -458,11 +478,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="input-group full">
                         <label for="contrasena">Contraseña</label>
-                        <input type="password" id="contrasena" name="contrasena" minlength="6" required class="auth-input" placeholder="Al menos 6 caracteres">
+                        <div class="password-wrapper">
+                            <input type="password" id="contrasena" name="contrasena" minlength="6" required class="auth-input" placeholder="Al menos 6 caracteres">
+                            <span class="toggle-password" onclick="togglePassword('contrasena', this)">👁️</span>
+                        </div>
                     </div>
                     <div class="input-group full">
                         <label for="confirmar">Confirmar contraseña</label>
-                        <input type="password" id="confirmar" name="confirmar" minlength="6" required class="auth-input" placeholder="Repite la contraseña">
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmar" name="confirmar" minlength="6" required class="auth-input" placeholder="Repite la contraseña">
+                            <span class="toggle-password" onclick="togglePassword('confirmar', this)">👁️</span>
+                        </div>
                     </div>
                 </div>
                 <button type="submit" class="btn-primary">Registrar</button>
@@ -476,5 +502,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script src="assets/js/app.js"></script>
+<script>
+function togglePassword(inputId, el) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+    } else {
+        input.type = 'password';
+    }
+}
+</script>
+
 </body>
 </html>

@@ -318,6 +318,63 @@ $navItems = [
         .nav-link.active { background: rgba(0, 229, 255, 0.12); border-color: rgba(0, 229, 255, 0.34); color: #fff; box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
         .back-btn { margin-top: auto; text-align: center; padding: 10px; color: #000; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; background: linear-gradient(90deg, var(--cyan), var(--pink)); border-radius: 9px; text-decoration: none; transition: var(--transition); }
         .back-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 229, 255, 0.35); }
+
+        .header-volume {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 10px;
+        }
+        .vol-btn {
+          background: rgba(0,229,255,0.1);
+          border: 1px solid rgba(0,229,255,0.5);
+          border-radius: 6px;
+          padding: 6px 10px;
+          cursor: pointer;
+          color: #00e5ff;
+          font-size: 16px;
+          transition: all 0.3s ease;
+          width: 100%;
+          justify-content: center;
+        }
+        .vol-btn:hover {
+          background: rgba(0,229,255,0.2);
+          border-color: #00e5ff;
+        }
+        .vol-slider {
+          display: none;
+          background: rgba(0,0,0,0.9);
+          border: 1px solid rgba(0,229,255,0.5);
+          border-radius: 6px;
+          padding: 8px;
+        }
+        .vol-slider.show {
+          display: block;
+        }
+        .vol-slider input {
+          width: 100px;
+          cursor: pointer;
+          -webkit-appearance: none;
+          background: #222;
+          height: 12px;
+          border: 2px solid #00e5ff;
+          border-radius: 4px;
+        }
+        .vol-slider input::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 16px;
+          height: 20px;
+          background: #c9408a;
+          border: 2px solid #fff;
+          cursor: pointer;
+          border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+          .vol-btn { padding: 4px 6px; font-size: 14px; }
+          .vol-slider { padding: 6px; }
+          .vol-slider input { width: 80px; height: 10px; }
+          .vol-slider input::-webkit-slider-thumb { width: 14px; height: 16px; }
+        }
         .content-area { padding: 42px 44px; margin-left: 0; }
         .doc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 32px 34px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.32); backdrop-filter: blur(12px); animation: fadeInUp 0.75s ease-out; }
         .markdown-body { color: #d8e9ff; line-height: 1.7; }
@@ -378,6 +435,12 @@ $navItems = [
                     </a>
                 <?php } ?>
             </nav>
+            <div class="header-volume">
+              <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+              <div class="vol-slider" id="volSlider">
+                <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.1" value="0.1">
+              </div>
+            </div>
             <a href="../index.php" class="back-btn">IR AL INICIO</a>
         </aside>
         <main class="content-area">
@@ -403,5 +466,33 @@ $navItems = [
             });
         });
     </script>
+<audio id="pageMusic" loop>
+  <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
+</audio>
+<script>
+const STORAGE_KEY = 'lc_volume_settings';
+function getStoredVolumes() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
+const volumes = getStoredVolumes();
+const pAudio = document.getElementById('pageMusic');
+pAudio.volume = volumes.principal;
+pAudio.play().then(() => console.log('Music playing')).catch(e => console.log('Audio error:', e));
+</script>
+<script>
+function toggleVolumeSlider() {
+  document.getElementById('volSlider').classList.toggle('show');
+}
+const volSlider = document.getElementById('volPrincipalSlider');
+volSlider.value = volumes.principal;
+volSlider.addEventListener('input', function(e) {
+  volumes.principal = parseFloat(e.target.value);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
+  pAudio.volume = volumes.principal;
+  document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+});
+</script>
 </body>
 </html>

@@ -204,7 +204,16 @@ if (!empty($userData)) {
     $_SESSION['usuario_nivel'] = $user['nivel'];
     $_SESSION['last_activity'] = time();
 
-    $final_redirect = $_SESSION['oauth_redirect'] ?? 'public/dashboard.php';
+    $stmt_check = $pdo->prepare("SELECT genero FROM usuarios WHERE id = ?");
+    $stmt_check->execute([$user['id']]);
+    $user_data = $stmt_check->fetch();
+    
+    if (empty($user_data['genero'])) {
+        $final_redirect = 'public/seleccionar_personaje.php';
+    } else {
+        $_SESSION['genero'] = $user_data['genero'];
+    }
+    
     unset($_SESSION['oauth_redirect']);
     redirigir($final_redirect);
 } else {

@@ -1,9 +1,39 @@
 <?php
 require_once __DIR__ . '/../../src/Config/config.php';
 requireLogin();
+
+// Leer género directamente de la BD para evitar problemas de sesión
+$usuario_id = $_SESSION['usuario_id'] ?? 0;
+$player_gender = 'M';
+if ($usuario_id > 0) {
+    $stmt = $pdo->prepare("SELECT genero FROM usuarios WHERE id = ?");
+    $stmt->execute([$usuario_id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($row['genero'])) {
+        $player_gender = $row['genero'];
+    }
+} elseif (!empty($_SESSION['genero'])) {
+    $player_gender = $_SESSION['genero'];
+}
+
+// Si todavía no hay género, redirigir a selección (excepto invitados)
+if ($player_gender === 'M' && empty($_SESSION['usuario_es_invitado']) && $usuario_id > 0) {
+    $stmt_check = $pdo->prepare("SELECT genero FROM usuarios WHERE id = ?");
+    $stmt_check->execute([$usuario_id]);
+    $check = $stmt_check->fetch();
+    if (empty($check['genero'])) {
+        header('Location: ../seleccionar_personaje.php');
+        exit;
+    }
+}
+
 $session_key = "map.player_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
 $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
 ?>
+<script>
+const P_KEY = "<?php echo $session_key; ?>";
+const NPC_KEY = "<?php echo $npc_key; ?>";
+</script>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -93,6 +123,19 @@ $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
       box-shadow: 0 0 30px #39ff14, 0 0 60px rgba(57, 255, 20, 0.3);
       text-shadow: none; transform: translateY(-2px); border-color: #fff;
     }
+    .char-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(0,255,255,0.2); }
+    .char-section h3 { color: var(--neon-cyan); font-size: 10px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .char-grid { display: flex; gap: 16px; justify-content: center; }
+    .char-btn {
+      width: 70px; height: 70px; background: rgba(20, 20, 35, 0.9);
+      border: 2px solid var(--neon-cyan); border-radius: 8px;
+      cursor: pointer; overflow: hidden; transition: all 0.3s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .char-btn:hover { border-color: var(--neon-yellow); transform: scale(1.1); }
+    .char-btn.active { border-color: #39ff14; box-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
+    .char-btn img { width: 100%; height: 100%; object-fit: contain; }
+    .char-btn span { color: var(--neon-yellow); font-family: 'Press Start 2P', monospace; font-size: 8px; }
     
     #interaction {
       position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
@@ -164,6 +207,21 @@ $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
     .volume-control input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: rgba(255,255,255,0.1); border-radius: 3px; outline: none; }
     .volume-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; background: var(--neon-cyan); border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px var(--neon-cyan); }
     .volume-control input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; background: var(--neon-cyan); border-radius: 50%; cursor: pointer; border: none; }
+    .menu-btns button.char {
+      border-color: var(--neon-cyan); color: var(--neon-cyan);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2), inset 0 0 20px rgba(0, 229, 255, 0.05);
+      text-shadow: 0 0 10px var(--neon-cyan);
+    }
+    .menu-btns button.char {
+      border-color: #ff9800; color: #ff9800;
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.2), inset 0 0 20px rgba(255, 152, 0, 0.05);
+      text-shadow: 0 0 10px #ff9800;
+    }
+    .menu-btns button.char:hover, .menu-btns button.char:focus {
+      background: #ff9800; color: #000;
+      box-shadow: 0 0 30px #ff9800, 0 0 60px rgba(255, 152, 0, 0.3);
+      text-shadow: none; transform: translateY(-2px); border-color: #fff;
+    }
   </style>
 </head>
 <body onclick="window.focus();">
@@ -173,21 +231,14 @@ $npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
       <div class="menu-btns">
         <button onclick="document.getElementById('pauseMenu').style.display='none'">▶ CONTINUAR</button>
         <button class="reset" onclick="localStorage.removeItem('<?php echo $session_key; ?>'); localStorage.removeItem('<?php echo $npc_key; ?>'); location.reload();">⟳ RESET POSICIÓN</button>
+        <button class="char" onclick="window.location.href='../seleccionar_personaje.php?from=mapa'">CAMBIAR PERSONAJE</button>
         <button class="exit" onclick="window.location.href='../../index.php'">⏻ SALIR</button>
       </div>
       <div class="volume-section">
         <h3>// VOLUMEN</h3>
         <div class="volume-control">
-          <label>Musica Principal</label>
-          <input type="range" id="volPrincipal" min="0" max="1" step="0.1" value="0.1">
-        </div>
-        <div class="volume-control">
           <label>Musica Ambiental</label>
           <input type="range" id="volAmbiental" min="0" max="1" step="0.1" value="0.8">
-        </div>
-        <div class="volume-control">
-          <label>Musica Examenes</label>
-          <input type="range" id="volExamenes" min="0" max="1" step="0.1" value="0.8">
         </div>
       </div>
     </div>
@@ -425,7 +476,7 @@ class NPC {
   draw() {
     ctx.fillStyle = "rgba(0,0,0,0.28)";
     ctx.beginPath();
-    ctx.ellipse(Math.floor(this.x), Math.floor(this.y + 6), 7, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(Math.floor(this.x), Math.floor(this.y + 3), 7, 3, 0, 0, Math.PI * 2);
     ctx.fill();
     this.tiles.forEach(t => {
       const info = getTile(t.gid);
@@ -435,8 +486,6 @@ class NPC {
   }
 }
 
-const P_KEY = "<?php echo $session_key; ?>";
-const NPC_KEY = "<?php echo $npc_key; ?>";
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d", { alpha: false });
 let ZOOM = 3;
@@ -571,7 +620,26 @@ function pointInPolygon(x, y, points) {
 // ---
 
 const KEYS=new Set(); window.onkeydown=e=>KEYS.add(e.key.toLowerCase()); window.onkeyup=e=>KEYS.delete(e.key.toLowerCase());
-const sprites={ L:new Image(),R:new Image(),U:new Image(),D:new Image(), load:()=>{ sprites.L.src="./C_L.gif"; sprites.R.src="./C_R.gif"; sprites.U.src="./C_U.gif"; sprites.D.src="./C_D.gif"; } }; sprites.load();
+const PLAYER_GENDER = '<?php echo $player_gender; ?>';
+const dirMap = {L:'Izquierda',R:'Derecha',U:'Atras',D:'Frente'};
+const sprites = {L:[],R:[],U:[],D:[]};
+function loadSprites() {
+  const p = PLAYER_GENDER;
+  for (const [d,name] of Object.entries(dirMap)) {
+    sprites[d] = [];
+    for (let i = 1; i <= 3; i++) {
+      const img = new Image();
+      img.src = `./${p}_${name}${i}.png`;
+      sprites[d].push(img);
+    }
+  }
+}
+loadSprites();
+let isMoving = false;
+let lastDirection = 'D';
+let animFrame = 0;
+let animTimer = 0;
+const ANIM_SPEED = 160;
 function getTile(gid) {
   const raw=gid; gid&=~0xE0000000; if(!gid)return null; const ts=world.tilesets.find(t=>gid>=t.firstgid&&gid<=t.lastgid);
   if(!ts)return null; const lid=gid-ts.firstgid; return {ts,sx:(lid%ts.cols)*16,sy:Math.floor(lid/ts.cols)*16,raw};
@@ -582,6 +650,20 @@ function updateGame(dt) {
   else if (KEYS.has("arrowright") || KEYS.has("d")) { dx =  1; world.player.dir = 'R'; }
   if (KEYS.has("arrowup")    || KEYS.has("w")) { dy = -1; world.player.dir = 'U'; }
   else if (KEYS.has("arrowdown")  || KEYS.has("s")) { dy =  1; world.player.dir = 'D'; }
+
+  isMoving = (dx !== 0 || dy !== 0);
+
+  if (isMoving) {
+    lastDirection = world.player.dir;
+    animTimer += dt * 1000;
+    if (animTimer >= ANIM_SPEED) {
+      animTimer -= ANIM_SPEED;
+      animFrame = (animFrame + 1) % 3;
+    }
+  } else {
+    animTimer = 0;
+    animFrame = 0;
+  }
 
   if (dx || dy) {
     const mag  = Math.hypot(dx, dy);
@@ -637,7 +719,9 @@ function updateGame(dt) {
 
   if (KEYS.has("escape")) { document.getElementById("pauseMenu").style.display = 'block'; KEYS.delete("escape"); }
 }
-function saveState(){ localStorage.setItem(P_KEY,JSON.stringify({x:world.player.x,y:world.player.y})); localStorage.setItem(NPC_KEY,JSON.stringify(world.npcs.map(n=>({x:n.x,y:n.y})))); }
+function saveState(){ localStorage.setItem(P_KEY, JSON.stringify({x:world.player.x,y:world.player.y}));
+localStorage.setItem(NPC_KEY, JSON.stringify(world.npcs.map(n=>({x:n.x,y:n.y}))));
+localStorage.setItem(P_KEY + '_ts', Date.now().toString()); }
 function renderLayer(l){
   if(!l.chunks)return; const vw=canvas.width/ZOOM+32, vh=canvas.height/ZOOM+32;
   l.chunks.forEach(chk=>{
@@ -662,7 +746,14 @@ function renderLayer(l){
 function draw(){
   ctx.imageSmoothingEnabled=false; ctx.fillStyle="#000"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.save(); ctx.scale(ZOOM,ZOOM); ctx.translate(-Math.floor(world.cameraX),-Math.floor(world.cameraY));
   if(world.map) world.map.layers.filter(l=>l.type==="tilelayer"&&l.visible&&l.name!=="Techo"&&l.name!=="Maestros"&&l.name!=="Edificios2").forEach(l=>renderLayer(l));
-  const pEnt={y:world.player.y,draw(){ctx.fillStyle="rgba(0,0,0,0.28)"; ctx.beginPath(); ctx.ellipse(Math.floor(world.player.x),Math.floor(world.player.y+6),7,3,0,0,Math.PI*2); ctx.fill(); ctx.drawImage(sprites[world.player.dir],Math.floor(world.player.x-10),Math.floor(world.player.y-17),20,20);}};
+  const pEnt={y:world.player.y,draw(){
+    ctx.fillStyle="rgba(0,0,0,0.28)"; ctx.beginPath(); ctx.ellipse(Math.floor(world.player.x),Math.floor(world.player.y+3),7,3,0,0,Math.PI*2); ctx.fill();
+    const dir = isMoving ? world.player.dir : 'D';
+    const frames = sprites[dir];
+    const idx = isMoving ? animFrame : 0;
+    const img = frames[idx];
+    ctx.drawImage(img, Math.floor(world.player.x-10), Math.floor(world.player.y-17), 20, 20);
+  }};
   [...world.npcs,pEnt].sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   if(world.map) world.map.layers.filter(l=>(l.name==="Techo"||l.name==="Edificios2")&&l.visible).forEach(l=>renderLayer(l)); ctx.restore();
 }
@@ -805,6 +896,28 @@ function playNext() {
 audio1.addEventListener('ended', playNext);
 audio2.addEventListener('ended', playNext);
 crossfadePlay(0);
+
+function cambiarPersonaje(genero) {
+  PLAYER_GENDER = genero;
+  loadSprites();
+  document.getElementById('charM').classList.remove('active');
+  document.getElementById('charW').classList.remove('active');
+  document.getElementById('char' + genero).classList.add('active');
+  
+  fetch('../guardar_genero.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'genero=' + genero + '&invitado=' + (<?= !empty($_SESSION['usuario_es_invitado']) ? 'true' : 'false' ?> ? '1' : '0')
+  });
+}
+
+document.getElementById('char' + PLAYER_GENDER).classList.add('active');
+
+function guardarPosYIr() {
+  localStorage.setItem(P_KEY, JSON.stringify({x:world.player.x,y:world.player.y}));
+  localStorage.setItem(NPC_KEY, JSON.stringify(world.npcs.map(n=>({x:n.x,y:n.y}))));
+  window.location.href = '../seleccionar_personaje.php?from=mapa';
+}
 </script>
 </body>
 </html>
