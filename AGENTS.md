@@ -120,6 +120,7 @@ define('GITHUB_CLIENT_SECRET', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d');
 ```
 
 **Nota:** No hagas commit de secrets. En producción usa variables de entorno.
+- La API key de OpenRouter actual está hardcodeada en `src/Config/config.php` para desarrollo. En producción usar `OPENROUTER_API_KEY` env var.
 
 ## Security Features
 
@@ -142,6 +143,10 @@ define('GITHUB_CLIENT_SECRET', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d');
 - **slug**: Must be unique per lesson
 - **Ranking**: Updates every 15s via `obtener_estado`
 - **Lesson CSS**: Individual lesson styles in `public/assets/css/leccion-*.css`
+- **AI Tutor**: Use `public/ai_tutor.php` endpoint for AI chat; "Preguntar al Maestro" per-teacher chat at `public/maestro_chat.php?materia=XXX`
+- **Maestro Chat**: Each teacher has their own chat with materia-specific context, history stored per-materia in session (`$_SESSION['maestro_chat_'.$materia]`), and a salon image background (`public/assets/img/salon_*.png`)
+- **Maestro Chat access**: Via dashboard filter - select a subject/teacher → "Preguntar al Maestro" button appears in the combat card
+- **Volume control consistency**: All pages use the same `.header-volume`, `.vol-btn`, `.vol-slider` CSS. If styling differs, check `margin-left: 15px` vs `margin-right: 15px` in `.header-volume` (dashboard uses margin-left, others should match)
 
 ## Common Path Issues
 
@@ -158,6 +163,39 @@ define('GITHUB_CLIENT_SECRET', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d');
 - **OAuth redirects**: After Google/GitHub login, users should go to `public/dashboard.php`, not directly to `mapa/index.php`
 
 - **Timeout redirect**: When session expires in `public/mapa/` subfolder, the redirect uses `../login.php?timeout=1` which correctly resolves to `public/login.php?timeout=1`
+
+## Music & Volume System
+
+### Music Files
+Located in `public/assets/music/`:
+
+| Section | Music Files | Behavior |
+|---------|-------------|----------|
+| `public/mapa/` (map) | `cuco_día_alt.mp3`, `cuco_dia.mp3`, `cuco-lost.mp3` | Alternating playback with crossfade |
+| `public/quiz.php` (quiz per theme) | `cuco_examen.mp3` | Single track |
+| `public/Examen/` (combat system) | `cuco_examen_final.mp3` | Single track |
+| Rest of app (login, dashboard, etc.) | `cuco_pantalla_inicio.mp3` | Single track |
+
+### Volume System
+- **Storage key**: `'lc_volume_settings'` in localStorage
+- **Default values**: `{ principal: 0.1, ambiental: 0.8, examenes: 0.8 }`
+- **Volume types**:
+  - `principal` - Main menu music
+  - `ambiental` - Map background music
+  - `examenes` - Quiz/combat music
+
+**Implementation pattern** (used in all pages):
+```javascript
+const STORAGE_KEY = 'lc_volume_settings';
+function getStoredVolumes() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
+const volumes = getStoredVolumes();
+```
+
+**Volume control UI**: Only in `public/mapa/index.php` (lines 178-192) - has three range sliders for all volume types. Other pages read but don't display controls.
 
 ## CI Pipeline
 

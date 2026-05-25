@@ -167,11 +167,71 @@ if (!empty($posts)) {
     .comment-meta { font-size:11px; color:rgba(220,236,255,.6); margin-bottom:5px; }
     .comment-body { white-space:pre-wrap; line-height:1.45; font-size:13px; }
     .muted { color:rgba(220,236,255,.6); font-size:12px; }
+
+    .header-volume {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .vol-btn {
+      background: rgba(0,229,255,0.1);
+      border: 1px solid rgba(0,229,255,0.5);
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: #00e5ff;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    .vol-btn:hover {
+      background: rgba(0,229,255,0.2);
+      border-color: #00e5ff;
+    }
+    .vol-slider {
+      display: none;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid rgba(0,229,255,0.5);
+      border-radius: 6px;
+      padding: 8px;
+    }
+    .vol-slider.show {
+      display: block;
+    }
+    .vol-slider input {
+      width: 100px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      background: #222;
+      height: 12px;
+      border: 2px solid #00e5ff;
+      border-radius: 4px;
+    }
+    .vol-slider input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 20px;
+      background: #c9408a;
+      border: 2px solid #fff;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    @media (max-width: 768px) {
+      .vol-btn { padding: 4px 6px; font-size: 14px; }
+      .vol-slider { padding: 6px; }
+      .vol-slider input { width: 80px; height: 10px; }
+      .vol-slider input::-webkit-slider-thumb { width: 14px; height: 16px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="top">
+      <div class="header-volume">
+        <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+        <div class="vol-slider" id="volSlider">
+          <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.1" value="0.1">
+        </div>
+      </div>
       <a href="../../index.php">Inicio</a>
       <a href="dashboard.php">Dashboard</a>
       <a href="mapa/index.php">Mapa</a>
@@ -274,5 +334,33 @@ if (!empty($posts)) {
       el.style.display = el.style.display === 'none' || !el.style.display ? 'block' : 'none';
     }
   </script>
+<audio id="pageMusic" loop>
+  <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
+</audio>
+<script>
+const STORAGE_KEY = 'lc_volume_settings';
+function getStoredVolumes() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
+const volumes = getStoredVolumes();
+const pAudio = document.getElementById('pageMusic');
+pAudio.volume = volumes.principal;
+pAudio.play().then(() => console.log('Music playing')).catch(e => console.log('Audio error:', e));
+</script>
+<script>
+function toggleVolumeSlider() {
+  document.getElementById('volSlider').classList.toggle('show');
+}
+const volSlider = document.getElementById('volPrincipalSlider');
+volSlider.value = volumes.principal;
+volSlider.addEventListener('input', function(e) {
+  volumes.principal = parseFloat(e.target.value);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
+  pAudio.volume = volumes.principal;
+  document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+});
+</script>
 </body>
 </html>

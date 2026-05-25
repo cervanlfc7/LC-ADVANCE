@@ -206,7 +206,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
-                redirigir($final_redirect);
+                $stmt_check = $pdo->prepare("SELECT genero FROM usuarios WHERE id = ?");
+                $stmt_check->execute([$usuario['id']]);
+                $user_data = $stmt_check->fetch();
+                
+                if (empty($user_data['genero'])) {
+                    redirigir('public/seleccionar_personaje.php');
+                } else {
+                    $_SESSION['genero'] = $user_data['genero'];
+                    redirigir($final_redirect);
+                }
             } else {
                 $intentos = $_SESSION['login_attempts'] ?? ['count' => 0, 'first' => time()];
                 $intentos['count']++;
@@ -547,10 +556,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .btn-back { top: 12px; left: 10px; font-size: 9px; }
             .auth-footer { font-size: 12px; }
         }
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-wrapper .auth-input {
+            padding-right: 40px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .toggle-password:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="auth-page">
-
 <div class="grid-bg"></div>
 <div class="bg-orb bg-orb-1"></div>
 <div class="bg-orb bg-orb-2"></div>
@@ -627,7 +655,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="input-group">
                     <label for="contrasena">Contraseña</label>
-                    <input type="password" id="contrasena" name="contrasena" class="auth-input" placeholder="********">
+                    <div class="password-wrapper">
+                        <input type="password" id="contrasena" name="contrasena" class="auth-input" placeholder="********">
+                        <span class="toggle-password" onclick="togglePassword('contrasena', this)">👁️</span>
+                    </div>
                 </div>
 
                 <button type="submit" class="auth-btn">Entrar</button>
@@ -721,6 +752,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     console.log('(Este código también se muestra en desarrollo - quitar en producción)');
 </script>
 <?php unset($_SESSION['otp_debug']); endif; ?>
+<script>
+function togglePassword(inputId, el) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+    } else {
+        input.type = 'password';
+    }
+}
+</script>
 
 <script src="assets/js/app.js"></script>
 <?php if (!empty($_GET['timeout']) || !empty($_GET['logout'])): ?>
@@ -734,5 +775,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 </script>
 <?php endif; ?>
+
 </body>
 </html>
