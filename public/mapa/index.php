@@ -707,11 +707,11 @@ function updateGame(dt) {
     if (KEYS.has("e")) {
       saveState();
       // Redirigir igual que en index_old.html: si hay materia, usarla; si no, usar profesor
-      if (materia) {
-        window.location.href = `../dashboard.php?materia=${encodeURIComponent(materia)}`;
-      } else {
-        window.location.href = `../dashboard.php?profesor=${encodeURIComponent(nombre)}`;
-      }
+      const basePath = window.location.pathname.replace(/\/mapa\/.*$/, '');
+      const dashboardUrl = materia 
+        ? `${basePath}/dashboard.php?materia=${encodeURIComponent(materia)}`
+        : `${basePath}/dashboard.php?profesor=${encodeURIComponent(nombre)}`;
+      window.location.href = dashboardUrl;
     }
   } else {
     ui.style.display = "none";

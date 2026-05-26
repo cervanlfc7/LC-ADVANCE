@@ -204,16 +204,7 @@ if (!empty($userData)) {
     $_SESSION['usuario_nivel'] = $user['nivel'];
     $_SESSION['last_activity'] = time();
 
-    $stmt_check = $pdo->prepare("SELECT genero FROM usuarios WHERE id = ?");
-    $stmt_check->execute([$user['id']]);
-    $user_data = $stmt_check->fetch();
-    
-    if (empty($user_data['genero'])) {
-        $final_redirect = 'public/seleccionar_personaje.php';
-    } else {
-        $_SESSION['genero'] = $user_data['genero'];
-    }
-    
+    $final_redirect = !empty($_SESSION['oauth_redirect']) ? $_SESSION['oauth_redirect'] : 'public/mapa/index.php';
     unset($_SESSION['oauth_redirect']);
     redirigir($final_redirect);
 } else {

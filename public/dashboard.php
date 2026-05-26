@@ -4,6 +4,17 @@
 // ==========================================
 require_once __DIR__ . '/../src/Config/config.php';
 requireLogin(true);
+
+// Guardar materia del GET a sesión inmediatamente
+if (!empty($_GET['materia'])) {
+    $_SESSION['selected_materia'] = trim($_GET['materia']);
+}
+
+// REQUERIR MATERIA - Si no hay materia seleccionada, redirigir a seleccionar
+if (empty($_SESSION['selected_materia']) && empty($_GET['profesor'])) {
+    redirigir('index.php?seleccionar_materia=1');
+}
+
 require_once __DIR__ . '/../src/Content/content.php';
 
 $supported_langs = ['es', 'en'];
@@ -25,10 +36,7 @@ $t = [
         'home' => 'Inicio',
         'go_map' => 'Ir al Mapa',
         'logout' => 'Cerrar Sesión',
-        
         'coding_lab' => 'Laboratorio',
-        'ask_teacher' => 'Preguntar al Maestro',
-        'ask_teacher_btn' => '💬 PREGUNTAR AL MAESTRO',
         'player_profile' => 'Perfil del jugador',
         'teacher_panel' => 'Panel Docente',
         'date_reports' => 'Reportes por rango de fecha',
@@ -75,10 +83,7 @@ $t = [
         'home' => 'Home',
         'go_map' => 'Go to Map',
         'logout' => 'Log Out',
-        
         'coding_lab' => 'Coding Lab',
-        'ask_teacher' => 'Ask the Teacher',
-        'ask_teacher_btn' => '💬 ASK THE TEACHER',
         'player_profile' => 'Player profile',
         'teacher_panel' => 'Teacher panel',
         'date_reports' => 'Date range reports',
@@ -432,18 +437,11 @@ $daily_quests = [
         <span class="logo-tag">// SYSTEM_DASHBOARD</span>
     </div>
     <nav>
-        <a href="index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
+        <a href="../index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
         <a href="mapa/index.php" class="btn-nav primary"><?= htmlspecialchars($t[$lang]['go_map']) ?></a>
-        
         <a href="lab.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></a>
         <a href="community.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['community']) ?></a>
         <a href="logout.php"     class="btn-nav"><?= htmlspecialchars($t[$lang]['logout']) ?></a>
-        <div class="header-volume">
-            <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
-            <div class="vol-slider" id="volSlider">
-                <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.1" value="0.5">
-            </div>
-        </div>
         <div class="toolbar-controls">
             <label for="langSelector" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);"><?= htmlspecialchars($t[$lang]['language']) ?></label>
             <select id="langSelector">
@@ -732,10 +730,6 @@ $daily_quests = [
                            class="combat-btn">
                             <?= htmlspecialchars($t[$lang]['start_exam']) ?>
                         </a>
-                        <a href="maestro_chat.php?materia=<?= urlencode($materia_usada) ?>"
-                           class="combat-btn" style="background:var(--cyan-dim);border-color:var(--cyan);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;">
-                            <?= htmlspecialchars($t[$lang]['ask_teacher_btn']) ?>
-                        </a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -895,141 +889,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 })();
-</script>
-
-<audio id="dashboardMusic" loop>
-  <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
-</audio>
-<script>
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.5, ambiental: 0.8, examenes: 0.8 };
-}
-const volumes = getStoredVolumes();
-const dAudio = document.getElementById('dashboardMusic');
-dAudio.volume = volumes.principal;
-dAudio.play().then(() => console.log('Dashboard music playing')).catch(e => console.log('Audio error:', e));
-</script>
-<style>
-.header-volume-btn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 9999;
-  background: rgba(0,0,0,0.7);
-  border: 2px solid #00e5ff;
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  color: #00e5ff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.header-volume-btn:hover {
-  background: rgba(0,229,255,0.2);
-}
-.header-volume-slider {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid #00e5ff;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 5px;
-}
-.header-volume-slider.show {
-  display: block;
-}
-.header-volume-slider input {
-  width: 100px;
-  cursor: pointer;
-}
-</style>
-<style>
-.header-volume {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 15px;
-}
-.vol-btn {
-  background: rgba(0,229,255,0.1);
-  border: 1px solid rgba(0,229,255,0.5);
-  border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: #00e5ff;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-.vol-btn:hover {
-  background: rgba(0,229,255,0.2);
-  border-color: #00e5ff;
-}
-.vol-slider {
-  display: none;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid rgba(0,229,255,0.5);
-  border-radius: 6px;
-  padding: 8px;
-}
-.vol-slider.show {
-  display: block;
-}
-.vol-slider input {
-  width: 100px;
-  cursor: pointer;
-  -webkit-appearance: none;
-  background: #222;
-  height: 12px;
-  border: 2px solid #00e5ff;
-  border-radius: 4px;
-}
-.vol-slider input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 20px;
-  background: #c9408a;
-  border: 2px solid #fff;
-  cursor: pointer;
-  border-radius: 4px;
-}
-@media (max-width: 768px) {
-  .vol-btn {
-    padding: 4px 6px;
-    font-size: 14px;
-  }
-  .vol-slider {
-    padding: 6px;
-  }
-  .vol-slider input {
-    width: 80px;
-    height: 10px;
-  }
-  .vol-slider input::-webkit-slider-thumb {
-    width: 14px;
-    height: 16px;
-  }
-}
-</style>
-<script>
-function toggleVolumeSlider() {
-  document.getElementById('volSlider').classList.toggle('show');
-}
-const volSlider = document.getElementById('volPrincipalSlider');
-volSlider.value = volumes.principal;
-volSlider.addEventListener('input', function(e) {
-  volumes.principal = parseFloat(e.target.value);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
-  dAudio.volume = volumes.principal;
-  document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
-});
 </script>
 
 </body>

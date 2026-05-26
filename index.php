@@ -1,16 +1,22 @@
 <?php
 // ==========================================
-// LC-ADVANCE - index.php (Rediseño Premium 2025)
+// LC-ADVANCE - index.php (Versión Mejorada 2025 v2.0)
 // ==========================================
-// Diseño Responsivo con Animaciones del Dashboard
+// Fecha: 07 Noviembre 2025
 // ==========================================
 
-require_once __DIR__ . '/src/Config/config.php';
+require_once 'config/config.php';
+// Asegurar que la sesión se inicie con las políticas definidas
 iniciarSesionSegura();
-header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
-header('Expires: 0');
-require_once __DIR__ . '/src/Config/csrf.php';
+require_once 'config/csrf.php';
+
+<<<<<<< Updated upstream
+// Verificar si el usuario está autenticado
+$usuario_logueado = isset($_SESSION['usuario_id']);
+=======
+// Base URL dinámica - detecta la ruta correcta
+$scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+$baseUrl = $scriptDir === '/' || $scriptDir === '\\' ? '' : $scriptDir;
 
 $usuario_logueado = isset($_SESSION['usuario_id']);
 $supported_langs = ['es', 'en'];
@@ -131,6 +137,9 @@ $t = [
         'stat_questions' => 'Preguntas',
         'stat_access' => 'Acceso',
         'stat_free' => 'Gratis',
+        'select_materia_title' => 'Selecciona una materia',
+        'select_materia_sub' => 'Elige el área que quieres estudiar para continuar.',
+        'select_materia_btn' => 'Continuar',
     ],
     'en' => [
         'language' => 'Language',
@@ -241,1241 +250,479 @@ $t = [
         'stat_questions' => 'Questions',
         'stat_access' => 'Access',
         'stat_free' => 'Free',
+        'select_materia_title' => 'Select a subject',
+        'select_materia_sub' => 'Choose the area you want to study to continue.',
+        'select_materia_btn' => 'Continue',
     ],
 ];
+>>>>>>> Stashed changes
 ?>
 
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars($lang) ?>">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LC-ADVANCE | Plataforma Educativa Gamificada</title>
-    <link rel="manifest" href="manifest.webmanifest">
-    
-    <!-- Fuentes de Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    
-    <!-- Favicon -->
+    <title>LC-ADVANCE</title>
+
+    <!-- Fuente retro y Google Fonts para más variety -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Force dark theme for lesson pages early to avoid flash -->
+    <script>(function(){try{const KEY='lc_advance_theme'; const saved=localStorage.getItem(KEY); if(!saved && (location.pathname.indexOf('leccion_detalle.php')!==-1 || location.search.indexOf('slug=')!==-1)){ document.documentElement.classList.add('dark'); try{localStorage.setItem(KEY,'dark')}catch(e){} } }catch(e){} })();</script>
+    <!-- Icono favicon retro -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
-    
+
+    <script src="assets/js/app.js" defer></script>
     <style>
-        /* ════════════════════════════════════════════════
-           VARIABLES (DASHBOARD THEME)
-           ════════════════════════════════════════════════ */
+        /* Corporate-Grade Retro Modern Style */
         :root {
-            --bg: #060a12;
-            --surface: #0c1220;
-            --surface2: #101828;
-            --border: rgba(0, 230, 255, 0.12);
-            --border2: rgba(0, 230, 255, 0.22);
-            --cyan: #00e5ff;
-            --cyan-dim: rgba(0, 229, 255, 0.12);
-            --pink: #ff3cac;
-            --green: #00ff87;
-            --yellow: #ffd23f;
-            --text: #e8f4ff;
-            --muted: rgba(200, 230, 255, 0.5);
-            --font-display: "Syne", sans-serif;
-            --font-body: "Space Grotesk", sans-serif;
-            --font-mono: "JetBrains Mono", monospace;
-            --transition: all 0.22s ease;
+            --accent-glow: 0 0 30px rgba(0, 255, 255, 0.3);
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --header-blur: blur(12px);
+            --section-spacing: clamp(40px, 8vw, 100px);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
+        .home {
+            overflow-x: hidden;
+            background-color: #050508;
             scroll-behavior: smooth;
         }
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-body);
-            font-size: 14px;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        button {
-            font-family: var(--font-body);
-            cursor: pointer;
-            border: none;
-        }
-
-        /* ════════════════════════════════════════════════
-           ANIMATED BACKGROUND
-           ════════════════════════════════════════════════ */
+        /* Animated Grid Background */
         .grid-bg {
             position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            background-image:
-                linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 229, 255, 0.018) 1px, transparent 1px);
-            background-size: 48px 48px;
-            animation: gridScroll 30s linear infinite;
-        }
-
-        @keyframes gridScroll {
-            to { background-position: 0 48px; }
-        }
-
-        .bg-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(90px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .bg-orb-1 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0, 229, 255, 0.07), transparent 70%);
-            top: -120px;
-            right: -100px;
-            animation: orbPulse 9s ease-in-out infinite;
-        }
-
-        .bg-orb-2 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(255, 60, 172, 0.055), transparent 70%);
-            bottom: 0;
-            left: -80px;
-            animation: orbPulse 11s ease-in-out infinite reverse;
-        }
-
-        @keyframes orbPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.14); }
-        }
-
-        /* ════════════════════════════════════════════════
-           HEADER
-           ════════════════════════════════════════════════ */
-        header {
-            position: sticky;
             top: 0;
-            z-index: 100;
-            padding: 0 28px;
-            min-height: 58px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(6, 10, 18, 0.88);
-            backdrop-filter: blur(18px);
-            border-bottom: 1px solid var(--border);
-            animation: fadeInDown 0.6s ease-out;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-text {
-            font-family: var(--font-display);
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            transition: all 0.3s ease;
-        }
-
-        .logo-text:hover {
-            letter-spacing: -0.3px;
-        }
-
-        .logo-tag {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--green);
-            opacity: 0.85;
-            animation: floatUp 3s ease-in-out infinite;
-            animation-delay: 0.1s;
-        }
-
-        nav {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-            animation: fadeInRight 0.5s ease-out;
-        }
-
-        /* ════════════════════════════════════════════════
-           BUTTONS
-           ════════════════════════════════════════════════ */
-        .btn {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            padding: 7px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border2);
-            color: var(--muted);
-            background: transparent;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-            display: inline-flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInRight 0.5s ease-out backwards;
-        }
-
-        .btn:nth-child(1) { animation-delay: 0.15s; }
-        .btn:nth-child(2) { animation-delay: 0.22s; }
-
-        .btn::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            transform: translate(-50%, -50%);
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
             pointer-events: none;
-            transition: all 0.4s ease;
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+            animation: gridMove 20s linear infinite;
         }
 
-        .btn:active::before {
-            width: 100px;
-            height: 100px;
-            opacity: 0;
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 50px; }
         }
 
-        .btn:hover {
-            color: var(--cyan);
-            border-color: rgba(0, 229, 255, 0.5);
-            background: rgba(0, 229, 255, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.15);
+        .home .container {
+            max-width: 1300px !important;
+            width: 100% !important;
+            padding: 0 20px !important;
+            margin: 0 auto !important;
+            box-sizing: border-box;
         }
 
-        .btn-primary {
-            border-color: var(--cyan);
-            color: #041420;
-            background: var(--cyan);
-            font-weight: 700;
+        /* Refined Header */
+        .header {
+            background: rgba(0, 0, 0, 0.6) !important;
+            backdrop-filter: var(--header-blur);
+            -webkit-backdrop-filter: var(--header-blur);
+            border-bottom: 1px solid rgba(255, 204, 0, 0.2) !important;
+            transition: var(--transition-smooth);
         }
 
-        .btn-primary:hover {
-            background: #33eeff;
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 10px 28px rgba(0, 229, 255, 0.35);
-        }
-
-        .toolbar-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 8px;
-        }
-
-        .toolbar-controls select {
-            background: var(--surface2);
-            border: 1px solid var(--border2);
-            color: var(--text);
-            border-radius: 7px;
-            height: 30px;
-            padding: 0 8px;
-            font-size: 10px;
-            font-family: var(--font-mono);
-        }
-
-        .toolbar-controls button {
-            height: 30px;
-            padding: 0 10px;
-            border-radius: 7px;
-            border: 1px solid var(--border2);
-            background: var(--surface2);
-            color: var(--text);
-            font-size: 10px;
-            font-family: var(--font-mono);
-        }
-
-        [data-theme="light"] {
-            --bg: #f4f8ff;
-            --surface: #ffffff;
-            --surface2: #eef4ff;
-            --text: #061523;
-            --muted: rgba(20, 35, 55, 0.65);
-            --border: rgba(0, 120, 170, 0.16);
-            --border2: rgba(0, 120, 170, 0.28);
-        }
-
-        /* ════════════════════════════════════════════════
-           CONTAINER
-           ════════════════════════════════════════════════ */
-        .container {
-            position: relative;
-            z-index: 1;
-            width: min(100%, 1320px);
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* ════════════════════════════════════════════════
-           HERO SECTION
-           ════════════════════════════════════════════════ */
+        /* Enhanced Hero Section */
         .hero {
-            min-height: 90vh;
+            min-height: 95vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 60px 20px;
-            animation: fadeInUp 0.6s ease-out 0.2s both;
+            padding: 100px 20px;
+            background: none;
+            position: relative;
         }
 
-        .hero h1 {
-            font-family: var(--font-display);
+        .hero::before {
+            content: "";
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.08) 0%, transparent 50%);
+            z-index: -1;
+            animation: pulseHero 8s ease-in-out infinite;
+        }
+
+        @keyframes pulseHero {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .hero h2 {
             font-size: clamp(32px, 8vw, 72px);
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
+            font-family: var(--font-pixel);
+            background: linear-gradient(to bottom, #fff, var(--neon-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.1;
+            text-shadow: none;
+            margin-bottom: 30px;
+            letter-spacing: -2px;
         }
 
         .hero p {
-            font-size: clamp(16px, 2vw, 20px);
-            color: var(--muted);
-            max-width: 800px;
-            margin-bottom: 40px;
-            line-height: 1.6;
+            font-size: clamp(18px, 2.5vw, 24px);
+            font-family: var(--font-retro);
+            max-width: 900px;
+            color: var(--text-dim);
+            margin-bottom: 50px;
+            line-height: 1.4;
         }
 
-        .hero-buttons {
+        /* Stats Bar */
+        .stats-bar {
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 60px;
+            gap: clamp(20px, 5vw, 80px);
+            margin-top: 60px;
+            padding: 30px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: var(--header-blur);
+            animation: fadeInUp 1s ease-out 0.9s both;
         }
 
-        .btn-hero {
-            padding: 12px 32px;
-            font-size: 11px;
-        }
-
-        .interactive-preview {
-            margin: -20px auto 70px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 22px;
-            max-width: 1000px;
-        }
-
-        .interactive-preview h3 {
-            font-family: var(--font-display);
-            margin-bottom: 8px;
-            font-size: 22px;
-        }
-
-        .interactive-preview p {
-            color: var(--muted);
-            margin-bottom: 14px;
-        }
-
-        .preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .preview-card {
-            border: 1px solid var(--border);
-            background: var(--surface2);
-            border-radius: 10px;
-            padding: 14px;
-            color: var(--text);
-            text-align: left;
-        }
-
-        .preview-card strong {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 12px;
-            color: var(--cyan);
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-        }
-
-        .preview-card span {
-            font-size: 13px;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        .tour-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 300;
-            padding: 16px;
-        }
-
-        .tour-modal.open {
+        .stat-item {
             display: flex;
-        }
-
-        .tour-content {
-            background: var(--surface);
-            border: 1px solid var(--border2);
-            border-radius: 14px;
-            width: min(680px, 100%);
-            padding: 22px;
-        }
-
-        .tour-content h4 {
-            font-family: var(--font-display);
-            margin-bottom: 10px;
-        }
-
-        .tour-content p {
-            color: var(--muted);
-            margin-bottom: 12px;
-        }
-
-        .tour-steps {
-            list-style: none;
-            display: grid;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .tour-steps li {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px;
-            background: var(--surface2);
-            font-size: 13px;
-            transition: border-color 0.2s ease, background 0.2s ease;
-        }
-
-        .tour-steps li.active {
-            background: rgba(0, 230, 255, 0.12);
-            border-color: rgba(0, 230, 255, 0.4);
-        }
-
-        .tour-preview {
-            display: grid;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .tour-frame {
-            background: #080d18;
-            border: 1px solid rgba(0, 255, 255, 0.18);
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.06);
-        }
-
-        .tour-screen {
-            min-height: 230px;
-            padding: 18px;
-            color: #e8f4ff;
-            font-family: var(--font-mono);
-            display: none;
-            gap: 14px;
-        }
-
-        .tour-screen.active {
-            display: grid;
-        }
-
-        .tour-screen h5 {
-            margin: 0 0 10px;
-            font-size: 14px;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .tour-screen p {
-            margin: 0;
-            font-size: 12px;
-            line-height: 1.6;
-            color: rgba(232, 244, 255, 0.78);
-        }
-
-        .tour-status {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .tour-chip {
-            background: rgba(0, 255, 255, 0.08);
-            border: 1px solid rgba(0, 255, 255, 0.12);
-            padding: 8px 12px;
-            border-radius: 999px;
-            font-size: 11px;
-            color: #c8f4ff;
-        }
-
-        .tour-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .tour-controls .btn {
-            min-width: 120px;
-        }
-
-        .tour-progress {
-            color: var(--muted);
-            font-size: 12px;
-            letter-spacing: 0.6px;
-        }
-
-        .landing-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 26px;
-            margin-bottom: 60px;
-        }
-
-        .landing-section h3 {
-            font-family: var(--font-display);
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
-
-        .landing-section > p {
-            color: var(--muted);
-            margin-bottom: 20px;
-        }
-
-        .path-grid, .testimonial-grid, .faq-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .path-grid {
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-        }
-
-        .path-card, .testimonial-card {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .path-card h4 {
-            margin-bottom: 8px;
-            font-family: var(--font-display);
-            font-size: 18px;
-        }
-
-        .path-card p, .testimonial-card p {
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.55;
-        }
-
-        .testimonial-card p {
-            margin-bottom: 10px;
-        }
-
-        .testimonial-card span {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--cyan);
-        }
-
-        .daily-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            background: var(--surface2);
-            border: 1px solid var(--border2);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .daily-card .countdown {
-            font-family: var(--font-mono);
-            font-size: 18px;
-            color: var(--green);
-        }
-
-        .testimonial-grid {
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        }
-
-        .faq-item {
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            background: var(--surface2);
-        }
-
-        .faq-question {
-            width: 100%;
-            text-align: left;
-            background: transparent;
-            color: var(--text);
-            padding: 14px;
-            font-size: 14px;
-            border: none;
-        }
-
-        .faq-answer {
-            display: none;
-            padding: 0 14px 14px;
-            color: var(--muted);
-            line-height: 1.6;
-            font-size: 14px;
-        }
-
-        .faq-item.open .faq-answer {
-            display: block;
-        }
-
-        .plans-grid,
-        .showcase-grid {
-            display: grid;
-            gap: 12px;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        }
-
-        .plan-card,
-        .showcase-card {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--surface2);
-            padding: 16px;
-        }
-
-        .plan-card h4,
-        .showcase-card h4 {
-            font-family: var(--font-display);
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-
-        .plan-card p,
-        .showcase-card p {
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.55;
-            margin-bottom: 12px;
-        }
-
-        .plan-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-
-        .plan-badge {
-            font-family: var(--font-mono);
-            font-size: 9px;
-            color: var(--cyan);
-            border: 1px solid var(--border2);
-            border-radius: 999px;
-            padding: 4px 8px;
-            background: rgba(0, 229, 255, 0.08);
-        }
-
-        .mockup-frame {
-            border: 1px solid var(--border2);
-            border-radius: 10px;
-            background: #0a1423;
-            min-height: 120px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .mockup-line {
-            height: 8px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, rgba(0,229,255,.4), rgba(255,60,172,.35));
-            margin-bottom: 8px;
-        }
-
-        .mockup-line.short { width: 56%; }
-        .mockup-line.mid { width: 78%; }
-        .mockup-line.long { width: 94%; }
-
-        .mobile-sticky-cta {
-            display: none;
-            position: fixed;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            z-index: 220;
-            border-radius: 12px;
-            padding: 11px 14px;
-            text-align: center;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 0.6px;
-            background: var(--cyan);
-            color: #041420;
-            border: 1px solid rgba(0, 229, 255, 0.5);
-            box-shadow: 0 10px 30px rgba(0,229,255,0.28);
-        }
-
-        /* ════════════════════════════════════════════════
-           STATS SECTION
-           ════════════════════════════════════════════════ */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 80px;
-            animation: fadeInUp 0.6s ease-out 0.4s both;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-            animation: scaleInCubic 0.4s ease-out backwards;
-        }
-
-        .stat-card:nth-child(1) { animation-delay: 0.05s; }
-        .stat-card:nth-child(2) { animation-delay: 0.1s; }
-        .stat-card:nth-child(3) { animation-delay: 0.15s; }
-        .stat-card:nth-child(4) { animation-delay: 0.2s; }
-
-        .stat-card:hover {
-            border-color: rgba(0, 229, 255, 0.35);
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 32px rgba(0, 229, 255, 0.12);
+            flex-direction: column;
+            gap: 5px;
         }
 
         .stat-value {
-            font-family: var(--font-display);
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--cyan);
-            margin-bottom: 8px;
+            font-family: var(--font-pixel);
+            font-size: 24px;
+            color: var(--neon-yellow);
         }
 
         .stat-label {
-            font-family: var(--font-mono);
-            font-size: 11px;
+            font-family: var(--font-retro);
+            font-size: 14px;
+            color: var(--text-muted);
             text-transform: uppercase;
-            color: var(--muted);
             letter-spacing: 1px;
         }
 
-        /* ════════════════════════════════════════════════
-           FEATURE SECTION
-           ════════════════════════════════════════════════ */
+        /* Premium Feature Sections */
         .feature-section {
+            padding: var(--section-spacing) 0;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: center;
-            margin-bottom: 100px;
-            animation: fadeInUp 0.6s ease-out backwards;
         }
 
-        .feature-section:nth-child(even) {
-            direction: rtl;
-        }
-
-        .feature-section:nth-child(even) > * {
-            direction: ltr;
-        }
-
-        .feature-text h2 {
-            font-family: var(--font-display);
-            font-size: clamp(28px, 5vw, 48px);
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 24px;
+        .feature-text h3 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-family: var(--font-pixel);
             color: #fff;
-            line-height: 1.2;
+            margin-bottom: 25px;
+            line-height: 1.1;
         }
 
         .feature-text p {
-            font-size: 16px;
-            color: var(--muted);
-            margin-bottom: 20px;
-            line-height: 1.8;
+            font-size: 20px;
+            font-family: var(--font-retro);
+            color: var(--text-dim);
+            margin-bottom: 30px;
         }
 
-        .feature-visual {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        .feature-asset {
+            background: #000;
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
 
-        .feature-visual:hover {
-            border-color: rgba(0, 229, 255, 0.35);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0, 229, 255, 0.12);
-        }
-
-        .feature-icon {
-            font-size: 80px;
-            margin-bottom: 16px;
+        .feature-asset img {
+            width: 100%;
+            height: auto;
+            max-height: 600px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            transition: var(--transition-smooth);
             display: block;
         }
 
-        /* ════════════════════════════════════════════════
-           CARDS GRID
-           ════════════════════════════════════════════════ */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 80px;
+        /* Prevent image glow that can cause artifacts on some gifs */
+        .feature-asset img.glow-orange,
+        .feature-asset img.glow-cyan {
+            filter: none;
         }
 
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-            animation: fadeInUp 0.55s ease-out backwards;
+        /* Add the glow to the container instead for better performance and look */
+        .feature-section:nth-child(odd) .feature-asset {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
         }
 
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.18s; }
-        .card:nth-child(3) { animation-delay: 0.26s; }
+        .feature-section:nth-child(even) .feature-asset {
+            border-color: var(--neon-orange);
+            box-shadow: 0 0 25px rgba(255, 152, 0, 0.15);
+        }
 
-        .card::before {
+        .feature-asset::after {
             content: "";
             position: absolute;
-            inset: 0;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(0, 229, 255, 0.03), transparent 60%);
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: 0.8s;
         }
 
-        .card:hover {
-            border-color: rgba(0, 229, 255, 0.35);
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 12px 32px rgba(0, 229, 255, 0.12);
+        .feature-section:hover .feature-asset::after {
+            transform: translateX(100%);
         }
 
-        .card:hover::before {
-            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), transparent 60%);
+        /* Corporate Footer */
+        .corporate-footer {
+            padding: 100px 20px 50px;
+            background: #000;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: var(--section-spacing);
         }
 
-        .card-icon {
-            font-size: 40px;
-            margin-bottom: 16px;
-        }
-
-        .card h3 {
-            font-family: var(--font-display);
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #fff;
-        }
-
-        .card p {
-            font-size: 14px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        /* ════════════════════════════════════════════════
-           CTA SECTION
-           ════════════════════════════════════════════════ */
-        .cta-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 60px;
-            text-align: center;
-            margin-bottom: 80px;
-            animation: fadeInUp 0.6s ease-out 0.3s both;
-        }
-
-        .cta-section h2 {
-            font-family: var(--font-display);
-            font-size: clamp(28px, 5vw, 48px);
-            font-weight: 800;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .cta-section p {
-            font-size: 18px;
-            color: var(--muted);
-            margin-bottom: 40px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* ════════════════════════════════════════════════
-           FOOTER
-           ════════════════════════════════════════════════ */
-        footer {
-            background: rgba(0, 0, 0, 0.4);
-            border-top: 1px solid var(--border);
-            padding: 60px 0 30px;
-            margin-top: 100px;
-        }
-
-        .footer-content {
+        .footer-grid {
             display: grid;
             grid-template-columns: 2fr repeat(3, 1fr);
-            gap: 40px;
-            margin-bottom: 40px;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .footer-brand h3 {
-            font-family: var(--font-display);
-            font-size: 16px;
-            color: var(--cyan);
-            margin-bottom: 12px;
+        .footer-brand h4 {
+            font-family: var(--font-pixel);
+            color: var(--neon-yellow);
+            font-size: 20px;
+            margin-bottom: 20px;
         }
 
         .footer-brand p {
-            font-size: 13px;
-            color: var(--muted);
+            color: var(--text-muted);
+            font-family: var(--font-retro);
             line-height: 1.6;
+            max-width: 300px;
         }
 
-        .footer-col h4 {
-            font-family: var(--font-display);
-            font-size: 12px;
-            text-transform: uppercase;
+        .footer-col h5 {
+            font-family: var(--font-pixel);
+            font-size: 14px;
             color: #fff;
-            margin-bottom: 16px;
-            letter-spacing: 1px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
         }
 
         .footer-col ul {
             list-style: none;
+            padding: 0;
         }
 
         .footer-col ul li {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .footer-col ul li a {
-            font-size: 13px;
-            color: var(--muted);
-            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-dim);
+            font-family: var(--font-retro);
+            font-size: 16px;
+            transition: 0.3s;
         }
 
         .footer-col ul li a:hover {
-            color: var(--cyan);
+            color: var(--neon-cyan);
             padding-left: 5px;
         }
 
         .footer-bottom {
-            border-top: 1px solid var(--border);
+            margin-top: 80px;
             padding-top: 30px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: var(--text-muted);
+            font-family: var(--font-retro);
+            font-size: 14px;
         }
 
-        /* ════════════════════════════════════════════════
-           KEYFRAMES
-           ════════════════════════════════════════════════ */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Buttons Enhancement */
+        .btn {
+            padding: 18px 32px !important;
+            font-family: var(--font-pixel) !important;
+            font-size: 12px !important;
+            border-radius: 12px !important;
+            transition: var(--transition-smooth) !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        @keyframes fadeInRight {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .btn-start {
+            background: var(--neon-cyan) !important;
+            color: #000 !important;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3) !important;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(25px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-start:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.6) !important;
         }
 
-        @keyframes scaleInCubic {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .btn-guest {
+            background: transparent !important;
+            border: 2px solid rgba(255, 255, 255, 0.1) !important;
+            color: #fff !important;
         }
 
-        @keyframes floatUp {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+        .btn-guest:hover {
+            border-color: #fff !important;
+            background: rgba(255, 255, 255, 0.05) !important;
         }
 
-        /* ════════════════════════════════════════════════
-           RESPONSIVE
-           ════════════════════════════════════════════════ */
-        @media (max-width: 768px) {
-            header {
-                padding: 10px 14px;
-                justify-content: flex-start;
+        @media (max-width: 992px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
             }
-
-            .logo {
-                flex: 1;
-            }
-
-            .logo-text {
-                font-size: 15px;
-            }
-
-            .logo-tag {
-                font-size: 8px;
-            }
-
-            nav {
-                width: 100%;
-                gap: 6px;
-                justify-content: flex-end;
-            }
-
-            .btn {
-                font-size: 9px;
-                padding: 6px 12px;
-            }
-
-            .feature-section,
-            .feature-section:nth-child(even) {
-                direction: ltr;
+            .feature-section {
                 grid-template-columns: 1fr;
                 gap: 40px;
+                text-align: center;
             }
-
-            .feature-section:nth-child(even) > * {
+            .feature-section:nth-child(even) {
                 direction: ltr;
             }
-
-            .cta-section {
-                padding: 40px 20px;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr;
+            .stats-bar {
+                flex-wrap: wrap;
                 gap: 30px;
             }
         }
 
-        @media (max-width: 640px) {
-            header {
-                padding: 10px 12px;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-
-            .logo {
-                width: 100%;
-                order: 1;
-            }
-
-            nav {
-                width: 100%;
-                order: 2;
-                justify-content: space-between;
-            }
-
-            .btn {
-                flex: 1;
-                font-size: 7px;
-                padding: 5px 8px;
-                min-height: 30px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .hero {
-                padding: 40px 14px;
-            }
-
-            .hero h1 {
-                font-size: 28px;
-            }
-
-            .hero p {
-                font-size: 14px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-            }
-
-            .stat-card {
-                padding: 16px;
-            }
-
-            .stat-value {
-                font-size: 24px;
-            }
-
-            .cards-grid {
+        @media (max-width: 600px) {
+            .footer-grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 40px;
             }
-
-            .cta-section {
-                padding: 30px 16px;
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
             }
-
-            .cta-section h2 {
-                font-size: 24px;
-            }
-
-            .mobile-sticky-cta {
-                display: block;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logo-text {
-                font-size: 13px;
-            }
-
-            .logo-tag {
-                font-size: 7px;
-            }
-
-            .hero h1 {
-                font-size: 24px;
-            }
-
-            .stats-grid {
-                gap: 10px;
-            }
-
-            .stat-card {
-                padding: 12px;
-            }
-
-            .stat-value {
-                font-size: 20px;
-            }
-        }
-
-        .hamburger {
-            display: none !important;
         }
     </style>
 </head>
-<body>
+<body class="home">
 
-
-<!-- Animated Background -->
 <div class="grid-bg"></div>
-<div class="bg-orb bg-orb-1"></div>
-<div class="bg-orb bg-orb-2"></div>
 
-<!-- HEADER -->
-<header>
-    <div class="logo">
-        <span class="logo-text">LC-ADVANCE</span>
-        <span class="logo-tag">// HOME</span>
-    </div>
+<header class="header">
+    <h1>🎮 LC-ADVANCE</h1>
+    <button class="hamburger" type="button" aria-label="Menu">☰</button>
     <nav>
         <?php if ($usuario_logueado): ?>
-            <button class="btn btn-primary" onclick="window.location='public/dashboard.php'"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></button>
+<<<<<<< Updated upstream
+            <button class="btn btn-dashboard" onclick="window.location='mapa/index.php'">Panel de Control</button>
+            <button class="btn btn-logout" onclick="window.location='logout.php'">Cerrar Sesión</button>
+        <?php else: ?>
+            <button class="btn btn-login" onclick="window.location='login.php'">Iniciar Sesión</button>
+            <button class="btn btn-register" onclick="window.location='register.php'">Registrarse</button>
+=======
+            <button class="btn btn-primary" onclick="window.location.href='<?= $baseUrl ?>/public/dashboard.php'"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></button>
             <button class="btn" onclick="window.location='public/coding_challenges.php'"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></button>
             <button class="btn" onclick="window.location='public/logout.php'"><?= htmlspecialchars($t[$lang]['nav_logout']) ?></button>
         <?php else: ?>
-            <button class="btn" onclick="window.location='public/login.php'"><?= htmlspecialchars($t[$lang]['nav_login']) ?></button>
-            <button class="btn btn-primary" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['nav_register']) ?></button>
+            <button class="btn" onclick="window.location.href='<?= $baseUrl ?>/public/login.php'"><?= htmlspecialchars($t[$lang]['nav_login']) ?></button>
+            <button class="btn btn-primary" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['nav_register']) ?></button>
+>>>>>>> Stashed changes
         <?php endif; ?>
-        <div class="toolbar-controls">
-            <label for="langSelector" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);"><?= htmlspecialchars($t[$lang]['language']) ?></label>
-            <select id="langSelector">
-                <option value="es" <?= $lang === 'es' ? 'selected' : '' ?>>ES</option>
-                <option value="en" <?= $lang === 'en' ? 'selected' : '' ?>>EN</option>
-            </select>
-        </div>
     </nav>
 </header>
 
-<!-- MAIN -->
 <main class="container">
+    <?php if (!empty($_GET['seleccionar_materia']) && (!empty($_GET['from']) && $_GET['from'] === 'dashboard')): 
+        require_once 'src/content.php';
+        $materias = [];
+        foreach ($lecciones as $l) $materias[] = $l['materia'] ?? 'Sin Materia';
+        $materias = array_values(array_unique($materias));
+    ?>
+    <!-- Modal select-materia -->
+    <div id="selectMateriaModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="selectMateriaTitle">
+      <div class="modal-card">
+        <button class="modal-close" aria-label="Cerrar">✖</button>
+        <h2 id="selectMateriaTitle">📚 Elige una materia para continuar</h2>
+        <p>Selecciona la materia que deseas estudiar hoy — esto configurará tu panel de estudio.</p>
+        <div class="materias-grid">
+          <?php foreach ($materias as $m): ?>
+            <a class="btn btn-primary btn-small" href="dashboard.php?materia=<?php echo urlencode($m); ?>"><?php echo htmlspecialchars($m); ?></a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const modal = document.getElementById('selectMateriaModal');
+      if (!modal) return;
+      // Auto-show the modal
+      modal.style.display = 'flex';
+      // Close handlers
+      modal.querySelector('.modal-close').addEventListener('click', ()=> modal.style.display = 'none');
+      modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display = 'none';});
+    });
+    </script>
+    <?php endif; ?>
 
     <!-- HERO SECTION -->
     <section class="hero">
+<<<<<<< Updated upstream
+        <?php if (!$usuario_logueado): ?>
+            <h2>DOMINA EL CÓDIGO</h2>
+            <p>La plataforma educativa que convierte el aprendizaje de programación en una aventura legendaria. Basado en estándares DGETI 2025.</p>
+            <div class="hero-btns">
+                <button class="btn btn-start" onclick="window.location='register.php'">Empezar Ahora</button>
+                <button class="btn btn-guest" onclick="window.location='guest_login.php'">Acceso Invitado</button>
+            </div>
+        <?php else: ?>
+            <h2>BIENVENIDO, <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?></h2>
+            <p>Tu progreso está guardado y listo. Continúa dominando los lenguajes del futuro.</p>
+            <div class="hero-btns">
+                <button class="btn btn-start" onclick="window.location='mapa/index.php'">Ir al Dashboard</button>
+            </div>
+        <?php endif; ?>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value">200+</span>
+                <span class="stat-label">Lecciones</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">15k+</span>
+                <span class="stat-label">Preguntas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">24/7</span>
+                <span class="stat-label">Acceso</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">100%</span>
+                <span class="stat-label">Gratis</span>
+            </div>
+=======
         <h1><?php echo $usuario_logueado ? htmlspecialchars($t[$lang]['hero_title_logged']) : htmlspecialchars($t[$lang]['hero_title_guest']); ?></h1>
         <p><?php echo $usuario_logueado 
             ? htmlspecialchars($t[$lang]['hero_sub_logged'])
@@ -1483,93 +730,59 @@ $t = [
         ?></p>
         <div class="hero-buttons">
             <?php if ($usuario_logueado): ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
             <?php else: ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['hero_start']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['hero_start']) ?></button>
                 <button class="btn btn-hero" onclick="window.location='public/guest_login.php'"><?= htmlspecialchars($t[$lang]['hero_guest']) ?></button>
             <?php endif; ?>
+>>>>>>> Stashed changes
         </div>
     </section>
 
-    <section class="interactive-preview">
-        <h3><?= htmlspecialchars($t[$lang]['tour_title']) ?></h3>
-        <p><?= htmlspecialchars($t[$lang]['tour_sub']) ?></p>
-        <div class="preview-grid">
-            <div class="preview-card">
-                <strong>Mapa</strong>
-                <span><?= htmlspecialchars($t[$lang]['preview_map_desc']) ?></span>
-            </div>
-            <div class="preview-card">
-                <strong>Dashboard</strong>
-                <span><?= htmlspecialchars($t[$lang]['preview_dashboard_desc']) ?></span>
-            </div>
-            <div class="preview-card">
-                <strong>Duelos</strong>
-                <span><?= htmlspecialchars($t[$lang]['preview_duels_desc']) ?></span>
-            </div>
-            <div class="preview-card">
-                <strong>Ranking</strong>
-                <span><?= htmlspecialchars($t[$lang]['preview_ranking_desc']) ?></span>
-            </div>
-        </div>
-        <button class="btn btn-primary" id="openTourBtn"><?= htmlspecialchars($t[$lang]['tour_btn']) ?></button>
-    </section>
-
-    <!-- STATS SECTION -->
-    <section class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value"><span class="stat-number" data-target="200">0</span>+</div>
-            <div class="stat-label"><?= htmlspecialchars($t[$lang]['stat_lessons']) ?></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value"><span class="stat-number" data-target="15">0</span>k+</div>
-            <div class="stat-label"><?= htmlspecialchars($t[$lang]['stat_questions']) ?></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value"><span class="stat-number" data-target="24">0</span>/7</div>
-            <div class="stat-label"><?= htmlspecialchars($t[$lang]['stat_access']) ?></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value"><span class="stat-number" data-target="100">0</span>%</div>
-            <div class="stat-label"><?= htmlspecialchars($t[$lang]['stat_free']) ?></div>
-        </div>
-    </section>
-
-    <!-- FEATURE 1: MAPA -->
-    <section class="feature-section" style="animation-delay: 0.15s">
+    <!-- MAP SECTION -->
+    <section class="feature-section">
         <div class="feature-text">
-            <h2><?= htmlspecialchars($t[$lang]['feature_map_title']) ?></h2>
-            <p><?= htmlspecialchars($t[$lang]['feature_map_p1']) ?></p>
-            <p><?= htmlspecialchars($t[$lang]['feature_map_p2']) ?></p>
+            <h3>Explora el Campus Virtual</h3>
+            <p>Navega por un mundo pixelado donde cada edificio representa un área del conocimiento. Habla con maestros, interactúa con el entorno y desbloquea secretos.</p>
+            <p>Un entorno inmersivo diseñado para que el aprendizaje se sienta como un RPG clásico.</p>
         </div>
-        <div class="feature-visual">
-            <img src="public/assets/img/mapa.png" alt="Mapa Interactivo" style="width:100%; height:auto; border-radius:10px; display:block;">
-        </div>
-    </section>
-
-    <!-- FEATURE 2: LECCIONES -->
-    <section class="feature-section" style="animation-delay: 0.25s">
-        <div class="feature-text">
-            <h2><?= htmlspecialchars($t[$lang]['feature_learning_title']) ?></h2>
-            <p><?= htmlspecialchars($t[$lang]['feature_learning_p1']) ?></p>
-            <p><?= htmlspecialchars($t[$lang]['feature_learning_p2']) ?></p>
-        </div>
-        <div class="feature-visual">
-            <img src="public/assets/img/dashboard.png" alt="Lecciones Interactivas" style="width:100%; height:auto; border-radius:10px; display:block;">
+        <div class="feature-asset">
+            <img src="assets/img/map.gif" alt="Exploración en el mapa" class="glow-cyan">
         </div>
     </section>
 
-    <!-- FEATURE 3: COMBATE -->
-    <section class="feature-section" style="animation-delay: 0.35s">
+    <!-- LESSONS SECTION -->
+    <section class="feature-section">
         <div class="feature-text">
-            <h2><?= htmlspecialchars($t[$lang]['feature_duel_title']) ?></h2>
-            <p><?= htmlspecialchars($t[$lang]['feature_duel_p1']) ?></p>
-            <p><?= htmlspecialchars($t[$lang]['feature_duel_p2']) ?></p>
+            <h3>Aprendizaje Adaptativo</h3>
+            <p>Desde C# y Python hasta desarrollo web moderno con PHP y JavaScript. Nuestras lecciones se adaptan a tu ritmo, con retroalimentación en tiempo real.</p>
+            <p>Contenido estructurado por semestres, facilitando el seguimiento del plan de estudios oficial.</p>
         </div>
-        <div class="feature-visual">
-            <img src="public/assets/img/duelo.png" alt="Sistema de Duelos" style="width:100%; height:auto; border-radius:10px; display:block;">
+        <div class="feature-asset">
+            <img src="assets/img/lecciones.png" alt="Aprendizaje Adaptativo" class="glow-cyan">
         </div>
     </section>
+
+    <!-- COMBAT SYSTEM SECTION -->
+    <section class="feature-section">
+        <div class="feature-text">
+            <h3>Duelos de Conocimiento</h3>
+            <p>Los exámenes ya no son aburridos. Enfrenta a los maestros en un sistema de combate por turnos donde tu arma es el código correcto.</p>
+            <p>Gana experiencia, sube de nivel y colecciona medallas que demuestren tu valía ante la comunidad.</p>
+        </div>
+        <div class="feature-asset">
+            <img src="assets/img/systemC.gif" alt="Maestro de Programación" class="glow-orange">
+        </div>
+    </section>
+<<<<<<< Updated upstream
+</main>
+
+<footer class="corporate-footer">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <h4>LC-ADVANCE</h4>
+            <p>Transformando la educación tecnológica mediante la gamificación y el diseño retro-futurista.</p>
+=======
 
     <!-- FEATURES GRID -->
     <section class="cards-grid" style="margin-top: 100px;">
@@ -1617,7 +830,7 @@ $t = [
                 <strong style="display:block;margin-bottom:6px;"><?= htmlspecialchars($t[$lang]['daily_goal']) ?></strong>
                 <span class="countdown" id="dailyCountdown">23:59:59</span>
             </div>
-            <button class="btn btn-primary" onclick="window.location='<?= $usuario_logueado ? 'public/mapa/index.php' : 'public/register.php' ?>'"><?= htmlspecialchars($t[$lang]['daily_btn']) ?></button>
+            <button class="btn btn-primary" onclick="window.location.href='<?= $usuario_logueado ? $baseUrl.'/public/mapa/index.php' : $baseUrl.'/public/register.php' ?>'"><?= htmlspecialchars($t[$lang]['daily_btn']) ?></button>
         </div>
     </section>
 
@@ -1675,7 +888,7 @@ $t = [
                     <span class="plan-badge">Dashboard</span>
                     <span class="plan-badge">Ranking</span>
                 </div>
-                <button class="btn btn-primary" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['plan_btn_free']) ?></button>
+                <button class="btn btn-primary" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['plan_btn_free']) ?></button>
             </article>
             <article class="plan-card">
                 <h4><?= htmlspecialchars($t[$lang]['plan_plus']) ?></h4>
@@ -1733,9 +946,9 @@ $t = [
         ?></p>
         <div class="hero-buttons">
             <?php if ($usuario_logueado): ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
             <?php else: ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location='public/register.php'"><?= htmlspecialchars($t[$lang]['cta_register']) ?></button>
+                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['cta_register']) ?></button>
             <?php endif; ?>
         </div>
     </section>
@@ -1753,8 +966,8 @@ $t = [
             <div class="footer-col">
                 <h4><?= htmlspecialchars($t[$lang]['footer_product']) ?></h4>
                 <ul>
-                    <li><a href="<?php echo $usuario_logueado ? 'public/mapa/index.php' : 'public/gatekeeper.php?redirect=mapa/index.php'; ?>"><?= htmlspecialchars($t[$lang]['footer_map']) ?></a></li>
-                    <li><a href="<?php echo $usuario_logueado ? 'public/dashboard.php' : 'public/gatekeeper.php?redirect=dashboard.php'; ?>"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></a></li>
+                    <li><a href="<?php echo $usuario_logueado ? $baseUrl.'/public/mapa/index.php' : $baseUrl.'/public/gatekeeper.php?redirect=public/mapa/index.php'; ?>"><?= htmlspecialchars($t[$lang]['footer_map']) ?></a></li>
+                    <li><a href="<?php echo $usuario_logueado ? $baseUrl.'/public/dashboard.php' : $baseUrl.'/public/gatekeeper.php?redirect=public/dashboard.php'; ?>"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></a></li>
                     <li><a href="<?php echo $usuario_logueado ? 'public/ranking.php' : 'public/gatekeeper.php?redirect=ranking.php'; ?>">Ranking</a></li>
                 </ul>
             </div>
@@ -1775,176 +988,93 @@ $t = [
                     <li><a href="public/register.php">Unirse</a></li>
                 </ul>
             </div>
+>>>>>>> Stashed changes
         </div>
-        <div class="footer-bottom">
-            <p>© 2025-2026 LC-ADVANCE. Todos los derechos reservados. | Hecho con 💚 para estudiantes DGETI.</p>
+        <div class="footer-col">
+            <h5>Producto</h5>
+            <ul>
+                <?php if ($usuario_logueado): ?>
+                    <li><a href="mapa/index.php">Mapa Interactivo</a></li>
+                    <li><a href="dashboard.php">Dashboard</a></li>
+                    <li><a href="ranking.php">Ranking Global</a></li>
+                <?php else: ?>
+                    <li><a href="gatekeeper.php?redirect=mapa/index.php">Mapa Interactivo</a></li>
+                    <li><a href="gatekeeper.php?redirect=dashboard.php">Dashboard</a></li>
+                    <li><a href="gatekeeper.php?redirect=ranking.php">Ranking Global</a></li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h5>Recursos</h5>
+            <ul>
+                <li><a href="docs.php?file=README.md">Documentación</a></li>
+                <li><a href="docs.php?file=DEVELOPMENT.md">Guía de Desarrollo</a></li>
+                <li><a href="docs.php?file=API.md">API Reference</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h5>Comunidad</h5>
+            <ul>
+                <li><a href="https://github.com/cervanlfc7/LC-ADVANCE" target="_blank">GitHub</a></li>
+                <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
+                <li><a href="register.php">Registrarse</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025-2026 LC-ADVANCE. Todos los derechos reservados.</p>
+        <div class="footer-links">
+            <span style="margin-left: 20px;">Hecho con 💚 para estudiantes de DGETI</span>
         </div>
     </div>
 </footer>
 
-<a class="mobile-sticky-cta" href="<?= $usuario_logueado ? 'public/dashboard.php' : 'public/register.php' ?>">
+<<<<<<< Updated upstream
+=======
+<a class="mobile-sticky-cta" href="<?= $usuario_logueado ? $baseUrl.'/public/dashboard.php' : $baseUrl.'/public/register.php' ?>">
     <?= htmlspecialchars($t[$lang]['mobile_cta']) ?>
 </a>
 
+>>>>>>> Stashed changes
 <script>
-// Smooth scroll behavior
-document.querySelectorAll('a[href*="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        if (href !== '#') {
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    const langSelector = document.getElementById('langSelector');
-    if (langSelector) {
-        langSelector.addEventListener('change', (e) => {
-            const u = new URL(window.location.href);
-            u.searchParams.set('lang', e.target.value);
-            window.location.href = u.toString();
-        });
-    }
-
-    const faqQuestions = document.querySelectorAll('.faq-question');
-    faqQuestions.forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const item = btn.closest('.faq-item');
-            if (!item) return;
-            item.classList.toggle('open');
-        });
-    });
-
-    const countdownEl = document.getElementById('dailyCountdown');
-    if (countdownEl) {
-        const updateCountdown = () => {
-            const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setHours(24, 0, 0, 0);
-            const diff = Math.max(0, tomorrow.getTime() - now.getTime());
-            const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
-            const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-            const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
-            countdownEl.textContent = `${hours}:${minutes}:${seconds}`;
-        };
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-    }
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js').catch(() => {});
-    }
-
-    const statNumbers = document.querySelectorAll('.stat-number');
-    if (statNumbers.length) {
-        const statsSection = document.querySelector('.stats-grid');
-        let hasAnimated = false;
-        const runStatAnimation = () => {
-            if (hasAnimated) return;
-            hasAnimated = true;
-            statNumbers.forEach((el) => {
-                const target = Number(el.dataset.target || 0);
-                const duration = 900;
-                const start = performance.now();
-                const step = (now) => {
-                    const progress = Math.min(1, (now - start) / duration);
-                    const value = Math.round(target * progress);
-                    el.textContent = String(value);
-                    if (progress < 1) requestAnimationFrame(step);
-                };
-                requestAnimationFrame(step);
-            });
-        };
-
-        if ('IntersectionObserver' in window && statsSection) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        runStatAnimation();
-                        observer.disconnect();
-                    }
-                });
-            }, { threshold: 0.3 });
-            observer.observe(statsSection);
-        } else {
-            runStatAnimation();
-        }
-    }
-});
-
-// Header sticky effect
-window.addEventListener('scroll', () => {
-    const header = document.querySelector('header');
-    if (window.scrollY > 50) {
-        header.style.background = 'rgba(6, 10, 18, 0.95)';
-    } else {
-        header.style.background = 'rgba(6, 10, 18, 0.88)';
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const tourModal = document.getElementById('tourModal');
-    const openTourBtn = document.getElementById('openTourBtn');
-    const closeTourBtn = document.getElementById('closeTourBtn');
-    const tourPrev = document.getElementById('tourPrev');
-    const tourNext = document.getElementById('tourNext');
-    const tourProgress = document.getElementById('tourProgress');
-    const tourScreens = Array.from(document.querySelectorAll('.tour-screen'));
-    const tourSteps = Array.from(document.querySelectorAll('.tour-steps li'));
-    let tourIndex = 0;
-
-    if (!tourModal || !openTourBtn || !closeTourBtn || !tourPrev || !tourNext || !tourProgress) return;
-
-    const updateTourView = () => {
-        tourScreens.forEach((screen, index) => {
-            screen.classList.toggle('active', index === tourIndex);
-        });
-        tourSteps.forEach((step, index) => {
-            step.classList.toggle('active', index === tourIndex);
-        });
-        tourPrev.disabled = tourIndex === 0;
-        tourNext.textContent = tourIndex === tourScreens.length - 1 ? 'Cerrar' : 'Siguiente';
-        tourProgress.textContent = `${tourIndex + 1} / ${tourScreens.length}`;
+    // Advanced Intersection Observer
+    const observerOptions = {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
     };
 
-    openTourBtn.addEventListener('click', () => {
-        tourModal.classList.add('open');
-        tourIndex = 0;
-        updateTourView();
-    });
-    closeTourBtn.addEventListener('click', () => tourModal.classList.remove('open'));
-    tourModal.addEventListener('click', (event) => {
-        if (event.target === tourModal) {
-            tourModal.classList.remove('open');
-        }
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = "1";
+                entry.target.style.transform = "translateY(0)";
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.feature-section').forEach(section => {
+        section.style.opacity = "0";
+        section.style.transform = "translateY(50px)";
+        section.style.transition = "var(--transition-smooth)";
+        observer.observe(section);
     });
 
-    tourPrev.addEventListener('click', () => {
-        if (tourIndex > 0) {
-            tourIndex -= 1;
-            updateTourView();
-        }
-    });
-
-    tourNext.addEventListener('click', () => {
-        if (tourIndex < tourScreens.length - 1) {
-            tourIndex += 1;
-            updateTourView();
+    // Header effect on scroll
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('.header');
+        if (window.scrollY > 50) {
+            header.style.padding = "10px 20px";
+            header.style.background = "rgba(0, 0, 0, 0.8) !important";
         } else {
-            tourModal.classList.remove('open');
+            header.style.padding = "15px 20px";
+            header.style.background = "rgba(0, 0, 0, 0.6) !important";
         }
     });
-
-    updateTourView();
-});
 </script>
 
+<<<<<<< Updated upstream
+=======
 <div class="tour-modal" id="tourModal" aria-hidden="true">
     <div class="tour-content">
         <h4><?= htmlspecialchars($t[$lang]['tour_modal_title']) ?></h4>
@@ -2000,22 +1130,65 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>
 
-<audio id="homeMusic" loop>
-  <source src="public/assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
-</audio>
+<!-- MATERIA SELECTION MODAL -->
+<?php if (!empty($_GET['seleccionar_materia'])): ?>
+<?php
+$todas_materias = [
+    'Pensamiento Matemático III',
+    'Física I',
+    'Química I',
+    'Programación',
+    'Inglés',
+    'Temas Selectos de Matemáticas I y II',
+    'Historia de México',
+    'Ciencias Sociales',
+    'Ecosistemas',
+    'Biología',
+    'Economía',
+    'Taller de Lectura y Redacción',
+];
+sort($todas_materias);
+?>
+<div id="materiaModal" class="materia-modal" style="display:flex;">
+    <div class="materia-modal-content">
+        <h2><?= htmlspecialchars($t[$lang]['select_materia_title']) ?></h2>
+        <p><?= htmlspecialchars($t[$lang]['select_materia_sub']) ?></p>
+        <form method="get" action="<?= $baseUrl ?>/public/dashboard.php">
+            <input type="hidden" name="materia" id="selectedMateriaInput" value="">
+            <div class="materia-grid">
+                <?php foreach ($todas_materias as $m): ?>
+                    <button type="button" class="materia-btn" data-materia="<?= htmlspecialchars($m) ?>" onclick="selectMateria('<?= htmlspecialchars(addslashes($m)) ?>')">
+                        <?= htmlspecialchars($m) ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+            <button type="submit" class="btn btn-primary" id="materiaContinueBtn" disabled><?= htmlspecialchars($t[$lang]['select_materia_btn']) ?></button>
+        </form>
+    </div>
+</div>
+<style>
+.materia-modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; display:none; align-items:center; justify-content:center; }
+.materia-modal-content { background:#101828; border:1px solid rgba(0,229,255,.3); border-radius:16px; padding:32px; max-width:500px; width:90%; text-align:center; }
+.materia-modal-content h2 { color:#00e5ff; margin:0 0 12px; font-size:24px; }
+.materia-modal-content p { color:rgba(220,236,255,.7); margin:0 0 24px; }
+.materia-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
+.materia-btn { background:#0c1525; border:1px solid rgba(0,229,255,.2); color:#e8f4ff; padding:12px 8px; border-radius:8px; cursor:pointer; font-size:13px; transition:all .2s; }
+.materia-btn:hover { border-color:#00e5ff; background:rgba(0,229,255,.1); }
+.materia-btn.selected { background:#00e5ff; color:#061523; border-color:#00e5ff; font-weight:700; }
+.materia-modal-content .btn-primary { width:100%; padding:14px; font-size:16px; }
+.materia-modal-content .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+</style>
 <script>
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+function selectMateria(materia) {
+    document.querySelectorAll('.materia-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelector('.materia-btn[data-materia="'+materia+'"]').classList.add('selected');
+    document.getElementById('selectedMateriaInput').value = materia;
+    document.getElementById('materiaContinueBtn').disabled = false;
 }
-const volumes = getStoredVolumes();
-const hAudio = document.getElementById('homeMusic');
-hAudio.volume = volumes.principal;
-hAudio.play().then(() => console.log('Home music playing')).catch(e => console.log('Audio error:', e));
-document.getElementById('volPrincipal')?.addEventListener('input', (e) => { volumes.principal = parseFloat(e.target.value); localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes)); hAudio.volume = volumes.principal; });
 </script>
+<?php endif; ?>
 
+>>>>>>> Stashed changes
 </body>
+</html>
 </html>
