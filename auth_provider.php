@@ -8,7 +8,7 @@ require_once 'config/config.php';
 iniciarSesionSegura();
 
 $provider = $_GET['provider'] ?? '';
-$redirect_to = $_GET['redirect'] ?? 'mapa/index.php';
+$redirect_to = !empty($_GET['redirect']) ? $_GET['redirect'] : 'public/mapa/index.php';
 
 // Guardar el destino final en la sesión para usarlo después del callback
 $_SESSION['oauth_redirect'] = $redirect_to;
