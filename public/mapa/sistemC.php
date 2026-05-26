@@ -9,7 +9,7 @@ requireLogin(true);
 $idPersonaje = $_GET['personaje'] ?? '1Cu';
 $idDialogo = intval($_GET['dialogo'] ?? 1);
 $indicePregunta = intval($_GET['pregunta'] ?? 0);
-$returnUrl = $_GET['return_url'] ?? '../dashboard.php';
+$returnUrl = $_GET['return_url'] ?? dirname($_SERVER['REQUEST_URI']) . '/dashboard.php';
 $slugExamen = $_GET['slug'] ?? 'examen_' . $idPersonaje;
 
 try {
@@ -426,7 +426,7 @@ try {
 
     <!-- Footer Controls -->
     <footer class="combat-footer">
-        <button class="btn-combat btn-exit" onclick="window.location.href='../dashboard.php'">HUIR</button>
+        <button class="btn-combat btn-exit" onclick="window.location.href='<?php echo dirname($_SERVER['REQUEST_URI']); ?>/dashboard.php'">HUIR</button>
         <button class="btn-combat btn-next" id="btnSiguiente" disabled>SIGUIENTE</button>
     </footer>
 

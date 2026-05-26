@@ -15,7 +15,7 @@ require_once __DIR__ . '/../src/Config/csrf.php';
 
 // Si ya hay sesión activa, redirige
 if (isset($_SESSION['usuario_id'])) {
-    $redirect = $_GET['redirect'] ?? 'public/dashboard.php';
+    $redirect = !empty($_GET['redirect']) ? $_GET['redirect'] : 'public/mapa/index.php';
     redirigir($redirect);
 }
 
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     protegerCSRF();
 
     $accion = $_POST['accion'] ?? 'login';
-    $final_redirect = $_POST['redirect_to'] ?? 'public/dashboard.php';
+    $final_redirect = !empty($_POST['redirect_to']) ? $_POST['redirect_to'] : 'public/mapa/index.php';
 
     // ================================
     // RATE LIMITING
@@ -206,16 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
-                $stmt_check = $pdo->prepare("SELECT genero FROM usuarios WHERE id = ?");
-                $stmt_check->execute([$usuario['id']]);
-                $user_data = $stmt_check->fetch();
-                
-                if (empty($user_data['genero'])) {
-                    redirigir('public/seleccionar_personaje.php');
-                } else {
-                    $_SESSION['genero'] = $user_data['genero'];
-                    redirigir($final_redirect);
-                }
+                redirigir($final_redirect);
             } else {
                 $intentos = $_SESSION['login_attempts'] ?? ['count' => 0, 'first' => time()];
                 $intentos['count']++;
@@ -556,29 +547,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .btn-back { top: 12px; left: 10px; font-size: 9px; }
             .auth-footer { font-size: 12px; }
         }
-        .password-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .password-wrapper .auth-input {
-            padding-right: 40px;
-        }
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            user-select: none;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-        .toggle-password:hover {
-            opacity: 1;
-        }
     </style>
 </head>
 <body class="auth-page">
+
 <div class="grid-bg"></div>
 <div class="bg-orb bg-orb-1"></div>
 <div class="bg-orb bg-orb-2"></div>
@@ -655,10 +627,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="input-group">
                     <label for="contrasena">Contraseña</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="contrasena" name="contrasena" class="auth-input" placeholder="********">
-                        <span class="toggle-password" onclick="togglePassword('contrasena', this)">👁️</span>
-                    </div>
+                    <input type="password" id="contrasena" name="contrasena" class="auth-input" placeholder="********">
                 </div>
 
                 <button type="submit" class="auth-btn">Entrar</button>
@@ -752,16 +721,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     console.log('(Este código también se muestra en desarrollo - quitar en producción)');
 </script>
 <?php unset($_SESSION['otp_debug']); endif; ?>
-<script>
-function togglePassword(inputId, el) {
-    const input = document.getElementById(inputId);
-    if (input.type === 'password') {
-        input.type = 'text';
-    } else {
-        input.type = 'password';
-    }
-}
-</script>
 
 <script src="assets/js/app.js"></script>
 <?php if (!empty($_GET['timeout']) || !empty($_GET['logout'])): ?>
@@ -775,6 +734,5 @@ function togglePassword(inputId, el) {
     }
 </script>
 <?php endif; ?>
-
 </body>
 </html>

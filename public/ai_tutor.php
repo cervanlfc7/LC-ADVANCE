@@ -37,7 +37,6 @@ $requestData = $method === 'POST' ? $_POST : $_REQUEST;
 
 $lessonTitle = trim($requestData['lesson_title'] ?? '');
 $lessonSubject = trim($requestData['lesson_subject'] ?? '');
-$materia = trim($requestData['materia'] ?? '');
 
 $slug = trim($requestData['slug'] ?? '');
 $correctas = max(0, intval($requestData['correctas'] ?? 0));
@@ -48,9 +47,19 @@ $total = max(1, intval($requestData['total'] ?? 1));
 $question = trim($requestData['question'] ?? '');
 $requestedProvider = trim($requestData['provider'] ?? 'auto');
 
-if (empty($slug) && empty($materia)) {
+// Obtener contexto del ejercicio (del Lab)
+$challengeContextJson = trim($requestData['challenge_context'] ?? '');
+$challengeContext = [];
+if ($challengeContextJson) {
+    $challengeContext = json_decode($challengeContextJson, true) ?? [];
+}
+
+// Obtener historial de conversación
+$conversationHistory = trim($requestData['conversation_history'] ?? '');
+
+if (empty($slug)) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Falta slug o materia']);
+    echo json_encode(['ok' => false, 'error' => 'Falta slug']);
     exit;
 }
 
@@ -121,84 +130,132 @@ if ($question) {
     $userMessage = "He completado la lección '{$slug}' con {$correctas}/{$total} aciertos. Nivel: {$difficulty} (modo: {$mode}). Por favor dame una retroalimentación súper breve de 1-2 líneas, un consejo práctico y un siguiente paso recomendado.";
 }
 
+// Programa completo de LC-ADVANCE
+$programContext = <<<CONTEXT
+LC-ADVANCE - Plataforma Educativa Gamificada
+
+ASIGNATURAS DISPONIBLES:
+• Pensamiento Matemático III - Matemáticas avanzadas (derivadas, integrales, trigonometría, límites, ecuaciones)
+• Física I - Mecánica, cinemática, energía, movimiento, fuerzas, gravitación
+• Química I - Átomo, tabla periódica, enlaces, reacciones, moles, disoluciones
+• Ecosistemas - Biología ambiental, cadenas tróficas, sucesión ecológica, sostenibilidad
+• Programación - PHP, JavaScript, algoritmos, desarrollo web
+• Ciencias Sociales - Historia, geografía, civismo
+
+CARACTERÍSTICAS DE LA PLATAFORMA:
+• Lecciones interactivas con teoría y ejercicios
+• Quiz con retroalimentación inmediata
+• Sistema de ranking y puntos de experiencia
+• Lab: entorno de práctica con editor de código y chatbot
+• Mapa interactivo para navegar lecciones
+• Tutor IA para resolver dudas en tiempo real
+• Ejercicios con MathJax para fórmulas matemáticas
+
+FUNCIONES ESPECIALES:
+• El usuario puede cambiar de materia desde el dashboard
+• Hay ejercicios de tipo "calculadora" en el lab (derivadas, integrales, ecuaciones cuadráticas, etc.)
+• El chatbot puede usar fórmulas LaTeX renderizadas con MathJax
+• Sistema de repetición espaciada: recuerda lecciones con bajo rendimiento para repasar
+CONTEXT;
+
 // Construimos el mensaje del sistema de manera unificada
-$materiaContext = !empty($materia) ? "- Materia: {$materia}. Eres el maestro experto en esta materia.\n" : '';
-$systemMessage = "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE, una plataforma educativa gamificada. Tu rol es guiar a los estudiantes respondiendo de manera MUY CONCISA, conversacional y directa, como un ser humano real. \n\n" .
-                 "Contexto actual:\n" .
-                 $materiaContext .
+// Incluir contexto del ejercicio si está disponible
+$exerciseContext = '';
+if (!empty($challengeContext['challengeTitle'])) {
+    $exerciseContext = "EJERCICIO ACTUAL DEL LAB:\n" .
+        "- Título: {$challengeContext['challengeTitle']}\n" .
+        "- Dificultad: {$challengeContext['challengeDifficulty']}\n" .
+        "- Descripción: " . substr($challengeContext['challengeDescription'] ?? '', 0, 300) . "\n" .
+        "- Código inicial:\n```php\n" . substr($challengeContext['challengeStarter'] ?? '', 0, 500) . "\n```\n\n";
+}
+
+// Incluir historial de conversación si está disponible
+$chatHistoryContext = '';
+if (!empty($conversationHistory)) {
+    $chatHistoryContext = "HISTORIAL DE CONVERSACIÓN RECIENTE:\n{$conversationHistory}\n\n";
+}
+
+$systemMessage = "Eres LC-Tutor, el Asistente Inteligente de LC-ADVANCE, una plataforma educativa gamificada para estudiantes de preparatoria. Tu rol es guiar a los estudiantes respondiendo de manera MUY CONCISA, conversacional y directa, como un ser humano real. \n\n" .
+                 $programContext . "\n\n" .
+                 $exerciseContext .
+                 $chatHistoryContext .
+                 "Contexto actual del usuario:\n" .
                  "- Lección actual: '{$lessonTitle}' sobre {$lessonSubject}.\n" .
-                 "- Nivel del alumno: {$difficulty}.\n" .
+                 "- Nivel del alumno: {$difficulty} (modo: {$mode}).\n" .
                  "- {$historySummary}\n" .
                  (!empty($spacedReview) && !$question ? "- {$spacedReview}\n" : "") .
-                 "\nReglas:\n" .
-                 "1. Si el usuario te saluda, devuélvele el saludo amigablemente.\n" .
-                 "2. Responde EXACTAMENTE a lo que el usuario pregunte. NO generes resúmenes largos de toda la lección a menos que te lo pidan explícitamente.\n" .
-                 "3. Sé muy humano, directo y breve (1-3 párrafos máximo). Nada de estructuras robóticas repetitivas.\n" .
-                 "4. Usa formato Markdown solo cuando sea útil para resaltar algo clave.";
+                 "\nReglas de comportamiento:\n" .
+                 "1. Si el usuario te saluda, devuélvele el saludo amigablemente y pregunta en qué puede ayudar.\n" .
+                 "2. Si pregunta sobre qué materias o lecciones hay disponibles, muéstrale la lista de asignaturas del programa.\n" .
+                 "3. Si pregunta cómo resolver ejercicios de matemáticas/física/química/programación, puedes mostrar fórmulas en formato LaTeX como: x = (-b ± √(b²-4ac)) / 2a\n" .
+                 "4. Si el usuario está en el LAB y pregunta sobre el ejercicio actual, usa la información del contexto del ejercicio para ayudar.\n" .
+                 "5. Si el usuario pide código, proporciona código limpio, bien comentado y funcional.\n" .
+                 "6. Responde EXACTAMENTE a lo que el usuario pregunte. NO generes resúmenes largos de toda la lección a menos que te lo pidan explícitamente.\n" .
+                 "7. Sé muy humano, directo y breve (1-3 párrafos máximo). Nada de estructuras robóticas repetitivas.\n" .
+                 "8. Usa formato Markdown solo cuando sea útil para resaltar algo clave.\n" .
+                 "9. Si el usuario tiene bajo rendimiento (menos de 50%), anímalo a revisar los fundamentos y offrece ayuda específica.";
 
 $aiResponse = null;
 $aiError = null;
 
 function localFallbackAnswer($question, $mode, $difficulty, $spacedReview) {
     $q = mb_strtolower($question, 'UTF-8');
-    $answer = "**⚠️ Sin conexión al servicio de IA**\n\nNo puedo conectar con el asistente en este momento, pero aquí tienes una guía de respaldo.\n\n";
+    $answer = "⚠️ **Sin conexión al servicio de IA**\n\nEstoy operando en modo offline. Aquí tienes ayuda según tu pregunta:\n\n---\n";
 
-    if ($question) {
-        $answer .= "**Tu pregunta:** _{$question}_\n\n";
-    }
-
-    if ($question && (str_contains($q, 'atp') || str_contains($q, 'energ') || str_contains($q, 'bio'))) {
-        $answer .= "## Sobre ATP y Energía Celular\n\nEl **ATP (adenosín trifosfato)** es la molécula energética principal de la célula. Es una **biomolécula**, no un nivel de organización biológica.\n\n- Los niveles van: molécula → orgánulo → célula → tejido → órgano → sistema → organismo\n- El ATP se sintetiza en las **mitocondrias** mediante la respiración celular\n- Se usa para casi todo: contracción muscular, síntesis de proteínas, transporte activo\n\nRevisa la diferencia entre moléculas funcionales y niveles estructurales.";
+    if ($question && (str_contains($q, 'materia') || str_contains($q, 'asignatura') || str_contains($q, 'qué hay') || str_contains($q, 'temas'))) {
+        $answer .= "## Materias Disponibles en LC-ADVANCE\n\n**1. Pensamiento Matemático III** - Matemáticas avanzadas\n**2. Física I** - Mecánica, cinemática, energía\n**3. Química I** - Átomo, tabla periódica, reacciones\n**4. Ecosistemas** - Biología y medio ambiente\n**5. Programación** - PHP, JavaScript, desarrollo web\n**6. Ciencias Sociales** - Historia, geografía\n\nPara cambiar de materia, ve al dashboard y selecciona otra.";
+    } elseif ($question && (str_contains($q, 'atp') || str_contains($q, 'energ') || str_contains($q, 'bio') || str_contains($q, 'mitocondr'))) {
+        $answer .= "## ATP y Energía Celular\n\nEl **ATP** es la molécula energética principal:\n- Se sintetiza en las **mitocondrias**\n- Se usa para: movimiento, síntesis, transporte\n- Es la \"moneda energética\" de la célula";
     } elseif ($question && (str_contains($q, 'nivel') || str_contains($q, 'organización') || str_contains($q, 'jerarquía'))) {
-        $answer .= "## Niveles de Organización Biológica\n\nDe menor a mayor complejidad:\n\n1. **Moléculas** — ADN, proteínas, lípidos\n2. **Orgánulos** — mitocondria, ribosomas\n3. **Células** — unidad básica de vida\n4. **Tejidos** — células del mismo tipo\n5. **Órganos** — corazón, pulmón\n6. **Sistemas** — circulatorio, nervioso\n7. **Organismo** — individuo completo\n\nCada nivel *integra* el anterior y añade nuevas propiedades.";
+        $answer .= "## Niveles de Organización Biológica\n\n1. Moléculas → 2. Orgánulos → 3. Células → 4. Tejidos → 5. Órganos → 6. Sistemas → 7. Organismo";
+    } elseif ($question && (str_contains($q, 'derivada') || str_contains($q, 'integrar') || str_contains($q, 'límite') || str_contains($q, 'ecuación'))) {
+        $answer .= "## Matemáticas - Fórmulas Útiles\n\n- **Derivada**: \\(f'(x) = \\lim_{h \\to 0} \\frac{f(x+h)-f(x)}{h}\\)\n- **Integral**: \\(\\int f(x)dx = F(x) + C\\)\n- **Cuadrática**: \\(x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\\)\n- **Trigonometría**: \\(\\sin^2\\theta + \\cos^2\\theta = 1\\)\n\nUsa el **Lab** para practicar ejercicios.";
+    } elseif ($question && (str_contains($q, 'fuerza') || str_contains($q, 'velocidad') || str_contains($q, 'aceleración') || str_contains($q, 'energía'))) {
+        $answer .= "## Física - Formulas Fundamentales\n\n- **Velocidad**: \\(v = \\frac{\\Delta x}{\\Delta t}\\)\n- **Aceleración**: \\(a = \\frac{\\Delta v}{\\Delta t}\\)\n- **Fuerza**: \\(F = ma\\)\n- **Energía cinética**: \\(K = \\frac{1}{2}mv^2\\)\n- **Trabajo**: \\(W = F \\cdot d \\cdot \\cos\\theta\\)";
+    } elseif ($question && (str_contains($q, 'átomo') || str_contains($q, 'mol') || str_contains($q, 'enlace') || str_contains($q, 'reacción'))) {
+        $answer .= "## Química - Conceptos Clave\n\n- **Mol**: \\(1 mol = 6.022 \\times 10^{23}\\) partículas\n- **Concentración**: \\(M = \\frac{mol}{L}\\)\n- **Gas ideal**: \\(PV = nRT\\)\n- **Número atómico** = protones = electrones";
     } elseif ($question && (str_contains($q, 'repaso') || str_contains($q, 'repetición') || str_contains($q, 'olvido'))) {
-        $answer .= "## Repetición Espaciada\n\nLa **repetición espaciada** es una técnica que aprovecha la curva del olvido:\n\n- Repasas el material **justo antes de olvidarlo**\n- Intervalos típicos: 1 día → 3 días → 1 semana → 2 semanas → 1 mes\n- Cada repaso exitoso **alarga el intervalo** siguiente\n\n> 💡 Vuelve a esta lección en **2-3 días** y enfócate en las preguntas que fallaste.";
+        $answer .= "## Repetición Espaciada\n\nRepasa **justo antes de olvidarte**: 1 día → 3 días → 1 semana → 2 semanas → 1 mes";
     } elseif ($question) {
-        $answer .= "## Respuesta General\n\nEsta pregunta requiere conexión con el asistente IA para una respuesta detallada. Mientras tanto:\n\n- Revisa el contenido de la lección\n- Consulta un recurso externo como Khan Academy o Wikipedia\n- Intenta de nuevo en unos minutos cuando se restaure la conexión";
+        $answer .= "## Sobre tu pregunta\n\nNo tengo conexión para responder en detalle. Mientras tanto:\n- Revisa la lección actual\n- Intenta de nuevo más tarde\n- Usa recursos como Khan Academy";
     } else {
         $difficulty_tips = [
-            'Novato'     => "Enfócate en entender **un concepto a la vez**. No avances hasta que el anterior sea claro.",
-            'Intermedio' => "Estás progresando bien. Intenta **conectar los conceptos** entre sí con un mapa mental.",
-            'Avanzado'   => "Excelente dominio. Busca **aplicar los conceptos** en problemas nuevos o contextos reales.",
+            'Novato'     => "Enfócate en **un concepto a la vez**.",
+            'Intermedio' => "Intenta **conectar los conceptos** entre sí.",
+            'Avanzado'   => "Busca **aplicar** en problemas nuevos.",
         ];
-        $tip = $difficulty_tips[$difficulty] ?? "Sigue practicando con constancia.";
-        $answer .= "## Retroalimentación de tu Quiz\n\n{$tip}\n";
+        $tip = $difficulty_tips[$difficulty] ?? "Sigue practicando.";
+        $answer .= "## Quiz: {$tip}\n";
     }
 
     if (!empty($spacedReview)) {
-        $answer .= "\n\n---\n📅 **Repaso sugerido:** " . (is_array($spacedReview) ? implode(', ', $spacedReview) : $spacedReview);
+        $answer .= "\n---\n📅 **Repaso**: " . (is_array($spacedReview) ? implode(', ', $spacedReview) : $spacedReview);
     }
     return trim($answer);
 }
 
 /**
- * Llama a OpenRouter (compatible con OpenAI chat/completions).
- * Modelo por defecto: google/gemini-2.0-flash-001 (gratuito en OpenRouter).
- * Se puede cambiar con la constante OPENROUTER_MODEL en config.php.
+ * Llama a OpenRouter con un modelo específico.
  */
-function callOpenRouter($systemPrompt, $userPrompt) {
+function callOpenRouter($systemPrompt, $userPrompt, $model = null) {
     $apiKey = OPENROUTER_API_KEY;
-    $model  = defined('OPENROUTER_MODEL') && OPENROUTER_MODEL !== ''
-                ? OPENROUTER_MODEL
-                : 'google/gemini-2.0-flash-001';
+    if ($model === null) {
+        $model = defined('OPENROUTER_MODEL') && OPENROUTER_MODEL !== ''
+                    ? OPENROUTER_MODEL
+                    : 'openrouter/free';
+    }
 
     $payload = [
         'model'       => $model,
         'max_tokens'  => 900,
         'temperature' => 0.7,
         'messages'    => [
-            [
-                'role'    => 'system',
-                'content' => $systemPrompt
-            ],
-            [
-                'role'    => 'user',
-                'content' => $userPrompt
-            ]
+            ['role' => 'system', 'content' => $systemPrompt],
+            ['role' => 'user', 'content' => $userPrompt]
         ]
     ];
 
-    $timeout = defined('OPENROUTER_TIMEOUT') && OPENROUTER_TIMEOUT > 0 ? OPENROUTER_TIMEOUT : 15;
+    $timeout = defined('OPENROUTER_TIMEOUT') && OPENROUTER_TIMEOUT > 0 ? OPENROUTER_TIMEOUT : 30;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://openrouter.ai/api/v1/chat/completions');
@@ -320,16 +377,24 @@ try {
         $usedProvider = 'local';
 
     } else {
-        // Auto: intenta API primero si está disponible, luego local.
+        // Auto: intenta múltiples modelos gratis de OpenRouter, luego local.
         if (defined('OPENROUTER_API_KEY') && OPENROUTER_API_KEY !== '') {
-            try {
-                $response = callOpenRouter($systemMessage, $userMessage);
-                $message = $response['choices'][0]['message']['content'] ?? null;
-                $aiResponse = trim($message ?: 'No se recibió texto de OpenRouter.');
-                $usedProvider = 'api';
-            } catch (Exception $apiEx) {
-                error_log('AI auto fallback: OpenRouter falló, intentando local. ' . $apiEx->getMessage());
-                $usedProvider = null;
+            $modelsToTry = defined('OPENROUTER_FALLBACK_MODELS') && is_array(OPENROUTER_FALLBACK_MODELS)
+                ? OPENROUTER_FALLBACK_MODELS
+                : ['openrouter/free', 'deepseek/deepseek-chat-v3-0324:free', 'qwen/qwen3-235b-a22b:free', 'meta-llama/llama-4-maverick:free', 'microsoft/phi-4:free'];
+
+            foreach ($modelsToTry as $tryModel) {
+                try {
+                    $response = callOpenRouter($systemMessage, $userMessage, $tryModel);
+                    $message = $response['choices'][0]['message']['content'] ?? null;
+                    $aiResponse = trim($message ?: 'No se recibió texto de OpenRouter.');
+                    $usedProvider = 'api';
+                    error_log("AI OK with model: $tryModel");
+                    break;
+                } catch (Exception $apiEx) {
+                    error_log("AI model $tryModel falló: " . $apiEx->getMessage());
+                    $usedProvider = null;
+                }
             }
         }
 

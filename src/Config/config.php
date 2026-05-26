@@ -39,9 +39,16 @@ define('LM_STUDIO_MODEL', getenv('LM_STUDIO_MODEL') ?: 'qwen2.5-0.5b-instruct-gg
 define('LM_STUDIO_API_KEY', getenv('LM_STUDIO_API_KEY') ?: '');
 define('LM_STUDIO_REQUEST_TIMEOUT', 0);
 
-define('OPENROUTER_API_KEY', getenv('OPENROUTER_API_KEY') ?: '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');
-define('OPENROUTER_MODEL', getenv('OPENROUTER_MODEL') ?: 'google/gemini-2.0-flash-001');
-define('OPENROUTER_TIMEOUT', 20);
+define('OPENROUTER_API_KEY', getenv('OPENROUTER_API_KEY') ?: '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');
+define('OPENROUTER_MODEL', getenv('OPENROUTER_MODEL') ?: 'openrouter/free');
+define('OPENROUTER_TIMEOUT', 30);
+define('OPENROUTER_FALLBACK_MODELS', getenv('OPENROUTER_FALLBACK_MODELS')
+    ? explode(',', getenv('OPENROUTER_FALLBACK_MODELS'))
+    : [
+        'openrouter/free',
+        'google/gemma-2-9b-it:free',
+        'microsoft/phi-3-mini-128k-instruct:free'
+    ]);
 define('APP_URL', getenv('APP_URL') ?: '');
 
 // ================================
@@ -100,7 +107,7 @@ function iniciarSesionSegura() {
         if ((time() - $_SESSION['last_activity']) > SESSION_TIMEOUT) {
             logSeguridadEvento('TIMEOUT', 'Sesión expirada', $_SESSION['usuario_id'] ?? null);
             cerrarSesionSegura();
-            redirigir((strpos($_SERVER['PHP_SELF'], 'mapa/') !== false ? '../' : '') . 'login.php?timeout=1');
+            redirigir('public/login.php?timeout=1');
         }
     }
     $_SESSION['last_activity'] = time();
@@ -128,7 +135,7 @@ function logSeguridadEvento($tipo, $detalle = '', $usuario_id = null) {
 
 function requireLogin($allowGuest = true) {
     iniciarSesionSegura();
-    if (empty($_SESSION['usuario_id']) && (empty($_SESSION['usuario_es_invitado']) || !$allowGuest)) { redirigir('login.php'); }
+    if (empty($_SESSION['usuario_id']) && (empty($_SESSION['usuario_es_invitado']) || !$allowGuest)) { redirigir('public/login.php'); }
 }
 
 function requireMateriaContext() {
