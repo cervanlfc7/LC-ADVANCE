@@ -1,0 +1,709 @@
+.leccion-fisica-energia {
+  --neon-concepto: #ff8c00;
+  --neon-interactivo: #20c9f3;
+  --neon-ejemplo: #9c27b0;
+  --neon-alerta: #ffeb3b;
+  --neon-evaluacion: #f44336;
+  --neon-dato: #00e676;
+
+  background: radial-gradient(
+    circle at 20% 15%,
+    rgba(14, 22, 36, 0.95),
+    rgba(5, 8, 18, 0.93)
+  );
+  color: #ebf8ff;
+  font-family: "Roboto Mono", monospace;
+  padding: 18px;
+  border: 1px solid rgba(22, 162, 255, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 0 20px rgba(0, 230, 255, 0.14);
+  overflow: hidden;
+  line-height: 1.6;
+}
+
+.leccion-fisica-energia .leccion-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.leccion-fisica-energia .titulo-leccion {
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(1.7rem, 3.5vw, 2.9rem);
+  color: var(--neon-concepto);
+  text-shadow:
+    0 0 18px rgba(255, 140, 0, 0.8),
+    0 0 35px rgba(255, 255, 0, 0.3);
+  margin: 0;
+}
+
+.leccion-fisica-energia .subtitulo {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  margin-top: 6px;
+}
+
+.leccion-fisica-energia .panel-objetivos,
+.leccion-fisica-energia .contexto-real,
+.leccion-fisica-energia .concepto-principal,
+.leccion-fisica-energia .formas-energia,
+.leccion-fisica-energia .transformaciones-section,
+.leccion-fisica-energia .simulator-section,
+.leccion-fisica-energia .quiz-section,
+.leccion-fisica-energia .errores-section,
+.leccion-fisica-energia .examen-section,
+.leccion-fisica-energia .cierre-section {
+  margin-bottom: 24px;
+  border-left: 4px solid rgba(32, 213, 255, 0.55);
+  padding-left: 1rem;
+}
+
+/* Override global cierre-section grid for this lesson: encabezado arriba + contenido abajo */
+.leccion-fisica-energia .cierre-section {
+  display: block !important;
+  width: 100%;
+  padding: 16px 12px 14px 12px;
+  margin-bottom: 20px;
+  background: rgba(2, 6, 18, 0.75);
+  border: 1px solid rgba(18, 160, 255, 0.45);
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(0, 230, 255, 0.2);
+  overflow: visible;
+}
+
+.leccion-fisica-energia .cierre-section .cierre-container {
+  width: 100%;
+  margin-top: 12px;
+  overflow: visible;
+}
+
+.leccion-fisica-energia .cierre-section .cierre-header {
+  display: block;
+}
+
+.leccion-fisica-energia .seccion-titulo {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.1rem;
+  color: var(--neon-concepto);
+  margin-bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leccion-fisica-energia .cierre-section .cierre-header {
+  margin-bottom: 12px;
+}
+
+.leccion-fisica-energia .cierre-section .cierre-header .small {
+  color: rgba(181, 243, 255, 0.85);
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+.leccion-fisica-energia .objetivos-grid,
+.leccion-fisica-energia .contexto-grid,
+.leccion-fisica-energia .transformaciones-grid,
+.leccion-fisica-energia .plan-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.leccion-fisica-energia .transformaciones-section {
+  border: 1px solid rgba(53, 211, 255, 0.35);
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(
+    130deg,
+    rgba(2, 4, 18, 0.88),
+    rgba(8, 18, 54, 0.9)
+  );
+  box-shadow: 0 0 32px rgba(0, 203, 255, 0.2);
+}
+
+.leccion-fisica-energia .transformaciones-section .seccion-titulo {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+  padding-bottom: 8px;
+}
+
+.leccion-fisica-energia .transf-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: rgba(5, 15, 32, 0.84);
+  border: 1px solid rgba(57, 210, 255, 0.32);
+  border-radius: 14px;
+  padding: 16px;
+  min-height: 220px;
+  box-shadow: 0 0 12px rgba(2, 189, 255, 0.18);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.leccion-fisica-energia .transf-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 18px rgba(0, 222, 255, 0.32);
+  border-color: rgba(126, 241, 255, 0.65);
+}
+
+.leccion-fisica-energia .transf-card .card-icon {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  color: var(--neon-interactivo);
+}
+
+.leccion-fisica-energia .transf-card .card-title {
+  color: #f9a916;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.25rem;
+  margin-bottom: 6px;
+}
+
+.leccion-fisica-energia .transf-card .card-equation {
+  color: #85e8ff;
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.98rem;
+  margin-bottom: 10px;
+}
+
+.leccion-fisica-energia .transf-card .card-text {
+  color: #dcefff;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.leccion-fisica-energia .transf-card .card-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(22, 220, 255, 0.45),
+    rgba(255, 190, 60, 0.42)
+  );
+  border: 1px solid rgba(153, 225, 255, 0.55);
+  border-radius: 9px;
+  color: #fff;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.83rem;
+  padding: 8px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.leccion-fisica-energia .transf-card .card-btn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(12, 174, 255, 0.55),
+    rgba(255, 210, 120, 0.6)
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(255, 212, 80, 0.3);
+}
+
+.leccion-fisica-energia .objetivo-card:hover,
+.leccion-fisica-energia .contexto-card:hover,
+.leccion-fisica-energia .transf-card:hover,
+.leccion-fisica-energia .problema-card:hover,
+.leccion-fisica-energia .plan-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 0, 0.6);
+}
+
+.leccion-fisica-energia .objetivo-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(58, 255, 255, 0.65);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  margin-bottom: 8px;
+}
+
+.leccion-fisica-energia
+  .objetivo-card[data-completado="true"]
+  .objetivo-checkbox {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 0, 0.7),
+    rgba(0, 255, 255, 0.5)
+  );
+  border-color: rgba(52, 191, 255, 0.9);
+}
+
+.leccion-fisica-energia .concept-card,
+.leccion-fisica-energia .ejemplo-interactivo,
+.leccion-fisica-energia .quiz-container,
+.leccion-fisica-energia .errores-container,
+.leccion-fisica-energia .examen-container,
+.leccion-fisica-energia .cierre-container {
+  background: rgba(2, 6, 18, 0.68);
+  border: 1px solid rgba(0, 230, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.leccion-fisica-energia .cierre-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  align-items: start;
+  grid-auto-rows: minmax(260px, auto);
+  overflow: visible;
+  margin: 0 auto;
+}
+
+.leccion-fisica-energia .cierre-grid .cierre-card {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.leccion-fisica-energia .cierre-card {
+  background: rgba(4, 10, 26, 0.75);
+  border: 1px solid rgba(72, 190, 245, 0.35);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 0 12px rgba(0, 200, 255, 0.15);
+  min-height: 230px;
+}
+
+.leccion-fisica-energia .cierre-card h3 {
+  margin: 0 0 10px;
+  color: #8de3ff;
+  font-size: 1.05rem;
+}
+
+.leccion-fisica-energia .cierre-card .small {
+  font-size: 0.86rem;
+  color: rgba(170, 222, 255, 0.9);
+  margin-bottom: 12px;
+}
+
+.leccion-fisica-energia .cierre-card .slider-group {
+  margin-bottom: 10px;
+}
+
+.leccion-fisica-energia .cierre-card .slider-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.84rem;
+  color: #c6eeff;
+}
+
+.leccion-fisica-energia .cierre-card .slider-group input[type="range"] {
+  width: 100%;
+  accent-color: #00d4ff;
+}
+
+.leccion-fisica-energia .cierre-card .slider-group output {
+  display: inline-block;
+  margin-top: 4px;
+  font-weight: 700;
+  color: #9cffb1;
+}
+
+.leccion-fisica-energia .cierre-card textarea {
+  width: 100%;
+  min-height: 90px;
+  background: rgba(8, 20, 40, 0.95);
+  border: 1px solid rgba(64, 130, 174, 0.44);
+  color: #e5f8ff;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.leccion-fisica-energia .cierre-card .plan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.leccion-fisica-energia .cierre-card .plan-list li {
+  margin-bottom: 6px;
+}
+
+.leccion-fisica-energia .cierre-card .plan-list label {
+  color: #c4e7ff;
+  font-size: 0.88rem;
+}
+
+.leccion-fisica-energia .cierre-card .plan-list input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: #59ffc8;
+}
+
+.leccion-fisica-energia .cierre-card .recursos-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leccion-fisica-energia .cierre-card .recurso-link {
+  color: #8effff;
+  text-decoration: none;
+  border: 1px solid rgba(128, 225, 255, 0.25);
+  border-radius: 8px;
+  padding: 8px;
+  background: rgba(8, 15, 32, 0.65);
+}
+
+.leccion-fisica-energia .cierre-card .recurso-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(0, 200, 255, 0.26);
+}
+
+.leccion-fisica-energia .cierre-card .btn-guardar {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.leccion-fisica-energia .cierre-card .mensaje-exito {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  min-height: 1.2rem;
+}
+
+@media (max-width: 1100px) {
+  .leccion-fisica-energia .cierre-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leccion-fisica-energia .tabla-cyberpunk {
+  width: 100%;
+  border-collapse: collapse;
+  color: #e1f8ff;
+}
+
+.leccion-fisica-energia .tabla-cyberpunk th,
+.leccion-fisica-energia .tabla-cyberpunk td {
+  border: 1px solid rgba(0, 204, 255, 0.3);
+  padding: 8px 9px;
+  text-align: left;
+}
+
+.leccion-fisica-energia .tabla-cyberpunk tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.leccion-fisica-energia .tabla-cyberpunk tr.selected {
+  background: rgba(0, 236, 255, 0.2);
+}
+
+.leccion-fisica-energia .tabla-info {
+  margin-top: 14px;
+  background: rgba(0, 0, 0, 0.32);
+  padding: 12px;
+  border-left: 4px solid var(--neon-ejemplo);
+}
+
+.leccion-fisica-energia .btn-mini,
+.leccion-fisica-energia .btn-simular,
+.leccion-fisica-energia .btn-pausar,
+.leccion-fisica-energia .btn-reset,
+.leccion-fisica-energia .btn-verificar,
+.leccion-fisica-energia .btn-guardar,
+.leccion-fisica-energia .btn-retry {
+  background: linear-gradient(
+    135deg,
+    rgba(32, 201, 255, 0.4),
+    rgba(255, 146, 0, 0.4)
+  );
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  color: #fff;
+  border-radius: 8px;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.leccion-fisica-energia .btn-mini:hover,
+.leccion-fisica-energia .btn-simular:hover,
+.leccion-fisica-energia .btn-pausar:hover,
+.leccion-fisica-energia .btn-reset:hover,
+.leccion-fisica-energia .btn-verificar:hover,
+.leccion-fisica-energia .btn-guardar:hover,
+.leccion-fisica-energia .btn-retry:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(0, 255, 255, 0.35);
+}
+
+.leccion-fisica-energia .quiz-question {
+  margin-bottom: 1rem;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(2, 5, 12, 0.6);
+}
+
+.leccion-fisica-energia .quiz-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  margin: 6px 0;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #f5f5f5;
+}
+
+.leccion-fisica-energia .quiz-option.selected {
+  border-color: rgba(255, 255, 0, 0.8);
+}
+.leccion-fisica-energia .quiz-option.correct {
+  background: rgba(34, 145, 61, 0.5);
+  border-color: #60ff84;
+}
+.leccion-fisica-energia .quiz-option.incorrect {
+  background: rgba(180, 33, 33, 0.5);
+  border-color: #ff4c4c;
+}
+
+.leccion-fisica-energia .quiz-feedback {
+  display: none;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+.leccion-fisica-energia .feedback-correct {
+  color: #aef4b5;
+}
+
+.leccion-fisica-energia .error-card,
+.leccion-fisica-energia .problema-card,
+.leccion-fisica-energia .plan-card {
+  border: 1px solid rgba(220, 250, 255, 0.34);
+  background: rgba(4, 9, 25, 0.85);
+}
+
+.leccion-fisica-energia .error-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leccion-fisica-energia .error-toggle {
+  font-weight: 700;
+  color: var(--neon-evaluacion);
+}
+
+.leccion-fisica-energia .error-content {
+  display: none;
+  padding: 8px;
+}
+
+.leccion-fisica-energia .error-card.open .error-content {
+  display: block;
+}
+
+.leccion-fisica-energia .simulator-visualization {
+  border: 1px solid rgba(50, 210, 255, 0.35);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.leccion-fisica-energia .data-card {
+  background: rgba(2, 12, 28, 0.85);
+  border: 1px solid rgba(90, 220, 255, 0.25);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.leccion-fisica-energia .data-card.highlight {
+  border-color: rgba(0, 255, 0, 0.8);
+}
+
+.leccion-fisica-energia input[type="range"] {
+  width: 100%;
+  accent-color: var(--neon-concepto);
+}
+
+.leccion-fisica-energia input[type="number"],
+.leccion-fisica-energia textarea {
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(55, 195, 255, 0.45);
+  background: rgba(5, 12, 22, 0.9);
+  color: #ecf8ff;
+  margin-top: 5px;
+}
+
+/* ===== Responsive (Apilar en móviles) ===== */
+@media (max-width: 1024px) {
+  .leccion-fisica-energia {
+    padding: 12px;
+  }
+
+  .leccion-fisica-energia .objetivos-grid,
+  .leccion-fisica-energia .contexto-grid,
+  .leccion-fisica-energia .transformaciones-grid,
+  .leccion-fisica-energia .simulator-grid,
+  .leccion-fisica-energia .plan-grid,
+  .leccion-fisica-energia .quiz-grid,
+  .leccion-fisica-energia .errores-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .leccion-fisica-energia .panel-objetivos,
+  .leccion-fisica-energia .contexto-real,
+  .leccion-fisica-energia .concepto-principal,
+  .leccion-fisica-energia .transformaciones-section,
+  .leccion-fisica-energia .simulator-section,
+  .leccion-fisica-energia .quiz-section,
+  .leccion-fisica-energia .errores-section,
+  .leccion-fisica-energia .examen-section,
+  .leccion-fisica-energia .cierre-section {
+    border-left: none;
+    border-top: 3px solid rgba(32, 213, 255, 0.55);
+    padding-left: 0.75rem;
+    padding-top: 0.8rem;
+  }
+
+  .leccion-fisica-energia .seccion-titulo {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .leccion-fisica-energia .panel-objetivos,
+  .leccion-fisica-energia .contexto-real,
+  .leccion-fisica-energia .concepto-principal,
+  .leccion-fisica-energia .transformaciones-section,
+  .leccion-fisica-energia .simulator-section,
+  .leccion-fisica-energia .quiz-section,
+  .leccion-fisica-energia .errores-section,
+  .leccion-fisica-energia .examen-section,
+  .leccion-fisica-energia .cierre-section {
+    margin-bottom: 16px;
+  }
+
+  .leccion-fisica-energia .transf-card,
+  .leccion-fisica-energia .problema-card,
+  .leccion-fisica-energia .plan-card,
+  .leccion-fisica-energia .concept-card,
+  .leccion-fisica-energia .quiz-container {
+    padding: 12px;
+  }
+
+  .leccion-fisica-energia .titulo-leccion {
+    font-size: clamp(1.4rem, 5vw, 2.4rem);
+  }
+
+  .leccion-fisica-energia .subtitulo {
+    font-size: 0.94rem;
+  }
+}
+
+/* refuerzo mobile-first, todo apilado vertical */
+.leccion-fisica-energia .seccion-fila {
+  display: block;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.leccion-fisica-energia .seccion-fila > * {
+  width: 100% !important;
+  margin-bottom: 14px !important;
+}
+
+@media (max-width: 760px) {
+  .leccion-fisica-energia {
+    padding: 10px;
+  }
+
+  .leccion-fisica-energia .panel-objetivos,
+  .leccion-fisica-energia .contexto-real,
+  .leccion-fisica-energia .concepto-principal,
+  .leccion-fisica-energia .transformaciones-section,
+  .leccion-fisica-energia .simulator-section,
+  .leccion-fisica-energia .quiz-section,
+  .leccion-fisica-energia .errores-section,
+  .leccion-fisica-energia .examen-section,
+  .leccion-fisica-energia .cierre-section {
+    padding: 10px;
+    margin-bottom: 16px;
+    border-left: none;
+    border-top: 3px solid rgba(32, 213, 255, 0.55);
+  }
+
+  .leccion-fisica-energia .objetivo-card,
+  .leccion-fisica-energia .contexto-card,
+  .leccion-fisica-energia .transf-card,
+  .leccion-fisica-energia .problema-card,
+  .leccion-fisica-energia .plan-card,
+  .leccion-fisica-energia .concept-card,
+  .leccion-fisica-energia .quiz-container,
+  .leccion-fisica-energia .errores-container {
+    width: 100%;
+    min-width: initial;
+    box-sizing: border-box;
+  }
+
+  .leccion-fisica-energia .data-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .leccion-fisica-energia .data-card span {
+    display: block;
+    margin-bottom: 5px;
+  }
+}
+
+.leccion-fisica-energia .plan-card ul,
+.leccion-fisica-energia .plan-card li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.leccion-fisica-energia .plan-card li::before {
+  content: "•";
+  color: var(--neon-dato);
+  padding-right: 6px;
+}
+
+@media (max-width: 900px) {
+  .leccion-fisica-energia {
+    padding: 12px;
+  }
+  .leccion-fisica-energia .lesson-main-content {
+    padding: 10px;
+  }
+  .leccion-fisica-energia .objetivos-grid,
+  .leccion-fisica-energia .transformaciones-grid,
+  .leccion-fisica-energia .contexto-grid,
+  .leccion-fisica-energia .plan-grid {
+    grid-template-columns: 1fr;
+  }
+}

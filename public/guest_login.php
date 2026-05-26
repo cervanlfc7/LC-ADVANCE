@@ -1,0 +1,32 @@
+<?php
+// guest_login.php — Inicio de sesión rápido en modo "Invitado" (solo lectura)
+require_once __DIR__ . '/../src/Config/config.php';
+// Iniciar sesión segura y regenerar id
+iniciarSesionSegura();
+session_regenerate_id(true);
+
+// Asegurarse de limpiar cualquier sesión previa sensible
+unset($_SESSION['usuario_id']);
+unset($_SESSION['usuario_nombre']);
+unset($_SESSION['usuario_puntos']);
+unset($_SESSION['usuario_nivel']);
+unset($_SESSION['usuario_es_invitado']);
+
+// Configurar sesión de invitado
+$_SESSION['usuario_id'] = 0; // id 0 reservada para Invitado
+$_SESSION['usuario_nombre'] = 'Invitado';
+$_SESSION['usuario_puntos'] = 0;
+$_SESSION['usuario_nivel'] = 1;
+$_SESSION['usuario_es_invitado'] = true;
+$_SESSION['last_activity'] = time();
+
+// Guardar materia si se pasó por la URL
+if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
+
+// Redirigir al destino final - Invitados siempre pasan por selección de personaje
+$redirect = 'public/seleccionar_personaje.php';
+if (strpos($redirect, 'public/') !== 0 && strpos($redirect, '/') !== 0) {
+    $redirect = 'public/' . $redirect;
+}
+redirigir($redirect);
+exit;

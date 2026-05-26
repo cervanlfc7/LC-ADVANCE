@@ -94,7 +94,7 @@ if (strpos($html, 'PAST SIMPLE DOMINATION 2025') === false) {
 
 // === QUIZ FLOW: submit answers using the server-provided `quizData` variable ===
 // Fetch current estado (puntos) before quiz
-$estadoBefore = json_decode(curl_post($base . 'src/funciones.php', ['accion' => 'obtener_estado'], $cookieFile), true);
+$estadoBefore = json_decode(curl_post($base . 'src/Core/funciones.php', ['accion' => 'obtener_estado'], $cookieFile), true);
 $pointsBefore = isset($estadoBefore['puntos']) ? (int)$estadoBefore['puntos'] : 0;
 
 // Extract `quizData` JSON from HTML
@@ -116,7 +116,7 @@ foreach ($quizData as $i => $q) {
     $payload["q$i"] = $q['correcta'] ?? '';
 }
 
-$calRespRaw = curl_post($base . 'src/funciones.php', $payload, $cookieFile);
+$calRespRaw = curl_post($base . 'src/Core/funciones.php', $payload, $cookieFile);
 $calResp = json_decode($calRespRaw, true);
 if (!is_array($calResp) || empty($calResp['ok'])) {
     echo "FAIL: calificar_quiz failed: " . substr($calRespRaw,0,400) . "\n";
@@ -128,7 +128,7 @@ $xp = isset($calResp['xp_ganado']) ? (int)$calResp['xp_ganado'] : 0;
 $newPointsFromResp = isset($calResp['new_puntos']) ? (int)$calResp['new_puntos'] : null;
 
 // Verify state via obtener_estado
-$estadoAfter = json_decode(curl_post($base . 'src/funciones.php', ['accion' => 'obtener_estado'], $cookieFile), true);
+$estadoAfter = json_decode(curl_post($base . 'src/Core/funciones.php', ['accion' => 'obtener_estado'], $cookieFile), true);
 $pointsAfter = isset($estadoAfter['puntos']) ? (int)$estadoAfter['puntos'] : 0;
 
 if ($pointsAfter !== $pointsBefore + $xp) {

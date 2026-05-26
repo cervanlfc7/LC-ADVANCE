@@ -28,28 +28,30 @@ CI expects `TEST_BASE_URL=http://127.0.0.1:8000/` and MySQL at `127.0.0.1:3306` 
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/Config/config.php` | DB, OAuth, AI config (env vars in prod, hardcoded dev fallbacks) |
-| `src/Content/content.php` | Lessons array (127K, ~200+ lessons) — add or edit here |
-| `src/Core/funciones.php` | AJAX endpoints with rate limiting |
-| `src/Config/challenges.php` | Lab coding challenges array |
-| `public/lab.php` | Lab: code challenges + Wolfram calculator (139KB, all inline CSS/JS) |
-| `public/ai_tutor.php` | AI tutor endpoint (OpenRouter free model router → LM Studio → offline) |
-| `public/leccion_detalle.php` | Lesson viewer + quiz + AI chat widget (all inline CSS/JS) |
-| `src/Database/lc_advance.sql` | Full database dump |
-| `public/assets/css/style.css` | Global retro-pixel theme (2253KB, includes embedded assets) |
-| `public/assets/css/dashboard.css` | Dashboard-specific dark theme (2119 lines) |
+| File                              | Purpose                                                                |
+| --------------------------------- | ---------------------------------------------------------------------- |
+| `src/Config/config.php`           | DB, OAuth, AI config (env vars in prod, hardcoded dev fallbacks)       |
+| `src/Content/content.php`         | Lessons array (127K, ~200+ lessons) — add or edit here                 |
+| `src/Core/funciones.php`          | AJAX endpoints with rate limiting                                      |
+| `src/Config/challenges.php`       | Lab coding challenges array                                            |
+| `public/lab.php`                  | Lab: code challenges + Wolfram calculator (139KB, all inline CSS/JS)   |
+| `public/ai_tutor.php`             | AI tutor endpoint (OpenRouter free model router → LM Studio → offline) |
+| `public/leccion_detalle.php`      | Lesson viewer + quiz + AI chat widget (all inline CSS/JS)              |
+| `src/Database/lc_advance.sql`     | Full database dump                                                     |
+| `public/assets/css/style.css`     | Global retro-pixel theme (2253KB, includes embedded assets)            |
+| `public/assets/css/dashboard.css` | Dashboard-specific dark theme (2119 lines)                             |
 
 ## AI API Architecture
 
 **Chain of providers** (in `public/ai_tutor.php`):
+
 1. `openrouter/free` — auto-router to best free model on OpenRouter (no cost)
 2. 2nd/3rd fallback models: `gemma-2-9b-it:free`, `phi-3-mini:free`
 3. LM Studio at `http://localhost:1234/v1` (local, requires LM Studio running)
 4. `localFallbackAnswer()` — hardcoded offline mode (⚠️ "Sin conexión al servicio de IA")
 
 **Config** (`src/Config/config.php`):
+
 - `OPENROUTER_API_KEY` — env var, fallback to hardcoded dev key
 - `OPENROUTER_MODEL` = `openrouter/free`
 - `OPENROUTER_FALLBACK_MODELS` = array of 3 models tried in sequence
@@ -63,12 +65,20 @@ Every page defines its own CSS variables in a `<style>` block. The **canonical v
 
 ```css
 :root {
-  --bg: #060a12;  --surface: #0c1220;  --surface2: #101828;
-  --border: rgba(0,230,255,0.12);  --border2: rgba(0,230,255,0.22);
-  --cyan: #00e5ff;  --cyan-dim: rgba(0,229,255,0.12);
-  --pink: #ff3cac;  --green: #00ff87;  --yellow: #ffd23f;  --red: #ff4d6d;
-  --text: #e8f4ff;  --text-secondary: rgba(200,230,255,0.75);
-  --muted: rgba(200,230,255,0.5);
+  --bg: #060a12;
+  --surface: #0c1220;
+  --surface2: #101828;
+  --border: rgba(0, 230, 255, 0.12);
+  --border2: rgba(0, 230, 255, 0.22);
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0, 229, 255, 0.12);
+  --pink: #ff3cac;
+  --green: #00ff87;
+  --yellow: #ffd23f;
+  --red: #ff4d6d;
+  --text: #e8f4ff;
+  --text-secondary: rgba(200, 230, 255, 0.75);
+  --muted: rgba(200, 230, 255, 0.5);
   --font-display: "Syne", sans-serif;
   --font-body: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
@@ -78,6 +88,7 @@ Every page defines its own CSS variables in a `<style>` block. The **canonical v
 ```
 
 **Rules:**
+
 - Always use `var(--cyan)` for accent, `var(--pink)` as secondary, `var(--green)` for success
 - Gradients: `linear-gradient(135deg, var(--cyan), var(--pink))` for primary buttons
 - Hover: `var(--cyan-dim)` background, `var(--cyan)` border/text color
@@ -101,6 +112,7 @@ Every page defines its own CSS variables in a `<style>` block. The **canonical v
 ## JS/LaTeX Brace Collision
 
 Never use literal `{` or `}` in JS template literals containing LaTeX. Use concatenation:
+
 ```js
 // BAD: `T = 2\\pi\\sqrt{\frac{${L}}{${g}}}`
 // GOOD: 'T = 2π√(L/g) = ' + periodStr + ' s'

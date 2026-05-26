@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$base = getenv('TEST_BASE_URL') ?: 'http://127.0.0.1:8000/';
+$base = getenv('TEST_BASE_URL') ?: 'http://127.0.0.1:80/';
 $cookieFile = __DIR__ . '/lessons_cookies.txt';
 @unlink($cookieFile);
 

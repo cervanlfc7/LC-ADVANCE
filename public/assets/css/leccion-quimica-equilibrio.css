@@ -1,0 +1,330 @@
+:root {
+  --neon-cyan: #00ffff;
+  --neon-green: #39ff14;
+  --neon-pink: #ff00ff;
+  --neon-yellow: #ffff00;
+  --bg-dark: #0a0a1a;
+  --bg-card: rgba(10, 10, 26, 0.85);
+  --text-light: #e0f0ff;
+  --border-glow: 1px solid rgba(0, 255, 255, 0.4);
+}
+
+.leccion-quimica-equilibrio {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  font-family: "Segoe UI", "Roboto", "Consolas", monospace;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  line-height: 1.6;
+}
+
+.leccion-quimica-equilibrio::before,
+.leccion-quimica-equilibrio::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.leccion-quimica-equilibrio::before {
+  background-image:
+    linear-gradient(rgba(57, 255, 20, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 20, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.leccion-quimica-equilibrio::after {
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 255, 255, 0.01) 51%
+  );
+  background-size: 100% 4px;
+  animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+.titulo-leccion {
+  font-size: 2.5rem;
+  text-align: center;
+  text-shadow: 0 0 5px var(--neon-cyan);
+  animation: glow 3s infinite;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    text-shadow: 0 0 5px var(--neon-cyan);
+  }
+  50% {
+    text-shadow:
+      0 0 15px var(--neon-cyan),
+      0 0 20px var(--neon-cyan);
+  }
+}
+
+.objetivos-rapidos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.ice-steps {
+  list-style: none;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba(0, 255, 255, 0.08);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.ice-steps li {
+  margin: 0.35rem 0;
+  color: #d8faff;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.objetivo-card {
+  background: var(--bg-card);
+  border: 1px solid var(--neon-green);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: transform 0.2s;
+}
+
+.objetivo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.2);
+}
+
+.seccion-titulo {
+  border-left: 4px solid var(--neon-cyan);
+  padding-left: 1rem;
+  margin: 2rem 0 1rem;
+  font-size: 1.8rem;
+}
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.concept-card {
+  background: rgba(0, 0, 0, 0.6);
+  border-left: 4px solid var(--neon-pink);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.formula {
+  text-align: center;
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.leccion-quimica-equilibrio table,
+.leccion-quimica-equilibrio .chem-table,
+.leccion-quimica-equilibrio .neon-table,
+.leccion-quimica-equilibrio .table,
+.leccion-quimica-equilibrio .table-wrapper table,
+.leccion-quimica-equilibrio .ice-panel table {
+  width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+.chem-table {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1rem 0;
+  width: 100% !important;
+}
+
+.ice-panel {
+  width: 100%;
+  max-width: 100%;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.chem-table th,
+.chem-table td,
+.neon-table th,
+.neon-table td,
+.table th,
+.table td {
+  border: 1px solid var(--neon-cyan);
+  padding: 0.75rem;
+  text-align: left;
+  min-width: 80px;
+}
+
+.chem-table th,
+.neon-table th,
+.table th {
+  background: rgba(0, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chem-table th {
+  background: rgba(0, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chem-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chem-table tbody tr:hover {
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.lechat-sim,
+.ice-panel,
+.calc-panel,
+.time-sim {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.15);
+}
+
+.control-panel,
+.ice-inputs,
+.calc-panel > * {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.reaction-viz {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  border: 1px dashed rgba(0, 255, 255, 0.35);
+  border-radius: 10px;
+  padding: 0.8rem;
+  background: rgba(10, 15, 30, 0.9);
+}
+
+.arrow {
+  font-size: 2rem;
+  transition: transform 0.3s;
+}
+
+.shift-display,
+.explain-box,
+.result-box {
+  text-align: center;
+  margin: 0.5rem 0;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.6rem;
+}
+
+.explain-box {
+  color: #bdfbff;
+  min-height: 50px;
+}
+
+.errores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.error-card {
+  background: rgba(255, 0, 0, 0.08);
+  border-left: 4px solid #ff6b6b;
+  padding: 1rem;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.error-card:hover,
+.error-card.expandido {
+  transform: translateY(-3px);
+  box-shadow: 0 0 12px rgba(255, 50, 50, 0.3);
+}
+
+.error-detail {
+  display: none;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.error-card.expandido .error-detail {
+  display: block;
+}
+
+button,
+.leccion-quimica-equilibrio button {
+  background: linear-gradient(45deg, var(--neon-cyan), #0097a7);
+  border: none;
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+button:hover,
+.leccion-quimica-equilibrio button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+@media (max-width: 768px) {
+  .leccion-quimica-equilibrio {
+    padding: 1rem;
+  }
+  .control-panel,
+  .ice-inputs,
+  .calc-panel > * {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

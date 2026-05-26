@@ -1,0 +1,11 @@
+{
+  "name": "LC-ADVANCE",
+  "short_name": "LC-ADVANCE",
+  "start_url": "/LC-ADVANCE/index.php",
+  "scope": "/LC-ADVANCE/",
+  "display": "standalone",
+  "background_color": "#060a12",
+  "theme_color": "#00e5ff",
+  "description": "Plataforma educativa gamificada con mapa, duelos y dashboard.",
+  "lang": "es-MX"
+}
