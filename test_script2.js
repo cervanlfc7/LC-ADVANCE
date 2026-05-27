@@ -1,1 +1,0 @@
-var window = {}; var document = { getElementById: () => null }; 

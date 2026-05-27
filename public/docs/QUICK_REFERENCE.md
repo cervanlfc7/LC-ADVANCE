@@ -52,6 +52,7 @@ EOT,
 ```
 
 **Importante:**
+
 - `slug` → único, sin espacios, minúsculas
 - Escapar `<?php` → `&lt;?php`
 - Usar `<<<'EOT' ... EOT;` para HTML
@@ -89,16 +90,17 @@ curl -X POST http://localhost:8000/src/funciones.php \
 ```
 
 **Respuesta:**
+
 ```json
 {
   "ok": true,
   "puntos": 580,
   "nivel": 2,
   "progreso": 30,
-  "badges": [{"nombre": "Nivel 1: Novato", "tipo": "bronze"}],
+  "badges": [{ "nombre": "Nivel 1: Novato", "tipo": "bronze" }],
   "ranking": [
-    {"nombre_usuario": "Admin", "puntos": 5000, "es_actual": false},
-    {"nombre_usuario": "Estudiante1", "puntos": 580, "es_actual": true}
+    { "nombre_usuario": "Admin", "puntos": 5000, "es_actual": false },
+    { "nombre_usuario": "Estudiante1", "puntos": 580, "es_actual": true }
   ]
 }
 ```
@@ -166,15 +168,15 @@ db/lc_advance.sql       ← BD dump (importar aquí)
 
 ## 🌐 URLs Principales
 
-| URL | Descripción |
-|-----|-----------|
-| `/index.php` | Landing page |
-| `/login.php` | Login |
-| `/register.php` | Registro |
-| `/dashboard.php` | Panel usuario (requiere login) |
-| `/leccion_detalle.php?slug=X&materia=Y` | Lección + quiz |
-| `/mapa/index.html` | Mapa interactivo |
-| `/src/funciones.php` | Endpoints AJAX |
+| URL                                     | Descripción                    |
+| --------------------------------------- | ------------------------------ |
+| `/index.php`                            | Landing page                   |
+| `/login.php`                            | Login                          |
+| `/register.php`                         | Registro                       |
+| `/dashboard.php`                        | Panel usuario (requiere login) |
+| `/leccion_detalle.php?slug=X&materia=Y` | Lección + quiz                 |
+| `/mapa/index.html`                      | Mapa interactivo               |
+| `/src/funciones.php`                    | Endpoints AJAX                 |
 
 ---
 
@@ -190,6 +192,7 @@ define('DB_PASS', '');              // Contraseña
 ```
 
 **Variables de entorno (override):**
+
 ```bash
 export DB_HOST=prod-server.com
 export DB_NAME=lc_prod
@@ -233,6 +236,7 @@ $lecciones[] = [
 ## 📤 Enviar Respuestas de Quiz
 
 **Request:**
+
 ```
 POST /src/funciones.php
 accion=calificar_quiz
@@ -244,6 +248,7 @@ q2=opcion3
 ```
 
 **Response:**
+
 ```json
 {
   "ok": true,
@@ -252,7 +257,12 @@ q2=opcion3
   "new_puntos": 580,
   "new_nivel": 2,
   "details": [
-    {"pregunta": "...", "correcta": "...", "respuesta": "...", "acertada": true}
+    {
+      "pregunta": "...",
+      "correcta": "...",
+      "respuesta": "...",
+      "acertada": true
+    }
   ]
 }
 ```
@@ -264,29 +274,29 @@ q2=opcion3
 ### 1. Usuario Nuevo → Quiz → Puntos
 
 ```
-Register → Login → Dashboard 
-  → Selecciona Lección 
-  → Lee Contenido 
-  → Responde Quiz 
-  → Recibe Puntos 
+Register → Login → Dashboard
+  → Selecciona Lección
+  → Lee Contenido
+  → Responde Quiz
+  → Recibe Puntos
   → Aparece en Ranking
 ```
 
 ### 2. Acceso Invitado
 
 ```
-"Entrar como invitado" 
-  → Lee lecciones 
-  → Puede responder quiz (sin guardar) 
+"Entrar como invitado"
+  → Lee lecciones
+  → Puede responder quiz (sin guardar)
   → Logout automático al cerrar
 ```
 
 ### 3. Admin (futuro)
 
 ```
-/admin/dashboard.php 
-  → Ver analytics 
-  → Agregar lecciones 
+/admin/dashboard.php
+  → Ver analytics
+  → Agregar lecciones
   → Ver reporte de usuarios
 ```
 
@@ -294,13 +304,13 @@ Register → Login → Dashboard
 
 ## 🚨 Errores Comunes
 
-| Error | Solución |
-|-------|----------|
-| "Table not found" | `mysql -u root -p < db/lc_advance.sql` |
-| "Access denied" | Verifica DB_USER/DB_PASS en `config/config.php` |
+| Error                            | Solución                                        |
+| -------------------------------- | ----------------------------------------------- |
+| "Table not found"                | `mysql -u root -p < db/lc_advance.sql`          |
+| "Access denied"                  | Verifica DB_USER/DB_PASS en `config/config.php` |
 | "Parse error in src/content.php" | Busca `<?php` sin escapar o `<<<EOT` sin cerrar |
-| "Login no funciona" | Verifica sesión y tabla `usuarios` |
-| "Puntos no se guardan" | Verifica `user_progress` table y conexión PDO |
+| "Login no funciona"              | Verifica sesión y tabla `usuarios`              |
+| "Puntos no se guardan"           | Verifica `user_progress` table y conexión PDO   |
 
 ---
 
@@ -316,7 +326,7 @@ Register → Login → Dashboard
 
 ## 🔗 Enlaces Útiles
 
-- 📚 README completo: [README.md](README.md)
+- 📚 README completo: [../../README.md](../../README.md)
 - 🔧 Guía de desarrollo: [DEVELOPMENT.md](DEVELOPMENT.md)
 - 📝 SQL schema: [db/lc_advance.sql](db/lc_advance.sql)
 - 🧪 Tests: [tests/run_all_tests.php](tests/run_all_tests.php)

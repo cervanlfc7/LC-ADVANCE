@@ -1342,11 +1342,16 @@ header.header {
 <?php if (!empty($_GET['seleccionar_materia'])): ?>
 <?php
 $todas_materias = [
-    'Pensamiento Matemático III', 'Física I', 'Química I', 'Programación',
-    'Inglés', 'Temas Selectos de Matemáticas I y II', 'Historia de México',
-    'Ciencias Sociales', 'Ecosistemas', 'Biología', 'Economía', 'Taller de Lectura y Redacción',
+    'Ciencias Sociales',
+    'Ecosistemas',
+    'Física I',
+    'Historia de México',
+    'Inglés',
+    'Pensamiento Matemático III',
+    'Programación',
+    'Química I',
+    'Temas Selectos de Matemáticas I y II',
 ];
-sort($todas_materias);
 ?>
 <div id="materiaModal" class="materia-modal" style="display:flex;">
     <div class="materia-modal-card">

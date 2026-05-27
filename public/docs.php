@@ -7,9 +7,23 @@ require_once __DIR__ . '/../src/Config/config.php';
 
 function getSafeDocPath($file) {
     $docsDir = realpath(__DIR__ . '/docs/') . DIRECTORY_SEPARATOR;
-    $requested = realpath($docsDir . trim($file));
-    if ($requested && strpos($requested, $docsDir) === 0 && pathinfo($requested, PATHINFO_EXTENSION) === 'md') {
-        return $requested;
+    $projectRoot = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR;
+
+    if (basename($file) === 'README.md') {
+        $requested = $projectRoot . 'README.md';
+    } else {
+        $requested = $docsDir . basename($file);
+    }
+
+    if ($requested && pathinfo($requested, PATHINFO_EXTENSION) === 'md') {
+        $allowedRoot = $docsDir;
+        $allowedProject = $projectRoot;
+        if (basename($file) === 'README.md' && file_exists($requested) && strpos(realpath($requested), $allowedProject) === 0) {
+            return realpath($requested);
+        }
+        if (file_exists($requested) && strpos(realpath($requested), $allowedRoot) === 0) {
+            return realpath($requested);
+        }
     }
     return null;
 }

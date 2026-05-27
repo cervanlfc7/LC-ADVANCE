@@ -5,6 +5,42 @@
 require_once __DIR__ . '/../src/Config/config.php';
 requireLogin(true);
 
+function norm($s) {
+    return mb_strtolower(trim(strtr($s, [
+        'Ã¡'=>'a','Ã©'=>'e','Ã­'=>'i','Ã³'=>'o','Ãº'=>'u','Ã±'=>'n','&'=>'y'
+    ])), 'UTF-8');
+}
+
+$profesor_materia_map = [
+    'Miguel Marquez'    => ['Temas Selectos de Matemáticas I y II'],
+    'Enrique'           => ['Inglés'],
+    'Espindola'         => ['Pensamiento Matemático III'],
+    'Manuel'            => ['Programación'],
+    'Meza'              => ['Programación'],
+    'Herson'            => ['Física I','Química I'],
+    'Carolina'          => ['Ecosistemas'],
+    'Refugio & Padilla' => ['Ciencias Sociales'],
+    'Armando'           => ['Historia de México']
+];
+
+$filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
+$resolved_materia = isset($_GET['materia']) ? trim($_GET['materia']) : '';
+
+if ($resolved_materia === '' && $filter_profesor !== '') {
+    $nf = norm($filter_profesor);
+    foreach ($profesor_materia_map as $prof => $mats) {
+        $np = norm($prof);
+        if ($np === $nf || strpos($np, $nf) !== false || strpos($nf, $np) !== false) {
+            $resolved_materia = $mats[0] ?? '';
+            break;
+        }
+    }
+}
+
+if ($resolved_materia !== '') {
+    $_GET['materia'] = $resolved_materia;
+}
+
 // REQUERIR MATERIA VÁLIDA para entrar al dashboard
 $materia = requireMateriaContext();
 
@@ -115,7 +151,6 @@ $t = [
     ],
 ];
 
-$filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
 $filter_materia  = $materia;
 
 // ------------------ USUARIO ------------------
@@ -144,23 +179,6 @@ if ($usuario['puntos'] >= 1000) $badges[] = ['nombre'=>'Explorador','tipo'=>'sil
 if ($usuario['puntos'] >= 2000) $badges[] = ['nombre'=>'Élite',     'tipo'=>'gold',   'icon'=>'🥇'];
 
 // ------------------ FILTRADO ------------------
-function norm($s){
-    return mb_strtolower(trim(strtr($s,[
-        'Ã¡'=>'a','Ã©'=>'e','Ã­'=>'i','Ã³'=>'o','Ãº'=>'u','Ã±'=>'n','&'=>'y'
-    ])), 'UTF-8');
-}
-
-$profesor_materia_map = [
-    'Miguel Marquez'    => ['Temas Selectos de Matemáticas I y II'],
-    'Enrique'           => ['Inglés'],
-    'Espindola'         => ['Pensamiento Matemático III'],
-    'Manuel'            => ['Programación'],
-    'Meza'              => ['Programación'],
-    'Herson'            => ['Física I','Química I'],
-    'Carolina'          => ['Ecosistemas'],
-    'Refugio & Padilla' => ['Ciencias Sociales'],
-    'Armando'           => ['Historia de México']
-];
 
 if ($filter_profesor && empty($filter_materia)) {
     $nf = norm($filter_profesor);
