@@ -1,20 +1,11 @@
 <?php
 // ==========================================
-// LC-ADVANCE - index.php (Versión Mejorada 2025 v2.0)
-// ==========================================
-// Fecha: 07 Noviembre 2025
+// LC-ADVANCE - index.php (Versión Mejorada 2025 v2.1 - Self-Contained)
 // ==========================================
 
-require_once 'config/config.php';
-// Asegurar que la sesión se inicie con las políticas definidas
+require_once 'src/Config/config.php';
 iniciarSesionSegura();
-require_once 'config/csrf.php';
 
-<<<<<<< Updated upstream
-// Verificar si el usuario está autenticado
-$usuario_logueado = isset($_SESSION['usuario_id']);
-=======
-// Base URL dinámica - detecta la ruta correcta
 $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
 $baseUrl = $scriptDir === '/' || $scriptDir === '\\' ? '' : $scriptDir;
 
@@ -24,18 +15,15 @@ if (isset($_GET['lang']) && in_array($_GET['lang'], $supported_langs, true)) {
     $_SESSION['lang'] = $_GET['lang'];
 }
 $lang = $_SESSION['lang'] ?? 'es';
-if (!in_array($lang, $supported_langs, true)) {
-    $lang = 'es';
-}
+if (!in_array($lang, $supported_langs, true)) $lang = 'es';
+
 $t = [
     'es' => [
-        'language' => 'Idioma',
-        'theme' => 'Tema',
-        'community' => 'Comunidad',
         'nav_dashboard' => 'Dashboard',
         'nav_logout' => 'Cerrar Sesión',
         'nav_login' => 'Iniciar Sesión',
         'nav_register' => 'Registrarse',
+        'coding_lab' => 'Laboratorio',
         'hero_title_logged' => 'Bienvenido de vuelta',
         'hero_title_guest' => 'Domina todas tus materias',
         'hero_sub_logged' => 'Tu progreso está guardado. Continúa tu aventura educativa.',
@@ -43,48 +31,14 @@ $t = [
         'hero_go_dashboard' => 'Ir al Dashboard',
         'hero_start' => 'Comenzar Ahora',
         'hero_guest' => 'Acceso Invitado',
-        'tour_title' => 'Tour interactivo rápido',
-        'tour_sub' => 'Conoce en menos de 1 minuto las funciones clave de LC-ADVANCE.',
-        'tour_btn' => 'Ver tour guiado',
-        'feature_map_title' => 'Explora el Campus Virtual',
-        'feature_map_p1' => 'Navega por un mundo pixelado donde cada zona representa un área del conocimiento. Interactúa con maestros, descubre secretos y desbloquea contenido oculto.',
-        'feature_map_p2' => 'Un entorno inmersivo diseñado para que el aprendizaje se sienta como un RPG clásico.',
-        'feature_map_badge' => 'Exploración Interactiva',
-        'feature_learning_title' => 'Aprendizaje Estructurado',
-        'feature_learning_p1' => 'Desde las materias más difíciles como química, matemáticas, hasta el dominio de la programación con lenguajes como Python y JavaScript. Lecciones adaptativas con retroalimentación en tiempo real y contenido estructurado por semestres.',
-        'feature_learning_p2' => 'Sigue el plan de estudios oficial DGETI 2025 con herramientas modernas.',
-        'feature_learning_badge' => 'Contenido Premium',
-        'feature_duel_title' => 'Duelos de Conocimiento',
-        'feature_duel_p1' => 'Los exámenes se transforman en épicos enfrentamientos. Enfrenta a los maestros en un sistema de combate por turnos donde tu arma es el código correcto.',
-        'feature_duel_p2' => 'Gana experiencia, sube de nivel y colecciona insignias que demuestren tu valía.',
-        'feature_duel_badge' => 'Gamificación Avanzada',
-        'cta_logged' => '¡Sigue Aprendiendo!',
-        'cta_guest' => '¿Listo para comenzar?',
-        'cta_sub_logged' => 'Tu jornada educativa te espera. Accede a todas las lecciones y domina las tecnologías del futuro.',
-        'cta_sub_guest' => 'Únete a miles de estudiantes que ya están transformando su educación con LC-ADVANCE.',
         'cta_map' => 'Ir al Mapa',
-        'cta_register' => 'Registrarse Gratis',
-        'footer_product' => 'Producto',
-        'footer_resources' => 'Recursos',
-        'footer_community' => 'Comunidad',
-        'footer_map' => 'Mapa Interactivo',
-        'tour_close' => 'Cerrar tour',
-        'tour_modal_title' => 'Recorrido LC-ADVANCE',
-        'tour_modal_sub' => 'Este flujo ayuda a nuevos usuarios a entender cómo avanzar rápido.',
-        'tour_step_1' => '1) Entra al Mapa para elegir profesor o materia.',
-        'tour_step_2' => '2) Abre el Dashboard y activa filtros por objetivo.',
-        'tour_step_3' => '3) Completa una lección y ejecuta un duelo/examen.',
-        'tour_step_4' => '4) Revisa tu posición en Ranking y repite.',
-        'preview_map_desc' => 'Explora zonas, habla con profesores y entra a retos desde el campus virtual.',
-        'preview_dashboard_desc' => 'Filtra materias, revisa tu progreso y ejecuta exámenes por enfoque.',
-        'preview_duels_desc' => 'Convierte evaluaciones en combates de conocimiento con XP real.',
-        'preview_ranking_desc' => 'Compite con otros estudiantes y sigue tu crecimiento semanal.',
+        'mobile_cta' => 'Comenzar gratis',
         'cards_rank_title' => 'Sistema de Ranking',
-        'cards_rank_desc' => 'Compite globalmente con otros estudiantes. Sube en el ranking, gana insignias y demuestra tu dominio en cada materia.',
+        'cards_rank_desc' => 'Compite globalmente. Sube en el ranking, gana insignias y demuestra tu dominio en cada materia.',
         'cards_progress_title' => 'Progreso Guardado',
-        'cards_progress_desc' => 'Tu avance se sincroniza automáticamente. Retoma desde donde dejaste en cualquier dispositivo, en cualquier momento.',
+        'cards_progress_desc' => 'Tu avance se sincroniza automáticamente. Retoma desde donde dejaste en cualquier dispositivo.',
         'cards_analytics_title' => 'Análisis Detallado',
-        'cards_analytics_desc' => 'Dashboard interactivo con métricas de tu desempeño, áreas de mejora y estadísticas visuales en tiempo real.',
+        'cards_analytics_desc' => 'Dashboard interactivo con métricas de tu desempeño y estadísticas visuales en tiempo real.',
         'paths_title' => 'Rutas destacadas',
         'paths_sub' => 'Elige un camino recomendado y avanza con metas claras.',
         'path_1_title' => 'Ruta Programación Fullstack',
@@ -93,62 +47,16 @@ $t = [
         'path_2_desc' => 'Física, química y matemáticas con simulaciones y práctica guiada.',
         'path_3_title' => 'Ruta Alto Rendimiento',
         'path_3_desc' => 'Entrenamiento intensivo con ranking competitivo y duelos semanales.',
-        'daily_title' => 'Reto del día',
-        'daily_sub' => 'Completa un mini objetivo para mantener tu racha activa.',
-        'daily_goal' => 'Meta de hoy: resolver 3 lecciones y 1 duelo.',
-        'daily_btn' => 'Comenzar reto',
-        'testimonials_title' => 'Lo que dice la comunidad',
-        'testimonials_sub' => 'Experiencias reales de estudiantes que ya usan LC-ADVANCE.',
-        'testi_1' => '"Antes me costaba mantener ritmo. Con los duelos y retos diarios ahora estudio todos los días."',
-        'testi_1_author' => 'Ana, 5to semestre',
-        'testi_2' => '"El mapa y el dashboard hacen súper claro qué tema sigue y cómo voy comparado con el grupo."',
-        'testi_2_author' => 'Carlos, área de programación',
-        'testi_3' => '"Me gustó que todo se siente como juego pero sí aprendes. Subí mi promedio en matemáticas."',
-        'testi_3_author' => 'Valeria, 4to semestre',
-        'faq_title' => 'Preguntas frecuentes',
-        'faq_sub' => 'Respuestas rápidas para empezar sin fricción.',
-        'faq_1_q' => '¿Necesito pagar para usar la plataforma?',
-        'faq_1_a' => 'No, el acceso base es gratuito. Puedes avanzar por materias, mapa y duelos sin costo.',
-        'faq_2_q' => '¿Puedo usarla desde celular?',
-        'faq_2_a' => 'Sí. La experiencia es responsive y el mapa incluye controles táctiles.',
-        'faq_3_q' => '¿Cómo mejoro en el ranking?',
-        'faq_3_a' => 'Completa lecciones, aprueba evaluaciones y mantén actividad diaria para subir más rápido.',
-        'faq_4_q' => '¿Dónde veo mi progreso?',
-        'faq_4_a' => 'En tu dashboard encuentras progreso por materia, reportes y rutas sugeridas.',
-        'plans_title' => 'Planes y acceso',
-        'plans_sub' => 'Empieza gratis hoy y escala tu experiencia cuando liberes nuevas funciones.',
-        'plan_free' => 'Plan Gratis',
-        'plan_free_desc' => 'Ideal para iniciar y dominar lo esencial.',
-        'plan_plus' => 'Plan Plus (próximamente)',
-        'plan_plus_desc' => 'Funciones avanzadas para rendimiento competitivo.',
-        'plan_btn_free' => 'Empezar gratis',
-        'plan_btn_plus' => 'Notificarme',
-        'showcase_title' => 'Vista previa de la plataforma',
-        'showcase_sub' => 'Así se ve la experiencia dentro de LC-ADVANCE.',
-        'showcase_1_title' => 'Dashboard inteligente',
-        'showcase_1_desc' => 'Seguimiento por materia, progreso y recomendaciones.',
-        'showcase_2_title' => 'Mapa inmersivo',
-        'showcase_2_desc' => 'Exploración, interacción con profesores y acceso directo a retos.',
-        'showcase_3_title' => 'Duelos y ranking',
-        'showcase_3_desc' => 'Combates de conocimiento y competitividad sana.',
-        'mobile_cta' => 'Comenzar gratis',
-        'coding_lab' => 'Laboratorio de código',
-        'stat_lessons' => 'Lecciones',
-        'stat_questions' => 'Preguntas',
-        'stat_access' => 'Acceso',
-        'stat_free' => 'Gratis',
         'select_materia_title' => 'Selecciona una materia',
         'select_materia_sub' => 'Elige el área que quieres estudiar para continuar.',
         'select_materia_btn' => 'Continuar',
     ],
     'en' => [
-        'language' => 'Language',
-        'theme' => 'Theme',
-        'community' => 'Community',
         'nav_dashboard' => 'Dashboard',
         'nav_logout' => 'Log Out',
         'nav_login' => 'Log In',
         'nav_register' => 'Sign Up',
+        'coding_lab' => 'Lab',
         'hero_title_logged' => 'Welcome back',
         'hero_title_guest' => 'Master all your subjects',
         'hero_sub_logged' => 'Your progress is saved. Continue your learning adventure.',
@@ -156,48 +64,14 @@ $t = [
         'hero_go_dashboard' => 'Go to Dashboard',
         'hero_start' => 'Start Now',
         'hero_guest' => 'Guest Access',
-        'tour_title' => 'Quick interactive tour',
-        'tour_sub' => 'Learn the key LC-ADVANCE features in under one minute.',
-        'tour_btn' => 'View guided tour',
-        'feature_map_title' => 'Explore the Virtual Campus',
-        'feature_map_p1' => 'Navigate a pixel world where each zone represents a knowledge area. Interact with teachers, discover secrets, and unlock hidden content.',
-        'feature_map_p2' => 'An immersive environment designed to make learning feel like a classic RPG.',
-        'feature_map_badge' => 'Interactive Exploration',
-        'feature_learning_title' => 'Structured Learning',
-        'feature_learning_p1' => 'From challenging subjects like chemistry and math to mastering programming with Python and JavaScript. Adaptive lessons with real-time feedback and semester-based structure.',
-        'feature_learning_p2' => 'Follow the official DGETI 2025 curriculum with modern tools.',
-        'feature_learning_badge' => 'Premium Content',
-        'feature_duel_title' => 'Knowledge Duels',
-        'feature_duel_p1' => 'Exams become epic battles. Face teachers in a turn-based combat system where your weapon is correct code.',
-        'feature_duel_p2' => 'Gain experience, level up, and collect badges that prove your mastery.',
-        'feature_duel_badge' => 'Advanced Gamification',
-        'cta_logged' => 'Keep Learning!',
-        'cta_guest' => 'Ready to begin?',
-        'cta_sub_logged' => 'Your learning journey is waiting. Access all lessons and master future technologies.',
-        'cta_sub_guest' => 'Join thousands of students already transforming their education with LC-ADVANCE.',
         'cta_map' => 'Go to Map',
-        'cta_register' => 'Register Free',
-        'footer_product' => 'Product',
-        'footer_resources' => 'Resources',
-        'footer_community' => 'Community',
-        'footer_map' => 'Interactive Map',
-        'tour_close' => 'Close tour',
-        'tour_modal_title' => 'LC-ADVANCE Walkthrough',
-        'tour_modal_sub' => 'This flow helps new users understand how to progress quickly.',
-        'tour_step_1' => '1) Enter the Map to choose a teacher or subject.',
-        'tour_step_2' => '2) Open the Dashboard and apply goal-based filters.',
-        'tour_step_3' => '3) Complete a lesson and start a duel/exam.',
-        'tour_step_4' => '4) Check your Ranking position and repeat.',
-        'preview_map_desc' => 'Explore zones, talk to teachers, and launch challenges from the virtual campus.',
-        'preview_dashboard_desc' => 'Filter subjects, review progress, and run focused exams.',
-        'preview_duels_desc' => 'Turn assessments into knowledge duels with real XP.',
-        'preview_ranking_desc' => 'Compete with other students and track your weekly growth.',
+        'mobile_cta' => 'Start free',
         'cards_rank_title' => 'Ranking System',
-        'cards_rank_desc' => 'Compete globally with other students. Climb the ranking, earn badges, and prove your mastery in every subject.',
+        'cards_rank_desc' => 'Compete globally. Climb the ranking, earn badges, and prove your mastery.',
         'cards_progress_title' => 'Saved Progress',
-        'cards_progress_desc' => 'Your progress syncs automatically. Resume from where you left off on any device, anytime.',
+        'cards_progress_desc' => 'Your progress syncs automatically. Resume from where you left off on any device.',
         'cards_analytics_title' => 'Detailed Analytics',
-        'cards_analytics_desc' => 'Interactive dashboard with performance metrics, improvement areas, and real-time visual stats.',
+        'cards_analytics_desc' => 'Interactive dashboard with performance metrics and real-time visual stats.',
         'paths_title' => 'Featured paths',
         'paths_sub' => 'Choose a recommended path and progress with clear milestones.',
         'path_1_title' => 'Fullstack Programming Path',
@@ -206,989 +80,1346 @@ $t = [
         'path_2_desc' => 'Physics, chemistry, and math with simulations and guided practice.',
         'path_3_title' => 'High Performance Path',
         'path_3_desc' => 'Intensive training with competitive ranking and weekly duels.',
-        'daily_title' => 'Daily challenge',
-        'daily_sub' => 'Complete a mini goal to keep your streak active.',
-        'daily_goal' => "Today's goal: solve 3 lessons and 1 duel.",
-        'daily_btn' => 'Start challenge',
-        'testimonials_title' => 'What the community says',
-        'testimonials_sub' => 'Real experiences from students already using LC-ADVANCE.',
-        'testi_1' => '"I used to struggle with consistency. With daily challenges and duels, now I study every day."',
-        'testi_1_author' => 'Ana, 5th semester',
-        'testi_2' => '"The map and dashboard make it super clear what topic comes next and how I compare to my class."',
-        'testi_2_author' => 'Carlos, programming track',
-        'testi_3' => '"I like that it feels like a game but you actually learn. My math grades improved."',
-        'testi_3_author' => 'Valeria, 4th semester',
-        'faq_title' => 'Frequently asked questions',
-        'faq_sub' => 'Quick answers to get started without friction.',
-        'faq_1_q' => 'Do I need to pay to use the platform?',
-        'faq_1_a' => 'No, core access is free. You can progress through subjects, map, and duels at no cost.',
-        'faq_2_q' => 'Can I use it from mobile?',
-        'faq_2_a' => 'Yes. The experience is responsive and the map includes touch controls.',
-        'faq_3_q' => 'How do I improve my ranking?',
-        'faq_3_a' => 'Complete lessons, pass assessments, and stay active daily to climb faster.',
-        'faq_4_q' => 'Where can I see my progress?',
-        'faq_4_a' => 'In your dashboard you can see progress by subject, reports, and suggested paths.',
-        'plans_title' => 'Plans and access',
-        'plans_sub' => 'Start free today and scale your experience as new features unlock.',
-        'plan_free' => 'Free Plan',
-        'plan_free_desc' => 'Ideal to begin and master core fundamentals.',
-        'plan_plus' => 'Plus Plan (coming soon)',
-        'plan_plus_desc' => 'Advanced features for competitive performance.',
-        'plan_btn_free' => 'Start free',
-        'plan_btn_plus' => 'Notify me',
-        'showcase_title' => 'Platform preview',
-        'showcase_sub' => 'This is how the LC-ADVANCE experience looks inside.',
-        'showcase_1_title' => 'Smart dashboard',
-        'showcase_1_desc' => 'Subject tracking, progress analytics, and recommendations.',
-        'showcase_2_title' => 'Immersive map',
-        'showcase_2_desc' => 'Exploration, teacher interaction, and direct challenge access.',
-        'showcase_3_title' => 'Duels and ranking',
-        'showcase_3_desc' => 'Knowledge battles and healthy competitiveness.',
-        'mobile_cta' => 'Start free',
-        'coding_lab' => 'Coding lab',
-        'stat_lessons' => 'Lessons',
-        'stat_questions' => 'Questions',
-        'stat_access' => 'Access',
-        'stat_free' => 'Free',
         'select_materia_title' => 'Select a subject',
         'select_materia_sub' => 'Choose the area you want to study to continue.',
         'select_materia_btn' => 'Continue',
     ],
 ];
->>>>>>> Stashed changes
 ?>
-
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?= $lang ?>">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LC-ADVANCE</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC-ADVANCE</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+<style>
+/* ═══════════════════════════════════════════════════
+   LC-ADVANCE  ·  index.php (Dark-Cyber Theme v2025)
+   Consistent with dashboard.css styling
+   ═══════════════════════════════════════════════════ */
 
-    <!-- Fuente retro y Google Fonts para más variety -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Force dark theme for lesson pages early to avoid flash -->
-    <script>(function(){try{const KEY='lc_advance_theme'; const saved=localStorage.getItem(KEY); if(!saved && (location.pathname.indexOf('leccion_detalle.php')!==-1 || location.search.indexOf('slug=')!==-1)){ document.documentElement.classList.add('dark'); try{localStorage.setItem(KEY,'dark')}catch(e){} } }catch(e){} })();</script>
-    <!-- Icono favicon retro -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap");
 
-    <script src="assets/js/app.js" defer></script>
-    <style>
-        /* Corporate-Grade Retro Modern Style */
-        :root {
-            --accent-glow: 0 0 30px rgba(0, 255, 255, 0.3);
-            --card-bg: rgba(20, 20, 25, 0.7);
-            --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            --header-blur: blur(12px);
-            --section-spacing: clamp(40px, 8vw, 100px);
-        }
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; }
 
-        .home {
-            overflow-x: hidden;
-            background-color: #050508;
-            scroll-behavior: smooth;
-        }
+/* ── Design Tokens ── */
+:root {
+    /* Colors - Cleaner & Less Saturated */
+    --bg:          #0a0d14;
+    --surface:     #0f1423;
+    --surface2:    #141a2f;
+    --surface3:    #1a1f35;
+    --border:      rgba(0, 229, 255, 0.12);
+    --border2:     rgba(0, 229, 255, 0.18);
 
-        /* Animated Grid Background */
-        .grid-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: -1;
-            mask-image: radial-gradient(circle at center, black, transparent 80%);
-            animation: gridMove 20s linear infinite;
-        }
+    --cyan:        #00e5ff;
+    --cyan-dim:    rgba(0, 229, 255, 0.1);
+    --cyan-glow:   rgba(0, 229, 255, 0.2);
+    --pink:        #ff3cac;
+    --pink-glow:   rgba(255, 60, 172, 0.15);
+    --green:       #00ff87;
+    --yellow:      #ffd23f;
 
-        @keyframes gridMove {
-            from { background-position: 0 0; }
-            to { background-position: 0 50px; }
-        }
+    --text:        #e4f2ff;
+    --text-secondary: rgba(200, 230, 255, 0.75);
+    --text-muted:  rgba(200, 230, 255, 0.45);
 
-        .home .container {
-            max-width: 1300px !important;
-            width: 100% !important;
-            padding: 0 20px !important;
-            margin: 0 auto !important;
-            box-sizing: border-box;
-        }
+    /* Typography */
+    --font-display: "Syne", sans-serif;
+    --font-body:    "Space Grotesk", sans-serif;
+    --font-mono:    "JetBrains Mono", monospace;
 
-        /* Refined Header */
-        .header {
-            background: rgba(0, 0, 0, 0.6) !important;
-            backdrop-filter: var(--header-blur);
-            -webkit-backdrop-filter: var(--header-blur);
-            border-bottom: 1px solid rgba(255, 204, 0, 0.2) !important;
-            transition: var(--transition-smooth);
-        }
+    /* Effects */
+    --section-gap: clamp(100px, 14vw, 160px);
+    --radius:      14px;
+    --radius-lg:   20px;
+    --transition:  all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --blur:        blur(16px);
+}
 
-        /* Enhanced Hero Section */
-        .hero {
-            min-height: 95vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 100px 20px;
-            background: none;
-            position: relative;
-        }
+/* ── Base ── */
+html { scroll-behavior: smooth; }
 
-        .hero::before {
-            content: "";
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.08) 0%, transparent 50%);
-            z-index: -1;
-            animation: pulseHero 8s ease-in-out infinite;
-        }
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
 
-        @keyframes pulseHero {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 1; }
-        }
+/* ── Animated grid background ── */
+.grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridScroll 45s linear infinite;
+    opacity: 0.5;
+}
+@keyframes gridScroll {
+    to {
+        background-position: 0 60px;
+    }
+}
 
-        .hero h2 {
-            font-size: clamp(32px, 8vw, 72px);
-            font-family: var(--font-pixel);
-            background: linear-gradient(to bottom, #fff, var(--neon-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: none;
-            margin-bottom: 30px;
-            letter-spacing: -2px;
-        }
+/* Ambient glow orbs - Subtle */
+.bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+}
+.bg-orb-1 {
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.08), transparent 70%);
+    top: -200px;
+    right: -200px;
+    animation: orbPulse 20s ease-in-out infinite;
+}
+.bg-orb-2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 60, 172, 0.06), transparent 70%);
+    bottom: -150px;
+    left: -150px;
+    animation: orbPulse 22s ease-in-out infinite reverse;
+}
+@keyframes orbPulse {
+    0%, 100% { transform: scale(1) translateY(0px); }
+    50%       { transform: scale(1.15) translateY(-40px); }
+}
 
-        .hero p {
-            font-size: clamp(18px, 2.5vw, 24px);
-            font-family: var(--font-retro);
-            max-width: 900px;
-            color: var(--text-dim);
-            margin-bottom: 50px;
-            line-height: 1.4;
-        }
+/* ── Layout ── */
+.wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px);
+}
 
-        /* Stats Bar */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: clamp(20px, 5vw, 80px);
-            margin-top: 60px;
-            padding: 30px;
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: var(--header-blur);
-            animation: fadeInUp 1s ease-out 0.9s both;
-        }
+/* ─────────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────────── */
+header.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 28px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(10, 13, 20, 0.95) 0%, rgba(10, 13, 20, 0.9) 100%);
+    backdrop-filter: var(--blur);
+    border-bottom: 1px solid var(--border);
+    animation: fadeInDown 0.6s ease-out;
+    gap: 16px;
+    flex-wrap: wrap;
+}
 
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+.logo-text {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: var(--transition);
+}
 
-        .stat-value {
-            font-family: var(--font-pixel);
-            font-size: 24px;
-            color: var(--neon-yellow);
-        }
+.logo-text:hover {
+    letter-spacing: -0.3px;
+}
 
-        .stat-label {
-            font-family: var(--font-retro);
-            font-size: 14px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+.site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: linear-gradient(180deg, rgba(10, 13, 20, 0.95) 0%, rgba(10, 13, 20, 0.9) 100%);
+    backdrop-filter: var(--blur);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    transition: var(--transition);
+}
+.header-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+.brand-icon {
+    font-size: 22px;
+    animation: float 3.5s ease-in-out infinite;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-3px); }
+}
+.brand-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+    transition: var(--transition);
+}
 
-        /* Premium Feature Sections */
-        .feature-section {
-            padding: var(--section-spacing) 0;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
 
-        .feature-text h3 {
-            font-size: clamp(28px, 4vw, 42px);
-            font-family: var(--font-pixel);
-            color: #fff;
-            margin-bottom: 25px;
-            line-height: 1.1;
-        }
+/* Nav buttons */
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 16px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    transition: var(--transition);
+    white-space: nowrap;
+    color: var(--text);
+    background: rgba(15, 20, 35, 0.3);
+}
+.nav-btn:hover {
+    background: rgba(0, 229, 255, 0.08);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    transform: translateY(-1px);
+}
+.nav-btn-primary {
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    border-color: transparent;
+    color: var(--bg);
+    font-weight: 700;
+}
+.nav-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--cyan-glow);
+}
 
-        .feature-text p {
-            font-size: 20px;
-            font-family: var(--font-retro);
-            color: var(--text-dim);
-            margin-bottom: 30px;
-        }
+/* Hamburger (mobile) */
+.hamburger {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px; height: 38px;
+    border-radius: var(--radius);
+    font-size: 18px;
+    margin-left: auto;
+}
 
-        .feature-asset {
-            background: #000;
-            border: 2px solid rgba(0, 255, 255, 0.4);
-            border-radius: 12px;
-            padding: 0;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
+/* ─────────────────────────────────────────────────
+   HERO
+   ───────────────────────────────────────────────── */
+.hero {
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px;
+    position: relative;
+    overflow: hidden;
+}
 
-        .feature-asset img {
-            width: 100%;
-            height: auto;
-            max-height: 600px;
-            object-fit: contain;
-            image-rendering: pixelated;
-            transition: var(--transition-smooth);
-            display: block;
-        }
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 120% 80% at 50% 30%, rgba(0, 229, 255, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
 
-        /* Prevent image glow that can cause artifacts on some gifs */
-        .feature-asset img.glow-orange,
-        .feature-asset img.glow-cyan {
-            filter: none;
-        }
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 850px;
+}
 
-        /* Add the glow to the container instead for better performance and look */
-        .feature-section:nth-child(odd) .feature-asset {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
-        }
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--cyan);
+    border: 1px solid var(--border);
+    background: rgba(0, 229, 255, 0.05);
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 32px;
+    animation: fadeDown 0.8s ease both;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
 
-        .feature-section:nth-child(even) .feature-asset {
-            border-color: var(--neon-orange);
-            box-shadow: 0 0 25px rgba(255, 152, 0, 0.15);
-        }
+.hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6.5vw, 64px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeDown 0.9s ease 0.1s both;
+    letter-spacing: -1.2px;
+}
 
-        .feature-asset::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.05), transparent);
-            transform: translateX(-100%);
-            transition: 0.8s;
-        }
+.hero-subtitle {
+    font-size: clamp(16px, 2vw, 18px);
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin: 0 auto 56px;
+    line-height: 1.65;
+    animation: fadeDown 0.9s ease 0.2s both;
+}
 
-        .feature-section:hover .feature-asset::after {
-            transform: translateX(100%);
-        }
+.hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 80px;
+    animation: fadeDown 0.9s ease 0.3s both;
+}
 
-        /* Corporate Footer */
-        .corporate-footer {
-            padding: 100px 20px 50px;
-            background: #000;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: var(--section-spacing);
-        }
+/* CTA buttons */
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 32px;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
 
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr repeat(3, 1fr);
-            gap: 60px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+.cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+}
 
-        .footer-brand h4 {
-            font-family: var(--font-pixel);
-            color: var(--neon-yellow);
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
+.cta-btn:hover::before {
+    transform: translateX(100%);
+}
 
-        .footer-brand p {
-            color: var(--text-muted);
-            font-family: var(--font-retro);
-            line-height: 1.6;
-            max-width: 300px;
-        }
+.cta-primary {
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--pink) 100%);
+    color: var(--bg);
+    box-shadow: 0 8px 28px rgba(0, 229, 255, 0.15);
+    z-index: 1;
+}
 
-        .footer-col h5 {
-            font-family: var(--font-pixel);
-            font-size: 14px;
-            color: #fff;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-        }
+.cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 229, 255, 0.25);
+}
 
-        .footer-col ul {
-            list-style: none;
-            padding: 0;
-        }
+.cta-secondary {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+}
 
-        .footer-col ul li {
-            margin-bottom: 15px;
-        }
+.cta-secondary:hover {
+    background: rgba(0, 229, 255, 0.05);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    transform: translateY(-1px);
+}
 
-        .footer-col ul li a {
-            text-decoration: none;
-            color: var(--text-dim);
-            font-family: var(--font-retro);
-            font-size: 16px;
-            transition: 0.3s;
-        }
+/* Stats strip */
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: clamp(40px, 8vw, 80px);
+    padding: 40px 48px;
+    background: rgba(15, 20, 35, 0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    backdrop-filter: var(--blur);
+    animation: fadeDown 0.9s ease 0.4s both;
+}
 
-        .footer-col ul li a:hover {
-            color: var(--neon-cyan);
-            padding-left: 5px;
-        }
+.stat-item {
+    text-align: center;
+}
 
-        .footer-bottom {
-            margin-top: 80px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            color: var(--text-muted);
-            font-family: var(--font-retro);
-            font-size: 14px;
-        }
+.stat-value {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 800;
+    color: var(--cyan);
+    display: block;
+    margin-bottom: 6px;
+}
 
-        /* Buttons Enhancement */
-        .btn {
-            padding: 18px 32px !important;
-            font-family: var(--font-pixel) !important;
-            font-size: 12px !important;
-            border-radius: 12px !important;
-            transition: var(--transition-smooth) !important;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+.stat-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+}
 
-        .btn-start {
-            background: var(--neon-cyan) !important;
-            color: #000 !important;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3) !important;
-        }
+/* ─────────────────────────────────────────────────
+   FEATURE SECTIONS
+   ───────────────────────────────────────────────── */
+.features-wrap {
+    padding: var(--section-gap) 0;
+}
 
-        .btn-start:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.6) !important;
-        }
+.feature-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(48px, 8vw, 100px);
+    align-items: center;
+    margin-bottom: var(--section-gap);
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.feature-row.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.feature-row.reverse { direction: rtl; }
+.feature-row.reverse > * { direction: ltr; }
 
-        .btn-guest {
-            background: transparent !important;
-            border: 2px solid rgba(255, 255, 255, 0.1) !important;
-            color: #fff !important;
-        }
+/* Feature text */
+.feature-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    background: rgba(0, 229, 255, 0.06);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 700;
+}
+.feature-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+.feature-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 14px;
+}
 
-        .btn-guest:hover {
-            border-color: #fff !important;
-            background: rgba(255, 255, 255, 0.05) !important;
-        }
+/* Feature image card */
+.feature-visual {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    background: var(--surface2);
+    aspect-ratio: 16 / 10;
+    transition: var(--transition);
+}
+.feature-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.04) 0%, transparent 50%);
+    z-index: 1;
+    pointer-events: none;
+}
+.feature-visual:hover {
+    transform: translateY(-6px);
+    border-color: var(--cyan);
+    box-shadow: 0 24px 60px rgba(0, 229, 255, 0.12);
+}
+.feature-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+.feature-visual:hover img {
+    transform: scale(1.03);
+}
+    display: block;
+    transition: transform 0.6s ease;
+}
+.feature-visual:hover img { transform: scale(1.03); }
+/* Corner chrome decoration */
+.feature-visual::after {
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px;
+    width: 28px; height: 28px;
+    border-top: 2px solid var(--cyan);
+    border-left: 2px solid var(--cyan);
+    border-radius: 2px;
+    opacity: 0.6;
+    z-index: 2;
+}
+.feature-row.accent-orange .feature-visual {
+    border-color: rgba(255,152,0,0.25);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,152,0,0.06);
+}
 
-        @media (max-width: 992px) {
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .feature-section {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                text-align: center;
-            }
-            .feature-section:nth-child(even) {
-                direction: ltr;
-            }
-            .stats-bar {
-                flex-wrap: wrap;
-                gap: 30px;
-            }
-        }
+.feature-row.accent-orange .feature-badge { color: var(--pink); background: rgba(255, 60, 172, 0.08); border-color: var(--border); }
 
-        @media (max-width: 600px) {
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-    </style>
+/* ─────────────────────────────────────────────────
+   CARDS GRID
+   ───────────────────────────────────────────────── */
+.cards-section {
+    padding: var(--section-gap) 0;
+    text-align: center;
+}
+.section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--cyan);
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+.section-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5.5vw, 52px);
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 14px;
+    letter-spacing: -0.8px;
+}
+.section-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto 60px;
+    line-height: 1.65;
+}
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+.info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 28px;
+    text-align: left;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+.info-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--cyan);
+    background: var(--surface2);
+    box-shadow: 0 16px 40px rgba(0, 229, 255, 0.1);
+}
+.card-icon-wrap {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 20px;
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+.info-card:hover .card-icon-wrap {
+    transform: scale(1.08);
+    background: rgba(0, 229, 255, 0.12);
+}
+.info-card h3 {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+}
+.info-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+}
+
+/* ─────────────────────────────────────────────────
+   PATHS
+   ───────────────────────────────────────────────── */
+.paths-section { padding: var(--section-gap) 0; }
+.paths-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+}
+.path-card {
+    background: linear-gradient(135deg, rgba(15, 22, 35, 0.6), rgba(10, 15, 26, 0.4));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    backdrop-filter: var(--blur);
+}
+.path-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--pink), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+}
+.path-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 100% 100% at 50% 50%, rgba(0, 229, 255, 0.05) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+.path-card:hover {
+    transform: translateY(-12px);
+    border-color: var(--cyan);
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(255, 60, 172, 0.04));
+    box-shadow: 0 24px 64px var(--cyan-glow), inset 0 0 40px rgba(0, 229, 255, 0.04);
+}
+.path-card:hover::before { transform: scaleX(1); }
+.path-card:hover::after { opacity: 1; }
+.path-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    margin-bottom: 16px;
+    display: block;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.path-card h4 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 14px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+}
+.path-card p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────────────
+   CTA BANNER
+   ───────────────────────────────────────────────── */
+.cta-banner {
+    margin: var(--section-gap) 0;
+    padding: 80px 60px;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.12) 0%, rgba(255, 60, 172, 0.08) 100%);
+    border: 1.5px solid var(--border2);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: var(--blur);
+}
+
+.cta-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 100% 100% at 50% 0%, rgba(0, 229, 255, 0.1), transparent 60%);
+    pointer-events: none;
+}
+
+.cta-banner h2 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 20px;
+    position: relative;
+    letter-spacing: -0.8px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cta-banner p {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 620px;
+    margin: 0 auto 40px;
+    position: relative;
+    line-height: 1.7;
+}
+
+.cta-banner .hero-actions { position: relative; }
+
+
+/* ─────────────────────────────────────────────────
+   FOOTER
+   ───────────────────────────────────────────────── */
+.site-footer {
+    background: linear-gradient(180deg, var(--bg) 0%, rgba(5, 7, 9, 0.95) 100%);
+    border-top: 1px solid var(--border);
+    padding: 100px clamp(16px, 4vw, 48px) 48px;
+}
+.footer-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 64px;
+    margin-bottom: 60px;
+}
+.footer-brand-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 18px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+}
+.footer-brand-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 300px;
+    line-height: 1.7;
+}
+.footer-col h5 {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 14px; }
+.footer-col ul li a {
+    font-size: 15px;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    position: relative;
+}
+.footer-col ul li a::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--cyan);
+    transition: width 0.3s ease;
+}
+.footer-col ul li a:hover {
+    color: var(--cyan);
+}
+.footer-col ul li a:hover::before {
+    width: 100%;
+}
+.footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────────
+   MOBILE STICKY CTA
+   ───────────────────────────────────────────────── */
+.mobile-cta {
+    display: none;
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    color: var(--bg);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 40px;
+    border-radius: 999px;
+    box-shadow: 0 12px 40px var(--cyan-glow), 0 0 20px var(--pink-glow);
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    transition: var(--transition);
+}
+.mobile-cta:hover {
+    transform: translateX(-50%) translateY(-3px);
+    box-shadow: 0 16px 56px var(--cyan-glow), 0 0 32px var(--pink-glow);
+}
+
+/* ─────────────────────────────────────────────────
+   MATERIA MODAL
+   ───────────────────────────────────────────────── */
+.materia-modal {
+    display: none;
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 229, 255, 0.05));
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: var(--blur);
+}
+.materia-modal-card {
+    background: linear-gradient(135deg, var(--surface3), var(--surface2));
+    border: 1.5px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 48px;
+    max-width: 560px; width: 90%;
+    text-align: center;
+    box-shadow: 0 32px 96px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(0, 229, 255, 0.05);
+}
+.materia-modal-card h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+.materia-modal-card p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+.materia-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.materia-btn {
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(255, 60, 172, 0.04));
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    padding: 14px 12px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    transition: var(--transition);
+    cursor: pointer;
+}
+.materia-btn:hover {
+    border-color: var(--cyan);
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(255, 60, 172, 0.08));
+    color: var(--cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--cyan-glow);
+}
+.materia-btn.selected {
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    color: var(--bg);
+    border-color: transparent;
+    font-weight: 700;
+    box-shadow: 0 8px 24px var(--cyan-glow);
+}
+.materia-modal-card .submit-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, var(--cyan), var(--pink));
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 8px 24px var(--cyan-glow);
+}
+.materia-modal-card .submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px var(--cyan-glow), 0 0 20px var(--pink-glow);
+}
+.materia-modal-card .submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ─────────────────────────────────────────────────
+   ANIMATIONS
+   ───────────────────────────────────────────────── */
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+    .footer-grid { grid-template-columns: 2fr 1fr 1fr; }
+}
+
+@media (max-width: 1024px) {
+    .feature-row { grid-template-columns: 1fr; gap: 48px; }
+    .feature-row.reverse { direction: ltr; }
+    .cards-grid, .paths-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 48px; }
+    .hero-stats { gap: 32px; padding: 32px 40px; flex-wrap: wrap; }
+}
+
+@media (max-width: 768px) {
+    .header-inner { height: 56px; }
+    .site-header { padding: 0 20px; }
+    .hero { margin-top: 56px; padding: 60px 20px; }
+    .hero-stats { gap: 24px; padding: 24px 20px; }
+    .cards-grid { grid-template-columns: 1fr; gap: 16px; }
+    .paths-grid { grid-template-columns: 1fr; gap: 16px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+    .cta-banner { padding: 48px 28px; }
+    .header-nav .nav-btn:not(:last-child) { display: none; }
+    .mobile-cta { display: block; }
+    .hamburger { display: flex; align-items: center; justify-content: center; }
+    .hero-actions { flex-direction: column; width: 100%; }
+    .cta-btn { width: 100%; }
+    .materia-modal-card { padding: 32px; }
+}
+</style>
 </head>
-<body class="home">
+<body>
 
+<!-- Background effects -->
 <div class="grid-bg"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
 
-<header class="header">
-    <h1>🎮 LC-ADVANCE</h1>
-    <button class="hamburger" type="button" aria-label="Menu">☰</button>
-    <nav>
-        <?php if ($usuario_logueado): ?>
-<<<<<<< Updated upstream
-            <button class="btn btn-dashboard" onclick="window.location='mapa/index.php'">Panel de Control</button>
-            <button class="btn btn-logout" onclick="window.location='logout.php'">Cerrar Sesión</button>
-        <?php else: ?>
-            <button class="btn btn-login" onclick="window.location='login.php'">Iniciar Sesión</button>
-            <button class="btn btn-register" onclick="window.location='register.php'">Registrarse</button>
-=======
-            <button class="btn btn-primary" onclick="window.location.href='<?= $baseUrl ?>/public/dashboard.php'"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></button>
-            <button class="btn" onclick="window.location='public/coding_challenges.php'"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></button>
-            <button class="btn" onclick="window.location='public/logout.php'"><?= htmlspecialchars($t[$lang]['nav_logout']) ?></button>
-        <?php else: ?>
-            <button class="btn" onclick="window.location.href='<?= $baseUrl ?>/public/login.php'"><?= htmlspecialchars($t[$lang]['nav_login']) ?></button>
-            <button class="btn btn-primary" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['nav_register']) ?></button>
->>>>>>> Stashed changes
-        <?php endif; ?>
-    </nav>
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="site-header" id="siteHeader">
+    <div class="header-inner">
+        <a class="header-brand" href="<?= $baseUrl ?>/">
+            <span class="brand-icon">🎮</span>
+            <span class="brand-name">LC-ADVANCE</span>
+        </a>
+
+        <nav class="header-nav">
+            <?php if ($usuario_logueado): ?>
+                <a href="<?= $baseUrl ?>/public/dashboard.php" class="nav-btn"><?= $t[$lang]['nav_dashboard'] ?></a>
+                <a href="public/coding_challenges.php" class="nav-btn"><?= $t[$lang]['coding_lab'] ?></a>
+                <a href="public/logout.php" class="nav-btn"><?= $t[$lang]['nav_logout'] ?></a>
+            <?php else: ?>
+                <a href="<?= $baseUrl ?>/public/login.php" class="nav-btn"><?= $t[$lang]['nav_login'] ?></a>
+                <a href="<?= $baseUrl ?>/public/register.php" class="nav-btn nav-btn-primary"><?= $t[$lang]['nav_register'] ?></a>
+            <?php endif; ?>
+        </nav>
+    </div>
 </header>
 
-<main class="container">
-    <?php if (!empty($_GET['seleccionar_materia']) && (!empty($_GET['from']) && $_GET['from'] === 'dashboard')): 
-        require_once 'src/content.php';
-        $materias = [];
-        foreach ($lecciones as $l) $materias[] = $l['materia'] ?? 'Sin Materia';
-        $materias = array_values(array_unique($materias));
-    ?>
-    <!-- Modal select-materia -->
-    <div id="selectMateriaModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="selectMateriaTitle">
-      <div class="modal-card">
-        <button class="modal-close" aria-label="Cerrar">✖</button>
-        <h2 id="selectMateriaTitle">📚 Elige una materia para continuar</h2>
-        <p>Selecciona la materia que deseas estudiar hoy — esto configurará tu panel de estudio.</p>
-        <div class="materias-grid">
-          <?php foreach ($materias as $m): ?>
-            <a class="btn btn-primary btn-small" href="dashboard.php?materia=<?php echo urlencode($m); ?>"><?php echo htmlspecialchars($m); ?></a>
-          <?php endforeach; ?>
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+    <div class="hero-content wrap">
+        <p class="hero-eyebrow">Plataforma Educativa Gamificada · DGETI 2026</p>
+
+        <h1 class="hero-title">
+            <?= $usuario_logueado
+                ? htmlspecialchars($t[$lang]['hero_title_logged'])
+                : htmlspecialchars($t[$lang]['hero_title_guest']) ?>
+        </h1>
+
+        <p class="hero-subtitle">
+            <?= $usuario_logueado
+                ? htmlspecialchars($t[$lang]['hero_sub_logged'])
+                : htmlspecialchars($t[$lang]['hero_sub_guest']) ?>
+        </p>
+
+        <div class="hero-actions">
+            <?php if ($usuario_logueado): ?>
+                <a href="<?= $baseUrl ?>/public/mapa/index.php" class="cta-btn cta-primary">🗺 <?= $t[$lang]['cta_map'] ?></a>
+                <a href="<?= $baseUrl ?>/public/dashboard.php" class="cta-btn cta-secondary">📊 <?= $t[$lang]['nav_dashboard'] ?></a>
+            <?php else: ?>
+                <a href="<?= $baseUrl ?>/public/register.php" class="cta-btn cta-primary">⚡ <?= $t[$lang]['hero_start'] ?></a>
+                <a href="public/guest_login.php" class="cta-btn cta-secondary">👤 <?= $t[$lang]['hero_guest'] ?></a>
+            <?php endif; ?>
         </div>
-      </div>
-    </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function(){
-      const modal = document.getElementById('selectMateriaModal');
-      if (!modal) return;
-      // Auto-show the modal
-      modal.style.display = 'flex';
-      // Close handlers
-      modal.querySelector('.modal-close').addEventListener('click', ()=> modal.style.display = 'none');
-      modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display = 'none';});
-    });
-    </script>
-    <?php endif; ?>
-
-    <!-- HERO SECTION -->
-    <section class="hero">
-<<<<<<< Updated upstream
-        <?php if (!$usuario_logueado): ?>
-            <h2>DOMINA EL CÓDIGO</h2>
-            <p>La plataforma educativa que convierte el aprendizaje de programación en una aventura legendaria. Basado en estándares DGETI 2025.</p>
-            <div class="hero-btns">
-                <button class="btn btn-start" onclick="window.location='register.php'">Empezar Ahora</button>
-                <button class="btn btn-guest" onclick="window.location='guest_login.php'">Acceso Invitado</button>
-            </div>
-        <?php else: ?>
-            <h2>BIENVENIDO, <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?></h2>
-            <p>Tu progreso está guardado y listo. Continúa dominando los lenguajes del futuro.</p>
-            <div class="hero-btns">
-                <button class="btn btn-start" onclick="window.location='mapa/index.php'">Ir al Dashboard</button>
-            </div>
-        <?php endif; ?>
-
-        <div class="stats-bar">
+        <div class="hero-stats">
             <div class="stat-item">
                 <span class="stat-value">200+</span>
                 <span class="stat-label">Lecciones</span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">15k+</span>
+                <span class="stat-value">1000+</span>
                 <span class="stat-label">Preguntas</span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">24/7</span>
-                <span class="stat-label">Acceso</span>
+                <span class="stat-value">6</span>
+                <span class="stat-label">Materias</span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">100%</span>
-                <span class="stat-label">Gratis</span>
+                <span class="stat-value">FREE</span>
+                <span class="stat-label">Acceso</span>
             </div>
-=======
-        <h1><?php echo $usuario_logueado ? htmlspecialchars($t[$lang]['hero_title_logged']) : htmlspecialchars($t[$lang]['hero_title_guest']); ?></h1>
-        <p><?php echo $usuario_logueado 
-            ? htmlspecialchars($t[$lang]['hero_sub_logged'])
-            : htmlspecialchars($t[$lang]['hero_sub_guest']); 
-        ?></p>
-        <div class="hero-buttons">
-            <?php if ($usuario_logueado): ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
-            <?php else: ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['hero_start']) ?></button>
-                <button class="btn btn-hero" onclick="window.location='public/guest_login.php'"><?= htmlspecialchars($t[$lang]['hero_guest']) ?></button>
-            <?php endif; ?>
->>>>>>> Stashed changes
-        </div>
-    </section>
-
-    <!-- MAP SECTION -->
-    <section class="feature-section">
-        <div class="feature-text">
-            <h3>Explora el Campus Virtual</h3>
-            <p>Navega por un mundo pixelado donde cada edificio representa un área del conocimiento. Habla con maestros, interactúa con el entorno y desbloquea secretos.</p>
-            <p>Un entorno inmersivo diseñado para que el aprendizaje se sienta como un RPG clásico.</p>
-        </div>
-        <div class="feature-asset">
-            <img src="assets/img/map.gif" alt="Exploración en el mapa" class="glow-cyan">
-        </div>
-    </section>
-
-    <!-- LESSONS SECTION -->
-    <section class="feature-section">
-        <div class="feature-text">
-            <h3>Aprendizaje Adaptativo</h3>
-            <p>Desde C# y Python hasta desarrollo web moderno con PHP y JavaScript. Nuestras lecciones se adaptan a tu ritmo, con retroalimentación en tiempo real.</p>
-            <p>Contenido estructurado por semestres, facilitando el seguimiento del plan de estudios oficial.</p>
-        </div>
-        <div class="feature-asset">
-            <img src="assets/img/lecciones.png" alt="Aprendizaje Adaptativo" class="glow-cyan">
-        </div>
-    </section>
-
-    <!-- COMBAT SYSTEM SECTION -->
-    <section class="feature-section">
-        <div class="feature-text">
-            <h3>Duelos de Conocimiento</h3>
-            <p>Los exámenes ya no son aburridos. Enfrenta a los maestros en un sistema de combate por turnos donde tu arma es el código correcto.</p>
-            <p>Gana experiencia, sube de nivel y colecciona medallas que demuestren tu valía ante la comunidad.</p>
-        </div>
-        <div class="feature-asset">
-            <img src="assets/img/systemC.gif" alt="Maestro de Programación" class="glow-orange">
-        </div>
-    </section>
-<<<<<<< Updated upstream
-</main>
-
-<footer class="corporate-footer">
-    <div class="footer-grid">
-        <div class="footer-brand">
-            <h4>LC-ADVANCE</h4>
-            <p>Transformando la educación tecnológica mediante la gamificación y el diseño retro-futurista.</p>
-=======
-
-    <!-- FEATURES GRID -->
-    <section class="cards-grid" style="margin-top: 100px;">
-        <div class="card">
-            <div class="card-icon">🏆</div>
-            <h3><?= htmlspecialchars($t[$lang]['cards_rank_title']) ?></h3>
-            <p><?= htmlspecialchars($t[$lang]['cards_rank_desc']) ?></p>
-        </div>
-        <div class="card">
-            <div class="card-icon">⚡</div>
-            <h3><?= htmlspecialchars($t[$lang]['cards_progress_title']) ?></h3>
-            <p><?= htmlspecialchars($t[$lang]['cards_progress_desc']) ?></p>
-        </div>
-        <div class="card">
-            <div class="card-icon">🎯</div>
-            <h3><?= htmlspecialchars($t[$lang]['cards_analytics_title']) ?></h3>
-            <p><?= htmlspecialchars($t[$lang]['cards_analytics_desc']) ?></p>
-        </div>
-    </section>
-
-    <section class="landing-section">
-        <h3><?= htmlspecialchars($t[$lang]['paths_title']) ?></h3>
-        <p><?= htmlspecialchars($t[$lang]['paths_sub']) ?></p>
-        <div class="path-grid">
-            <article class="path-card">
-                <h4><?= htmlspecialchars($t[$lang]['path_1_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['path_1_desc']) ?></p>
-            </article>
-            <article class="path-card">
-                <h4><?= htmlspecialchars($t[$lang]['path_2_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['path_2_desc']) ?></p>
-            </article>
-            <article class="path-card">
-                <h4><?= htmlspecialchars($t[$lang]['path_3_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['path_3_desc']) ?></p>
-            </article>
-        </div>
-    </section>
-
-    <section class="landing-section">
-        <h3><?= htmlspecialchars($t[$lang]['daily_title']) ?></h3>
-        <p><?= htmlspecialchars($t[$lang]['daily_sub']) ?></p>
-        <div class="daily-card">
-            <div>
-                <strong style="display:block;margin-bottom:6px;"><?= htmlspecialchars($t[$lang]['daily_goal']) ?></strong>
-                <span class="countdown" id="dailyCountdown">23:59:59</span>
-            </div>
-            <button class="btn btn-primary" onclick="window.location.href='<?= $usuario_logueado ? $baseUrl.'/public/mapa/index.php' : $baseUrl.'/public/register.php' ?>'"><?= htmlspecialchars($t[$lang]['daily_btn']) ?></button>
-        </div>
-    </section>
-
-    <section class="landing-section">
-        <h3><?= htmlspecialchars($t[$lang]['testimonials_title']) ?></h3>
-        <p><?= htmlspecialchars($t[$lang]['testimonials_sub']) ?></p>
-        <div class="testimonial-grid">
-            <article class="testimonial-card">
-                <p><?= htmlspecialchars($t[$lang]['testi_1']) ?></p>
-                <span>— <?= htmlspecialchars($t[$lang]['testi_1_author']) ?></span>
-            </article>
-            <article class="testimonial-card">
-                <p><?= htmlspecialchars($t[$lang]['testi_2']) ?></p>
-                <span>— <?= htmlspecialchars($t[$lang]['testi_2_author']) ?></span>
-            </article>
-            <article class="testimonial-card">
-                <p><?= htmlspecialchars($t[$lang]['testi_3']) ?></p>
-                <span>— <?= htmlspecialchars($t[$lang]['testi_3_author']) ?></span>
-            </article>
-        </div>
-    </section>
-
-    <section class="landing-section">
-        <h3><?= htmlspecialchars($t[$lang]['faq_title']) ?></h3>
-        <p><?= htmlspecialchars($t[$lang]['faq_sub']) ?></p>
-        <div class="faq-grid">
-            <div class="faq-item">
-                <button class="faq-question"><?= htmlspecialchars($t[$lang]['faq_1_q']) ?></button>
-                <div class="faq-answer"><?= htmlspecialchars($t[$lang]['faq_1_a']) ?></div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question"><?= htmlspecialchars($t[$lang]['faq_2_q']) ?></button>
-                <div class="faq-answer"><?= htmlspecialchars($t[$lang]['faq_2_a']) ?></div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question"><?= htmlspecialchars($t[$lang]['faq_3_q']) ?></button>
-                <div class="faq-answer"><?= htmlspecialchars($t[$lang]['faq_3_a']) ?></div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question"><?= htmlspecialchars($t[$lang]['faq_4_q']) ?></button>
-                <div class="faq-answer"><?= htmlspecialchars($t[$lang]['faq_4_a']) ?></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="landing-section">
-        <h3><?= htmlspecialchars($t[$lang]['plans_title']) ?></h3>
-        <p><?= htmlspecialchars($t[$lang]['plans_sub']) ?></p>
-        <div class="plans-grid">
-            <article class="plan-card">
-                <h4><?= htmlspecialchars($t[$lang]['plan_free']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['plan_free_desc']) ?></p>
-                <div class="plan-badges">
-                    <span class="plan-badge">Mapa</span>
-                    <span class="plan-badge">Dashboard</span>
-                    <span class="plan-badge">Ranking</span>
-                </div>
-                <button class="btn btn-primary" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['plan_btn_free']) ?></button>
-            </article>
-            <article class="plan-card">
-                <h4><?= htmlspecialchars($t[$lang]['plan_plus']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['plan_plus_desc']) ?></p>
-                <div class="plan-badges">
-                    <span class="plan-badge">Mentorías</span>
-                    <span class="plan-badge">Eventos</span>
-                    <span class="plan-badge">Labs</span>
-                </div>
-                <button class="btn" onclick="window.location='public/community.php'"><?= htmlspecialchars($t[$lang]['plan_btn_plus']) ?></button>
-            </article>
-        </div>
-    </section>
-
-    <section class="landing-section">
-        <h3><?= htmlspecialchars($t[$lang]['showcase_title']) ?></h3>
-        <p><?= htmlspecialchars($t[$lang]['showcase_sub']) ?></p>
-        <div class="showcase-grid">
-            <article class="showcase-card">
-                <div class="mockup-frame">
-                    <div class="mockup-line long"></div>
-                    <div class="mockup-line mid"></div>
-                    <div class="mockup-line short"></div>
-                </div>
-                <h4><?= htmlspecialchars($t[$lang]['showcase_1_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['showcase_1_desc']) ?></p>
-            </article>
-            <article class="showcase-card">
-                <div class="mockup-frame">
-                    <div class="mockup-line mid"></div>
-                    <div class="mockup-line long"></div>
-                    <div class="mockup-line short"></div>
-                </div>
-                <h4><?= htmlspecialchars($t[$lang]['showcase_2_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['showcase_2_desc']) ?></p>
-            </article>
-            <article class="showcase-card">
-                <div class="mockup-frame">
-                    <div class="mockup-line short"></div>
-                    <div class="mockup-line long"></div>
-                    <div class="mockup-line mid"></div>
-                </div>
-                <h4><?= htmlspecialchars($t[$lang]['showcase_3_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['showcase_3_desc']) ?></p>
-            </article>
-        </div>
-    </section>
-
-    <!-- CTA SECTION -->
-    <section class="cta-section">
-        <h2><?php echo $usuario_logueado ? htmlspecialchars($t[$lang]['cta_logged']) : htmlspecialchars($t[$lang]['cta_guest']); ?></h2>
-        <p><?php echo $usuario_logueado 
-            ? htmlspecialchars($t[$lang]['cta_sub_logged'])
-            : htmlspecialchars($t[$lang]['cta_sub_guest']); 
-        ?></p>
-        <div class="hero-buttons">
-            <?php if ($usuario_logueado): ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/mapa/index.php'"><?= htmlspecialchars($t[$lang]['cta_map']) ?></button>
-            <?php else: ?>
-                <button class="btn btn-primary btn-hero" onclick="window.location.href='<?= $baseUrl ?>/public/register.php'"><?= htmlspecialchars($t[$lang]['cta_register']) ?></button>
-            <?php endif; ?>
-        </div>
-    </section>
-
-</main>
-
-<!-- FOOTER -->
-<footer>
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h3>🎮 LC-ADVANCE</h3>
-                <p>Transformando la educación tecnológica mediante gamificación y diseño moderno.</p>
-            </div>
-            <div class="footer-col">
-                <h4><?= htmlspecialchars($t[$lang]['footer_product']) ?></h4>
-                <ul>
-                    <li><a href="<?php echo $usuario_logueado ? $baseUrl.'/public/mapa/index.php' : $baseUrl.'/public/gatekeeper.php?redirect=public/mapa/index.php'; ?>"><?= htmlspecialchars($t[$lang]['footer_map']) ?></a></li>
-                    <li><a href="<?php echo $usuario_logueado ? $baseUrl.'/public/dashboard.php' : $baseUrl.'/public/gatekeeper.php?redirect=public/dashboard.php'; ?>"><?= htmlspecialchars($t[$lang]['nav_dashboard']) ?></a></li>
-                    <li><a href="<?php echo $usuario_logueado ? 'public/ranking.php' : 'public/gatekeeper.php?redirect=ranking.php'; ?>">Ranking</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4><?= htmlspecialchars($t[$lang]['footer_resources']) ?></h4>
-                <ul>
-                    <li><a href="public/docs.php?file=README.md">Documentación</a></li>
-                    <li><a href="public/docs.php?file=DEVELOPMENT.md">Guía de Desarrollo</a></li>
-                    <li><a href="public/docs.php?file=API.md">API Reference</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4><?= htmlspecialchars($t[$lang]['footer_community']) ?></h4>
-                <ul>
-                    <li><a href="https://github.com" target="_blank">GitHub</a></li>
-                    <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
-                    <li><a href="<?php echo $usuario_logueado ? 'public/community.php' : 'public/gatekeeper.php?redirect=community.php'; ?>"><?= htmlspecialchars($t[$lang]['community']) ?></a></li>
-                    <li><a href="public/register.php">Unirse</a></li>
-                </ul>
-            </div>
->>>>>>> Stashed changes
-        </div>
-        <div class="footer-col">
-            <h5>Producto</h5>
-            <ul>
-                <?php if ($usuario_logueado): ?>
-                    <li><a href="mapa/index.php">Mapa Interactivo</a></li>
-                    <li><a href="dashboard.php">Dashboard</a></li>
-                    <li><a href="ranking.php">Ranking Global</a></li>
-                <?php else: ?>
-                    <li><a href="gatekeeper.php?redirect=mapa/index.php">Mapa Interactivo</a></li>
-                    <li><a href="gatekeeper.php?redirect=dashboard.php">Dashboard</a></li>
-                    <li><a href="gatekeeper.php?redirect=ranking.php">Ranking Global</a></li>
-                <?php endif; ?>
-            </ul>
-        </div>
-        <div class="footer-col">
-            <h5>Recursos</h5>
-            <ul>
-                <li><a href="docs.php?file=README.md">Documentación</a></li>
-                <li><a href="docs.php?file=DEVELOPMENT.md">Guía de Desarrollo</a></li>
-                <li><a href="docs.php?file=API.md">API Reference</a></li>
-            </ul>
-        </div>
-        <div class="footer-col">
-            <h5>Comunidad</h5>
-            <ul>
-                <li><a href="https://github.com/cervanlfc7/LC-ADVANCE" target="_blank">GitHub</a></li>
-                <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
-                <li><a href="register.php">Registrarse</a></li>
-            </ul>
         </div>
     </div>
-    <div class="footer-bottom">
-        <p>© 2025-2026 LC-ADVANCE. Todos los derechos reservados.</p>
-        <div class="footer-links">
-            <span style="margin-left: 20px;">Hecho con 💚 para estudiantes de DGETI</span>
+</section>
+
+<!-- ═══════════════ FEATURES ═══════════════ -->
+<div class="wrap features-wrap">
+
+    <!-- Mapa -->
+    <div class="feature-row js-reveal">
+        <div class="feature-text">
+            <span class="feature-badge">🗺 Exploración Interactiva</span>
+            <h2 class="feature-title">Explora el Campus Virtual</h2>
+            <p class="feature-desc">Navega por un mundo pixelado donde cada edificio representa un área del conocimiento. Habla con maestros, interactúa con el entorno y desbloquea secretos.</p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;">Un entorno inmersivo diseñado para que el aprendizaje se sienta como un RPG clásico.</p>
+        </div>
+        <div class="feature-visual">
+            <img src="public/assets/img/map.gif" alt="Campus virtual — mapa interactivo">
+        </div>
+    </div>
+
+    <!-- Lecciones -->
+    <div class="feature-row reverse js-reveal">
+        <div class="feature-text">
+            <span class="feature-badge">📚 Contenido Premium</span>
+            <h2 class="feature-title">Aprendizaje Adaptativo</h2>
+            <p class="feature-desc">Desde C# y Python hasta desarrollo web moderno. Lecciones adaptativas con retroalimentación en tiempo real y contenido estructurado por semestres.</p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;">Sigue el plan de estudios oficial DGETI 2025 con herramientas modernas.</p>
+        </div>
+        <div class="feature-visual">
+            <img src="public/assets/img/dashboard.png" alt="Sistema de lecciones adaptativas">
+        </div>
+    </div>
+
+    <!-- Duelos -->
+    <div class="feature-row accent-orange js-reveal">
+        <div class="feature-text">
+            <span class="feature-badge">⚔ Gamificación Avanzada</span>
+            <h2 class="feature-title">Duelos de Conocimiento</h2>
+            <p class="feature-desc">Los exámenes se convierten en épicos enfrentamientos. Enfrenta a los maestros en combate por turnos donde tu arma es el código correcto.</p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;">Gana experiencia, sube de nivel y colecciona insignias que demuestren tu valía.</p>
+        </div>
+        <div class="feature-visual">
+            <img src="public/assets/img/systemC.gif" alt="Sistema de duelos y combate">
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══════════════ CARDS ═══════════════ -->
+<section class="cards-section">
+    <div class="wrap">
+        <p class="section-label">Características</p>
+        <h2 class="section-title">Todo lo que necesitas para aprender</h2>
+        <p class="section-sub">Una plataforma completa diseñada para el estudiante moderno.</p>
+        <div class="cards-grid">
+            <div class="info-card">
+                <div class="card-icon-wrap">🏆</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_rank_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_rank_desc']) ?></p>
+            </div>
+            <div class="info-card">
+                <div class="card-icon-wrap">⚡</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_progress_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_progress_desc']) ?></p>
+            </div>
+            <div class="info-card">
+                <div class="card-icon-wrap">🎯</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_analytics_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_analytics_desc']) ?></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ PATHS ═══════════════ -->
+<section class="paths-section">
+    <div class="wrap">
+        <p class="section-label">Rutas de Aprendizaje</p>
+        <h2 class="section-title"><?= htmlspecialchars($t[$lang]['paths_title']) ?></h2>
+        <p class="section-sub"><?= htmlspecialchars($t[$lang]['paths_sub']) ?></p>
+        <div class="paths-grid">
+            <div class="path-card">
+                <span class="path-num">RUTA 01</span>
+                <h4><?= htmlspecialchars($t[$lang]['path_1_title']) ?></h4>
+                <p><?= htmlspecialchars($t[$lang]['path_1_desc']) ?></p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">RUTA 02</span>
+                <h4><?= htmlspecialchars($t[$lang]['path_2_title']) ?></h4>
+                <p><?= htmlspecialchars($t[$lang]['path_2_desc']) ?></p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">RUTA 03</span>
+                <h4><?= htmlspecialchars($t[$lang]['path_3_title']) ?></h4>
+                <p><?= htmlspecialchars($t[$lang]['path_3_desc']) ?></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ CTA BANNER ═══════════════ -->
+<div class="wrap">
+    <div class="cta-banner">
+        <h2>¿Listo para comenzar tu aventura?</h2>
+        <p>Únete a estudiantes que ya están transformando su educación con LC-ADVANCE.</p>
+        <div class="hero-actions">
+            <?php if ($usuario_logueado): ?>
+                <a href="<?= $baseUrl ?>/public/mapa/index.php" class="cta-btn cta-primary">🗺 <?= $t[$lang]['cta_map'] ?></a>
+            <?php else: ?>
+                <a href="<?= $baseUrl ?>/public/register.php" class="cta-btn cta-primary">⚡ Registrarse Gratis</a>
+                <a href="public/guest_login.php" class="cta-btn cta-secondary">👤 <?= $t[$lang]['hero_guest'] ?></a>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <div>
+                <p class="footer-brand-name">🎮 LC-ADVANCE</p>
+                <p class="footer-brand-desc">Plataforma educativa gamificada para estudiantes DGETI. Aprende, compite y crece.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Producto</h5>
+                <ul>
+                    <?php if ($usuario_logueado): ?>
+                        <li><a href="<?= $baseUrl ?>/public/mapa/index.php">Mapa Interactivo</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/dashboard.php">Dashboard</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/ranking.php">Ranking Global</a></li>
+                    <?php else: ?>
+                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=mapa/index.php">Mapa Interactivo</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=dashboard.php">Dashboard</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=ranking.php">Ranking Global</a></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Recursos</h5>
+                <ul>
+                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=README.md">Documentación</a></li>
+                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=DEVELOPMENT.md">Desarrollo</a></li>
+                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=API.md">API Reference</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Comunidad</h5>
+                <ul>
+                    <li><a href="https://github.com/cervanlfc7/LC-ADVANCE" target="_blank">GitHub</a></li>
+                    <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
+                    <li><a href="<?= $baseUrl ?>/public/register.php">Registrarse</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2025–2026 LC-ADVANCE · Todos los derechos reservados.</span>
+            <span>Hecho con 💚 para estudiantes de DGETI</span>
         </div>
     </div>
 </footer>
 
-<<<<<<< Updated upstream
-=======
-<a class="mobile-sticky-cta" href="<?= $usuario_logueado ? $baseUrl.'/public/dashboard.php' : $baseUrl.'/public/register.php' ?>">
+<!-- Mobile sticky CTA -->
+<a class="mobile-cta" href="<?= $usuario_logueado ? $baseUrl.'/public/dashboard.php' : $baseUrl.'/public/register.php' ?>">
     <?= htmlspecialchars($t[$lang]['mobile_cta']) ?>
 </a>
 
->>>>>>> Stashed changes
-<script>
-    // Advanced Intersection Observer
-    const observerOptions = {
-        threshold: 0.15,
-        rootMargin: "0px 0px -50px 0px"
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = "1";
-                entry.target.style.transform = "translateY(0)";
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll('.feature-section').forEach(section => {
-        section.style.opacity = "0";
-        section.style.transform = "translateY(50px)";
-        section.style.transition = "var(--transition-smooth)";
-        observer.observe(section);
-    });
-
-    // Header effect on scroll
-    window.addEventListener('scroll', () => {
-        const header = document.querySelector('.header');
-        if (window.scrollY > 50) {
-            header.style.padding = "10px 20px";
-            header.style.background = "rgba(0, 0, 0, 0.8) !important";
-        } else {
-            header.style.padding = "15px 20px";
-            header.style.background = "rgba(0, 0, 0, 0.6) !important";
-        }
-    });
-</script>
-
-<<<<<<< Updated upstream
-=======
-<div class="tour-modal" id="tourModal" aria-hidden="true">
-    <div class="tour-content">
-        <h4><?= htmlspecialchars($t[$lang]['tour_modal_title']) ?></h4>
-        <p><?= htmlspecialchars($t[$lang]['tour_modal_sub']) ?></p>
-        <div class="tour-preview" id="tourPreview">
-            <div class="tour-frame">
-                <div class="tour-screen active" data-step="1">
-                    <h5>Mapa interactivo</h5>
-                    <div class="tour-status">
-                        <span class="tour-chip">Explora el campus</span>
-                        <span class="tour-chip">Habla con profesores</span>
-                    </div>
-                    <p>Visualiza la zona principal del mapa, los puntos de acceso y la guía para entrar desde el campus virtual directamente a lecciones y retos.</p>
-                </div>
-                <div class="tour-screen" data-step="2">
-                    <h5>Dashboard dinámico</h5>
-                    <div class="tour-status">
-                        <span class="tour-chip">Filtros por materia</span>
-                        <span class="tour-chip">Progreso guardado</span>
-                    </div>
-                    <p>El dashboard muestra tu progreso real, los objetivos del día y las métricas que te ayudan a avanzar con enfoque.</p>
-                </div>
-                <div class="tour-screen" data-step="3">
-                    <h5>Duelo y examen</h5>
-                    <div class="tour-status">
-                        <span class="tour-chip">Combates de conocimiento</span>
-                        <span class="tour-chip">XP y nivel</span>
-                    </div>
-                    <p>Cada evaluación funciona como un duelo: responde, acumula puntos y desbloquea nuevas rutas en el mapa.</p>
-                </div>
-                <div class="tour-screen" data-step="4">
-                    <h5>Ranking y logros</h5>
-                    <div class="tour-status">
-                        <span class="tour-chip">Posición global</span>
-                        <span class="tour-chip">Rutas recomendadas</span>
-                    </div>
-                    <p>Consulta tu posición frente a otros estudiantes y usa el ranking para mejorar punto por punto.</p>
-                </div>
-            </div>
-        </div>
-        <ul class="tour-steps" id="tourStepList">
-            <li class="active"><?= htmlspecialchars($t[$lang]['tour_step_1']) ?></li>
-            <li><?= htmlspecialchars($t[$lang]['tour_step_2']) ?></li>
-            <li><?= htmlspecialchars($t[$lang]['tour_step_3']) ?></li>
-            <li><?= htmlspecialchars($t[$lang]['tour_step_4']) ?></li>
-        </ul>
-        <div class="tour-controls">
-            <button class="btn" id="tourPrev" disabled>Anterior</button>
-            <span class="tour-progress" id="tourProgress">1 / 4</span>
-            <button class="btn btn-primary" id="tourNext">Siguiente</button>
-        </div>
-        <button class="btn btn-primary" id="closeTourBtn"><?= htmlspecialchars($t[$lang]['tour_close']) ?></button>
-    </div>
-</div>
-
-<!-- MATERIA SELECTION MODAL -->
+<!-- ═══════════════ MATERIA MODAL ═══════════════ -->
 <?php if (!empty($_GET['seleccionar_materia'])): ?>
 <?php
 $todas_materias = [
-    'Pensamiento Matemático III',
-    'Física I',
-    'Química I',
-    'Programación',
-    'Inglés',
-    'Temas Selectos de Matemáticas I y II',
-    'Historia de México',
-    'Ciencias Sociales',
-    'Ecosistemas',
-    'Biología',
-    'Economía',
-    'Taller de Lectura y Redacción',
+    'Pensamiento Matemático III', 'Física I', 'Química I', 'Programación',
+    'Inglés', 'Temas Selectos de Matemáticas I y II', 'Historia de México',
+    'Ciencias Sociales', 'Ecosistemas', 'Biología', 'Economía', 'Taller de Lectura y Redacción',
 ];
 sort($todas_materias);
 ?>
 <div id="materiaModal" class="materia-modal" style="display:flex;">
-    <div class="materia-modal-content">
-        <h2><?= htmlspecialchars($t[$lang]['select_materia_title']) ?></h2>
+    <div class="materia-modal-card">
+        <h2>📚 <?= htmlspecialchars($t[$lang]['select_materia_title']) ?></h2>
         <p><?= htmlspecialchars($t[$lang]['select_materia_sub']) ?></p>
         <form method="get" action="<?= $baseUrl ?>/public/dashboard.php">
             <input type="hidden" name="materia" id="selectedMateriaInput" value="">
             <div class="materia-grid">
                 <?php foreach ($todas_materias as $m): ?>
-                    <button type="button" class="materia-btn" data-materia="<?= htmlspecialchars($m) ?>" onclick="selectMateria('<?= htmlspecialchars(addslashes($m)) ?>')">
+                    <button type="button" class="materia-btn"
+                        data-materia="<?= htmlspecialchars($m) ?>"
+                        onclick="selectMateria(this, '<?= htmlspecialchars(addslashes($m)) ?>')">
                         <?= htmlspecialchars($m) ?>
                     </button>
                 <?php endforeach; ?>
             </div>
-            <button type="submit" class="btn btn-primary" id="materiaContinueBtn" disabled><?= htmlspecialchars($t[$lang]['select_materia_btn']) ?></button>
+            <button type="submit" class="submit-btn" id="materiaContinueBtn" disabled>
+                <?= htmlspecialchars($t[$lang]['select_materia_btn']) ?>
+            </button>
         </form>
     </div>
 </div>
-<style>
-.materia-modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; display:none; align-items:center; justify-content:center; }
-.materia-modal-content { background:#101828; border:1px solid rgba(0,229,255,.3); border-radius:16px; padding:32px; max-width:500px; width:90%; text-align:center; }
-.materia-modal-content h2 { color:#00e5ff; margin:0 0 12px; font-size:24px; }
-.materia-modal-content p { color:rgba(220,236,255,.7); margin:0 0 24px; }
-.materia-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
-.materia-btn { background:#0c1525; border:1px solid rgba(0,229,255,.2); color:#e8f4ff; padding:12px 8px; border-radius:8px; cursor:pointer; font-size:13px; transition:all .2s; }
-.materia-btn:hover { border-color:#00e5ff; background:rgba(0,229,255,.1); }
-.materia-btn.selected { background:#00e5ff; color:#061523; border-color:#00e5ff; font-weight:700; }
-.materia-modal-content .btn-primary { width:100%; padding:14px; font-size:16px; }
-.materia-modal-content .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
-</style>
 <script>
-function selectMateria(materia) {
+function selectMateria(btn, materia) {
     document.querySelectorAll('.materia-btn').forEach(b => b.classList.remove('selected'));
-    document.querySelector('.materia-btn[data-materia="'+materia+'"]').classList.add('selected');
+    btn.classList.add('selected');
     document.getElementById('selectedMateriaInput').value = materia;
     document.getElementById('materiaContinueBtn').disabled = false;
 }
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('materiaModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+});
 </script>
 <?php endif; ?>
 
->>>>>>> Stashed changes
+<script>
+// ── Scroll-triggered reveal ──────────────────────
+(function() {
+    var els = document.querySelectorAll('.js-reveal');
+    if (!('IntersectionObserver' in window)) {
+        els.forEach(function(el) { el.classList.add('visible'); });
+        return;
+    }
+    var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                obs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function(el) { obs.observe(el); });
+})();
+
+// ── Header shrink on scroll ──────────────────────
+(function() {
+    var header = document.getElementById('siteHeader');
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 60) {
+            header.style.background = 'rgba(5,5,8,0.92)';
+            header.style.borderBottomColor = 'rgba(255,204,0,0.10)';
+        } else {
+            header.style.background = 'rgba(5,5,8,0.70)';
+            header.style.borderBottomColor = 'rgba(255,204,0,0.18)';
+        }
+    }, { passive: true });
+})();
+</script>
+
 </body>
-</html>
 </html>

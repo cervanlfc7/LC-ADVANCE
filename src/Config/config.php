@@ -138,16 +138,39 @@ function requireLogin($allowGuest = true) {
     if (empty($_SESSION['usuario_id']) && (empty($_SESSION['usuario_es_invitado']) || !$allowGuest)) { redirigir('public/login.php'); }
 }
 
+function getMateriasValidas() {
+    return [
+        'Temas Selectos de Matemáticas I y II',
+        'Inglés',
+        'Pensamiento Matemático III',
+        'Programación',
+        'Física I',
+        'Química I',
+        'Ecosistemas',
+        'Ciencias Sociales',
+        'Historia de México',
+    ];
+}
+
+function isValidMateria($materia) {
+    if (empty($materia)) {
+        return false;
+    }
+    return in_array(trim($materia), getMateriasValidas(), true);
+}
+
 function requireMateriaContext() {
     iniciarSesionSegura();
     $materia = null;
-    if (!empty($_GET['materia'])) { $materia = trim($_GET['materia']); $_SESSION['selected_materia'] = $materia; }
-    elseif (!empty($_SESSION['selected_materia'])) { $materia = $_SESSION['selected_materia']; }
-    if (empty($materia)) {
-        $script = basename($_SERVER['PHP_SELF'] ?? '');
-        if ($script === 'dashboard.php' && !empty($_GET['profesor'])) { return null; }
+    if (!empty($_GET['materia'])) {
+        $materia = trim($_GET['materia']);
+    } elseif (!empty($_SESSION['selected_materia'])) {
+        $materia = trim($_SESSION['selected_materia']);
+    }
+    if (!isValidMateria($materia)) {
         redirigir('index.php?seleccionar_materia=1');
     }
+    $_SESSION['selected_materia'] = $materia;
     return $materia;
 }
 

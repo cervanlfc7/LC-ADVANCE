@@ -343,7 +343,7 @@ if (isset($_SESSION['usuario_id'])) {
         <div class="options">
             <a href="login.php?redirect=<?php echo urlencode($redirect); ?>" class="btn btn-login">INICIAR SESIÓN</a>
             <a href="guest_login.php?redirect=<?php echo urlencode($redirect); ?>" class="btn btn-guest">ACCESO INVITADO</a>
-            <a href="../../index.php" class="back-link">VOLVER AL INICIO</a>
+            <a href="../index.php" class="back-link">VOLVER AL INICIO</a>
         </div>
     </div>
 <audio id="pageMusic" loop>

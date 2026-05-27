@@ -27,8 +27,8 @@ if ($player_gender === 'M' && empty($_SESSION['usuario_es_invitado']) && $usuari
     }
 }
 
-$session_key = "map.player_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
-$npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest');
+$session_key = "map.player_pos_" . ($_SESSION['usuario_id'] ?? 'guest') . '_' . session_id();
+$npc_key = "map.npc_pos_" . ($_SESSION['usuario_id'] ?? 'guest') . '_' . session_id();
 ?>
 <script>
 const P_KEY = "<?php echo $session_key; ?>";
@@ -231,7 +231,7 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
       <div class="menu-btns">
         <button onclick="document.getElementById('pauseMenu').style.display='none'">▶ CONTINUAR</button>
         <button class="reset" onclick="localStorage.removeItem('<?php echo $session_key; ?>'); localStorage.removeItem('<?php echo $npc_key; ?>'); location.reload();">⟳ RESET POSICIÓN</button>
-        <button class="char" onclick="window.location.href='../seleccionar_personaje.php?from=mapa'">CAMBIAR PERSONAJE</button>
+        <button class="char" onclick="guardarPosYIr(); return false;">CAMBIAR PERSONAJE</button>
         <button class="exit" onclick="window.location.href='../../index.php'">⏻ SALIR</button>
       </div>
       <div class="volume-section">
@@ -385,10 +385,16 @@ function raycast(ox, oy, angle, maxD) {
   }
   return maxD;
 }
+function buildNpcId(x, y, inter) {
+  return `npc-${Math.round(x)}-${Math.round(y)}-${identificarProfesor(inter) || 'Profesor'}`;
+}
+
 class NPC {
   constructor(name, tiles, x, y, inter) {
     this.name  = name; this.tiles = tiles;
     this.x = x; this.y = y; this.bx = x; this.by = y;
+    this.originX = x; this.originY = y;
+    this.id = buildNpcId(x, y, inter);
     this.tx = x; this.ty = y; this.inter = inter;
     this.speed      = 42 + Math.random() * 16;
     this.waitTimer  = Math.random() * 0.6;
@@ -422,55 +428,96 @@ class NPC {
     this._pickNewTarget();
   }
   update(dt) {
-    if (Math.hypot(this.x-world.player.x, this.y-world.player.y) < 26) return;
+    const playerDist = Math.hypot(this.x - world.player.x, this.y - world.player.y);
+    if (playerDist < 26) return;
     if (this.waitTimer > 0) { this.waitTimer -= dt; return; }
-    if (Math.hypot(this.x-this.bx, this.y-this.by) > this.patrolRadius*1.3) {
-      const back=walkableNear(this.bx, this.by, 80);
-      this.tx=back.x; this.ty=back.y; this.steerOffset=0;
+
+    if (Math.hypot(this.x - this.bx, this.y - this.by) > this.patrolRadius * 1.35) {
+      const back = walkableNear(this.bx, this.by, 90);
+      this.tx = back.x;
+      this.ty = back.y;
+      this.steerOffset = 0;
     }
-    if (Math.hypot(this.x-this.tx, this.y-this.ty) < 6) {
-      this._pickNewTarget(); return;
+
+    if (Math.hypot(this.x - this.tx, this.y - this.ty) < 8) {
+      this._pickNewTarget();
+      return;
     }
-    const baseAngle = Math.atan2(this.ty-this.y, this.tx-this.x);
-    const RAY = 32;
-    const freeAhead = raycast(this.x, this.y, baseAngle + this.steerOffset, RAY);
-    if (freeAhead < RAY * 0.55) {
-      this.steerOffset += this.steerDir * (Math.PI / 8);
-      if (Math.abs(this.steerOffset) > Math.PI * 1.1) {
-        this.steerDir   *= -1;
-        this.steerOffset = this.steerDir * Math.PI / 8;
+
+    const baseAngle = Math.atan2(this.ty - this.y, this.tx - this.x);
+    const playerBias = playerDist < 180 ? Math.atan2(this.y - world.player.y, this.x - world.player.x) : baseAngle;
+    const smartAngle = (baseAngle * 0.65) + (playerBias * 0.35) + (this.steerOffset * 0.35);
+
+    const candidates = [
+      smartAngle - 0.0,
+      smartAngle - 0.35,
+      smartAngle + 0.35,
+      smartAngle - 0.70,
+      smartAngle + 0.70,
+      smartAngle - 1.05,
+      smartAngle + 1.05,
+    ];
+
+    let best = null;
+    let bestScore = -Infinity;
+    for (const angle of candidates) {
+      const ray = raycast(this.x, this.y, angle, 28);
+      const dx = Math.cos(angle) * this.speed * dt;
+      const dy = Math.sin(angle) * this.speed * dt;
+      const nextX = this.x + dx;
+      const nextY = this.y + dy;
+      const collision = checkColNPC(nextX, nextY);
+      const toTarget = Math.hypot(this.tx - nextX, this.ty - nextY);
+      const toPlayer = Math.hypot(world.player.x - nextX, world.player.y - nextY);
+      const avoidOthers = world.npcs
+        .filter(other => other !== this)
+        .map(other => Math.hypot(nextX - other.x, nextY - other.y))
+        .reduce((a, b) => Math.min(a, b), Infinity);
+      const openness = ray / 28;
+      let score = (1000 / (toTarget + 1)) + (openness * 35) + (avoidOthers > 18 ? 18 : 0);
+      if (playerDist < 120) {
+        score += toPlayer > 40 ? 10 : -18;
       }
-    } else {
-      this.steerOffset *= 0.82;
-      if (Math.abs(this.steerOffset) < 0.05) this.steerOffset = 0;
+      if (!collision) {
+        score += 18;
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        best = { angle, dx, dy };
+      }
     }
-    const moveAngle = baseAngle + this.steerOffset;
-    const sx = Math.cos(moveAngle) * this.speed * dt;
-    const sy = Math.sin(moveAngle) * this.speed * dt;
-    let movedX = false, movedY = false;
-    if (!checkColNPC(this.x+sx, this.y)) { this.x += sx; movedX = true; }
-    if (!checkColNPC(this.x, this.y+sy)) { this.y += sy; movedY = true; }
+
+    if (!best) {
+      this._pickNewTarget();
+      return;
+    }
+
+    this.steerOffset = (this.steerOffset * 0.7) + (best.angle - baseAngle) * 0.3;
+    let movedX = false;
+    let movedY = false;
+    if (!checkColNPC(this.x + best.dx, this.y)) { this.x += best.dx; movedX = true; }
+    if (!checkColNPC(this.x, this.y + best.dy)) { this.y += best.dy; movedY = true; }
+
     for (const other of world.npcs) {
       if (other === this) continue;
-      const dx = this.x - other.x, dy = this.y - other.y;
+      const dx = this.x - other.x;
+      const dy = this.y - other.y;
       const dist = Math.hypot(dx, dy);
-      if (dist < 14 && dist > 0) {
-        const push = (14 - dist) / 14 * 2.5;
-        this.x += (dx/dist)*push; this.y += (dy/dist)*push;
+      if (dist < 16 && dist > 0) {
+        const push = (16 - dist) / 16 * 2.8;
+        this.x += (dx / dist) * push;
+        this.y += (dy / dist) * push;
       }
     }
+
     if (!movedX && !movedY) {
-      this.stuckTimer  += dt;
+      this.stuckTimer += dt;
       this.escapeTimer += dt;
-      if (this.stuckTimer > 0.25) {
-        this._pickNewTarget();
-      }
-      if (this.escapeTimer > 1.2) {
-        this._hardEscape();
-      }
+      if (this.stuckTimer > 0.18) this._pickNewTarget();
+      if (this.escapeTimer > 0.8) this._hardEscape();
     } else {
-      this.stuckTimer  = 0;
-      this.escapeTimer = Math.max(0, this.escapeTimer - dt*1.5);
+      this.stuckTimer = 0;
+      this.escapeTimer = Math.max(0, this.escapeTimer - dt * 1.2);
     }
   }
   draw() {
@@ -639,6 +686,7 @@ let isMoving = false;
 let lastDirection = 'D';
 let animFrame = 0;
 let animTimer = 0;
+let autosaveTimer = 0;
 const ANIM_SPEED = 160;
 function getTile(gid) {
   const raw=gid; gid&=~0xE0000000; if(!gid)return null; const ts=world.tilesets.find(t=>gid>=t.firstgid&&gid<=t.lastgid);
@@ -680,6 +728,12 @@ function updateGame(dt) {
   world.cameraX += (world.player.x - canvas.width  / (2 * ZOOM) - world.cameraX) * 0.15;
   world.cameraY += (world.player.y - canvas.height / (2 * ZOOM) - world.cameraY) * 0.15;
 
+  autosaveTimer += dt;
+  if (autosaveTimer >= 0.5) {
+    saveState();
+    autosaveTimer = 0;
+  }
+
 
   // ====== NUEVA LÓGICA DE INTERACCIÓN CON PROFESORES ======
   const INTERACT_DIST = 28;
@@ -719,9 +773,23 @@ function updateGame(dt) {
 
   if (KEYS.has("escape")) { document.getElementById("pauseMenu").style.display = 'block'; KEYS.delete("escape"); }
 }
-function saveState(){ localStorage.setItem(P_KEY, JSON.stringify({x:world.player.x,y:world.player.y}));
-localStorage.setItem(NPC_KEY, JSON.stringify(world.npcs.map(n=>({x:n.x,y:n.y}))));
-localStorage.setItem(P_KEY + '_ts', Date.now().toString()); }
+function saveState(){
+  localStorage.setItem(P_KEY, JSON.stringify({x:world.player.x,y:world.player.y}));
+  localStorage.setItem(NPC_KEY, JSON.stringify(world.npcs.map(n => ({
+    id: n.id || `npc-${Math.round(n.x)}-${Math.round(n.y)}-${n.name}`,
+    x: n.x, y: n.y,
+    bx: n.bx ?? n.x,
+    by: n.by ?? n.y,
+    tx: n.tx ?? n.x,
+    ty: n.ty ?? n.y,
+    patrolRadius: n.patrolRadius ?? 190,
+    speed: n.speed ?? 42,
+    waitTimer: n.waitTimer ?? 0,
+    steerOffset: n.steerOffset ?? 0,
+    steerDir: n.steerDir ?? 1
+  }))));
+  localStorage.setItem(P_KEY + '_ts', Date.now().toString());
+}
 function renderLayer(l){
   if(!l.chunks)return; const vw=canvas.width/ZOOM+32, vh=canvas.height/ZOOM+32;
   l.chunks.forEach(chk=>{
@@ -812,13 +880,28 @@ async function init(){
           g.tiles.push({dx:tx-g.x, dy:ty-g.y, gid});
         }
       });
-      groups.forEach(g => {
+      let restoredNpcs = [];
+      try { restoredNpcs = JSON.parse(localStorage.getItem(NPC_KEY) || '[]'); } catch (e) { restoredNpcs = []; }
+      groups.forEach((g) => {
         const inter = world.interactions.find(i => Math.hypot(i.x-g.x, i.y-g.y)<96);
-        // Resolver spawn: empujar al NPC fuera de cualquier colisión
         const safe = resolveSpawn(g.x, g.y);
         const npc  = new NPC("Profesor", g.tiles, safe.x, safe.y, inter);
-        // Actualizar base al punto seguro para que el rango de patrulla sea correcto
+        npc.id = buildNpcId(safe.x, safe.y, inter);
         npc.bx = safe.x; npc.by = safe.y;
+        const saved = restoredNpcs.find(s => s.id === npc.id || s.id === `npc-${Math.round(safe.x)}-${Math.round(safe.y)}-Profesor`) || null;
+        if (saved) {
+          npc.x = saved.x ?? npc.x;
+          npc.y = saved.y ?? npc.y;
+          npc.bx = saved.bx ?? npc.bx;
+          npc.by = saved.by ?? npc.by;
+          npc.tx = saved.tx ?? npc.tx;
+          npc.ty = saved.ty ?? npc.ty;
+          npc.patrolRadius = saved.patrolRadius ?? npc.patrolRadius;
+          npc.speed = saved.speed ?? npc.speed;
+          npc.waitTimer = saved.waitTimer ?? npc.waitTimer;
+          npc.steerOffset = saved.steerOffset ?? npc.steerOffset;
+          npc.steerDir = saved.steerDir ?? npc.steerDir;
+        }
         world.npcs.push(npc);
       });
     }
@@ -900,10 +983,14 @@ crossfadePlay(0);
 function cambiarPersonaje(genero) {
   PLAYER_GENDER = genero;
   loadSprites();
-  document.getElementById('charM').classList.remove('active');
-  document.getElementById('charW').classList.remove('active');
-  document.getElementById('char' + genero).classList.add('active');
-  
+  const charM = document.getElementById('charM');
+  const charW = document.getElementById('charW');
+  const charCurrent = document.getElementById('char' + genero);
+  if (charM) charM.classList.remove('active');
+  if (charW) charW.classList.remove('active');
+  if (charCurrent) charCurrent.classList.add('active');
+  try { saveState(); } catch (e) { console.warn('No se pudo guardar la posición al cambiar personaje:', e); }
+
   fetch('../guardar_genero.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -914,8 +1001,11 @@ function cambiarPersonaje(genero) {
 document.getElementById('char' + PLAYER_GENDER).classList.add('active');
 
 function guardarPosYIr() {
-  localStorage.setItem(P_KEY, JSON.stringify({x:world.player.x,y:world.player.y}));
-  localStorage.setItem(NPC_KEY, JSON.stringify(world.npcs.map(n=>({x:n.x,y:n.y}))));
+  try {
+    saveState();
+  } catch (e) {
+    console.warn('No se pudo guardar la posición antes de cambiar personaje:', e);
+  }
   window.location.href = '../seleccionar_personaje.php?from=mapa';
 }
 </script>

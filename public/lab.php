@@ -11,6 +11,24 @@ if (!isset($challenges[$active_challenge])) {
 }
 
 $subjects = ['Programación', 'Pensamiento Matemático III', 'Física I', 'Química I', 'Ecosistemas'];
+
+$return_params = '';
+$params = [];
+if (!empty($_GET['profesor'])) {
+    $params[] = 'profesor=' . urlencode($_GET['profesor']);
+}
+$materia = null;
+if (isset($_GET['materia']) && $_GET['materia'] !== '') {
+    $materia = $_GET['materia'];
+} elseif (!empty($_SESSION['selected_materia'])) {
+    $materia = $_SESSION['selected_materia'];
+}
+if (!empty($materia)) {
+    $params[] = 'materia=' . urlencode($materia);
+}
+if (!empty($params)) {
+    $return_params = '?' . implode('&', $params);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -1486,7 +1504,7 @@ $subjects = ['Programación', 'Pensamiento Matemático III', 'Física I', 'Quím
     <header class="header">
         <div class="logo-text">LC-ADVANCE</div>
         <nav style="display:flex;gap:8px;">
-            <a href="dashboard.php" class="btn btn-reset">📊 Dashboard</a>
+            <a href="dashboard.php<?= $return_params ?>" class="btn btn-reset">📊 Dashboard</a>
             <a href="mapa/index.php" class="btn btn-reset">🗺️ Mapa</a>
         </nav>
     </header>

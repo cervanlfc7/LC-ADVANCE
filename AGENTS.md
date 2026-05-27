@@ -16,6 +16,16 @@ mysql -u root < src/Database/lc_advance.sql     # Rebuild DB
 
 CI expects `TEST_BASE_URL=http://127.0.0.1:8000/` and MySQL at `127.0.0.1:3306` user `root` pass `root`.
 
+## Entry Point & Initialization
+
+- **Main entry point**: `index.php` (project root) handles frontend routing, language detection, and base URL calculation
+- **Initialization flow**: 
+  1. Loads `src/Config/config.php` (DB, OAuth, AI config)
+  2. Calls `iniciarSesionSegura()` (session management with 30-min timeout)
+  3. Sets `$baseUrl` from `dirname($_SERVER['SCRIPT_NAME'])` for proper asset/link routing
+  4. Loads language translations (`$t` array) from session or defaults to 'es'
+  5. **Note**: `src/Core/funciones.php` is NOT loaded in index.php - it's loaded individually by pages that need AJAX endpoints
+
 ## Path Conventions (gotchas)
 
 - **funciones.php**: Always `src/Core/funciones.php` (NOT `src/funciones.php`)
@@ -25,6 +35,24 @@ CI expects `TEST_BASE_URL=http://127.0.0.1:8000/` and MySQL at `127.0.0.1:3306` 
 - **Login redirect**: After login → `public/mapa/index.php` (game map), not dashboard
 - **Dashboard guard**: No `selected_materia` in session → redirects to `index.php?seleccionar_materia=1`
 - **Timeout redirect** from `public/mapa/`: `../login.php?timeout=1` (resolves to `public/login.php`)
+- **Footer links in index.php**: Must use `$baseUrl` prefix like other site links
+  - Logged-in user links: 
+    - `<a href="<?= $baseUrl ?>/public/mapa/index.php">Mapa Interactivo</a>`
+    - `<a href="<?= $baseUrl ?>/public/dashboard.php">Dashboard</a>`
+    - `<a href="<?= $baseUrl ?>/public/ranking.php">Ranking Global</a>`
+  - Guest user links:
+    - `<a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=mapa/index.php">Mapa Interactivo</a>`
+    - `<a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=dashboard.php">Dashboard</a>`
+    - `<a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=ranking.php">Ranking Global</a>`
+  - Missing `$baseUrl` causes broken links when site is not at document root
+- **Lab dashboard button**: Must preserve current filters when returning to dashboard
+  - Use `$return_params` built from both `profesor` and `materia` GET parameters
+  - Fix: Build params array and implode with '&' to support both parameters
+  - Example: `dashboard.php?profesor=Herson&materia=Física I`
+- **Dashboard access requires materia selection**: 
+  - All dashboard access points (index.php buttons, lab.php button, etc.) must require materia selection
+  - Enforced in dashboard.php: if no `selected_materia` in session AND no `profesor` in GET → redirect to `index.php?seleccionar_materia=1`
+  - Do not bypass this check by linking directly to dashboard.php without parameters
 
 ## Key Files
 

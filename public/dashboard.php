@@ -5,15 +5,8 @@
 require_once __DIR__ . '/../src/Config/config.php';
 requireLogin(true);
 
-// Guardar materia del GET a sesión inmediatamente
-if (!empty($_GET['materia'])) {
-    $_SESSION['selected_materia'] = trim($_GET['materia']);
-}
-
-// REQUERIR MATERIA - Si no hay materia seleccionada, redirigir a seleccionar
-if (empty($_SESSION['selected_materia']) && empty($_GET['profesor'])) {
-    redirigir('index.php?seleccionar_materia=1');
-}
+// REQUERIR MATERIA VÁLIDA para entrar al dashboard
+$materia = requireMateriaContext();
 
 require_once __DIR__ . '/../src/Content/content.php';
 
@@ -123,7 +116,7 @@ $t = [
 ];
 
 $filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
-$filter_materia  = isset($_GET['materia'])  ? trim($_GET['materia'])  : null;
+$filter_materia  = $materia;
 
 // ------------------ USUARIO ------------------
 if (!empty($_SESSION['usuario_es_invitado'])) {
@@ -248,6 +241,17 @@ if (empty($lecciones_agrupadas) && !$filter_activo) {
     }
 }
 ksort($all_materias, SORT_NATURAL | SORT_FLAG_CASE);
+
+$lab_query_params = [];
+if (!empty($_GET['profesor'])) {
+    $lab_query_params[] = 'profesor=' . urlencode($_GET['profesor']);
+}
+if (!empty($_GET['materia'])) {
+    $lab_query_params[] = 'materia=' . urlencode($_GET['materia']);
+} elseif (!empty($_SESSION['selected_materia'])) {
+    $lab_query_params[] = 'materia=' . urlencode($_SESSION['selected_materia']);
+}
+$lab_href = 'lab.php' . (!empty($lab_query_params) ? '?' . implode('&', $lab_query_params) : '');
 
 $completadas = [];
 if (empty($_SESSION['usuario_es_invitado'])) {
@@ -439,7 +443,7 @@ $daily_quests = [
     <nav>
         <a href="../index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
         <a href="mapa/index.php" class="btn-nav primary"><?= htmlspecialchars($t[$lang]['go_map']) ?></a>
-        <a href="lab.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></a>
+        <a href="<?= htmlspecialchars($lab_href) ?>" class="btn-nav"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></a>
         <a href="community.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['community']) ?></a>
         <a href="logout.php"     class="btn-nav"><?= htmlspecialchars($t[$lang]['logout']) ?></a>
         <div class="toolbar-controls">
