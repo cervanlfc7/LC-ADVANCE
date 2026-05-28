@@ -197,24 +197,74 @@ function calcularNivel($puntos) { return floor($puntos / 500) + 1; }
 // LOCAL DEV: hardcoded for testing (NO commit!)
 $_google_client_id = '317866808413-8odsje97n8j7k150j3ag1lr89ughotb7.apps.googleusercontent.com';
 $_google_client_secret = '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';
-$_github_client_id = 'Ov23liR2ex0RxXcrUfAz';
-$_github_client_secret = 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d';
+// Credenciales GitHub: conservar credenciales antiguas para local (dev)
+// y usar las nuevas para el servidor (prod).
+// Dev (local) - credenciales antiguas:
+$_github_client_id_dev = 'Ov23liR2ex0RxXcrUfAz';
+$_github_client_secret_dev = 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d';
+// Prod (servidor) - credenciales nuevas proporcionadas:
+$_github_client_id_prod = 'Ov23ligyvD096zr7u85V';
+$_github_client_secret_prod = '0c1a890c637e28fbf27579982b5b79c6a524d69e';
 
-define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: $_google_client_id);
-define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: $_google_client_secret);
-define('GITHUB_CLIENT_ID', getenv('GITHUB_CLIENT_ID') ?: $_github_client_id);
-define('GITHUB_CLIENT_SECRET', getenv('GITHUB_CLIENT_SECRET') ?: $_github_client_secret);
+// (GitHub selection moved below to avoid using AUTH_CALLBACK_URL before it's defined)
 
+// Autenticación OAuth: configuraciones locales y de producción.
+// Si se define AUTH_CALLBACK_URL en el entorno, úsalo directamente.
+// Si se define APP_URL, se construye el callback desde esa URL.
+// En producción con dominio completo, APP_URL puede ser la URL raíz,
+// y el callback se normaliza a /public/auth_callback.php si la app corre en /public.
 $defaultAuthCallback = '';
 $customAppUrl = trim(APP_URL);
-if (!empty(getenv('AUTH_CALLBACK_URL'))) { $defaultAuthCallback = getenv('AUTH_CALLBACK_URL'); }
-elseif ($customAppUrl !== '') { $defaultAuthCallback = rtrim($customAppUrl, '/') . '/auth_callback.php'; }
+if (!empty(getenv('AUTH_CALLBACK_URL'))) {
+    $defaultAuthCallback = getenv('AUTH_CALLBACK_URL');
+} elseif ($customAppUrl !== '') {
+    $normalizedAppUrl = rtrim($customAppUrl, '/');
+    if (strpos($normalizedAppUrl, '/public') === false && !empty($_SERVER['SCRIPT_NAME']) && strpos($_SERVER['SCRIPT_NAME'], '/public/') !== false) {
+        $normalizedAppUrl .= '/public';
+    }
+    $defaultAuthCallback = $normalizedAppUrl . '/auth_callback.php';
+}
 elseif (!empty($_SERVER['HTTP_HOST'])) {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
     $defaultAuthCallback = $scheme . '://' . $_SERVER['HTTP_HOST'] . $scriptDir . '/auth_callback.php';
 } else { $defaultAuthCallback = 'http://localhost/LC-Advance/auth_callback.php'; }
 define('AUTH_CALLBACK_URL', $defaultAuthCallback);
+
+// Selección de credenciales Google: permite credenciales separadas para producción.
+// Variables de entorno soportadas:
+// - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET (dev/default)
+// - GOOGLE_CLIENT_ID_PROD, GOOGLE_CLIENT_SECRET_PROD (producción)
+$devGoogleId = getenv('GOOGLE_CLIENT_ID') ?: $_google_client_id;
+$devGoogleSecret = getenv('GOOGLE_CLIENT_SECRET') ?: $_google_client_secret;
+$prodGoogleId = getenv('GOOGLE_CLIENT_ID_PROD') ?: '';
+$prodGoogleSecret = getenv('GOOGLE_CLIENT_SECRET_PROD') ?: '';
+
+// Si hay credenciales de prod y el callback no apunta a localhost, usar prod.
+if (!empty($prodGoogleId) && !preg_match('#^https?://(localhost|127\.0\.0\.1)#i', AUTH_CALLBACK_URL)) {
+    define('GOOGLE_CLIENT_ID', $prodGoogleId);
+    define('GOOGLE_CLIENT_SECRET', $prodGoogleSecret ?: $devGoogleSecret);
+} else {
+    define('GOOGLE_CLIENT_ID', $devGoogleId);
+    define('GOOGLE_CLIENT_SECRET', $devGoogleSecret);
+}
+
+// Selección de credenciales GitHub: soporta credenciales separadas para producción.
+// Variables de entorno soportadas:
+// - GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET (dev/default)
+// - GITHUB_CLIENT_ID_PROD, GITHUB_CLIENT_SECRET_PROD (producción)
+$devGithubId = getenv('GITHUB_CLIENT_ID') ?: $_github_client_id_dev;
+$devGithubSecret = getenv('GITHUB_CLIENT_SECRET') ?: $_github_client_secret_dev;
+$prodGithubId = getenv('GITHUB_CLIENT_ID_PROD') ?: $_github_client_id_prod;
+$prodGithubSecret = getenv('GITHUB_CLIENT_SECRET_PROD') ?: $_github_client_secret_prod;
+
+if (!empty($prodGithubId) && !preg_match('#^https?://(localhost|127\.0\.0\.1)#i', AUTH_CALLBACK_URL)) {
+    define('GITHUB_CLIENT_ID', $prodGithubId);
+    define('GITHUB_CLIENT_SECRET', $prodGithubSecret ?: $devGithubSecret);
+} else {
+    define('GITHUB_CLIENT_ID', $devGithubId);
+    define('GITHUB_CLIENT_SECRET', $devGithubSecret);
+}
 
 // ================================
 // EMAIL / SMTP CONFIG
