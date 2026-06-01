@@ -432,7 +432,7 @@ $daily_quests = [
         <span class="logo-tag">// SYSTEM_DASHBOARD</span>
     </div>
     <nav>
-        <a href="index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
+        <a href="../index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
         <a href="mapa/index.php" class="btn-nav primary"><?= htmlspecialchars($t[$lang]['go_map']) ?></a>
         
         <a href="lab.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></a>
