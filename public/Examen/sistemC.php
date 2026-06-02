@@ -1035,12 +1035,15 @@ const STORAGE_KEY = 'lc_volume_settings';
 function getStoredVolumes() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) return JSON.parse(stored);
-  return { principal: 0.5, ambiental: 0.8, examenes: 0.5 };
+    return { principal: 1.0, ambiental: 0.8, examenes: 1.0 };
 }
 const volumes = getStoredVolumes();
+</script>
 const cAudio = document.getElementById('combatMusic');
-cAudio.volume = volumes.examenes;
-cAudio.play().then(() => console.log('Combat music playing')).catch(e => console.log('Audio error:', e));
+if (cAudio) cAudio.volume = volumes.examenes;
+</script>
+<script src="../assets/js/volume_manager.js"></script>
+<script>if (typeof initPageAudio === 'function') initPageAudio('combatMusic', volumes.examenes);</script>
 </script>
 <style>
 .header-volume-btn {

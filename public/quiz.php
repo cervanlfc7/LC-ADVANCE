@@ -115,12 +115,14 @@ const STORAGE_KEY = 'lc_volume_settings';
 function getStoredVolumes() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) return JSON.parse(stored);
-  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+  return { principal: 1.0, ambiental: 0.8, examenes: 0.8 };
 }
 const volumes = getStoredVolumes();
 const qAudio = document.getElementById('quizMusic');
-qAudio.volume = volumes.examenes;
-qAudio.play().then(() => console.log('Quiz music playing')).catch(e => console.log('Audio error:', e));
+if (qAudio) qAudio.volume = volumes.examenes;
+</script>
+<script src="assets/js/volume_manager.js"></script>
+<script>if (typeof initPageAudio === 'function') initPageAudio('quizMusic', volumes.examenes);</script>
 </script>
 <style>
 .header-volume-btn {

@@ -913,17 +913,18 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 const STORAGE_KEY = 'lc_volume_settings';
 function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.5, ambiental: 0.8, examenes: 0.8 };
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored);
+    return { principal: 1.0, ambiental: 0.8, examenes: 0.8 };
 }
 const volumes = getStoredVolumes();
 const dAudio = document.getElementById('dashboardMusic');
-dAudio.volume = volumes.principal;
+if (dAudio) dAudio.volume = volumes.principal;
 // Do not autoplay audio on mobile to avoid blocking and unwanted data/playback.
 // Users can enable playback via the volume control or a play button if desired.
 // Attempting to autoplay is intentionally omitted for better mobile UX.
-</script>
+<script src="assets/js/volume_manager.js"></script>
+<script>if (typeof initPageAudio === 'function') initPageAudio('dashboardMusic');</script>
 <style>
 .header-volume-btn {
   position: fixed;
