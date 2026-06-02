@@ -65,9 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$puntosGanados, $_SESSION['usuario_id']]);
 
     $_SESSION['mensaje'] = "¡Ganaste $puntosGanados puntos! 🎉";
-    $dashboardTarget = 'dashboard.php';
-    if (!empty($leccion['materia'])) $dashboardTarget .= '?materia=' . urlencode($leccion['materia']);
-    redirigir($dashboardTarget);
+    redirigir(getDashboardUrl());
 }
 
 ?>
@@ -105,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" class="btn btn-submit">Enviar Respuestas</button>
     </form>
 
-    <p><a href="dashboard.php<?php echo !empty($leccion['materia']) ? '?materia=' . urlencode($leccion['materia']) : ''; ?>" class="btn btn-back">Volver al Dashboard</a></p>
+    <p><a href="<?= htmlspecialchars(getDashboardUrl()) ?>" class="btn btn-back">Volver al Dashboard</a></p>
 </div>
 
 <script src="assets/js/app.js"></script>

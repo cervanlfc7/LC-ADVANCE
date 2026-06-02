@@ -120,6 +120,12 @@ $t = [
 $filter_profesor = isset($_GET['profesor']) ? trim($_GET['profesor']) : null;
 $filter_materia  = isset($_GET['materia'])  ? trim($_GET['materia'])  : null;
 
+if (!empty($filter_materia)) {
+    $_SESSION['selected_materia'] = $filter_materia;
+}
+
+$dashboard_context_params = getDashboardReturnParams();
+
 // ------------------ USUARIO ------------------
 if (!empty($_SESSION['usuario_es_invitado'])) {
     $usuario = [
@@ -432,12 +438,12 @@ $daily_quests = [
         <span class="logo-tag">// SYSTEM_DASHBOARD</span>
     </div>
     <nav>
-        <a href="../index.php"      class="btn-nav"><?= htmlspecialchars($t[$lang]['home']) ?></a>
-        <a href="mapa/index.php" class="btn-nav primary"><?= htmlspecialchars($t[$lang]['go_map']) ?></a>
+        <a href="../index.php"      class="btn-nav"><span class="nav-icon">🏠</span><span class="nav-label"><?= htmlspecialchars($t[$lang]['home']) ?></span></a>
+        <a href="mapa/index.php" class="btn-nav primary"><span class="nav-icon">🗺️</span><span class="nav-label"><?= htmlspecialchars($t[$lang]['go_map']) ?></span></a>
         
-        <a href="lab.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></a>
-        <a href="community.php" class="btn-nav"><?= htmlspecialchars($t[$lang]['community']) ?></a>
-        <a href="logout.php"     class="btn-nav"><?= htmlspecialchars($t[$lang]['logout']) ?></a>
+        <a href="lab.php<?= htmlspecialchars($dashboard_context_params) ?>" class="btn-nav"><span class="nav-icon">🧪</span><span class="nav-label"><?= htmlspecialchars($t[$lang]['coding_lab']) ?></span></a>
+        <a href="community.php<?= htmlspecialchars($dashboard_context_params) ?>" class="btn-nav"><span class="nav-icon">👥</span><span class="nav-label"><?= htmlspecialchars($t[$lang]['community']) ?></span></a>
+        <a href="logout.php"     class="btn-nav"><span class="nav-icon">🔓</span><span class="nav-label"><?= htmlspecialchars($t[$lang]['logout']) ?></span></a>
         <div class="header-volume">
             <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
             <div class="vol-slider" id="volSlider">
@@ -910,7 +916,9 @@ function getStoredVolumes() {
 const volumes = getStoredVolumes();
 const dAudio = document.getElementById('dashboardMusic');
 dAudio.volume = volumes.principal;
-dAudio.play().then(() => console.log('Dashboard music playing')).catch(e => console.log('Audio error:', e));
+// Do not autoplay audio on mobile to avoid blocking and unwanted data/playback.
+// Users can enable playback via the volume control or a play button if desired.
+// Attempting to autoplay is intentionally omitted for better mobile UX.
 </script>
 <style>
 .header-volume-btn {
@@ -990,6 +998,10 @@ dAudio.play().then(() => console.log('Dashboard music playing')).catch(e => cons
   height: 12px;
   border: 2px solid #00e5ff;
   border-radius: 4px;
+}
+
+@media (max-width: 640px) {
+    .vol-slider input { width: 120px; }
 }
 .vol-slider input::-webkit-slider-thumb {
   -webkit-appearance: none;

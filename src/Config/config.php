@@ -138,6 +138,27 @@ function requireLogin($allowGuest = true) {
     if (empty($_SESSION['usuario_id']) && (empty($_SESSION['usuario_es_invitado']) || !$allowGuest)) { redirigir('public/login.php'); }
 }
 
+function getDashboardReturnParams() {
+    if (session_status() === PHP_SESSION_NONE) {
+        iniciarSesionSegura();
+    }
+
+    $params = [];
+    if (!empty($_GET['profesor'])) {
+        $params[] = 'profesor=' . urlencode($_GET['profesor']);
+    }
+    if (isset($_GET['materia']) && $_GET['materia'] !== '') {
+        $params[] = 'materia=' . urlencode($_GET['materia']);
+    } elseif (!empty($_SESSION['selected_materia'])) {
+        $params[] = 'materia=' . urlencode($_SESSION['selected_materia']);
+    }
+    return $params ? '?' . implode('&', $params) : '';
+}
+
+function getDashboardUrl() {
+    return 'dashboard.php' . getDashboardReturnParams();
+}
+
 function getMateriasValidas() {
     return [
         'Temas Selectos de Matemáticas I y II',

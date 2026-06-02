@@ -184,6 +184,33 @@ header.header nav {
   animation: fadeInRight 0.5s ease-out backwards;
 }
 
+.btn-nav .nav-icon {
+  display: none;
+  font-size: 18px;
+  margin-right: 8px;
+  line-height: 1;
+}
+.btn-nav .nav-label {
+  display: inline;
+}
+
+@media (max-width: 640px) {
+  .btn-nav {
+    font-size: 12px;
+    padding: 10px 10px;
+    min-height: 44px;
+  }
+  .btn-nav .nav-label {
+    display: none;
+  }
+  .btn-nav .nav-icon {
+    display: inline-block;
+  }
+  header.header .hamburger {
+    display: inline-flex;
+  }
+}
+
 .btn-nav:nth-child(1) {
   animation-delay: 0.15s;
 }
@@ -995,7 +1022,8 @@ header.header nav {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
-  min-width: 620px;
+  /* allow table to fit mobile width; wrapper will scroll if needed */
+  min-width: 0;
   table-layout: fixed;
 }
 .report-table th {
@@ -2035,9 +2063,9 @@ header.header {
 
   nav .btn-nav {
     flex: 1;
-    font-size: 7px;
-    padding: 5px 8px;
-    min-height: 30px;
+    font-size: 12px; /* aumento para mejor legibilidad y targets táctiles */
+    padding: 10px 12px;
+    min-height: 44px; /* mínimo recomendado para touch */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2069,13 +2097,13 @@ header.header {
 
   .leccion-grid {
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 8px;
   }
 
   .date-filter-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 6px;
+    gap: 8px;
   }
 
   .search-filters {
