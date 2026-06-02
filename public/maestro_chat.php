@@ -979,15 +979,29 @@ clearBtn.onclick = async () => {
 scrollToBottom();
 
 /* ════════════════════════════════════════════
-   AUDIO / VOLUME (centralizado)
+   AUDIO / VOLUME
 ════════════════════════════════════════════ */
 const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : { principal: 1.0, ambiental: 0.8, examenes: 0.8 }; }
+function getStoredVolumes() {
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? JSON.parse(s) : { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+}
 const volumes = getStoredVolumes();
 const pAudio  = document.getElementById('pageMusic');
-if (pAudio) pAudio.volume = volumes.principal;
+pAudio.volume = volumes.principal;
+pAudio.play().catch(() => {});
+
+function toggleVolumeSlider() {
+    document.getElementById('volSlider').classList.toggle('show');
+}
+const volSlider = document.getElementById('volPrincipalSlider');
+volSlider.value = volumes.principal;
+volSlider.addEventListener('input', e => {
+    volumes.principal = parseFloat(e.target.value);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
+    pAudio.volume = volumes.principal;
+    document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+});
 </script>
-<script src="assets/js/volume_manager.js"></script>
-<script>if (typeof initPageAudio === 'function') initPageAudio('pageMusic');</script>
 </body>
 </html>

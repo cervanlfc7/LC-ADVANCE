@@ -1062,7 +1062,7 @@ const STORAGE_KEY = 'lc_volume_settings';
 function getStoredVolumes() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) return JSON.parse(stored);
-  return { principal: 1.0, ambiental: 0.8, examenes: 0.8 };
+  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
 }
 function saveVolumes(v) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
@@ -1119,10 +1119,6 @@ function playNext() {
 audio1.addEventListener('ended', playNext);
 audio2.addEventListener('ended', playNext);
 crossfadePlay(0);
-
-</script>
-<script src="../assets/js/volume_manager.js"></script>
-<script>if (typeof initPageAudio === 'function') { initPageAudio('mapMusic1'); initPageAudio('mapMusic2'); }</script>
 
 function cambiarPersonaje(genero) {
   PLAYER_GENDER = genero;
