@@ -35,9 +35,7 @@ $t = [
   ],
 ];
 $langData = $t[$lang];
-$return_params = '';
-if (!empty($_GET['profesor']))       $return_params = '?profesor=' . urlencode($_GET['profesor']);
-elseif (isset($_GET['materia']) && $_GET['materia'] !== '') $return_params = '?materia=' . urlencode($_GET['materia']);
+$dashboardUrl = getDashboardUrl();
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($lang) ?>" data-theme="dark">
@@ -108,20 +106,31 @@ button { cursor:pointer; font-family: var(--font-body); }
 .search-bar:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,0.08); }
 .nav-actions { display:flex; gap:10px; align-items:center; }
 .btn-primary {
-  padding:8px 18px; background: var(--cyan); color: #041420; border:none;
-  border-radius: 10px; font-size:12px; font-weight:700; letter-spacing:0.5px;
-  font-family: var(--font-mono); white-space:nowrap; transition: var(--transition);
-  text-transform: uppercase;
-}
-.btn-primary:hover { opacity:0.85; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,229,255,0.2); }
-a.btn-primary { display:inline-flex; align-items:center; height:36px; }
-.theme-toggle {
-  width:36px; height:36px; border-radius:10px; border: 1px solid var(--border);
-  background: transparent; color: var(--text2); font-size:16px;
-  display:flex; align-items:center; justify-content:center;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #00e5ff 0%, #8d5bff 100%);
+  color: #041420;
+  border: none;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
   transition: var(--transition);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 14px 30px rgba(0, 229, 255, 0.18);
 }
-.theme-toggle:hover { background: var(--surface); color: var(--cyan); border-color: var(--cyan); }
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 34px rgba(0, 229, 255, 0.3);
+  opacity: 1;
+}
+a.btn-primary { display:inline-flex; align-items:center; height:38px; }
+/* theme toggle removed: keep base dark theme */
 
 /* ── Layout ── */
 .main-layout {
@@ -316,9 +325,8 @@ a.btn-primary { display:inline-flex; align-items:center; height:36px; }
   <div class="nav-logo">LC<span>Advance</span></div>
   <input class="search-bar" id="searchInput" type="text" placeholder="<?= htmlspecialchars($langData['search']) ?>">
   <div class="nav-actions">
-    <a href="dashboard.php<?= $return_params ?>" class="btn-primary">Dashboard</a>
+    <a href="<?= htmlspecialchars($dashboardUrl) ?>" class="btn-primary">🏠 Dashboard</a>
     <button class="btn-primary" onclick="openModal()">+ <?= htmlspecialchars($langData['newpost']) ?></button>
-    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="<?= htmlspecialchars($langData['dark']) ?>">🌙</button>
   </div>
 </nav>
 
@@ -729,24 +737,12 @@ function renderAll() {
   renderSidebar(data, vid);
 }
 
-// ── Theme ──
-function toggleTheme() {
-  var html = document.documentElement;
-  var current = html.getAttribute('data-theme');
-  var next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('lc_community_theme', next);
-  document.getElementById('themeBtn').textContent = next === 'dark' ? '🌙' : '☀️';
-  document.getElementById('themeBtn').title = next === 'dark' ? LANG.light : LANG.dark;
-}
+// Theme switching removed — site fixed to dark theme.
 
 // ── Init ──
 (function init() {
-  // Restore theme
-  var savedTheme = localStorage.getItem('lc_community_theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-  document.getElementById('themeBtn').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
-  document.getElementById('themeBtn').title = savedTheme === 'dark' ? LANG.light : LANG.dark;
+  // Enforce dark theme across the app
+  document.documentElement.setAttribute('data-theme', 'dark');
 
   // Close modal on overlay click
   document.getElementById('modalOverlay').addEventListener('click', function(e){
