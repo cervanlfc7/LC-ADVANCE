@@ -274,7 +274,11 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
       box-shadow: 0 0 15px rgba(0,255,255,0.3);
       pointer-events: none;
     }
-    @media (min-width: 1025px) { .mobile-controls { display: none !important; } }
+    @media (min-width: 1025px), (pointer: fine) {
+      .mobile-controls { display: none !important; }
+      .joystick-area { display: none !important; }
+      #ctrlOptions .ctrl-opt[onclick*="joystick"] { display: none !important; }
+    }
 
     .volume-control label { display: block; color: var(--neon-yellow); font-size: 9px; margin-bottom: 6px; text-transform: uppercase; font-family: 'Press Start 2P', monospace; }
     .volume-control input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: rgba(255,255,255,0.1); border-radius: 3px; outline: none; }
@@ -356,6 +360,36 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
     <div class="joystick-area" id="joystickArea">
       <div class="joystick-knob" id="joystickKnob"></div>
     </div>
+
+<!-- ── Tutorial overlay dismiss — debe ir ANTES del módulo para que window.__dismissTutorial esté disponible ── -->
+<script>
+(function() {
+  if (window.innerWidth < 900) return;
+  var overlay = document.getElementById('tutorialOverlay');
+  if (!overlay) return;
+  var key = P_KEY + '_tutorial';
+  if (localStorage.getItem(key) === '1') {
+    overlay.classList.add('dismissed');
+    return;
+  }
+
+  function dismiss() {
+    if (overlay.classList.contains('dismissed')) return;
+    overlay.classList.add('dismissed');
+    try { localStorage.setItem(key, '1'); } catch(e) {}
+    document.removeEventListener('keydown', onAnyKey);
+  }
+
+  function onAnyKey() { dismiss(); }
+
+  // Expuesto para que el módulo lo llame al detectar movimiento WASD
+  window.__dismissTutorial = dismiss;
+
+  overlay.addEventListener('click', dismiss);
+  document.addEventListener('keydown', onAnyKey);
+})();
+</script>
+
  <script type="module">
 
 // ===== LÓGICA DE IDENTIFICACIÓN Y MOVIMIENTO DE PROFESORES (ROBUSTA) =====
@@ -1062,7 +1096,7 @@ const STORAGE_KEY = 'lc_volume_settings';
 function getStoredVolumes() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) return JSON.parse(stored);
-  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
+  return { principal: 1.0, ambiental: 0.8, examenes: 0.8 };
 }
 function saveVolumes(v) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
@@ -1120,6 +1154,11 @@ audio1.addEventListener('ended', playNext);
 audio2.addEventListener('ended', playNext);
 crossfadePlay(0);
 
+</script>
+<script src="../assets/js/volume_manager.js"></script>
+<script>if (typeof initPageAudio === 'function') { initPageAudio('mapMusic1'); initPageAudio('mapMusic2'); }</script>
+
+<script>
 function cambiarPersonaje(genero) {
   PLAYER_GENDER = genero;
   loadSprites();
@@ -1141,8 +1180,15 @@ function cambiarPersonaje(genero) {
 // ── Controles toggle (Cruz / Joystick) ──
 (function(){
   var pref = localStorage.getItem('ctrl_pref') || 'dpad';
+  var isDesktopControl = window.matchMedia('(pointer: fine)').matches || window.innerWidth >= 1025;
+  if (isDesktopControl) {
+    pref = 'dpad';
+    var joystickBtn = document.querySelector('.ctrl-opt[onclick*="joystick"]');
+    if (joystickBtn) joystickBtn.style.display = 'none';
+  }
   window.toggleControles = function(){
     var o = document.getElementById('ctrlOptions');
+    if (!o) return;
     o.style.display = o.style.display === 'none' ? 'flex' : 'none';
   };
   window.setControl = function(type){
@@ -1164,24 +1210,6 @@ window.toggleMusica = function(){
   if (!o) return;
   o.style.display = o.style.display === 'none' ? 'block' : 'none';
 };
-
-// ── Tutorial overlay (ASDW) — first visit only (desktop only) ──
-(function() {
-  if (window.innerWidth < 900) return;
-  var overlay = document.getElementById('tutorialOverlay');
-  if (!overlay) return;
-  var key = P_KEY + '_tutorial';
-  if (localStorage.getItem(key) === '1') {
-    overlay.classList.add('dismissed');
-    return;
-  }
-  window.__dismissTutorial = function() {
-    if (overlay.classList.contains('dismissed')) return;
-    overlay.classList.add('dismissed');
-    try { localStorage.setItem(key, '1'); } catch(e) {}
-  };
-  overlay.addEventListener('click', window.__dismissTutorial);
-})();
 
 try { document.getElementById('char' + PLAYER_GENDER).classList.add('active'); } catch(e) {}
 
