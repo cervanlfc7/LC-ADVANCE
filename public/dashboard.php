@@ -853,6 +853,10 @@ document.addEventListener('DOMContentLoaded', () => {
 (function () {
     const canvas = document.getElementById('teacherProgressChart');
     if (!canvas) return;
+    if (typeof Chart === 'undefined') {
+        canvas.parentElement.innerHTML = '<div class="chart-error">Gráfica no disponible. Por favor recarga la página.</div>';
+        return;
+    }
 
     const materias = <?= json_encode(array_column($materia_rezagada, 'materia')) ?>;
     const tasa     = <?= json_encode(array_map(fn($m) => round($m['tasa_fallo'], 1), $materia_rezagada)) ?>;
