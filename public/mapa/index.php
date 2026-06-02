@@ -199,14 +199,87 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
       background: var(--neon-pink); color: #fff; box-shadow: 0 0 32px var(--neon-pink), 0 0 0 8px rgba(255,0,255,0.18);
       border-color: #fff;
     }
+
+    .menu-btns button.ctrl-toggle {
+      border-color: #ff3c3c; color: #ff3c3c;
+      box-shadow: 0 0 15px rgba(255, 60, 60, 0.2), inset 0 0 20px rgba(255, 60, 60, 0.05);
+      text-shadow: 0 0 10px #ff3c3c;
+    }
+    .menu-btns button.ctrl-toggle:hover, .menu-btns button.ctrl-toggle:focus {
+      background: #ff3c3c; color: #fff;
+      box-shadow: 0 0 30px #ff3c3c, 0 0 60px rgba(255, 60, 60, 0.3);
+      text-shadow: none; transform: translateY(-2px); border-color: #fff;
+    }
+    #ctrlOptions, #musicOptions {
+      display: none; gap: 12px; flex-direction: column;
+    }
+    .ctrl-opt {
+      flex: 1; padding: 10px 0; margin: 0;
+      background: linear-gradient(135deg, rgba(40, 10, 10, 0.9), rgba(20, 5, 5, 0.9));
+      color: #ff6666; border: 2px solid #ff3c3c; cursor: pointer;
+      font-family: 'Press Start 2P', monospace; font-size: 9px;
+      letter-spacing: 1px; border-radius: 4px;
+      transition: all 0.2s ease; outline: none;
+    }
+    .ctrl-opt.active {
+      background: #ff3c3c; color: #fff; border-color: #fff;
+      box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
+    }
+    .menu-btns button.music-toggle {
+      border-color: #00bcd4; color: #00bcd4;
+      box-shadow: 0 0 15px rgba(0, 188, 212, 0.2), inset 0 0 20px rgba(0, 188, 212, 0.05);
+      text-shadow: 0 0 10px #00bcd4;
+    }
+    .menu-btns button.music-toggle:hover, .menu-btns button.music-toggle:focus {
+      background: #00bcd4; color: #fff;
+      box-shadow: 0 0 30px #00bcd4, 0 0 60px rgba(0, 188, 212, 0.3);
+      text-shadow: none; transform: translateY(-2px); border-color: #fff;
+    }
+    #musicOptions .volume-control { padding: 8px 0; }
+    @media (max-width: 480px) {
+      #pauseMenu {
+        padding: 24px 16px 20px 16px; min-width: auto;
+        width: 92vw; max-width: 360px;
+      }
+      #pauseMenu h2 { font-size: 0.8em; margin-bottom: 18px; padding-bottom: 12px; }
+      .menu-btns { gap: 10px; }
+      .menu-btns button { padding: 12px 0; font-size: 10px; }
+      .ctrl-opt { font-size: 8px; padding: 8px 0; }
+    }
+    @media (orientation: landscape) and (max-height: 500px) {
+      #pauseMenu { padding: 14px 12px 12px 12px; width: 85vw; max-width: 480px; }
+      #pauseMenu h2 { font-size: 0.65em; margin-bottom: 10px; padding-bottom: 8px; }
+      .menu-btns { gap: 6px; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      .menu-btns button { padding: 8px 10px; font-size: 8px; flex: 0 1 auto; min-width: 90px; }
+      .menu-btns .ctrl-opt { padding: 6px 8px; font-size: 7px; min-width: 60px; }
+      #ctrlOptions, #musicOptions { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      #musicOptions .volume-control { width: 140px; }
+    }
+
+    .joystick-area {
+      position: fixed; bottom: 70px; left: 24px;
+      width: 120px; height: 120px; border-radius: 50%;
+      background: rgba(0, 255, 255, 0.08);
+      border: 2px solid rgba(0, 255, 255, 0.25);
+      z-index: 999; display: none; touch-action: none;
+      pointer-events: auto;
+    }
+    .joystick-knob {
+      position: absolute; top: 50%; left: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,255,255,0.5), rgba(0,255,255,0.2));
+      border: 2px solid var(--neon-cyan);
+      transform: translate(-50%, -50%);
+      transition: transform 0.06s ease-out;
+      box-shadow: 0 0 15px rgba(0,255,255,0.3);
+      pointer-events: none;
+    }
     @media (min-width: 1025px) { .mobile-controls { display: none !important; } }
-    .volume-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(0,255,255,0.2); }
-    .volume-section h3 { color: var(--neon-cyan); font-size: 10px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-    .volume-control { margin-bottom: 12px; }
-    .volume-control label { display: block; color: var(--neon-yellow); font-size: 9px; margin-bottom: 6px; text-transform: uppercase; }
+
+    .volume-control label { display: block; color: var(--neon-yellow); font-size: 9px; margin-bottom: 6px; text-transform: uppercase; font-family: 'Press Start 2P', monospace; }
     .volume-control input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: rgba(255,255,255,0.1); border-radius: 3px; outline: none; }
-    .volume-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; background: var(--neon-cyan); border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px var(--neon-cyan); }
-    .volume-control input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; background: var(--neon-cyan); border-radius: 50%; cursor: pointer; border: none; }
+    .volume-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; background: #00bcd4; border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px #00bcd4; }
+    .volume-control input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; background: #00bcd4; border-radius: 50%; cursor: pointer; border: none; }
     .menu-btns button.char {
       border-color: var(--neon-cyan); color: var(--neon-cyan);
       box-shadow: 0 0 15px rgba(0, 229, 255, 0.2), inset 0 0 20px rgba(0, 229, 255, 0.05);
@@ -222,6 +295,23 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
       box-shadow: 0 0 30px #ff9800, 0 0 60px rgba(255, 152, 0, 0.3);
       text-shadow: none; transform: translateY(-2px); border-color: #fff;
     }
+
+    .tutorial-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.75);
+    }
+    .tutorial-overlay img {
+      width: min(45vw, 350px); height: auto;
+      image-rendering: pixelated;
+      animation: tutorialBlink 0.8s ease-in-out infinite;
+    }
+    @keyframes tutorialBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    .tutorial-overlay.dismissed { display: none; }
+    @media (max-width: 899px) { .tutorial-overlay { display: none !important; } }
   </style>
 </head>
 <body onclick="window.focus();">
@@ -231,29 +321,40 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
       <div class="menu-btns">
         <button onclick="document.getElementById('pauseMenu').style.display='none'">▶ CONTINUAR</button>
         <button class="reset" onclick="localStorage.removeItem('<?php echo $session_key; ?>'); localStorage.removeItem('<?php echo $npc_key; ?>'); location.reload();">⟳ RESET POSICIÓN</button>
+        <button class="ctrl-toggle" onclick="toggleControles()">CONTROLES</button>
+        <div id="ctrlOptions" style="display:none">
+          <button class="ctrl-opt active" onclick="setControl('dpad')">CRUZ</button>
+          <button class="ctrl-opt" onclick="setControl('joystick')">JOYSTICK</button>
+        </div>
+        <button class="music-toggle" onclick="toggleMusica()">MUSICA</button>
+        <div id="musicOptions" style="display:none">
+          <div class="volume-control">
+            <label>Musica Ambiental</label>
+            <input type="range" id="volAmbiental" min="0" max="1" step="0.1" value="0.8">
+          </div>
+        </div>
         <button class="char" onclick="guardarPosYIr(); return false;">CAMBIAR PERSONAJE</button>
         <button class="exit" onclick="window.location.href='../../index.php'">⏻ SALIR</button>
-      </div>
-      <div class="volume-section">
-        <h3>// VOLUMEN</h3>
-        <div class="volume-control">
-          <label>Musica Ambiental</label>
-          <input type="range" id="volAmbiental" min="0" max="1" step="0.1" value="0.8">
-        </div>
       </div>
     </div>
     <div id="interaction">INTERACTUAR [E]</div>
     <canvas id="game"></canvas>
+    <div id="tutorialOverlay" class="tutorial-overlay">
+      <img src="../assets/img/ASDW.png" alt="Presiona A S W D para moverte">
+    </div>
     <div class="mobile-controls">
       <div class="dpad">
         <div></div><div class="btn" id="btnUp">▲</div><div></div>
         <div class="btn" id="btnLeft">◀</div><div></div><div class="btn" id="btnRight">▶</div>
         <div></div><div class="btn" id="btnDown">▼</div><div></div>
       </div>
-      <div style="display:flex; flex-direction:column; gap:15px;">
+      <div id="ctrlActions" style="display:flex; flex-direction:column; gap:15px; margin-left:auto;">
         <button class="act-btn" id="btnE">💬 HABLAR</button>
         <button class="act-btn exit" id="btnEsc">⏸ PAUSA</button>
       </div>
+    </div>
+    <div class="joystick-area" id="joystickArea">
+      <div class="joystick-knob" id="joystickKnob"></div>
     </div>
  <script type="module">
 
@@ -700,6 +801,7 @@ function updateGame(dt) {
   else if (KEYS.has("arrowdown")  || KEYS.has("s")) { dy =  1; world.player.dir = 'D'; }
 
   isMoving = (dx !== 0 || dy !== 0);
+  if (isMoving && window.__dismissTutorial) window.__dismissTutorial();
 
   if (isMoving) {
     lastDirection = world.player.dir;
@@ -912,6 +1014,44 @@ async function init(){
   } 
 const bind=(id,k,p=false)=>{ const el=document.getElementById(id); if(!el)return; const s=e=>{e.preventDefault(); KEYS.add(k); if(p)setTimeout(()=>KEYS.delete(k),100);}; el.addEventListener('touchstart',s,{passive:false}); el.addEventListener('touchend',e=>{e.preventDefault(); KEYS.delete(k);}); el.addEventListener('mousedown',s); el.addEventListener('mouseup',()=>KEYS.delete(k)); };
 bind("btnUp","arrowup"); bind("btnDown","arrowdown"); bind("btnLeft","arrowleft"); bind("btnRight","arrowright"); bind("btnE","e",true); bind("btnEsc","escape",true);
+
+// ── Virtual Joystick ──
+(function(){
+  var area = document.getElementById('joystickArea');
+  var knob = document.getElementById('joystickKnob');
+  if (!area || !knob) return;
+  var dirKeys = ['arrowleft','arrowright','arrowup','arrowdown'];
+  var touchId = null;
+  function center() {
+    var r = area.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2 };
+  }
+  function update(t) {
+    var c = center();
+    var dx = t.clientX - c.x, dy = t.clientY - c.y;
+    var maxR = area.offsetWidth/2 - 24;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    var clamped = Math.min(dist, maxR);
+    var angle = Math.atan2(dy, dx);
+    knob.style.transform = 'translate(calc(-50% + ' + (Math.cos(angle)*clamped) + 'px), calc(-50% + ' + (Math.sin(angle)*clamped) + 'px))';
+    dirKeys.forEach(function(k){KEYS.delete(k);});
+    if (dist > 14) {
+      if (angle > -Math.PI/4 && angle <= Math.PI/4) KEYS.add('arrowright');
+      else if (angle > Math.PI/4 && angle <= 3*Math.PI/4) KEYS.add('arrowdown');
+      else if (angle > 3*Math.PI/4 || angle <= -3*Math.PI/4) KEYS.add('arrowleft');
+      else KEYS.add('arrowup');
+    }
+  }
+  function reset() {
+    touchId = null;
+    knob.style.transform = 'translate(-50%, -50%)';
+    dirKeys.forEach(function(k){KEYS.delete(k);});
+  }
+  area.addEventListener('touchstart', function(e){e.preventDefault();if(touchId!==null)return;touchId=e.changedTouches[0].identifier;},{passive:false});
+  document.addEventListener('touchmove', function(e){if(touchId===null)return;for(var i=0;i<e.changedTouches.length;i++){if(e.changedTouches[i].identifier===touchId){update(e.changedTouches[i]);break;}}},{passive:false});
+  document.addEventListener('touchend', function(e){for(var i=0;i<e.changedTouches.length;i++){if(e.changedTouches[i].identifier===touchId){reset();break;}}},{passive:false});
+  document.addEventListener('touchcancel', function(e){for(var i=0;i<e.changedTouches.length;i++){if(e.changedTouches[i].identifier===touchId){reset();break;}}},{passive:false});
+})();
 init();
 </script>
 </div>
@@ -998,7 +1138,52 @@ function cambiarPersonaje(genero) {
   });
 }
 
-document.getElementById('char' + PLAYER_GENDER).classList.add('active');
+// ── Controles toggle (Cruz / Joystick) ──
+(function(){
+  var pref = localStorage.getItem('ctrl_pref') || 'dpad';
+  window.toggleControles = function(){
+    var o = document.getElementById('ctrlOptions');
+    o.style.display = o.style.display === 'none' ? 'flex' : 'none';
+  };
+  window.setControl = function(type){
+    try { localStorage.setItem('ctrl_pref', type); } catch(e) {}
+    document.querySelectorAll('.ctrl-opt').forEach(function(b){
+      b.classList.toggle('active', b.textContent.trim() === (type==='dpad' ? 'CRUZ' : 'JOYSTICK'));
+    });
+    var dpad = document.querySelector('.dpad');
+    if (dpad) dpad.style.display = type === 'dpad' ? 'grid' : 'none';
+    var ja = document.getElementById('joystickArea');
+    if (ja) ja.style.display = type === 'joystick' ? 'block' : 'none';
+  };
+  setControl(pref);
+})();
+
+// ── Musica toggle ──
+window.toggleMusica = function(){
+  var o = document.getElementById('musicOptions');
+  if (!o) return;
+  o.style.display = o.style.display === 'none' ? 'block' : 'none';
+};
+
+// ── Tutorial overlay (ASDW) — first visit only (desktop only) ──
+(function() {
+  if (window.innerWidth < 900) return;
+  var overlay = document.getElementById('tutorialOverlay');
+  if (!overlay) return;
+  var key = P_KEY + '_tutorial';
+  if (localStorage.getItem(key) === '1') {
+    overlay.classList.add('dismissed');
+    return;
+  }
+  window.__dismissTutorial = function() {
+    if (overlay.classList.contains('dismissed')) return;
+    overlay.classList.add('dismissed');
+    try { localStorage.setItem(key, '1'); } catch(e) {}
+  };
+  overlay.addEventListener('click', window.__dismissTutorial);
+})();
+
+try { document.getElementById('char' + PLAYER_GENDER).classList.add('active'); } catch(e) {}
 
 function guardarPosYIr() {
   try {
