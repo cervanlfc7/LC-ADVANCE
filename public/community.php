@@ -125,7 +125,7 @@ $currentUserName = $_SESSION['usuario_nombre'] ?? 'Invitado';
   <div class="wrap">
     <div class="top">
       <a href="../index.php">Inicio</a>
-      <a href="dashboard.php?materia=<?= urlencode($_SESSION['selected_materia'] ?? '') ?>">Dashboard</a>
+      <a href="<?= htmlspecialchars(getDashboardUrl()) ?>">Dashboard</a>
       <a href="mapa/index.php">Mapa</a>
     </div>
 
