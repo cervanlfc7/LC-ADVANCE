@@ -24,7 +24,6 @@ mysql -u root -p < db/lc_advance.sql # init DB
 - Player position/NPC state persisted via `localStorage` (session-scoped keys).
 - `cache/lecciones_compiled.php` — auto-generated JSON cache of lessons array.
 - OAuth secrets and SMTP creds are hardcoded in config.php for dev (use env vars in prod).
-- **Joystick visibility**: Only visible on mobile devices (max-width: 1024px). Controlled by CSS media query in `public/mapa/index.php` line 277 that hides `.mobile-controls` and joystick elements on desktop.
 
 ## Test quirks
 - CI imports `db/lc_advance.sql` then runs `scripts/seed_test_data.php`.

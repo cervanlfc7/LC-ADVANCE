@@ -274,11 +274,7 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
       box-shadow: 0 0 15px rgba(0,255,255,0.3);
       pointer-events: none;
     }
-    @media (min-width: 1025px), (pointer: fine) {
-      .mobile-controls { display: none !important; }
-      .joystick-area { display: none !important; }
-      #ctrlOptions .ctrl-opt[onclick*="joystick"] { display: none !important; }
-    }
+    @media (min-width: 1025px) { .mobile-controls { display: none !important; } }
 
     .volume-control label { display: block; color: var(--neon-yellow); font-size: 9px; margin-bottom: 6px; text-transform: uppercase; font-family: 'Press Start 2P', monospace; }
     .volume-control input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: rgba(255,255,255,0.1); border-radius: 3px; outline: none; }
@@ -1149,15 +1145,8 @@ function cambiarPersonaje(genero) {
 // ── Controles toggle (Cruz / Joystick) ──
 (function(){
   var pref = localStorage.getItem('ctrl_pref') || 'dpad';
-  var isDesktopControl = window.matchMedia('(pointer: fine)').matches || window.innerWidth >= 1025;
-  if (isDesktopControl) {
-    pref = 'dpad';
-    var joystickBtn = document.querySelector('.ctrl-opt[onclick*="joystick"]');
-    if (joystickBtn) joystickBtn.style.display = 'none';
-  }
   window.toggleControles = function(){
     var o = document.getElementById('ctrlOptions');
-    if (!o) return;
     o.style.display = o.style.display === 'none' ? 'flex' : 'none';
   };
   window.setControl = function(type){
