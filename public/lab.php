@@ -12,23 +12,13 @@ if (!isset($challenges[$active_challenge])) {
 
 $subjects = ['Programación', 'Pensamiento Matemático III', 'Física I', 'Química I', 'Ecosistemas'];
 
-$return_params = '';
-$params = [];
-if (!empty($_GET['profesor'])) {
-    $params[] = 'profesor=' . urlencode($_GET['profesor']);
-}
 $materia = null;
 if (isset($_GET['materia']) && $_GET['materia'] !== '') {
     $materia = $_GET['materia'];
 } elseif (!empty($_SESSION['selected_materia'])) {
     $materia = $_SESSION['selected_materia'];
 }
-if (!empty($materia)) {
-    $params[] = 'materia=' . urlencode($materia);
-}
-if (!empty($params)) {
-    $return_params = '?' . implode('&', $params);
-}
+$return_params = getDashboardReturnParams();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -74,7 +64,8 @@ if (!empty($params)) {
             font-family: var(--font-body);
             font-size: 14px;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* ─── BACKGROUNDS ───────────────────────────────────────── */
@@ -134,6 +125,26 @@ if (!empty($params)) {
             flex-direction: column;
             min-height: 0;
             overflow: hidden;
+        }
+
+        /* Mobile responsive: keep sidebar accessible and make editor scrollable */
+        @media (max-width: 900px) {
+            .app-layout { grid-template-columns: 1fr; height: auto; }
+            .sidebar { display: block; width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 340px; overflow-y: auto; }
+            .sidebar-header { padding: 16px 18px; }
+            .sidebar-search-wrap { padding: 0 16px 16px; }
+            .main-panel { padding: 16px; min-height: 0; }
+            .content-area { flex-direction: column; }
+            .workspace-panel { overflow: visible; }
+            .workspace-tabs { gap: 8px; }
+            .editor-area { flex-direction: column; }
+            .code-editor-inner { padding: 12px; }
+            .code-editor-inner textarea { min-height: 280px; }
+            .console-panel { height: 220px; max-height: 55vh; }
+            .console-tabs { overflow-x: auto; }
+            .console-tab { flex: 0 0 auto; }
+            .console-resize-handle { height: 10px; }
+            body { overflow-x: hidden; overflow-y: auto; }
         }
 
         /* ─── SIDEBAR ────────────────────────────────────────────── */
@@ -764,9 +775,12 @@ if (!empty($params)) {
 
         /* ─── RESPONSIVE ─────────────────────────────────────────── */
         @media (max-width: 1200px) {
-            .app-layout { grid-template-columns: 1fr; }
-            .sidebar { display: none; }
+            .app-layout { grid-template-columns: 1fr; height: auto; }
+            .sidebar { display: block; width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 360px; overflow-y: auto; }
             .content-area { flex-direction: column; }
+            .main-panel { padding: 16px; min-height: 0; }
+            .sidebar-search-wrap { padding: 0 16px 16px; }
+            .console-tabs { overflow-x: auto; }
         }
 
         /* ─── LOADING SPINNER ────────────────────────────────────── */
@@ -1038,25 +1052,33 @@ if (!empty($params)) {
         /* ─── AI CHAT WIDGET ──────────────────────────────────────── */
         .chat-widget { 
             position: fixed; 
-            bottom: 24px; 
-            right: 24px; 
-            z-index: 999;
+            bottom: 16px; 
+            right: 16px; 
+            z-index: 10020;
+            max-width: calc(100vw - 32px);
+            width: auto;
         }
         
         .chat-toggle-btn {
-            padding: 14px 24px;
+            width: 62px;
+            height: 62px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: linear-gradient(135deg, var(--cyan), var(--pink));
             border: none;
-            border-radius: 999px;
+            border-radius: 50%;
             color: var(--bg);
             font-family: var(--font-body);
-            font-size: 14px;
+            font-size: 22px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 12px 30px rgba(0, 229, 255, 0.25);
             position: relative;
             overflow: hidden;
+            min-width: 62px;
         }
         
         .chat-toggle-btn::before {
@@ -1085,17 +1107,19 @@ if (!empty($params)) {
         .chat-panel {
             position: fixed;
             bottom: 80px;
-            right: 24px;
-            width: 380px;
-            max-height: 540px;
+            right: 16px;
+            width: min(420px, calc(100vw - 32px));
+            max-width: 420px;
+            max-height: min(560px, calc(100vh - 120px));
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 18px;
             display: none;
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 0 0 1px var(--cyan);
             animation: chatSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: min(420px, calc(100vw - 32px));
         }
         
         @keyframes chatSlideIn {
@@ -1125,18 +1149,36 @@ if (!empty($params)) {
         .chat-panel-header-title {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .chat-panel-header-title span {
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .chat-title {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 13px;
+        }
+        .chat-subtitle {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.3;
         }
         
         .chat-header-actions {
             display: flex;
             gap: 6px;
+        }
+        .chat-hint {
+            font-size: 11px;
+            color: var(--muted);
+            padding: 6px 16px 14px;
+            text-align: center;
+            font-family: var(--font-mono);
         }
         
         .chat-header-btn {
@@ -1171,9 +1213,9 @@ if (!empty($params)) {
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            min-height: 280px;
-            max-height: 380px;
+            gap: 14px;
+            min-height: 220px;
+            max-height: calc(100vh - 280px);
             background: var(--bg);
         }
         
@@ -1377,6 +1419,69 @@ if (!empty($params)) {
             box-shadow: 0 4px 12px rgba(0, 229, 255, 0.3);
         }
 
+        @media (max-width: 900px) {
+            .chat-widget {
+                right: 12px;
+                left: auto;
+                bottom: 12px;
+                max-width: unset;
+                width: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            .chat-toggle-btn {
+                width: 62px;
+                height: 62px;
+                min-width: 62px;
+                padding: 0;
+                border-radius: 50%;
+            }
+            .chat-panel {
+                right: 12px;
+                left: auto;
+                bottom: 86px;
+                width: min(92vw, 420px);
+                max-width: calc(100vw - 24px);
+                max-height: calc(100vh - 140px);
+                border-radius: 20px;
+            }
+            .chat-messages {
+                max-height: calc(100vh - 280px);
+                min-height: 180px;
+            }
+            .chat-input-row {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 10px 12px;
+            }
+            .chat-input {
+                flex: 1 1 100%;
+                min-width: 0;
+                width: 100%;
+            }
+            .chat-send-btn {
+                width: 100%;
+                max-width: 180px;
+            }
+        }
+        @media (max-width: 640px) {
+            .chat-widget {
+                left: 8px;
+                right: 8px;
+                bottom: 8px;
+                max-width: calc(100vw - 16px);
+            }
+            .chat-panel {
+                bottom: 68px;
+                max-height: calc(100vh - 96px);
+                border-radius: 16px;
+            }
+            .chat-header-actions {
+                gap: 4px;
+            }
+        }
+
         /* ─── BOTTOM CONSOLE ─────────────────────────────────────── */
         .app-main-wrap {
             flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0;
@@ -1386,6 +1491,7 @@ if (!empty($params)) {
             height: 6px; background: var(--border); cursor: ns-resize; flex-shrink: 0;
             transition: all 0.2s ease; position: relative; z-index: 10;
             display: flex; align-items: center; justify-content: center;
+            touch-action: none;
         }
         .console-resize-handle::before {
             content: ''; width: 40px; height: 3px; background: var(--muted);
@@ -1639,27 +1745,32 @@ if (!empty($params)) {
 
         <!-- AI Chat Widget -->
         <div class="chat-widget" id="chatWidget">
-            <button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()">💬 LC-Tutor</button>
-            <div class="chat-panel" id="chatPanel">
+            <button class="chat-toggle-btn" id="chatToggleBtn" type="button" aria-label="Abrir LC-Tutor">💬</button>
+            <div class="chat-panel" id="chatPanel" aria-hidden="true" aria-label="Asistente LC-Tutor">
                 <div class="chat-panel-header">
                     <div class="chat-panel-header-title">
-                        <span>🤖</span> <span>LC-Tutor</span>
+                        <div class="chat-msg-avatar">🤖</div>
+                        <div>
+                            <div class="chat-title">LC-Tutor</div>
+                            <div class="chat-subtitle">Tu asistente educativo</div>
+                        </div>
                     </div>
                     <div class="chat-header-actions">
                         <button class="chat-header-btn clear-btn" onclick="clearChatHistory()" title="Limpiar conversación">🗑</button>
-                        <button class="chat-header-btn" onclick="toggleChat()">✕</button>
+                        <button class="chat-header-btn" onclick="toggleChat()" title="Cerrar chat">✕</button>
                     </div>
                 </div>
                 <div class="chat-messages" id="chatMessages">
-                    <div class="chat-msg welcome-msg" style="text-align: center; color: var(--muted); padding: 40px 20px;">
-                        <div style="font-size: 32px; margin-bottom: 12px;">🤖</div>
-                        <div>Haz clic en el botón para iniciar una conversación</div>
+                    <div class="chat-msg welcome-msg" style="text-align: center; color: var(--muted); padding: 32px 20px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🚀</div>
+                        <div>Pulsa el botón para iniciar una conversación con LC-Tutor.</div>
                     </div>
                 </div>
-                <div class="chat-input-row">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }">
-                    <button class="chat-send-btn" onclick="sendChatMessage()">➤</button>
-                </div>
+                <form class="chat-input-row" onsubmit="event.preventDefault(); sendChatMessage();">
+                    <textarea class="chat-input" id="chatInput" rows="2" placeholder="Pregunta lo que necesites..." autocomplete="off"></textarea>
+                    <button class="chat-send-btn" type="submit">➤</button>
+                </form>
+                <div class="chat-hint">Enter para enviar · Shift+Enter para nueva línea</div>
             </div>
         </div>
 
@@ -1769,6 +1880,28 @@ if (!empty($params)) {
         if (window.marked) marked.setOptions({ breaks: true, gfm: true });
         refreshSidebarBadges();
         loadChallenge(currentChallenge);
+
+        var chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
+                }
+            });
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+        }
+
+        var chatToggleBtn = document.getElementById('chatToggleBtn');
+        if (chatToggleBtn) {
+            chatToggleBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                toggleChat();
+            });
+        }
     });
 
     function refreshSidebarBadges() {
@@ -2458,7 +2591,12 @@ if (!empty($params)) {
         var ws = document.getElementById('wolframSection');
         var mp = document.querySelector('.main-panel');
         var cw = document.querySelector('.chat-widget');
+        var cp = document.getElementById('consolePanel');
+        var ch = document.getElementById('consoleResizeHandle');
         if (cw) cw.classList.toggle('hidden', wolframActive);
+        if (cp) cp.style.display = wolframActive ? 'none' : 'flex';
+        if (ch) ch.style.display = wolframActive ? 'none' : 'flex';
+
         if (wolframActive) {
             ws.classList.remove('hidden');
             ws.style.display = 'flex';
@@ -2477,9 +2615,13 @@ if (!empty($params)) {
     function closeWolframMode() {
         wolframActive = false;
         var ws = document.getElementById('wolframSection');
+        var cp = document.getElementById('consolePanel');
+        var ch = document.getElementById('consoleResizeHandle');
         ws.classList.add('hidden');
         ws.style.display = 'none';
         document.querySelector('.main-panel').style.display = 'flex';
+        if (cp) cp.style.display = 'flex';
+        if (ch) ch.style.display = 'flex';
         var cw = document.querySelector('.chat-widget');
         if (cw) cw.classList.remove('hidden');
     }
@@ -3501,10 +3643,21 @@ if (!empty($params)) {
     function toggleChat() {
         chatOpen = !chatOpen;
         var panel = document.getElementById('chatPanel');
+        if (!panel) return;
+
         panel.classList.toggle('visible', chatOpen);
+        panel.style.display = chatOpen ? 'flex' : 'none';
+        panel.setAttribute('aria-hidden', chatOpen ? 'false' : 'true');
+        panel.style.pointerEvents = chatOpen ? 'auto' : 'none';
+
+        if (chatOpen) {
+            setTimeout(function() {
+                var input = document.getElementById('chatInput');
+                if (input) input.focus();
+            }, 150);
+        }
         
         if (chatOpen && chatHistory.length === 0) {
-            // Mensaje inicial con contexto del desafío
             var initMsg = getInitialContextMessage();
             addChatMessage('ai', initMsg, false);
         }
@@ -3514,36 +3667,38 @@ if (!empty($params)) {
         var challenge = challenges[currentChallenge];
         var title = challenge ? challenge.title : 'Desafío desconocido';
         var difficulty = challenge ? challenge.difficulty : '';
+        var subject = challenge ? (challenge.materia || 'Laboratorio') : 'Laboratorio';
+        var challengeType = challenge && challenge.type === 'code' ? 'editor de código' : 'actividad interactiva';
         var description = challenge ? (challenge.description || '') : '';
         
         return '¡Hola! Soy **LC-Tutor**, tu asistente de código.\n\n' +
-            'Estoy ayudarte con el desafío actual: **' + title + '**\n' +
-            'Nivel: ' + (difficulty || 'No especificado') + '\n\n' +
+            'Estás en el Laboratorio de **' + subject + '**, desafío **' + title + '**.\n' +
+            'Sección: ' + challengeType + ' · Nivel: ' + (difficulty || 'No especificado') + '.\n\n' +
             (description ? '📋 ' + description.substring(0, 200) + '...\n\n' : '') +
-            '¿En qué puedo ayudarte? Puedo:\n' +
-            '- Explicarte el problema\n' +
+            'Te ayudaré con el contexto exacto de este desafío. Puedo:\n' +
+            '- Explicar el problema\n' +
             '- Ayudarte con el código\n' +
-            '- Darte pistas sin spoilear la solución\n' +
+            '- Dar pistas sin spoilear la solución\n' +
             '- Explicar conceptos de programación';
     }
 
-    function sendChatMessage() {
+    async function sendChatMessage() {
         if (isGenerating) return;
         
         var input = document.getElementById('chatInput');
-        var msg = input.value.trim();
+        var msg = input ? input.value.trim() : '';
         if (!msg) return;
         
-        // Agregar mensaje del usuario
         addChatMessage('user', msg, true);
-        input.value = '';
+        if (input) {
+            input.value = '';
+            input.style.height = 'auto';
+            input.disabled = true;
+        }
         
-        // Mostrar indicador de "escribiendo"
         showTypingIndicator();
-        input.disabled = true;
         isGenerating = true;
         
-        // Construir contexto del desafío actual
         var challenge = challenges[currentChallenge];
         var contextInfo = {
             challengeId: currentChallenge,
@@ -3554,7 +3709,6 @@ if (!empty($params)) {
             challengeSolution: challenge ? (challenge.solution || '') : ''
         };
         
-        // Construir historial de la conversación para contexto
         var conversationHistory = chatHistory.slice(-6).map(function(item) {
             return (item.role === 'user' ? 'Usuario: ' : 'Tutor: ') + item.content;
         }).join('\n');
@@ -3567,46 +3721,46 @@ if (!empty($params)) {
             total: '10',
             question: msg,
             provider: 'auto',
-            // Información adicional del contexto
             challenge_context: JSON.stringify(contextInfo),
             conversation_history: conversationHistory
         });
 
-        fetch('ai_tutor.php', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            cache: 'no-store',
-            body: body
-        })
-        .then(function(r) { return r.text(); })
-        .then(function(raw) {
+        try {
+            var response = await fetch('ai_tutor.php', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                cache: 'no-store',
+                body: body
+            });
+            var raw = await response.text();
             removeTypingIndicator();
-            input.disabled = false;
+            if (input) input.disabled = false;
             isGenerating = false;
+
+            var data;
             try {
-                var data = JSON.parse(raw);
-                if (data.ok && data.ai_text) {
-                    addChatMessage('ai', data.ai_text, false);
-                } else {
-                    addChatMessage('ai', '⚠️ No se pudo obtener respuesta. Por favor intenta de nuevo.', false);
-                }
-            } catch(e) {
-                addChatMessage('ai', '⚠️ Error al procesar la respuesta: ' + e.message, false);
+                data = JSON.parse(raw);
+            } catch (e) {
+                throw new Error('Respuesta inválida del asistente.');
             }
-        })
-        .catch(function(err) {
+
+            if (data.ok && data.ai_text) {
+                addChatMessage('ai', data.ai_text, false);
+            } else {
+                addChatMessage('ai', '⚠️ No se pudo obtener respuesta. Por favor intenta de nuevo.' + (data.error ? ' ' + data.error : ''), false);
+            }
+        } catch (err) {
             removeTypingIndicator();
-            input.disabled = false;
+            if (input) input.disabled = false;
             isGenerating = false;
-            addChatMessage('ai', '⚠️ Error de conexión. Verifica tu internet e intenta de nuevo.', false);
-        });
+            addChatMessage('ai', '⚠️ Error al conectar con el asistente. ' + err.message, false);
+        }
     }
 
     function addChatMessage(role, text, saveToHistory) {
         var container = document.getElementById('chatMessages');
         
-        // Remover mensaje de bienvenida si existe
         var welcomeMsg = container.querySelector('.welcome-msg');
         if (welcomeMsg) welcomeMsg.remove();
         
@@ -3622,9 +3776,6 @@ if (!empty($params)) {
                 '<div class="chat-msg-text">' + renderMd(text) + '</div>' +
                 '</div>';
             div.innerHTML = avatar + content;
-            
-            // Agregar botones de acción para mensajes de IA
-            addActionButtons(div, text);
         } else {
             var avatar = '<div class="chat-msg-avatar user">👤</div>';
             var content = '<div class="chat-msg-content">' + 
@@ -3637,76 +3788,30 @@ if (!empty($params)) {
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;
         
-        // Guardar en historial
         if (saveToHistory) {
             chatHistory.push({ role: role, content: text, timestamp: Date.now() });
             try {
                 sessionStorage.setItem('lc_chat_history_' + currentChallenge, JSON.stringify(chatHistory.slice(-20)));
-            } catch(e) {}
+            } catch (e) {}
         }
         
-        // Renderizar matemática si hay
         setTimeout(function() {
             renderMath();
-            // Highlight de código
             container.querySelectorAll('pre code').forEach(function(block) {
-                hljs.highlightElement(block);
+                if (window.hljs) hljs.highlightElement(block);
             });
         }, 100);
         
-        // Asegurar que el panel esté visible
-        document.getElementById('chatPanel').classList.add('visible');
+        var panel = document.getElementById('chatPanel');
+        if (panel) {
+            panel.classList.add('visible');
+            panel.style.display = 'flex';
+            panel.setAttribute('aria-hidden', 'false');
+            panel.style.pointerEvents = 'auto';
+        }
         chatOpen = true;
     }
-    
-    function addActionButtons(msgDiv, text) {
-        var actions = document.createElement('div');
-        actions.className = 'chat-msg-actions';
-        
-        // Botón copiar
-        var copyBtn = document.createElement('button');
-        copyBtn.className = 'chat-action-btn';
-        copyBtn.innerHTML = '📋 Copiar';
-        copyBtn.onclick = function() {
-            var textToCopy = text.replace(/```[\s\S]*?```/g, function(m) {
-                return m.replace(/```\w*\n?/g, '').trim();
-            });
-            navigator.clipboard.writeText(textToCopy).then(function() {
-                copyBtn.innerHTML = '✓ Copiado';
-                setTimeout(function() { copyBtn.innerHTML = '📋 Copiar'; }, 2000);
-            });
-        };
-        
-        // Botón regenerar
-        var regenBtn = document.createElement('button');
-        regenBtn.className = 'chat-action-btn';
-        regenBtn.innerHTML = '🔄 Regenerar';
-        regenBtn.onclick = function() {
-            if (chatHistory.length > 1) {
-                var lastUserMsg = chatHistory[chatHistory.length - 2];
-                chatHistory = chatHistory.slice(0, -2);
-                var container = document.getElementById('chatMessages');
-                container.innerHTML = '';
-                sendChatMessage.call({ previousMessage: lastUserMsg.content });
-            }
-        };
-        
-        // Botón compartir
-        var shareBtn = document.createElement('button');
-        shareBtn.className = 'chat-action-btn';
-        shareBtn.innerHTML = '📤 Compartir';
-        shareBtn.onclick = function() {
-            if (navigator.share) {
-                navigator.share({ text: text, title: 'Conversación con LC-Tutor' });
-            }
-        };
-        
-        actions.appendChild(copyBtn);
-        actions.appendChild(regenBtn);
-        actions.appendChild(shareBtn);
-        msgDiv.appendChild(actions);
-    }
-    
+
     function showTypingIndicator() {
         var container = document.getElementById('chatMessages');
         var indicator = document.createElement('div');
@@ -3820,6 +3925,43 @@ if (!empty($params)) {
             document.addEventListener('mouseup', onMouseUp);
             e.preventDefault();
         });
+
+        handle.addEventListener('touchstart', function(e) {
+            if (!e.touches || e.touches.length !== 1) return;
+            isResizing = true;
+            startY = e.touches[0].clientY;
+            startHeight = panel.offsetHeight;
+            document.body.style.userSelect = 'none';
+            handle.classList.add('active');
+            document.addEventListener('touchmove', onTouchMove, { passive: false });
+            document.addEventListener('touchend', onMouseUp);
+            e.preventDefault();
+        });
+
+        function onTouchMove(e) {
+            if (!isResizing) return;
+            var clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+            var newHeight = startHeight - (clientY - startY);
+            if (newHeight < 60) newHeight = 60;
+            var maxH = window.innerHeight * 0.7;
+            if (newHeight > maxH) newHeight = maxH;
+            panel.style.height = newHeight + 'px';
+            panel.classList.remove('collapsed');
+            e.preventDefault();
+        }
+
+        function onMouseUp() {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                handle.classList.remove('active');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                document.removeEventListener('touchmove', onTouchMove);
+                document.removeEventListener('touchend', onMouseUp);
+            }
+        }
     })();
 
 </script>

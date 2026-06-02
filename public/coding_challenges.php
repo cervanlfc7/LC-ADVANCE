@@ -35,6 +35,8 @@ $i18n = [
         'difficulty' => 'Difficulty',
     ],
 ];
+
+$dashboardUrl = getDashboardUrl();
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($lang) ?>">
@@ -145,7 +147,7 @@ $i18n = [
             <h1 style="margin:0 0 6px;"><?= htmlspecialchars($i18n[$lang]['title']) ?></h1>
             <div class="subtitle"><?= htmlspecialchars($i18n[$lang]['subtitle']) ?></div>
         </div>
-        <a href="dashboard.php"><?= htmlspecialchars($i18n[$lang]['go_dashboard']) ?></a>
+        <a href="<?= htmlspecialchars($dashboardUrl) ?>"><?= htmlspecialchars($i18n[$lang]['go_dashboard']) ?></a>
     </div>
 
     <div class="grid">

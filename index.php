@@ -1084,15 +1084,17 @@ header.header {
 @media (max-width: 768px) {
     .header-inner { height: 56px; }
     .site-header { padding: 0 20px; }
-    .hero { margin-top: 56px; padding: 60px 20px; }
+    .hero { margin-top: 56px; padding: 40px 20px; }
     .hero-stats { gap: 24px; padding: 24px 20px; }
     .cards-grid { grid-template-columns: 1fr; gap: 16px; }
     .paths-grid { grid-template-columns: 1fr; gap: 16px; }
     .footer-grid { grid-template-columns: 1fr; gap: 40px; }
     .cta-banner { padding: 48px 28px; }
-    .header-nav .nav-btn:not(:last-child) { display: none; }
+    .header-inner { height: auto; gap: 10px; flex-wrap: wrap; }
+    .header-nav { width: 100%; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; overflow-x: auto; padding-bottom: 8px; }
+    .header-nav .nav-btn { flex: 0 0 auto; white-space: nowrap; }
     .mobile-cta { display: block; }
-    .hamburger { display: flex; align-items: center; justify-content: center; }
+    .hamburger { display: none; }
     .hero-actions { flex-direction: column; width: 100%; }
     .cta-btn { width: 100%; }
     .materia-modal-card { padding: 32px; }
