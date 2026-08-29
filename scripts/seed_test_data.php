@@ -13,20 +13,25 @@ try {
     exit(2);
 }
 
-$username = 'ci_test_user';
-$email = 'ci_test@example.com';
-$password = 'Test1234';
+$test_users = [
+    ['ci_test_user', 'ci_test@example.com', 'Test1234', 'student', 0],
+    ['admin', 'admin@lc-advance.test', 'Admin1234', 'admin', 99999],
+    ['profesor', 'teacher@lc-advance.test', 'Teacher1234', 'teacher', 500],
+];
 
-$stmt = $pdo->prepare('SELECT id FROM usuarios WHERE nombre_usuario = ? OR correo = ?');
-$stmt->execute([$username, $email]);
-if ($stmt->fetch()) {
-    echo "User already exists, skipping seeding\n";
-    exit(0);
+$seeded = 0;
+foreach ($test_users as [$username, $email, $password, $tipo, $puntos]) {
+    $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE nombre_usuario = ? OR correo = ?');
+    $stmt->execute([$username, $email]);
+    if ($stmt->fetch()) continue;
+
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare('INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, puntos, nivel, tipo) VALUES (?, ?, ?, ?, ?, ?)');
+    $nivel = floor($puntos / 500) + 1;
+    $stmt->execute([$username, $email, $hash, $puntos, $nivel, $tipo]);
+    echo "Seeded user: {$username} ({$tipo})\n";
+    $seeded++;
 }
 
-$hash = password_hash($password, PASSWORD_DEFAULT);
-$stmt = $pdo->prepare('INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, puntos, nivel) VALUES (?, ?, ?, 0, 1)');
-$stmt->execute([$username, $email, $hash]);
-
-echo "Seeded CI test user: {$username}\n";
+if ($seeded === 0) echo "All users already exist, skipping seeding\n";
 exit(0);

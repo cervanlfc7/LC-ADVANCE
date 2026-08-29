@@ -1,24 +1,21 @@
 <?php
 header("Content-Type: application/json; charset=utf-8");
-header("Access-Control-Allow-Origin: *");
+$allowedOrigin = (!empty($_SERVER['HTTP_ORIGIN']) && parse_url($_SERVER['HTTP_ORIGIN'], PHP_URL_HOST) === ($_SERVER['HTTP_HOST'] ?? '')) ? $_SERVER['HTTP_ORIGIN'] : '';
+if ($allowedOrigin) {
+    header("Access-Control-Allow-Origin: $allowedOrigin");
+}
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
+require_once __DIR__ . '/../../src/Config/config.php';
 
-$conexion = new mysqli("localhost", "root", "", "lc_advance");
-if ($conexion->connect_error) {
-    die(json_encode(["success" => false, "error" => $conexion->connect_error]));
-}
-
-// Asegurar que la tabla maestroact exista para evitar errores en tiempo de ejecución
-$conexion->query("CREATE TABLE IF NOT EXISTS `maestroact` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `maestroact` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `IDPersonajeC` VARCHAR(100) NOT NULL,
   `Maestro_Actual` VARCHAR(255) NOT NULL,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 
-// --- Catálogo: nombreProfesor → IDPersonajeC --- (usando nombres cortos como en original)
 $mapaIDs = [
     "Miguel"    => "1Le",
     "Enrique"   => "1Go",
@@ -28,17 +25,22 @@ $mapaIDs = [
     "Herson"    => "1He",
     "Carolina"  => "1Ca",
     "Refugio & Padilla" => "1Cu",
-    "Armando"   => "1Ar" // Si existe
+    "Armando"   => "1Ar"
 ];
 
-// --- Recibir datos desde el juego ---
 $raw_input = file_get_contents("php://input");
 $data = json_decode($raw_input, true);
-// Fallback to form-encoded POST if JSON decoding fails (some clients may not send proper JSON)
 if (!is_array($data)) {
     $data = $_POST;
 }
-// If still empty but raw input exists, try parsing urlencoded or re-decode
+
+$csrf_token = $data['csrf_token'] ?? '';
+if (!validarCsrfToken($csrf_token)) {
+    http_response_code(403);
+    echo json_encode(["success" => false, "error" => "CSRF inválido"]);
+    exit;
+}
+
 if (empty($data) && !empty($raw_input)) {
     parse_str($raw_input, $parsed);
     if (!empty($parsed)) {
@@ -51,7 +53,6 @@ if (empty($data) && !empty($raw_input)) {
 $maestro = $data["maestro"] ?? null;
 $materia_received = $data["materia"] ?? null;
 
-// Normalizar nombre...
 function normalize_name($s) {
     if ($s === null) return null;
     $s = trim(mb_strtolower($s, 'UTF-8'));
@@ -69,21 +70,11 @@ foreach ($mapaIDs as $name => $id) {
 
 if ($maestro && $foundKey) {
     $idPersonaje = $mapaIDs[$foundKey];
-    $conexion->query("DELETE FROM maestroact");
-    $sql = "INSERT INTO maestroact (IDPersonajeC, Maestro_Actual) VALUES (?, ?)";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("ss", $idPersonaje, $foundKey);
+    $pdo->exec("DELETE FROM maestroact");
+    $stmt = $pdo->prepare("INSERT INTO maestroact (IDPersonajeC, Maestro_Actual) VALUES (?, ?)");
+    $stmt->execute([$idPersonaje, $foundKey]);
 
-    if ($stmt->execute()) {
-        echo json_encode(["success" => true, "message" => "Registro insertado", "maestro" => $foundKey, "materia" => $materia_received]);
-    } else {
-        echo json_encode(["success" => false, "error" => $stmt->error, "received_materia" => $materia_received]);
-    }
-
-    $stmt->close();
+    echo json_encode(["success" => true, "message" => "Registro insertado", "maestro" => $foundKey, "materia" => $materia_received]);
 } else {
     echo json_encode(["success" => false, "error" => "Maestro no reconocido", "received" => $maestro, "received_materia" => $materia_received]);
 }
-
-$conexion->close();
-?>

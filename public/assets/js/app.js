@@ -12,21 +12,26 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
       const leccionId = this.dataset.leccion;
+      const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
 
-      fetch("src/funciones.php", {
+      var restoreBtn = lcLoader && lcLoader.disableBtn(btn, 'Guardando...');
+      var root = window.__APP_ROOT__ || '.'; fetch(root + "/src/Core/funciones.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `accion=completar&leccion=${leccionId}`,
+        body: `accion=completar&leccion=${leccionId}&csrf_token=${encodeURIComponent(csrfToken)}`,
       })
         .then((res) => res.json())
         .then((data) => {
+          if (restoreBtn) restoreBtn();
           if (data.ok) {
             alert(`🎉 Lección completada! +${data.puntos} puntos`);
             actualizarProgreso(data.nivel, data.puntos, data.badges);
           } else {
             alert("Error al completar la lección");
           }
-        });
+        })
+        ['catch'](function () { if (restoreBtn) restoreBtn(); });
     });
   });
 
@@ -139,32 +144,27 @@ if (loginBtn && authWrapper && usernameInput && passwordInput) {
   const root = document.documentElement || document.body;
 
   function applyTheme(theme) {
-    if (theme === "dark") document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      document.body.classList.remove("theme-light");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.classList.add("theme-light");
+    }
   }
 
-  // Aplicar preferencia guardada; no forzar tema por defecto (se usará la configuración del sistema o del CSS base)
+  // Aplicar preferencia guardada
   try {
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved) {
-      applyTheme(saved);
-    } else {
-      // No se aplica tema automáticamente; el sitio usa estilos base por defecto
-      // Si necesitamos aplicar el recomendado por sistema: // if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
-    }
-  } catch (e) {
-    /* ignored */
-  }
+    const saved = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : '');
+    if (saved) applyTheme(saved);
+  } catch (e) {}
 
   // Exponer función global para alternar
   window.toggleDarkMode = function () {
-    const isDark = document.documentElement.classList.toggle("dark");
-    try {
-      localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
-    } catch (e) {
-      /* ignored */
-    }
-    return isDark;
+    const isDark = document.documentElement.classList.contains("dark");
+    applyTheme(isDark ? "light" : "dark");
+    try { localStorage.setItem(THEME_KEY, isDark ? "light" : "dark"); } catch (e) {}
+    return !isDark;
   };
 
   // Delegación: botones con clase .dark-toggle alternan el tema
@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // TOP 10 RANKING - Actualizar dashboard
 // ========================================
 function fetchAndUpdateDashboard() {
-  fetch("api/ranking.php", {
+  var root = window.__APP_ROOT__ || '.'; fetch(root + "/public/api/ranking.php", {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   })

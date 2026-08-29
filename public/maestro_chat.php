@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/Config/config.php';
-requireLogin(true);
+require_once __DIR__ . '/../src/Core/panel_docente.php';
+requireStudent();
 
 $supported_langs = ['es', 'en'];
 if (isset($_GET['lang']) && in_array($_GET['lang'], $supported_langs, true)) $_SESSION['lang'] = $_GET['lang'];
@@ -70,6 +71,11 @@ $history     = $_SESSION[$history_key] ?? [];
 /* ── AJAX handlers ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json; charset=utf-8');
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (!validarCsrfToken($csrf_token)) {
+        echo json_encode(['ok' => false, 'error' => 'CSRF inválido']);
+        exit;
+    }
     $action = $_POST['action'] ?? '';
 
     if ($action === 'clear') {
@@ -149,8 +155,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="<?= $lang ?>">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
 <title><?= htmlspecialchars($profesor) ?> | <?= htmlspecialchars($t[$lang]['title']) ?> | LC-ADVANCE</title>
+<script>MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']] } };</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
@@ -353,11 +362,23 @@ html, body {
 }
 @keyframes msgIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
 .msg.user      { align-self:flex-end; background:rgba(0,229,255,.06); border:1px solid rgba(0,230,255,.15); }
+.msg.user code { font-family:var(--font-mono); background:rgba(6,10,18,.6); padding:1px 4px; border-radius:3px; font-size:10px; }
 .msg.assistant { align-self:flex-start; background:rgba(16,24,40,.85); border:1px solid rgba(0,230,255,.06); }
 .msg.assistant strong { color:var(--cyan); }
 .msg.assistant code  { font-family:var(--font-mono); background:rgba(6,10,18,.8); padding:1px 4px; border-radius:3px; font-size:10px; }
 .msg.assistant pre   { background:rgba(6,10,18,.8); padding:6px; border-radius:4px; overflow-x:auto; margin:4px 0; font-size:10px; }
 .msg.assistant pre code { background:none; padding:0; }
+.msg.assistant ul, .msg.assistant ol { margin:4px 0; padding-left:16px; }
+.msg.assistant li { margin:2px 0; }
+.msg.assistant p { margin:4px 0; }
+.msg.assistant h3, .msg.assistant h4 { margin:6px 0 2px; color:var(--cyan); font-family:var(--font-mono); font-size:11px; }
+.msg.assistant blockquote { border-left:2px solid var(--cyan); padding-left:8px; margin:4px 0; color:var(--muted); }
+.msg.assistant a { color:var(--cyan); text-decoration:underline; }
+.msg a { color:var(--cyan); text-decoration:underline; }
+.msg img { max-width:100%; border-radius:4px; margin:4px 0; }
+.msg table { border-collapse:collapse; margin:4px 0; font-size:10px; width:100%; }
+.msg th, .msg td { border:1px solid var(--border); padding:3px 6px; text-align:left; }
+.msg th { background:rgba(0,229,255,.08); color:var(--cyan); font-family:var(--font-mono); }
 .msg.thinking  { align-self:flex-start; color:var(--muted); font-style:italic; background:transparent; border:none; }
 .msg.greeting  { align-self:center; text-align:center; background:transparent; border:none; color:var(--muted); padding:12px 6px; }
 .msg.greeting strong { color:var(--text-secondary); display:block; font-size:11px; margin-bottom:4px; }
@@ -588,7 +609,7 @@ html, body {
 
     <div class="header-right">
         <div class="header-volume">
-            <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+            <button class="vol-btn" id="volBtn">🔊</button>
             <div class="vol-slider" id="volSlider">
                 <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.05" value="0.1">
             </div>
@@ -659,6 +680,7 @@ html, body {
 <div class="salon-credits"><?= htmlspecialchars($profesor) ?> — <?= htmlspecialchars($materia) ?></div>
 
 <!-- ══ AUDIO ══ -->
+<script src="<?= assetUrl('assets/js/volume_control.js') ?>"></script>
 <audio id="pageMusic" loop>
     <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
 </audio>
@@ -929,6 +951,7 @@ function addMsg(role, content) {
     d.innerHTML = content.replace(/\n/g, '<br>');
     chatMsgs.appendChild(d);
     scrollToBottom();
+    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([d]);
 }
 function addThinking() {
     const d = document.createElement('div');
@@ -940,6 +963,8 @@ function rmThink() { const e = document.getElementById('thinkingMsg'); if (e) e.
 
 async function saveMsg(role, content) {
     const fd = new FormData();
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    fd.append('csrf_token', csrfMeta ? csrfMeta.getAttribute('content') : '');
     fd.append('action', 'save'); fd.append('role', role); fd.append('content', content);
     try { await fetch(window.location.href, { method: 'POST', body: fd }); } catch(e) {}
 }
@@ -950,6 +975,8 @@ async function sendMessage() {
     addMsg('user', q); saveMsg('user', q);
     sendBtn.disabled = true; chatInput.disabled = true; addThinking();
     const fd = new FormData();
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    fd.append('csrf_token', csrfMeta ? csrfMeta.getAttribute('content') : '');
     fd.append('action', 'ask'); fd.append('question', q);
     try {
         const r = await fetch(window.location.href, { method: 'POST', body: fd });
@@ -971,36 +998,24 @@ chatInput.addEventListener('input', () => {
 
 clearBtn.onclick = async () => {
     if (!confirm('<?= htmlspecialchars($t[$lang]['confirm_clear']) ?>')) return;
-    const fd = new FormData(); fd.append('action', 'clear');
+    const fd = new FormData();
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    fd.append('csrf_token', csrfMeta ? csrfMeta.getAttribute('content') : '');
+    fd.append('action', 'clear');
     try { await fetch(window.location.href, { method: 'POST', body: fd }); } catch(e) {}
     location.reload();
 };
 
 scrollToBottom();
 
-/* ════════════════════════════════════════════
-   AUDIO / VOLUME
-════════════════════════════════════════════ */
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-    const s = localStorage.getItem(STORAGE_KEY);
-    return s ? JSON.parse(s) : { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
-}
-const volumes = getStoredVolumes();
-const pAudio  = document.getElementById('pageMusic');
-pAudio.volume = volumes.principal;
-pAudio.play().catch(() => {});
-
-function toggleVolumeSlider() {
-    document.getElementById('volSlider').classList.toggle('show');
-}
-const volSlider = document.getElementById('volPrincipalSlider');
-volSlider.value = volumes.principal;
-volSlider.addEventListener('input', e => {
-    volumes.principal = parseFloat(e.target.value);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
-    pAudio.volume = volumes.principal;
-    document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+/* AUDIO / VOLUME */
+initVolumeControl({
+  audioId: 'pageMusic',
+  sliderId: 'volPrincipalSlider',
+  btnId: 'volBtn',
+  containerId: 'volSlider',
+  channel: 'principal',
+  defaultVol: 0.1
 });
 </script>
 </body>

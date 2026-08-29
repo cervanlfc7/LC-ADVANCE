@@ -23,66 +23,196 @@ $t = [
         'nav_logout' => 'Cerrar Sesión',
         'nav_login' => 'Iniciar Sesión',
         'nav_register' => 'Registrarse',
-        'coding_lab' => 'Laboratorio',
+        'nav_teacher' => 'Panel Docente',
+        'nav_profile' => 'Mi Perfil',
+        'nav_logros' => 'Logros',
+        'nav_coding' => 'Laboratorio',
+        'nav_community' => 'Comunidad',
+        'nav_ai_tutor' => 'Tutor IA',
+
         'hero_title_logged' => 'Bienvenido de vuelta',
         'hero_title_guest' => 'Domina todas tus materias',
         'hero_sub_logged' => 'Tu progreso está guardado. Continúa tu aventura educativa.',
-        'hero_sub_guest' => 'La plataforma educativa gamificada que transforma el aprendizaje en una experiencia épica.',
-        'hero_go_dashboard' => 'Ir al Dashboard',
+        'hero_sub_guest' => 'La plataforma educativa gamificada para DGETI que transforma el aprendizaje en una experiencia épica con IA, retos de programación y combates por turnos.',
         'hero_start' => 'Comenzar Ahora',
         'hero_guest' => 'Acceso Invitado',
         'cta_map' => 'Ir al Mapa',
-        'mobile_cta' => 'Comenzar gratis',
-        'cards_rank_title' => 'Sistema de Ranking',
-        'cards_rank_desc' => 'Compite globalmente. Sube en el ranking, gana insignias y demuestra tu dominio en cada materia.',
-        'cards_progress_title' => 'Progreso Guardado',
-        'cards_progress_desc' => 'Tu avance se sincroniza automáticamente. Retoma desde donde dejaste en cualquier dispositivo.',
-        'cards_analytics_title' => 'Análisis Detallado',
-        'cards_analytics_desc' => 'Dashboard interactivo con métricas de tu desempeño y estadísticas visuales en tiempo real.',
-        'paths_title' => 'Rutas destacadas',
-        'paths_sub' => 'Elige un camino recomendado y avanza con metas claras.',
-        'path_1_title' => 'Ruta Programación Fullstack',
-        'path_1_desc' => 'Fundamentos, lógica, frontend y backend con retos progresivos.',
-        'path_2_title' => 'Ruta Ciencias Aplicadas',
-        'path_2_desc' => 'Física, química y matemáticas con simulaciones y práctica guiada.',
-        'path_3_title' => 'Ruta Alto Rendimiento',
-        'path_3_desc' => 'Entrenamiento intensivo con ranking competitivo y duelos semanales.',
+
+        'stats_lessons' => 'Lecciones',
+        'stats_questions' => 'Preguntas',
+        'stats_subjects' => 'Materias',
+        'stats_badges' => 'Logros',
+
+        'feature_map_title' => 'Explora el Campus Virtual',
+        'feature_map_badge' => '🗺 Exploración Interactiva',
+        'feature_map_desc' => 'Navega por un mundo pixelado donde cada edificio representa un área del conocimiento. Camina, habla con maestros NPC, y desbloquea secretos ocultos en el mapa.',
+        'feature_map_sub' => 'Un entorno inmersivo RPG donde el aprendizaje se siente como una aventura clásica de 16 bits.',
+
+        'feature_ai_title' => 'Tutor con Inteligencia Artificial',
+        'feature_ai_badge' => '🤖 IA Educativa',
+        'feature_ai_desc' => 'Cada lección tiene un tutor IA potenciado por OpenRouter. Haz preguntas, pide explicaciones, o activa el modo Repaso para enfoque automático en tus áreas débiles.',
+        'feature_ai_sub' => 'También puedes chatear con maestros virtuales como "Profe Manuel" para Programación o "Profe Herson" para Física.',
+
+        'feature_duel_title' => 'Combates de Conocimiento',
+        'feature_duel_badge' => '⚔ Gamificación Avanzada',
+        'feature_duel_desc' => 'Los exámenes se convierten en épicos enfrentamientos por turnos contra los maestros. Cada respuesta correcta es un golpe; cada error, una oportunidad de aprender.',
+        'feature_duel_sub' => 'Gana XP, sube de nivel, colecciona insignias y libera todo tu potencial.',
+
+        'feature_teacher_title' => 'Panel del Docente',
+        'feature_teacher_badge' => '👨‍🏫 Para Docentes DGETI',
+        'feature_teacher_desc' => 'Crea grupos con código de acceso, monitorea el progreso individual de cada estudiante, visualiza gráficas de avance grupal y envía notificaciones directas.',
+        'feature_teacher_sub' => 'Exporta reportes CSV, identifica alumnos en riesgo y toma decisiones basadas en datos reales.',
+
+        'feature_lab_title' => 'Laboratorio Interactivo',
+        'feature_lab_badge' => '🔬 Laboratorio STEM',
+        'feature_lab_desc' => 'Simulaciones de Monte Carlo, álgebra matricial, series de Fourier, estadística avanzada y física computacional. Todo en tu navegador con gráficos en tiempo real.',
+        'feature_lab_sub' => 'Además, retos de programación con editor de código integrado y pruebas automatizadas.',
+
+        'feature_community_title' => 'Comunidad de Aprendizaje',
+        'feature_community_badge' => '💬 Foro Colaborativo',
+        'feature_community_desc' => 'Foro integrado donde estudiantes y docentes publican dudas, comparten recursos y colaboran. Crea hilos, comenta, y construye conocimiento colectivo.',
+        'feature_community_sub' => 'Aprender en comunidad multiplica tu crecimiento.',
+
+        'cards_rank_title' => 'Ranking & XP',
+        'cards_rank_desc' => 'Tabla de posiciones global por puntos. Compite, sube de nivel y demuestra tu dominio en cada materia.',
+        'cards_achievements_title' => '22 Logros por Desbloquear',
+        'cards_achievements_desc' => 'Insignias automáticas por hitos: XP acumulado, lecciones completadas, rachas, materias dominadas y más. Cada logro, una medalla de honor.',
+        'cards_streaks_title' => 'Rachas y Misiones Diarias',
+        'cards_streaks_desc' => 'Mantén tu racha de inicio de sesión para bonus de XP. Completa misiones diarias (6 tipos) y acumula recompensas progresivas.',
+        'cards_oauth_title' => 'Acceso Multicanal',
+        'cards_oauth_desc' => 'Regístrate con correo, Google o GitHub. Recupera tu contraseña por email si la olvidas. Tu progreso viaja contigo.',
+        'cards_security_title' => 'Seguridad de Nivel Administrativo',
+        'cards_security_desc' => 'Autenticación 2FA, tokens CSRF en todos los formularios, rate limiting, logs de seguridad, cabeceras HTTP estrictas y .htaccess hardening.',
+        'cards_progress_title' => 'Perfil y Progreso',
+        'cards_progress_desc' => 'Dashboard con estadísticas detalladas, historial de rachas, lecciones completadas por materia y comparativa de rendimiento.',
+
+        'paths_title' => 'Materias DGETI',
+        'paths_sub' => '9 áreas del conocimiento alineadas al plan de estudios oficial de la DGETI. Elige tu materia y comienza.',
+
+        'teacher_cta_title' => '¿Eres Docente DGETI?',
+        'teacher_cta_desc' => 'Accede al Panel Docente para gestionar tus grupos, dar seguimiento personalizado a cada estudiante, exportar calificaciones y potenciar tu enseñanza con tecnología gamificada.',
+        'teacher_cta_btn' => 'Ir al Panel Docente',
+        'teacher_cta_register' => 'Crear Cuenta Docente',
+        'teacher_more' => 'Más información para docentes →',
+
         'select_materia_title' => 'Selecciona una materia',
         'select_materia_sub' => 'Elige el área que quieres estudiar para continuar.',
         'select_materia_btn' => 'Continuar',
+
+        'mobile_cta' => 'Comenzar gratis',
+        'footer_desc' => 'Plataforma educativa gamificada para estudiantes DGETI. Aprende, compite, crece.',
+        'footer_product' => 'Producto',
+        'footer_resources' => 'Recursos',
+        'footer_community' => 'Comunidad',
+        'footer_legal' => 'Legal',
+        'footer_docs' => 'Documentación',
+        'footer_api' => 'API Reference',
+        'footer_github' => 'GitHub',
+        'footer_support' => 'Soporte',
+        'footer_privacy' => 'Aviso de Privacidad',
+        'footer_terms' => 'Términos de Uso',
+        'footer_copyright' => '© 2025–2026 LC-ADVANCE · Todos los derechos reservados.',
+        'footer_made' => 'Hecho con 💚 para estudiantes de DGETI',
+        'map_interactive' => 'Mapa Interactivo',
+        'ranking_global' => 'Ranking Global',
     ],
     'en' => [
         'nav_dashboard' => 'Dashboard',
         'nav_logout' => 'Log Out',
         'nav_login' => 'Log In',
         'nav_register' => 'Sign Up',
-        'coding_lab' => 'Lab',
+        'nav_teacher' => 'Teacher Panel',
+        'nav_profile' => 'My Profile',
+        'nav_logros' => 'Achievements',
+        'nav_coding' => 'Lab',
+        'nav_community' => 'Community',
+        'nav_ai_tutor' => 'AI Tutor',
+
         'hero_title_logged' => 'Welcome back',
         'hero_title_guest' => 'Master all your subjects',
         'hero_sub_logged' => 'Your progress is saved. Continue your learning adventure.',
-        'hero_sub_guest' => 'The gamified learning platform that turns studying into an epic experience.',
-        'hero_go_dashboard' => 'Go to Dashboard',
+        'hero_sub_guest' => 'The DGETI gamified learning platform that turns studying into an epic experience with AI, coding challenges, and turn-based combat.',
         'hero_start' => 'Start Now',
         'hero_guest' => 'Guest Access',
         'cta_map' => 'Go to Map',
-        'mobile_cta' => 'Start free',
-        'cards_rank_title' => 'Ranking System',
-        'cards_rank_desc' => 'Compete globally. Climb the ranking, earn badges, and prove your mastery.',
-        'cards_progress_title' => 'Saved Progress',
-        'cards_progress_desc' => 'Your progress syncs automatically. Resume from where you left off on any device.',
-        'cards_analytics_title' => 'Detailed Analytics',
-        'cards_analytics_desc' => 'Interactive dashboard with performance metrics and real-time visual stats.',
-        'paths_title' => 'Featured paths',
-        'paths_sub' => 'Choose a recommended path and progress with clear milestones.',
-        'path_1_title' => 'Fullstack Programming Path',
-        'path_1_desc' => 'Foundations, logic, frontend, and backend with progressive challenges.',
-        'path_2_title' => 'Applied Sciences Path',
-        'path_2_desc' => 'Physics, chemistry, and math with simulations and guided practice.',
-        'path_3_title' => 'High Performance Path',
-        'path_3_desc' => 'Intensive training with competitive ranking and weekly duels.',
+
+        'stats_lessons' => 'Lessons',
+        'stats_questions' => 'Questions',
+        'stats_subjects' => 'Subjects',
+        'stats_badges' => 'Achievements',
+
+        'feature_map_title' => 'Explore the Virtual Campus',
+        'feature_map_badge' => '🗺 Interactive Exploration',
+        'feature_map_desc' => 'Navigate a pixel-art world where every building represents a knowledge area. Walk, talk to NPC teachers, and unlock hidden secrets across the map.',
+        'feature_map_sub' => 'An immersive RPG environment where learning feels like a classic 16-bit adventure.',
+
+        'feature_ai_title' => 'AI-Powered Tutor',
+        'feature_ai_badge' => '🤖 Educational AI',
+        'feature_ai_desc' => 'Every lesson includes an AI tutor powered by OpenRouter. Ask questions, request explanations, or activate Repaso mode for automatic focus on your weak areas.',
+        'feature_ai_sub' => 'Chat with virtual teachers like "Prof. Manuel" for Programming or "Prof. Herson" for Physics.',
+
+        'feature_duel_title' => 'Knowledge Battles',
+        'feature_duel_badge' => '⚔ Advanced Gamification',
+        'feature_duel_desc' => 'Exams become epic turn-based battles against teachers. Each correct answer lands a hit; each mistake is a learning opportunity.',
+        'feature_duel_sub' => 'Earn XP, level up, collect badges, and unleash your full potential.',
+
+        'feature_teacher_title' => 'Teacher Dashboard',
+        'feature_teacher_badge' => '👨‍🏫 For DGETI Teachers',
+        'feature_teacher_desc' => 'Create groups with access codes, monitor individual student progress, visualize group advancement charts, and send direct notifications.',
+        'feature_teacher_sub' => 'Export CSV reports, identify at-risk students, and make data-driven decisions.',
+
+        'feature_lab_title' => 'Interactive Laboratory',
+        'feature_lab_badge' => '🔬 STEM Lab',
+        'feature_lab_desc' => 'Monte Carlo simulations, matrix algebra, Fourier series, advanced statistics, and computational physics. All in your browser with real-time graphics.',
+        'feature_lab_sub' => 'Plus programming challenges with an integrated code editor and automated tests.',
+
+        'feature_community_title' => 'Learning Community',
+        'feature_community_badge' => '💬 Collaborative Forum',
+        'feature_community_desc' => 'Integrated forum where students and teachers post questions, share resources, and collaborate. Create threads, comment, and build collective knowledge.',
+        'feature_community_sub' => 'Learning in a community multiplies your growth.',
+
+        'cards_rank_title' => 'Ranking & XP',
+        'cards_rank_desc' => 'Global points leaderboard. Compete, level up, and prove your mastery in every subject.',
+        'cards_achievements_title' => '22 Achievements to Unlock',
+        'cards_achievements_desc' => 'Auto-awarded badges for milestones: accumulated XP, completed lessons, streaks, mastered subjects, and more. Each achievement is a medal of honor.',
+        'cards_streaks_title' => 'Streaks & Daily Quests',
+        'cards_streaks_desc' => 'Maintain your login streak for XP bonuses. Complete daily quests (6 types) and accumulate progressive rewards.',
+        'cards_oauth_title' => 'Multi-Channel Access',
+        'cards_oauth_desc' => 'Register with email, Google, or GitHub. Recover your password via email if forgotten. Your progress follows you everywhere.',
+        'cards_security_title' => 'Enterprise-Grade Security',
+        'cards_security_desc' => '2FA authentication, CSRF tokens on all forms, rate limiting, security audit logs, strict HTTP headers, and .htaccess hardening.',
+        'cards_progress_title' => 'Profile & Progress',
+        'cards_progress_desc' => 'Dashboard with detailed stats, streak history, completed lessons by subject, and performance comparisons.',
+
+        'paths_title' => 'DGETI Subjects',
+        'paths_sub' => '9 knowledge areas aligned with the official DGETI curriculum. Pick your subject and start.',
+
+        'teacher_cta_title' => 'Are you a DGETI Teacher?',
+        'teacher_cta_desc' => 'Access the Teacher Dashboard to manage your groups, personalize student tracking, export grades, and enhance your teaching with gamified technology.',
+        'teacher_cta_btn' => 'Go to Teacher Panel',
+        'teacher_cta_register' => 'Create Teacher Account',
+        'teacher_more' => 'More info for teachers →',
+
         'select_materia_title' => 'Select a subject',
         'select_materia_sub' => 'Choose the area you want to study to continue.',
         'select_materia_btn' => 'Continue',
+
+        'mobile_cta' => 'Start free',
+        'footer_desc' => 'Gamified educational platform for DGETI students. Learn, compete, grow.',
+        'footer_product' => 'Product',
+        'footer_resources' => 'Resources',
+        'footer_community' => 'Community',
+        'footer_legal' => 'Legal',
+        'footer_docs' => 'Documentation',
+        'footer_api' => 'API Reference',
+        'footer_github' => 'GitHub',
+        'footer_support' => 'Support',
+        'footer_privacy' => 'Privacy Notice',
+        'footer_terms' => 'Terms of Use',
+        'footer_copyright' => '© 2025–2026 LC-ADVANCE · All rights reserved.',
+        'footer_made' => 'Made with 💚 for DGETI students',
+        'map_interactive' => 'Interactive Map',
+        'ranking_global' => 'Global Ranking',
     ],
 ];
 ?>
@@ -91,6 +221,7 @@ $t = [
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>window.__APP_ROOT__ = <?= json_encode(appRootPath()) ?>;if('serviceWorker'in navigator){navigator.serviceWorker.register((window.__APP_ROOT__||'')+'/service-worker.js')['catch'](function(){})}</script>
 <title>LC-ADVANCE</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
@@ -605,12 +736,6 @@ header.header {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: var(--transition);
-}
-.feature-visual:hover img {
-    transform: scale(1.03);
-}
-    display: block;
     transition: transform 0.6s ease;
 }
 .feature-visual:hover img { transform: scale(1.03); }
@@ -1118,8 +1243,15 @@ header.header {
 
         <nav class="header-nav">
             <?php if ($usuario_logueado): ?>
+                <?php if (!empty($_SESSION['usuario_tipo']) && ($_SESSION['usuario_tipo'] === 'teacher' || $_SESSION['usuario_tipo'] === 'admin')): ?>
+                    <a href="<?= $baseUrl ?>/public/panel_docente.php" class="nav-btn"><?= $t[$lang]['nav_teacher'] ?></a>
+                <?php endif; ?>
                 <a href="<?= $baseUrl ?>/public/dashboard.php" class="nav-btn"><?= $t[$lang]['nav_dashboard'] ?></a>
-                <a href="public/coding_challenges.php" class="nav-btn"><?= $t[$lang]['coding_lab'] ?></a>
+                <a href="<?= $baseUrl ?>/public/perfil.php" class="nav-btn"><?= $t[$lang]['nav_profile'] ?></a>
+                <a href="<?= $baseUrl ?>/public/logros.php" class="nav-btn"><?= $t[$lang]['nav_logros'] ?></a>
+                <a href="<?= $baseUrl ?>/public/coding_challenges.php" class="nav-btn"><?= $t[$lang]['nav_coding'] ?></a>
+                <a href="<?= $baseUrl ?>/public/community.php" class="nav-btn"><?= $t[$lang]['nav_community'] ?></a>
+                <a href="<?= $baseUrl ?>/public/ai_tutor.php" class="nav-btn"><?= $t[$lang]['nav_ai_tutor'] ?></a>
                 <a href="public/logout.php" class="nav-btn"><?= $t[$lang]['nav_logout'] ?></a>
             <?php else: ?>
                 <a href="<?= $baseUrl ?>/public/login.php" class="nav-btn"><?= $t[$lang]['nav_login'] ?></a>
@@ -1158,20 +1290,20 @@ header.header {
 
         <div class="hero-stats">
             <div class="stat-item">
-                <span class="stat-value">200+</span>
-                <span class="stat-label">Lecciones</span>
+                <span class="stat-value">113+</span>
+                <span class="stat-label"><?= $t[$lang]['stats_lessons'] ?></span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">1000+</span>
-                <span class="stat-label">Preguntas</span>
+                <span class="stat-value">3,332+</span>
+                <span class="stat-label"><?= $t[$lang]['stats_questions'] ?></span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">6</span>
-                <span class="stat-label">Materias</span>
+                <span class="stat-value">9</span>
+                <span class="stat-label"><?= $t[$lang]['stats_subjects'] ?></span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">FREE</span>
-                <span class="stat-label">Acceso</span>
+                <span class="stat-value">22</span>
+                <span class="stat-label"><?= $t[$lang]['stats_badges'] ?></span>
             </div>
         </div>
     </div>
@@ -1183,39 +1315,78 @@ header.header {
     <!-- Mapa -->
     <div class="feature-row js-reveal">
         <div class="feature-text">
-            <span class="feature-badge">🗺 Exploración Interactiva</span>
-            <h2 class="feature-title">Explora el Campus Virtual</h2>
-            <p class="feature-desc">Navega por un mundo pixelado donde cada edificio representa un área del conocimiento. Habla con maestros, interactúa con el entorno y desbloquea secretos.</p>
-            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;">Un entorno inmersivo diseñado para que el aprendizaje se sienta como un RPG clásico.</p>
+            <span class="feature-badge"><?= $t[$lang]['feature_map_badge'] ?></span>
+            <h2 class="feature-title"><?= $t[$lang]['feature_map_title'] ?></h2>
+            <p class="feature-desc"><?= $t[$lang]['feature_map_desc'] ?></p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;"><?= $t[$lang]['feature_map_sub'] ?></p>
         </div>
         <div class="feature-visual">
-            <img src="public/assets/img/map.gif" alt="Campus virtual — mapa interactivo">
+            <img src="public/assets/img/mapa.png" alt="Campus virtual — mapa interactivo">
         </div>
     </div>
 
-    <!-- Lecciones -->
+    <!-- AI Tutor -->
     <div class="feature-row reverse js-reveal">
         <div class="feature-text">
-            <span class="feature-badge">📚 Contenido Premium</span>
-            <h2 class="feature-title">Aprendizaje Adaptativo</h2>
-            <p class="feature-desc">Desde C# y Python hasta desarrollo web moderno. Lecciones adaptativas con retroalimentación en tiempo real y contenido estructurado por semestres.</p>
-            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;">Sigue el plan de estudios oficial DGETI 2025 con herramientas modernas.</p>
+            <span class="feature-badge"><?= $t[$lang]['feature_ai_badge'] ?></span>
+            <h2 class="feature-title"><?= $t[$lang]['feature_ai_title'] ?></h2>
+            <p class="feature-desc"><?= $t[$lang]['feature_ai_desc'] ?></p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;"><?= $t[$lang]['feature_ai_sub'] ?></p>
         </div>
         <div class="feature-visual">
-            <img src="public/assets/img/dashboard.png" alt="Sistema de lecciones adaptativas">
+            <img src="public/assets/img/IA_tutor.png" alt="Tutor IA — aprendizaje asistido">
         </div>
     </div>
 
     <!-- Duelos -->
     <div class="feature-row accent-orange js-reveal">
         <div class="feature-text">
-            <span class="feature-badge">⚔ Gamificación Avanzada</span>
-            <h2 class="feature-title">Duelos de Conocimiento</h2>
-            <p class="feature-desc">Los exámenes se convierten en épicos enfrentamientos. Enfrenta a los maestros en combate por turnos donde tu arma es el código correcto.</p>
-            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;">Gana experiencia, sube de nivel y colecciona insignias que demuestren tu valía.</p>
+            <span class="feature-badge"><?= $t[$lang]['feature_duel_badge'] ?></span>
+            <h2 class="feature-title"><?= $t[$lang]['feature_duel_title'] ?></h2>
+            <p class="feature-desc"><?= $t[$lang]['feature_duel_desc'] ?></p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;"><?= $t[$lang]['feature_duel_sub'] ?></p>
         </div>
         <div class="feature-visual">
-            <img src="public/assets/img/systemC.gif" alt="Sistema de duelos y combate">
+            <img src="public/assets/img/duelo.png" alt="Sistema de duelos y combate">
+        </div>
+    </div>
+
+    <!-- Teacher Panel -->
+    <div class="feature-row reverse js-reveal">
+        <div class="feature-text">
+            <span class="feature-badge"><?= $t[$lang]['feature_teacher_badge'] ?></span>
+            <h2 class="feature-title"><?= $t[$lang]['feature_teacher_title'] ?></h2>
+            <p class="feature-desc"><?= $t[$lang]['feature_teacher_desc'] ?></p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;"><?= $t[$lang]['feature_teacher_sub'] ?></p>
+        </div>
+        <div class="feature-visual">
+            <img src="public/assets/img/salon_manuel.png" alt="Panel del Docente — gestión educativa">
+        </div>
+    </div>
+
+    <!-- Lab -->
+    <div class="feature-row accent-orange js-reveal">
+        <div class="feature-text">
+            <span class="feature-badge"><?= $t[$lang]['feature_lab_badge'] ?></span>
+            <h2 class="feature-title"><?= $t[$lang]['feature_lab_title'] ?></h2>
+            <p class="feature-desc"><?= $t[$lang]['feature_lab_desc'] ?></p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;"><?= $t[$lang]['feature_lab_sub'] ?></p>
+        </div>
+        <div class="feature-visual">
+            <img src="public/assets/img/lab.png" alt="Laboratorio interactivo STEM">
+        </div>
+    </div>
+
+    <!-- Community -->
+    <div class="feature-row reverse js-reveal">
+        <div class="feature-text">
+            <span class="feature-badge"><?= $t[$lang]['feature_community_badge'] ?></span>
+            <h2 class="feature-title"><?= $t[$lang]['feature_community_title'] ?></h2>
+            <p class="feature-desc"><?= $t[$lang]['feature_community_desc'] ?></p>
+            <p class="feature-desc" style="color:var(--text-muted); font-size:17px;"><?= $t[$lang]['feature_community_sub'] ?></p>
+        </div>
+        <div class="feature-visual">
+            <img src="public/assets/img/salon_carolina.png" alt="Foro comunitario">
         </div>
     </div>
 
@@ -1234,14 +1405,29 @@ header.header {
                 <p><?= htmlspecialchars($t[$lang]['cards_rank_desc']) ?></p>
             </div>
             <div class="info-card">
-                <div class="card-icon-wrap">⚡</div>
-                <h3><?= htmlspecialchars($t[$lang]['cards_progress_title']) ?></h3>
-                <p><?= htmlspecialchars($t[$lang]['cards_progress_desc']) ?></p>
+                <div class="card-icon-wrap">🎖️</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_achievements_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_achievements_desc']) ?></p>
             </div>
             <div class="info-card">
-                <div class="card-icon-wrap">🎯</div>
-                <h3><?= htmlspecialchars($t[$lang]['cards_analytics_title']) ?></h3>
-                <p><?= htmlspecialchars($t[$lang]['cards_analytics_desc']) ?></p>
+                <div class="card-icon-wrap">🔥</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_streaks_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_streaks_desc']) ?></p>
+            </div>
+            <div class="info-card">
+                <div class="card-icon-wrap">🔑</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_oauth_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_oauth_desc']) ?></p>
+            </div>
+            <div class="info-card">
+                <div class="card-icon-wrap">🛡️</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_security_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_security_desc']) ?></p>
+            </div>
+            <div class="info-card">
+                <div class="card-icon-wrap">📊</div>
+                <h3><?= htmlspecialchars($t[$lang]['cards_progress_title']) ?></h3>
+                <p><?= htmlspecialchars($t[$lang]['cards_progress_desc']) ?></p>
             </div>
         </div>
     </div>
@@ -1250,28 +1436,74 @@ header.header {
 <!-- ═══════════════ PATHS ═══════════════ -->
 <section class="paths-section">
     <div class="wrap">
-        <p class="section-label">Rutas de Aprendizaje</p>
+        <p class="section-label">Plan de Estudios DGETI</p>
         <h2 class="section-title"><?= htmlspecialchars($t[$lang]['paths_title']) ?></h2>
         <p class="section-sub"><?= htmlspecialchars($t[$lang]['paths_sub']) ?></p>
         <div class="paths-grid">
             <div class="path-card">
-                <span class="path-num">RUTA 01</span>
-                <h4><?= htmlspecialchars($t[$lang]['path_1_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['path_1_desc']) ?></p>
+                <span class="path-num">📐 01</span>
+                <h4>Pensamiento Matemático III</h4>
+                <p>Derivadas, integrales, puntos críticos, máximos y mínimos, y temas selectos de matemáticas con aplicaciones al mundo real.</p>
             </div>
             <div class="path-card">
-                <span class="path-num">RUTA 02</span>
-                <h4><?= htmlspecialchars($t[$lang]['path_2_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['path_2_desc']) ?></p>
+                <span class="path-num">🔬 02</span>
+                <h4>Física I</h4>
+                <p>Energía cinética y potencial, conservación, colisiones, impulso, trabajo, calor y termodinámica con simulaciones interactivas.</p>
             </div>
             <div class="path-card">
-                <span class="path-num">RUTA 03</span>
-                <h4><?= htmlspecialchars($t[$lang]['path_3_title']) ?></h4>
-                <p><?= htmlspecialchars($t[$lang]['path_3_desc']) ?></p>
+                <span class="path-num">⚗️ 03</span>
+                <h4>Química I</h4>
+                <p>Estructura atómica, configuración electrónica, enlaces, ecuaciones químicas, equilibrio y reacciones con laboratorios virtuales.</p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">🌿 04</span>
+                <h4>Ecosistemas</h4>
+                <p>Biomas, ciclos biogeoquímicos, cadenas tróficas, cambio climático, sustentabilidad, huella ecológica y educación ambiental.</p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">💻 05</span>
+                <h4>Programación</h4>
+                <p>C# .NET, Python, SQLite, PHP backend, HTML5, CSS3, JavaScript, metodologías ágiles Scrum y desarrollo de aplicaciones web.</p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">🌎 06</span>
+                <h4>Ciencias Sociales</h4>
+                <p>Estado, organización social, normas, relaciones de poder, bienestar social, necesidades humanas y derechos fundamentales.</p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">📜 07</span>
+                <h4>Historia de México</h4>
+                <p>México prehispánico, conquista, virreinato, independencia, revolución, México contemporáneo e identidad nacional.</p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">🗣️ 08</span>
+                <h4>Inglés</h4>
+                <p>Desde nivel A1 hasta B1: saludos, rutinas, comida, conversación, futuro con going to/will y pasado simple con enfoque comunicativo.</p>
+            </div>
+            <div class="path-card">
+                <span class="path-num">📊 09</span>
+                <h4>Temas Selectos de Matemáticas</h4>
+                <p>Derivadas avanzadas, integrales, segundas derivadas, aplicaciones al cálculo diferencial e integral con ejercicios prácticos.</p>
             </div>
         </div>
     </div>
 </section>
+
+<!-- ═══════════════ TEACHER CTA ═══════════════ -->
+<div class="wrap">
+    <div class="cta-banner" style="border-color: rgba(0,255,135,0.2); background: linear-gradient(135deg, rgba(0,255,135,0.06) 0%, rgba(0,229,255,0.1) 100%);">
+        <h2 style="background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><?= $t[$lang]['teacher_cta_title'] ?></h2>
+        <p><?= $t[$lang]['teacher_cta_desc'] ?></p>
+        <div class="hero-actions">
+            <?php if ($usuario_logueado && !empty($_SESSION['usuario_tipo']) && ($_SESSION['usuario_tipo'] === 'teacher' || $_SESSION['usuario_tipo'] === 'admin')): ?>
+                <a href="<?= $baseUrl ?>/public/panel_docente.php" class="cta-btn cta-primary">📋 <?= $t[$lang]['teacher_cta_btn'] ?></a>
+            <?php else: ?>
+                <a href="<?= $baseUrl ?>/public/register.php" class="cta-btn cta-primary">📋 <?= $t[$lang]['teacher_cta_register'] ?></a>
+                <a href="<?= $baseUrl ?>/public/panel_docente.php" class="cta-btn cta-secondary" style="border-color: var(--green); color: var(--green);"><?= $t[$lang]['teacher_more'] ?></a>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
 
 <!-- ═══════════════ CTA BANNER ═══════════════ -->
 <div class="wrap">
@@ -1281,6 +1513,7 @@ header.header {
         <div class="hero-actions">
             <?php if ($usuario_logueado): ?>
                 <a href="<?= $baseUrl ?>/public/mapa/index.php" class="cta-btn cta-primary">🗺 <?= $t[$lang]['cta_map'] ?></a>
+                <a href="<?= $baseUrl ?>/public/logros.php" class="cta-btn cta-secondary">🎖️ <?= $t[$lang]['nav_logros'] ?></a>
             <?php else: ?>
                 <a href="<?= $baseUrl ?>/public/register.php" class="cta-btn cta-primary">⚡ Registrarse Gratis</a>
                 <a href="public/guest_login.php" class="cta-btn cta-secondary">👤 <?= $t[$lang]['hero_guest'] ?></a>
@@ -1295,42 +1528,61 @@ header.header {
         <div class="footer-grid">
             <div>
                 <p class="footer-brand-name">🎮 LC-ADVANCE</p>
-                <p class="footer-brand-desc">Plataforma educativa gamificada para estudiantes DGETI. Aprende, compite y crece.</p>
+                <p class="footer-brand-desc"><?= $t[$lang]['footer_desc'] ?></p>
+                <?php if ($usuario_logueado): ?>
+                    <p style="margin-top:12px;font-size:14px;color:var(--text-secondary);">
+                        👋 <?= htmlspecialchars($_SESSION['usuario_nombre'] ?? '') ?> · 
+                        <a href="<?= $baseUrl ?>/public/perfil.php" style="color:var(--cyan);text-decoration:underline;"><?= $t[$lang]['nav_profile'] ?></a>
+                    </p>
+                <?php endif; ?>
             </div>
             <div class="footer-col">
-                <h5>Producto</h5>
+                <h5><?= $t[$lang]['footer_product'] ?></h5>
                 <ul>
                     <?php if ($usuario_logueado): ?>
-                        <li><a href="<?= $baseUrl ?>/public/mapa/index.php">Mapa Interactivo</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/mapa/index.php"><?= $t[$lang]['map_interactive'] ?></a></li>
                         <li><a href="<?= $baseUrl ?>/public/dashboard.php">Dashboard</a></li>
-                        <li><a href="<?= $baseUrl ?>/public/ranking.php">Ranking Global</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/logros.php"><?= $t[$lang]['nav_logros'] ?></a></li>
+                        <li><a href="<?= $baseUrl ?>/public/ranking.php"><?= $t[$lang]['ranking_global'] ?></a></li>
+                        <li><a href="<?= $baseUrl ?>/public/coding_challenges.php"><?= $t[$lang]['nav_coding'] ?></a></li>
+                        <li><a href="<?= $baseUrl ?>/public/ai_tutor.php"><?= $t[$lang]['nav_ai_tutor'] ?></a></li>
                     <?php else: ?>
-                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=mapa/index.php">Mapa Interactivo</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=mapa/index.php"><?= $t[$lang]['map_interactive'] ?></a></li>
                         <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=dashboard.php">Dashboard</a></li>
-                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=ranking.php">Ranking Global</a></li>
+                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=logros.php"><?= $t[$lang]['nav_logros'] ?></a></li>
+                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=ranking.php"><?= $t[$lang]['ranking_global'] ?></a></li>
+                        <li><a href="<?= $baseUrl ?>/public/gatekeeper.php?redirect=coding_challenges.php"><?= $t[$lang]['nav_coding'] ?></a></li>
+                    <?php endif; ?>
+                    <?php if (!empty($_SESSION['usuario_tipo']) && ($_SESSION['usuario_tipo'] === 'teacher' || $_SESSION['usuario_tipo'] === 'admin')): ?>
+                        <li><a href="<?= $baseUrl ?>/public/panel_docente.php"><?= $t[$lang]['nav_teacher'] ?></a></li>
+                    <?php endif; ?>
+                    <?php if (!empty($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'admin'): ?>
+                        <li><a href="<?= $baseUrl ?>/public/admin/index.php">Admin Panel</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
             <div class="footer-col">
-                <h5>Recursos</h5>
+                <h5><?= $t[$lang]['footer_resources'] ?></h5>
                 <ul>
-                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=README.md">Documentación</a></li>
-                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=DEVELOPMENT.md">Desarrollo</a></li>
-                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=API.md">API Reference</a></li>
+                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=README.md"><?= $t[$lang]['footer_docs'] ?></a></li>
+                    <li><a href="<?= $baseUrl ?>/public/lab.php">🔬 <?= $t[$lang]['nav_coding'] ?> STEM</a></li>
+                    <li><a href="<?= $baseUrl ?>/public/docs.php?file=API.md"><?= $t[$lang]['footer_api'] ?></a></li>
+                    <li><a href="<?= $baseUrl ?>/public/recuperar.php">🔑 Recuperar Contraseña</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h5>Comunidad</h5>
+                <h5><?= $t[$lang]['footer_community'] ?></h5>
                 <ul>
-                    <li><a href="https://github.com/cervanlfc7/LC-ADVANCE" target="_blank">GitHub</a></li>
-                    <li><a href="mailto:lcadvance40@gmail.com">Soporte</a></li>
-                    <li><a href="<?= $baseUrl ?>/public/register.php">Registrarse</a></li>
+                    <li><a href="<?= $baseUrl ?>/public/community.php">💬 <?= $t[$lang]['nav_community'] ?></a></li>
+                    <li><a href="https://github.com/cervanlfc7/LC-ADVANCE" target="_blank"><?= $t[$lang]['footer_github'] ?></a></li>
+                    <li><a href="mailto:lcadvance40@gmail.com"><?= $t[$lang]['footer_support'] ?></a></li>
+                    <li><a href="<?= $baseUrl ?>/public/register.php"><?= $t[$lang]['nav_register'] ?></a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2025–2026 LC-ADVANCE · Todos los derechos reservados.</span>
-            <span>Hecho con 💚 para estudiantes de DGETI</span>
+            <span><?= $t[$lang]['footer_copyright'] ?></span>
+            <span><?= $t[$lang]['footer_made'] ?></span>
         </div>
     </div>
 </footer>
@@ -1343,16 +1595,16 @@ header.header {
 <!-- ═══════════════ MATERIA MODAL ═══════════════ -->
 <?php if (!empty($_GET['seleccionar_materia'])): ?>
 <?php
-$todas_materias = [
-    'Ciencias Sociales',
-    'Ecosistemas',
-    'Física I',
-    'Historia de México',
-    'Inglés',
-    'Pensamiento Matemático III',
-    'Programación',
-    'Química I',
-    'Temas Selectos de Matemáticas I y II',
+$materias_disponibles = [
+    'Pensamiento Matemático III' => '📐',
+    'Física I'                  => '🔬',
+    'Química I'                 => '⚗️',
+    'Ecosistemas'               => '🌿',
+    'Programación'              => '💻',
+    'Ciencias Sociales'         => '🌎',
+    'Historia de México'        => '📜',
+    'Inglés'                    => '🗣️',
+    'Temas Selectos de Matemáticas I y II' => '📊',
 ];
 ?>
 <div id="materiaModal" class="materia-modal" style="display:flex;">
@@ -1362,11 +1614,11 @@ $todas_materias = [
         <form method="get" action="<?= $baseUrl ?>/public/dashboard.php">
             <input type="hidden" name="materia" id="selectedMateriaInput" value="">
             <div class="materia-grid">
-                <?php foreach ($todas_materias as $m): ?>
+                <?php foreach ($materias_disponibles as $m => $icon): ?>
                     <button type="button" class="materia-btn"
                         data-materia="<?= htmlspecialchars($m) ?>"
                         onclick="selectMateria(this, '<?= htmlspecialchars(addslashes($m)) ?>')">
-                        <?= htmlspecialchars($m) ?>
+                        <?= $icon ?>&nbsp;<?= htmlspecialchars($m) ?>
                     </button>
                 <?php endforeach; ?>
             </div>
@@ -1413,19 +1665,7 @@ document.addEventListener('DOMContentLoaded', function() {
     els.forEach(function(el) { obs.observe(el); });
 })();
 
-// ── Header shrink on scroll ──────────────────────
-(function() {
-    var header = document.getElementById('siteHeader');
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 60) {
-            header.style.background = 'rgba(5,5,8,0.92)';
-            header.style.borderBottomColor = 'rgba(255,204,0,0.10)';
-        } else {
-            header.style.background = 'rgba(5,5,8,0.70)';
-            header.style.borderBottomColor = 'rgba(255,204,0,0.18)';
-        }
-    }, { passive: true });
-})();
+// ── (Header scroll effect removed — CSS backdrop-filter handles it) ──
 </script>
 
 </body>

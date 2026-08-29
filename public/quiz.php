@@ -6,7 +6,8 @@
 // ==========================================
 
 require_once __DIR__ . '/../src/Config/config.php';
-requireLogin(true); // permite invitados
+require_once __DIR__ . '/../src/Core/panel_docente.php';
+requireStudent();
 require_once __DIR__ . '/../src/Content/content.php'; // Incluye el array $lecciones
 
 // Función auxiliar (por compatibilidad si no existe)
@@ -46,6 +47,15 @@ $leccion = $lecciones[$leccion_id];
 $preguntas = $leccion['quiz'];
 
 
+// CSRF validation
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (!validarCsrfToken($csrf_token)) {
+        $_SESSION['mensaje'] = "Error de validación del formulario.";
+        redirigir('public/dashboard.php');
+    }
+}
+
 // 3. Si el usuario envió respuestas (La lógica de procesamiento debe ir después de cargar $preguntas)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $puntosGanados = 0;
@@ -68,24 +78,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirigir(getDashboardUrl());
 }
 
+$page_title = 'Quiz - LC-ADVANCE';
+$page_fonts = 'Press+Start+2P';
+$page_css_files = ['assets/css/style.css'];
+$page_extra_js = '<script src="' . assetUrl('assets/js/loader.js') . '"></script><script src="' . assetUrl('assets/js/app.js') . '"></script>';
+require __DIR__ . '/../src/Templates/page_start.php';
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - LC-ADVANCE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
+<div class="header-volume">
+  <button class="vol-btn" id="volBtn">🔊</button>
+  <div class="vol-slider" id="volSlider">
+    <input type="range" id="volExamenesSlider" min="0" max="1" step="0.1" value="0.8">
+  </div>
+</div>
 
 <div class="quiz-container">
     <h1>🧠 Quiz de: <?php echo htmlspecialchars($leccion['titulo']); ?></h1>
 
     <form method="POST">
-        <input type="hidden" name="leccion_id" value="<?php echo $leccion_id; ?>"> 
+        <input type="hidden" name="leccion_id" value="<?php echo $leccion_id; ?>">
+        <?= campoTokenCSRF() ?>
 
         <?php foreach ($preguntas as $index => $pregunta): ?>
             <div class="quiz-question">
@@ -106,80 +117,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p><a href="<?= htmlspecialchars(getDashboardUrl()) ?>" class="btn btn-back">Volver al Dashboard</a></p>
 </div>
 
-<script src="assets/js/app.js"></script>
-<audio id="quizMusic" loop>
-  <source src="assets/music/cuco_examen.mp3" type="audio/mpeg">
-</audio>
-<script>
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
-}
-const volumes = getStoredVolumes();
-const qAudio = document.getElementById('quizMusic');
-qAudio.volume = volumes.examenes;
-qAudio.play().then(() => console.log('Quiz music playing')).catch(e => console.log('Audio error:', e));
-</script>
-<style>
-.header-volume-btn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 9999;
-  background: rgba(0,0,0,0.7);
-  border: 2px solid #00e5ff;
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  color: #00e5ff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.header-volume-btn:hover {
-  background: rgba(0,229,255,0.2);
-}
-.header-volume-slider {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid #00e5ff;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 5px;
-}
-.header-volume-slider.show {
-  display: block;
-}
-.header-volume-slider input {
-  width: 100px;
-  cursor: pointer;
-}
-</style>
-<div class="header-volume-btn" id="volBtn" onclick="toggleVolumeSlider()">
-  <span id="volIcon">🔊</span>
-  <span style="font-size:12px;">Vol</span>
-  <div class="header-volume-slider" id="volSlider">
-    <input type="range" id="volExamenesSlider" min="0" max="1" step="0.1" value="0.8">
-  </div>
-</div>
-<script>
-function toggleVolumeSlider() {
-  document.getElementById('volSlider').classList.toggle('show');
-}
-const volSlider = document.getElementById('volExamenesSlider');
-volSlider.value = volumes.examenes;
-volSlider.addEventListener('input', function(e) {
-  volumes.examenes = parseFloat(e.target.value);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
-  qAudio.volume = volumes.examenes;
-  document.getElementById('volIcon').textContent = volumes.examenes > 0 ? '🔊' : '🔇';
-});
-</script>
-</body>
-</html>
+<script src="<?= assetUrl('assets/js/loader.js') ?>"></script>
+<script src="<?= assetUrl('assets/js/app.js') ?>"></script>
+<?php
+$page_volume = [
+    'audioId' => 'quizMusic',
+    'source' => 'assets/music/cuco_examen.mp3',
+    'sliderId' => 'volExamenesSlider',
+    'btnId' => 'volBtn',
+    'containerId' => 'volSlider',
+    'channel' => 'examenes',
+    'defaultVol' => 0.8,
+];
+require __DIR__ . '/../src/Templates/page_end.php';

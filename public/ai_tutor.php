@@ -1,6 +1,8 @@
 <?php
 ob_start();
 require_once __DIR__ . '/../src/Config/config.php';
+require_once __DIR__ . '/../src/Core/panel_docente.php';
+requireStudent();
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -32,8 +34,12 @@ if (!in_array($method, ['POST', 'GET'], true)) {
 
 $requestData = $method === 'POST' ? $_POST : $_REQUEST;
 
-// El chat interno usa sesión y origen seguro, así que omitimos la validación CSRF
-// que estaba rompiendo la petición cuando se entregaba el token en el frontend.
+$csrf_token = $requestData['csrf_token'] ?? '';
+if (!validarCsrfToken($csrf_token)) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'CSRF inválido']);
+    exit;
+}
 
 $lessonTitle = trim($requestData['lesson_title'] ?? '');
 $lessonSubject = trim($requestData['lesson_subject'] ?? '');

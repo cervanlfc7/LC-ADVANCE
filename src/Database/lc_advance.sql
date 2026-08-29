@@ -30,10 +30,42 @@ CREATE TABLE IF NOT EXISTS usuarios (
     genero ENUM('M', 'W') DEFAULT NULL,
     otp_code VARCHAR(6) DEFAULT NULL,
     otp_expires TIMESTAMP NULL DEFAULT NULL,
+    tipo ENUM('student','teacher','admin') NOT NULL DEFAULT 'student',
+    email_verified tinyint(1) NOT NULL DEFAULT 0,
+    email_verify_token varchar(128) DEFAULT NULL,
+    ultimo_login DATE DEFAULT NULL,
+    racha_actual INT NOT NULL DEFAULT 0,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (google_id),
     UNIQUE (github_id)
 );
+
+-- =========================
+-- Tabla: grupos (clases de profesores)
+-- =========================
+CREATE TABLE IF NOT EXISTS grupos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    profesor_id INT NOT NULL,
+    codigo_acceso VARCHAR(10) DEFAULT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profesor_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    INDEX idx_grupos_profesor (profesor_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================
+-- Tabla: grupo_usuarios (estudiantes en grupos)
+-- =========================
+CREATE TABLE IF NOT EXISTS grupo_usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    grupo_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_grupo_usuario (grupo_id, usuario_id),
+    INDEX idx_grupo_usuarios_usuario (usuario_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================
 -- Tabla: badges
@@ -93,13 +125,98 @@ CREATE TABLE IF NOT EXISTS lecciones_completadas (
     UNIQUE(usuario_id, slug)
 );
 
+-- =========================
+-- Tabla: grade_changes (auditoría de calificaciones)
+-- =========================
+CREATE TABLE IF NOT EXISTS grade_changes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  grupo_id INT NOT NULL,
+  user_id INT NOT NULL,
+  slug VARCHAR(100) NOT NULL,
+  old_score INT NULL,
+  new_score INT NULL,
+  changed_by INT NOT NULL,
+  changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_grade_changes_user (user_id),
+  INDEX idx_grade_changes_slug (slug)
+);
+
+-- =========================
+-- Tabla: notificaciones
+-- =========================
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    tipo VARCHAR(50) NOT NULL DEFAULT 'info',
+    titulo VARCHAR(200) NOT NULL,
+    mensaje TEXT,
+    leida TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    INDEX idx_notificaciones_usuario (usuario_id, leida, created_at DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================
+-- Tabla: daily_quests (misiones diarias)
+-- =========================
+CREATE TABLE IF NOT EXISTS daily_quests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    fecha DATE NOT NULL,
+    quest_type VARCHAR(50) NOT NULL,
+    titulo VARCHAR(200) NOT NULL,
+    descripcion VARCHAR(500) DEFAULT '',
+    objetivo INT NOT NULL DEFAULT 1,
+    progreso INT NOT NULL DEFAULT 0,
+    recompensa_xp INT NOT NULL DEFAULT 50,
+    completada TINYINT(1) NOT NULL DEFAULT 0,
+    reclamada TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_user_date_type (usuario_id, fecha, quest_type),
+    INDEX idx_user_date (usuario_id, fecha)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================
 -- Badges iniciales
+-- =========================
 INSERT INTO badges (nombre_badge, descripcion, icono) VALUES
 ('Primer Paso', 'Completaste tu primera lección', 'badge_start.png'),
 ('Estrella del Código', 'Puntaje perfecto en un quiz', 'badge_perfect.png'),
 ('Maestro del Nivel', 'Alcanzaste el nivel 5', 'badge_level5.png'),
 ('Coleccionista', 'Obtuviste 5 insignias', 'badge_collector.png'),
-('Racha de 7 Días', 'Estudiaste 7 días seguidos', 'badge_streak.png');
+('Racha de 7 Días', 'Estudiaste 7 días seguidos', 'badge_streak.png'),
+('Novato', 'Acumulaste 500 XP', 'badge_novice.png'),
+('Explorador', 'Acumulaste 1,000 XP', 'badge_explorer.png'),
+('Élite', 'Acumulaste 2,000 XP', 'badge_elite.png'),
+('Leyenda', 'Acumulaste 5,000 XP', 'badge_legend.png'),
+('Dios del Conocimiento', 'Acumulaste 10,000 XP', 'badge_god.png'),
+('Estudiante Dedicado', 'Completaste 10 lecciones', 'badge_dedicated.png'),
+('Sabio', 'Completaste 25 lecciones', 'badge_sage.png'),
+('Erudito', 'Completaste 50 lecciones', 'badge_erudite.png'),
+('Genio', 'Completaste 100 lecciones', 'badge_genius.png'),
+('Quizzero', 'Pasaste 10 quizzes', 'badge_quizzer.png'),
+('Maestro Quiz', 'Pasaste 50 quizzes', 'badge_quizmaster.png'),
+('Racha de 14 Días', 'Estudiaste 14 días seguidos', 'badge_streak14.png'),
+('Racha de 30 Días', 'Estudiaste 30 días seguidos', 'badge_streak30.png'),
+('Matemático', 'Completaste todas las lecciones de Pensamiento Matemático', 'badge_math.png'),
+('Científico', 'Completaste Química I y Física I', 'badge_science.png'),
+('Humanista', 'Completaste todas las lecciones de Humanidades I', 'badge_humanities.png'),
+('Políglota', 'Completaste todas las lecciones de Inglés', 'badge_language.png');
+
+-- =========================
+-- Tabla: security_logs
+-- =========================
+CREATE TABLE IF NOT EXISTS security_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    evento_tipo VARCHAR(80) NOT NULL,
+    usuario_id INT NULL,
+    detalle TEXT NULL,
+    ip VARCHAR(45) DEFAULT '',
+    creado_en DATETIME NOT NULL,
+    INDEX idx_evento_tipo (evento_tipo),
+    INDEX idx_creado_en (creado_en)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Trigger: Actualizar nivel
 DELIMITER //
@@ -130,8 +247,10 @@ LEFT JOIN usuarios_badges ub ON u.id = ub.usuario_id
 GROUP BY u.id
 ORDER BY u.puntos DESC;
 
--- Usuarios de prueba: NINGUNO (la BD inicia vacía)
--- Los usuarios se crean mediante el formulario de registro en register.php
+-- Usuario admin por defecto (se elimina primero por si ya existe en una re-importación)
+DELETE FROM usuarios WHERE nombre_usuario = 'dgeti168';
+INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, avatar, puntos, nivel, tipo, email_verified, ultimo_login, creado_en) VALUES
+('dgeti168', 'lcadvance40@gmail.com', '$2y$10$7/.MgzuvL4HFTmkD4KXCh.gxCekGquKJgeXfUCNueYOevNth3g.NW', 'default.png', 0, 1, 'admin', 1, CURDATE(), NOW());
 
 -- =====================================================
 -- End: schema.sql
@@ -433,12 +552,50 @@ CREATE TABLE IF NOT EXISTS `maestroact` (
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Estructura de tabla para la tabla `credenciales` (claves de API/OAuth/SMTP)
+CREATE TABLE IF NOT EXISTS `credenciales` (
+  `clave` VARCHAR(100) PRIMARY KEY,
+  `valor` TEXT NOT NULL,
+  `descripcion` VARCHAR(255) DEFAULT NULL,
+  `actualizado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `credenciales` (`clave`, `valor`, `descripcion`) VALUES
+('google_client_id', '317866808413-8odsje97n8j7k150j3ag1lr89ughotb7.apps.googleusercontent.com', 'Google OAuth Client ID'),
+('google_client_secret', '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', 'Google OAuth Client Secret'),
+('github_client_id_dev', 'Ov23liR2ex0RxXcrUfAz', 'GitHub OAuth Client ID (dev)'),
+('github_client_secret_dev', 'dc8524f64a5a4dff43d8aa1d6e9e7f01d57e968d', 'GitHub OAuth Client Secret (dev)'),
+('github_client_id_prod', 'Ov23ligyvD096zr7u85V', 'GitHub OAuth Client ID (prod)'),
+('github_client_secret_prod', '0c1a890c637e28fbf27579982b5b79c6a524d69e', 'GitHub OAuth Client Secret (prod)'),
+('smtp_username', 'lcadvance40@gmail.com', 'SMTP Username'),
+('smtp_password', 'jbgt frey azdf fsjo', 'SMTP Password'),
+('smtp_from_email', 'lcadvance40@gmail.com', 'SMTP From Email'),
+('openrouter_api_key', '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', 'OpenRouter API Key');
+
 -- Índices para tablas volcadas
 --
 -- Indices de la tabla `preguntas`
 ALTER TABLE `preguntas`
   ADD PRIMARY KEY (`IDPregunta`);
 ALTER TABLE `preguntas` MODIFY `IDPregunta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+
+-- Nota: ultimo_login y racha_actual ya están en CREATE TABLE usuarios arriba.
+
+-- =====================================================
+-- Tabla: password_resets (recuperación de contraseña)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS `password_resets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) NOT NULL,
+  `token` varchar(128) NOT NULL,
+  `expiracion` datetime NOT NULL,
+  `usado` tinyint(1) NOT NULL DEFAULT 0,
+  `creado_en` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `token` (`token`),
+  CONSTRAINT `password_resets_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

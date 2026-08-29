@@ -17,6 +17,7 @@
   --green: #00ff87;
   --yellow: #ffd23f;
   --text: #e8f4ff;
+  --text-secondary: rgba(200, 230, 255, 0.75);
   --muted: rgba(200, 230, 255, 0.5);
   --font-display: "Syne", sans-serif;
   --font-body: "Space Grotesk", sans-serif;
@@ -666,6 +667,10 @@ header.header nav {
 
 .chip-val.green {
   color: var(--green);
+}
+
+.chip-val.gold {
+  color: var(--yellow, #ffd23f);
 }
 
 /* ── PROGRESS BAR ────────────────────────────── */

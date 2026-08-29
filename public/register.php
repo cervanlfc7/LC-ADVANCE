@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = limpiarEntrada($_POST['correo'] ?? '');
     $contrasena = $_POST['contrasena'] ?? '';
     $confirmar = $_POST['confirmar'] ?? '';
+    $tipo = $_POST['tipo'] ?? 'student';
 
     // Validaciones básicas
     if (empty($nombre_usuario) || empty($correo) || empty($contrasena) || empty($confirmar)) {
@@ -48,10 +49,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Crear usuario
             $hash = password_hash($contrasena, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash) VALUES (?, ?, ?)");
-            if ($stmt->execute([$nombre_usuario, $correo, $hash])) {
+            $tipo_valido = in_array($tipo, ['student', 'teacher']) ? $tipo : 'student';
+            $verify_token = bin2hex(random_bytes(32));
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, tipo, email_verify_token) VALUES (?, ?, ?, ?, ?)");
+            if ($stmt->execute([$nombre_usuario, $correo, $hash, $tipo_valido, $verify_token])) {
+                // Enviar email de verificación
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                $host = $_SERVER['HTTP_HOST'];
+                $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+                $verify_url = "$protocol://$host$base/verificar.php?token=" . urlencode($verify_token);
+                $nombre = htmlspecialchars($nombre_usuario);
+                $cuerpoHtml = emailTemplate('Verificación de correo', "
+                    <p>Hola <strong>{$nombre}</strong>,</p>
+                    <p>Gracias por registrarte. Haz clic en el botón para verificar tu correo:</p>
+                    <p style=\"text-align:center\"><a href=\"{$verify_url}\" class=\"btn\">Verificar Correo</a></p>
+                    <p style=\"color:#888fa0;font-size:0.82rem\">Si no creaste una cuenta, ignora este mensaje.</p>
+                ");
+                enviarEmail($correo, 'Verifica tu correo - LC-ADVANCE', $cuerpoHtml);
+
+                logSeguridadEvento('REGISTER', "Usuario: {$nombre_usuario} | Correo: {$correo} | Tipo: {$tipo_valido}");
                 $exito = true;
-                $mensaje = '✅ ¡Registro exitoso! Ahora puedes iniciar sesión.';
+                $mensaje = '✅ ¡Registro exitoso! Revisa tu correo para verificar tu cuenta.';
             } else {
                 $mensaje = '⚠️ Error al registrar. Intenta más tarde.';
             }
@@ -64,7 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
+    <script>window.__APP_ROOT__ = <?= json_encode(appRootPath()) ?>;</script>
     <title>Registro | LC-ADVANCE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -490,6 +510,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span class="toggle-password" onclick="togglePassword('confirmar', this)">👁️</span>
                         </div>
                     </div>
+                    <div class="input-group full">
+                        <label for="tipo">Tipo de cuenta</label>
+                        <select id="tipo" name="tipo" class="auth-input" style="appearance:auto;">
+                            <option value="student">🎓 Estudiante</option>
+                            <option value="teacher">👨‍🏫 Profesor / Docente</option>
+                        </select>
+                    </div>
                 </div>
                 <button type="submit" class="btn-primary">Registrar</button>
             </form>
@@ -501,7 +528,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<script src="assets/js/app.js"></script>
+<script src="<?= assetUrl('assets/js/loader.js') ?>"></script>
+<script src="<?= assetUrl('assets/js/app.js') ?>"></script>
 <script>
 function togglePassword(inputId, el) {
     const input = document.getElementById(inputId);

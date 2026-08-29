@@ -60,6 +60,12 @@ if ($method === 'GET') {
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!empty($_POST)) $input = array_merge($input ?? [], $_POST);
+
+    $csrf_token = $input['csrf_token'] ?? '';
+    if (!validarCsrfToken($csrf_token)) {
+        echo json_encode(['ok' => false, 'error' => 'CSRF inválido']);
+        exit;
+    }
     
     $action = $input['action'] ?? '';
     

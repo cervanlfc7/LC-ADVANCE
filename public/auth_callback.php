@@ -172,13 +172,13 @@ if (!empty($userData)) {
     $col_id = ($provider === 'google') ? 'google_id' : 'github_id';
     
     // Buscar si ya existe por ID social
-    $stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel FROM usuarios WHERE $col_id = ?");
+    $stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel, tipo FROM usuarios WHERE $col_id = ?");
     $stmt->execute([$userData['id']]);
     $user = $stmt->fetch();
 
     if (!$user) {
         // Buscar por email (vincular cuenta existente)
-        $stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel FROM usuarios WHERE correo = ?");
+        $stmt = $pdo->prepare("SELECT id, nombre_usuario, puntos, nivel, tipo FROM usuarios WHERE correo = ?");
         $stmt->execute([$userData['email']]);
         $user = $stmt->fetch();
 
@@ -202,10 +202,22 @@ if (!empty($userData)) {
     $_SESSION['usuario_nombre'] = $user['nombre_usuario'];
     $_SESSION['usuario_puntos'] = $user['puntos'];
     $_SESSION['usuario_nivel'] = $user['nivel'];
+    $_SESSION['usuario_tipo'] = $user['tipo'] ?? 'student';
     $_SESSION['last_activity'] = time();
+
+    require_once __DIR__ . '/../src/Core/rachas.php';
+    actualizarRacha($user['id'], $pdo);
 
     $final_redirect = !empty($_SESSION['oauth_redirect']) ? $_SESSION['oauth_redirect'] : 'public/mapa/index.php';
     unset($_SESSION['oauth_redirect']);
+    $tipo = $_SESSION['usuario_tipo'] ?? 'student';
+    if ($tipo === 'teacher') {
+        $final_redirect = 'public/panel_docente.php';
+    } elseif ($tipo === 'admin') {
+        $final_redirect = 'public/admin/index.php';
+    } elseif ($tipo === 'student' && str_contains($final_redirect, 'panel_docente.php')) {
+        $final_redirect = 'public/dashboard.php';
+    }
     redirigir($final_redirect);
 } else {
     die("No se pudieron obtener los datos del usuario desde $provider.");

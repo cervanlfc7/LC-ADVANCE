@@ -3,8 +3,9 @@
 // LC-ADVANCE - sistemC.php (Rediseño Premium)
 // ==========================================
 require_once __DIR__ . '/../../src/Config/config.php';
+require_once __DIR__ . '/../../src/Core/panel_docente.php';
 iniciarSesionSegura();
-requireLogin(true);
+requireStudent();
 
 $idPersonaje = $_GET['personaje'] ?? '1Cu';
 $idDialogo = intval($_GET['dialogo'] ?? 1);
@@ -76,6 +77,8 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
+    <script>window.__APP_ROOT__ = <?= json_encode(appRootPath()) ?>;</script>
     <title>SISTEMA DE COMBATE | LC-ADVANCE</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -475,18 +478,24 @@ function reducirVida() {
 async function registrarResultado(score) {
     const isGuest = <?= !empty($_SESSION['usuario_es_invitado']) ? 'true' : 'false' ?>;
     if (isGuest) return;
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
 
     const formData = new FormData();
     formData.append('accion', 'calificar_examen_final');
     formData.append('slug', '<?= $slugExamen ?>');
     formData.append('score', score);
+    formData.append('csrf_token', csrfToken);
 
+    if (typeof lcLoader !== 'undefined') lcLoader.show('Guardando resultado...');
     try {
-        const resp = await fetch('../src/Core/funciones.php', { method: 'POST', body: formData });
+        const base = window.__APP_ROOT__ || '.'; const resp = await fetch(base + '/src/Core/funciones.php', { method: 'POST', body: formData });
         const data = await resp.json();
         return data;
     } catch (err) {
         console.error("Error al registrar resultado:", err);
+    } finally {
+        if (typeof lcLoader !== 'undefined') lcLoader.hide();
     }
 }
 
@@ -580,6 +589,7 @@ if (primero) {
     dialogContent.textContent = "⚠️ No se encontró el diálogo inicial.";
 }
 </script>
+<script src="<?= assetUrl('../assets/js/loader.js') ?>"></script>
 
 </body>
 </html>
