@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/Config/config.php';
-requireLogin(true);
+require_once __DIR__ . '/../src/Core/panel_docente.php';
+requireStudent();
 
 $supported_langs = ['es', 'en'];
 if (isset($_GET['lang']) && in_array($_GET['lang'], $supported_langs, true)) {
@@ -78,6 +79,7 @@ $currentUserName = $_SESSION['usuario_nombre'] ?? 'Invitado';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
   <title><?= htmlspecialchars($i18n[$lang]['title']) ?></title>
   <style>
     body { margin:0; font-family: Arial, sans-serif; background:#0a111d; color:#e8f4ff; }
@@ -135,8 +137,8 @@ $currentUserName = $_SESSION['usuario_nombre'] ?? 'Invitado';
     <section class="card">
       <h2><?= htmlspecialchars($i18n[$lang]['new_post']) ?></h2>
       <div class="post-form">
-        <input type="text" id="post-title" maxlength="180" required placeholder="<?= htmlspecialchars($i18n[$lang]['placeholder_title']) ?>">
-        <textarea id="post-body" rows="5" required placeholder="<?= htmlspecialchars($i18n[$lang]['placeholder_body']) ?>"></textarea>
+        <input type="text" id="post-title" maxlength="180" required aria-label="<?= htmlspecialchars($i18n[$lang]['placeholder_title']) ?>" placeholder="<?= htmlspecialchars($i18n[$lang]['placeholder_title']) ?>">
+        <textarea id="post-body" rows="5" required aria-label="<?= htmlspecialchars($i18n[$lang]['placeholder_body']) ?>" placeholder="<?= htmlspecialchars($i18n[$lang]['placeholder_body']) ?>"></textarea>
         <button onclick="createPost()" id="btn-post"><?= htmlspecialchars($i18n[$lang]['publish']) ?></button>
       </div>
     </section>
@@ -158,8 +160,14 @@ $currentUserName = $_SESSION['usuario_nombre'] ?? 'Invitado';
     function $(id) { return document.getElementById(id); }
 
     async function apiCall(endpoint, data = null) {
+      const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      const csrfTok = csrfMeta ? csrfMeta.getAttribute('content') : '';
       const opts = { headers: { 'Content-Type': 'application/json' } };
-      if (data) opts.method = 'POST', opts.body = JSON.stringify(data);
+      if (data) {
+        data.csrf_token = csrfTok;
+        opts.method = 'POST';
+        opts.body = JSON.stringify(data);
+      }
       const res = await fetch(endpoint, opts);
       return res.json();
     }
@@ -168,6 +176,7 @@ $currentUserName = $_SESSION['usuario_nombre'] ?? 'Invitado';
       const div = document.createElement('div');
       div.className = 'notification';
       div.textContent = msg;
+      div.setAttribute('role', 'alert');
       document.body.appendChild(div);
       setTimeout(() => div.remove(), 3000);
     }

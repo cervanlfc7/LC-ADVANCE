@@ -2,6 +2,8 @@
 // Simple test runner that executes each test script in a separate PHP process
 $tests = [
     __DIR__ . '/unittest.php',
+    __DIR__ . '/test_uni.php',
+    __DIR__ . '/test_security_logs.php',
     __DIR__ . '/test_lessons.php',
     __DIR__ . '/test_integration.php',
     __DIR__ . '/test_updateDB.php',

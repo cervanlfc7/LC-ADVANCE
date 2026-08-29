@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/Config/config.php';
-iniciarSesionSegura();
+require_once __DIR__ . '/../src/Core/panel_docente.php';
+requireStudent();
 
 $es_invitado = !empty($_SESSION['usuario_es_invitado']);
 $es_usuario = isset($_SESSION['usuario_id']) && !$es_invitado;
@@ -19,6 +20,7 @@ if ($es_usuario && $usuario_id > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
     <title>Elegir Personaje - LC ADVANCE</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
@@ -230,7 +232,7 @@ if ($es_usuario && $usuario_id > 0) {
 <body>
     <div class="bg-grid"></div>
     <div class="header-volume">
-      <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+      <button class="vol-btn" id="volBtn">🔊</button>
       <div class="vol-slider" id="volSlider">
         <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.1" value="0.1">
       </div>
@@ -239,13 +241,13 @@ if ($es_usuario && $usuario_id > 0) {
         <h2>// SELECCIONA_TU_PERSONAJE</h2>
         <p class="subtitle">Elige tu género para continuar</p>
         <div class="char-grid">
-            <div class="char-card" onclick="seleccionar('M')">
+            <div class="char-card" onclick="seleccionar('M')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')seleccionar('M')">
                 <div class="char-bg">
                     <img src="assets/pj/Eleccion_M.png" alt="Hombre">
                 </div>
                 <span class="char-label">HOMBRE</span>
             </div>
-            <div class="char-card" onclick="seleccionar('W')">
+            <div class="char-card" onclick="seleccionar('W')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')seleccionar('W')">
                 <div class="char-bg">
                     <img src="assets/pj/Eleccion_W.png" alt="Mujer">
                 </div>
@@ -265,10 +267,12 @@ if ($from_mapa && isset($_SESSION['player_pos_x']) && isset($_SESSION['player_po
     function seleccionar(genero) {
         const esInvitado = <?= $es_invitado ? 'true' : 'false' ?>;
         
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
         fetch('guardar_genero.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'genero=' + genero + '&invitado=' + (esInvitado ? '1' : '0')
+            body: 'genero=' + genero + '&invitado=' + (esInvitado ? '1' : '0') + '&csrf_token=' + encodeURIComponent(csrfToken)
         })
         .then(r => r.json())
         .then(data => {
@@ -282,32 +286,18 @@ if ($from_mapa && isset($_SESSION['player_pos_x']) && isset($_SESSION['player_po
         });
     }
     </script>
+<script src="<?= assetUrl('assets/js/volume_control.js') ?>"></script>
 <audio id="pageMusic" loop>
   <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
 </audio>
 <script>
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
-}
-const volumes = getStoredVolumes();
-const pAudio = document.getElementById('pageMusic');
-pAudio.volume = volumes.principal;
-pAudio.play().then(() => console.log('Music playing')).catch(e => console.log('Audio error:', e));
-</script>
-<script>
-function toggleVolumeSlider() {
-  document.getElementById('volSlider').classList.toggle('show');
-}
-const volSlider = document.getElementById('volPrincipalSlider');
-volSlider.value = volumes.principal;
-volSlider.addEventListener('input', function(e) {
-  volumes.principal = parseFloat(e.target.value);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
-  pAudio.volume = volumes.principal;
-  document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+initVolumeControl({
+  audioId: 'pageMusic',
+  sliderId: 'volPrincipalSlider',
+  btnId: 'volBtn',
+  containerId: 'volSlider',
+  channel: 'principal',
+  defaultVol: 0.1
 });
 </script>
 </body>

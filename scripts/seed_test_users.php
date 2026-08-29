@@ -8,16 +8,16 @@ require_once __DIR__ . '/../src/Config/config.php';
 
 // Usuarios de prueba con sus puntos
 $test_users = [
-    ['nombre_usuario' => 'Admin', 'correo' => 'admin@test.com', 'contrasena' => 'Test1234', 'puntos' => 5000],
-    ['nombre_usuario' => 'Campeón', 'correo' => 'campeon@test.com', 'contrasena' => 'Test1234', 'puntos' => 4200],
-    ['nombre_usuario' => 'Estudiante1', 'correo' => 'est1@test.com', 'contrasena' => 'Test1234', 'puntos' => 3500],
-    ['nombre_usuario' => 'Estudiante2', 'correo' => 'est2@test.com', 'contrasena' => 'Test1234', 'puntos' => 3000],
-    ['nombre_usuario' => 'Aprendiz', 'correo' => 'aprendiz@test.com', 'contrasena' => 'Test1234', 'puntos' => 2100],
-    ['nombre_usuario' => 'Novato', 'correo' => 'novato@test.com', 'contrasena' => 'Test1234', 'puntos' => 1500],
-    ['nombre_usuario' => 'Principiante', 'correo' => 'principiante@test.com', 'contrasena' => 'Test1234', 'puntos' => 800],
-    ['nombre_usuario' => 'Recién_llegado', 'correo' => 'nuevo@test.com', 'contrasena' => 'Test1234', 'puntos' => 300],
-    ['nombre_usuario' => 'Explorador', 'correo' => 'explorador@test.com', 'contrasena' => 'Test1234', 'puntos' => 1200],
-    ['nombre_usuario' => 'Investigador', 'correo' => 'investigador@test.com', 'contrasena' => 'Test1234', 'puntos' => 2800],
+    ['nombre_usuario' => 'Admin', 'correo' => 'admin@test.com', 'contrasena' => 'Test1234', 'puntos' => 5000, 'tipo' => 'admin'],
+    ['nombre_usuario' => 'Campeón', 'correo' => 'campeon@test.com', 'contrasena' => 'Test1234', 'puntos' => 4200, 'tipo' => 'teacher'],
+    ['nombre_usuario' => 'Estudiante1', 'correo' => 'est1@test.com', 'contrasena' => 'Test1234', 'puntos' => 3500, 'tipo' => 'student'],
+    ['nombre_usuario' => 'Estudiante2', 'correo' => 'est2@test.com', 'contrasena' => 'Test1234', 'puntos' => 3000, 'tipo' => 'student'],
+    ['nombre_usuario' => 'Aprendiz', 'correo' => 'aprendiz@test.com', 'contrasena' => 'Test1234', 'puntos' => 2100, 'tipo' => 'student'],
+    ['nombre_usuario' => 'Novato', 'correo' => 'novato@test.com', 'contrasena' => 'Test1234', 'puntos' => 1500, 'tipo' => 'student'],
+    ['nombre_usuario' => 'Principiante', 'correo' => 'principiante@test.com', 'contrasena' => 'Test1234', 'puntos' => 800, 'tipo' => 'student'],
+    ['nombre_usuario' => 'Recién_llegado', 'correo' => 'nuevo@test.com', 'contrasena' => 'Test1234', 'puntos' => 300, 'tipo' => 'student'],
+    ['nombre_usuario' => 'Explorador', 'correo' => 'explorador@test.com', 'contrasena' => 'Test1234', 'puntos' => 1200, 'tipo' => 'student'],
+    ['nombre_usuario' => 'Investigador', 'correo' => 'investigador@test.com', 'contrasena' => 'Test1234', 'puntos' => 2800, 'tipo' => 'student'],
 ];
 
 echo "🌱 Creando usuarios de prueba...\n\n";
@@ -42,8 +42,8 @@ foreach ($test_users as $user) {
         $nivel = max(1, (int)($user['puntos'] / 500));
         
         $stmt = $pdo->prepare("
-            INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, puntos, nivel)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, puntos, nivel, tipo)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
         
         $stmt->execute([
@@ -51,7 +51,8 @@ foreach ($test_users as $user) {
             $user['correo'],
             $hash,
             $user['puntos'],
-            $nivel
+            $nivel,
+            $user['tipo'] ?? 'student'
         ]);
         
         echo "✅ Usuario '{$user['nombre_usuario']}' creado con {$user['puntos']} puntos (Nivel {$nivel})\n";

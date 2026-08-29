@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/Config/config.php';
-requireLogin(true); // permite invitados pero la acción no
+require_once __DIR__ . '/../src/Core/panel_docente.php';
+requireStudent();
 
 // Evitar que invitados guarden progreso
 if (!empty($_SESSION['usuario_es_invitado'])) {

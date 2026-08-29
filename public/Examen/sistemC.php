@@ -3,8 +3,9 @@
 // LC-ADVANCE - sistemC.php (Rediseño Premium v2)
 // ==========================================
 require_once __DIR__ . '/../../src/Config/config.php';
+require_once __DIR__ . '/../../src/Core/panel_docente.php';
 iniciarSesionSegura();
-requireLogin(true);
+requireStudent();
 
 $idPersonaje = $_GET['personaje'] ?? '1Cu';
 $idDialogo = intval($_GET['dialogo'] ?? 1);
@@ -73,10 +74,12 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
+    <script>window.__APP_ROOT__ = <?= json_encode(appRootPath()) ?>;</script>
     <title>SISTEMA DE COMBATE | LC-ADVANCE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="stylesheet" href="<?= assetUrl('../assets/css/dashboard.css') ?>">
     <style>
         /* ── VARIABLES COMBAT ── */
         :root {
@@ -756,7 +759,7 @@ try {
             </div>
             <span class="mode-tag">Examen Final</span>
             <div class="header-volume">
-                <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+                <button class="vol-btn" id="volBtn">🔊</button>
                 <div class="vol-slider" id="volSlider">
                     <input type="range" id="volExamenesSlider" min="0" max="1" step="0.1" value="0.5">
                 </div>
@@ -897,14 +900,19 @@ function reducirVida() {
 async function registrarResultado(score) {
     const isGuest = <?= !empty($_SESSION['usuario_es_invitado']) ? 'true' : 'false' ?>;
     if (isGuest) return;
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
     const fd = new FormData();
     fd.append('accion', 'calificar_examen_final');
     fd.append('slug', '<?= $slugExamen ?>');
     fd.append('score', score);
+    fd.append('csrf_token', csrfToken);
+    if (typeof lcLoader !== 'undefined') lcLoader.show('Guardando resultado...');
     try {
-        const r = await fetch('../src/Core/funciones.php', { method: 'POST', body: fd });
+        const base = window.__APP_ROOT__ || '.'; const r = await fetch(base + '/src/Core/funciones.php', { method: 'POST', body: fd });
         return await r.json();
     } catch(e) { console.error("Error al registrar:", e); }
+    finally { if (typeof lcLoader !== 'undefined') lcLoader.hide(); }
 }
 
 /* ── MOSTRAR DIALOGO ── */
@@ -1027,138 +1035,19 @@ if (primero) {
     dialogContent.textContent = "⚠️ No se encontró el diálogo inicial.";
 }
 </script>
+<script src="<?= assetUrl('../assets/js/loader.js') ?>"></script>
+<script src="<?= assetUrl('../assets/js/volume_control.js') ?>"></script>
 <audio id="combatMusic" loop>
   <source src="../assets/music/cuco_examen_final.mp3" type="audio/mpeg">
 </audio>
 <script>
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.5, ambiental: 0.8, examenes: 0.5 };
-}
-const volumes = getStoredVolumes();
-const cAudio = document.getElementById('combatMusic');
-cAudio.volume = volumes.examenes;
-cAudio.play().then(() => console.log('Combat music playing')).catch(e => console.log('Audio error:', e));
-</script>
-<style>
-.header-volume-btn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 9999;
-  background: rgba(0,0,0,0.7);
-  border: 2px solid #00e5ff;
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  color: #00e5ff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.header-volume-btn:hover {
-  background: rgba(0,229,255,0.2);
-}
-.header-volume-slider {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid #00e5ff;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 5px;
-}
-.header-volume-slider.show {
-  display: block;
-}
-.header-volume-slider input {
-  width: 100px;
-  cursor: pointer;
-}
-</style>
-<style>
-.header-volume {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 15px;
-}
-.vol-btn {
-  background: rgba(0,229,255,0.1);
-  border: 1px solid rgba(0,229,255,0.5);
-  border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: #00e5ff;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-.vol-btn:hover {
-  background: rgba(0,229,255,0.2);
-  border-color: #00e5ff;
-}
-.vol-slider {
-  display: none;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid rgba(0,229,255,0.5);
-  border-radius: 6px;
-  padding: 8px;
-}
-.vol-slider.show {
-  display: block;
-}
-.vol-slider input {
-  width: 100px;
-  cursor: pointer;
-  -webkit-appearance: none;
-  background: #222;
-  height: 12px;
-  border: 2px solid #00e5ff;
-  border-radius: 4px;
-}
-.vol-slider input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 20px;
-  background: #c9408a;
-  border: 2px solid #fff;
-  cursor: pointer;
-  border-radius: 4px;
-}
-@media (max-width: 768px) {
-  .vol-btn {
-    padding: 4px 6px;
-    font-size: 14px;
-  }
-  .vol-slider {
-    padding: 6px;
-  }
-  .vol-slider input {
-    width: 80px;
-    height: 10px;
-  }
-  .vol-slider input::-webkit-slider-thumb {
-    width: 14px;
-    height: 16px;
-  }
-}
-</style>
-<script>
-function toggleVolumeSlider() {
-  document.getElementById('volSlider').classList.toggle('show');
-}
-const volSlider = document.getElementById('volExamenesSlider');
-volSlider.value = volumes.examenes;
-volSlider.addEventListener('input', function(e) {
-  volumes.examenes = parseFloat(e.target.value);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
-  cAudio.volume = volumes.examenes;
-  document.getElementById('volBtn').textContent = volumes.examenes > 0 ? '🔊' : '🔇';
+initVolumeControl({
+  audioId: 'combatMusic',
+  sliderId: 'volExamenesSlider',
+  btnId: 'volBtn',
+  containerId: 'volSlider',
+  channel: 'examenes',
+  defaultVol: 0.5
 });
 </script>
 </body>

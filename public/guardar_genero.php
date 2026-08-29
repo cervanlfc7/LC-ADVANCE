@@ -11,6 +11,13 @@ header('Content-Type: application/json');
 
 $response = ['success' => false];
 
+$csrf_token = $_POST['csrf_token'] ?? '';
+if (!validarCsrfToken($csrf_token)) {
+    $response['error'] = 'CSRF inválido';
+    echo json_encode($response);
+    exit;
+}
+
 try {
     $genero = $_POST['genero'] ?? '';
     $es_invitado = isset($_POST['invitado']) && $_POST['invitado'] === '1';

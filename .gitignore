@@ -1,0 +1,10 @@
+# Secrets
+.env
+
+# Cache
+cache/*.cache
+cache/lecciones_compiled.php
+
+# Test artifacts
+tests/*_cookies.txt
+tests/tmp/

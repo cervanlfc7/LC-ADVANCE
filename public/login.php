@@ -13,9 +13,18 @@ header('Pragma: no-cache');
 header('Expires: 0');
 require_once __DIR__ . '/../src/Config/csrf.php';
 
-// Si ya hay sesión activa, redirige
+// Si ya hay sesión activa, redirige según el rol
 if (isset($_SESSION['usuario_id'])) {
+    $tipo = $_SESSION['usuario_tipo'] ?? 'student';
+    if ($tipo === 'teacher') {
+        redirigir('public/panel_docente.php');
+    } elseif ($tipo === 'admin') {
+        redirigir('public/admin/index.php');
+    }
     $redirect = !empty($_GET['redirect']) ? $_GET['redirect'] : 'public/mapa/index.php';
+    if (str_contains($redirect, 'panel_docente.php')) {
+        $redirect = 'dashboard.php';
+    }
     redirigir($redirect);
 }
 
@@ -55,7 +64,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $bloqueado_key = "login_blocked_{$ip}";
 
-    if (isset($_SESSION[$bloqueado_key]) && time() < $_SESSION[$bloqueado_key]) {
+    // Additional IP-based check: count recent LOGIN_FAIL events in last 15 minutes
+    try {
+        $stmtFail = $pdo->prepare("SELECT COUNT(*) FROM security_logs WHERE ip = ? AND evento_tipo = 'LOGIN_FAIL' AND creado_en >= (NOW() - INTERVAL 15 MINUTE)");
+        $stmtFail->execute([$ip]);
+        $recentFails = (int)$stmtFail->fetchColumn();
+    } catch (Exception $e) {
+        // If table doesn't exist yet or query fails, fallback to 0
+        $recentFails = 0;
+    }
+
+    if ($recentFails >= 10) {
+        // Temporarily block attempts from this IP for 15 minutes
+        $_SESSION[$bloqueado_key] = time() + 900;
+        $mensaje = '⏳ Demasios intentos desde esta IP. Intenta de nuevo en 15 minutos.';
+    } elseif (isset($_SESSION[$bloqueado_key]) && time() < $_SESSION[$bloqueado_key]) {
         $remaining = $_SESSION[$bloqueado_key] - time();
         $mensaje = '⏳ Demasiados intentos. Intenta de nuevo en ' . ceil($remaining / 60) . ' minuto(s).';
     } elseif ($accion === 'solicitar_otp') {
@@ -81,27 +104,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Enviar código por email
                 $asunto = "🔐 Tu código de verificación LC-Advance";
-                $cuerpoHtml = '
-                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-                    <h2 style="color: #00e5ff;">🔐 LC-Advance</h2>
+                $cuerpoHtml = emailTemplate('Código de verificación', "
                     <p>Tu código de verificación es:</p>
-                    <div style="background: #0d1626; padding: 20px; text-align: center; border-radius: 10px; margin: 20px 0;">
-                        <span style="font-size: 32px; font-weight: bold; color: #00e5ff; letter-spacing: 8px;">' . $otp . '</span>
+                    <div class=\"box\">
+                        <div class=\"code\">{$otp}</div>
                     </div>
-                    <p style="color: #888; font-size: 12px;">Este código expira en 5 minutos.</p>
-                    <p style="color: #666; font-size: 11px;">Si no solicitaste este código, ignora este correo.</p>
-                </div>';
+                    <p style=\"color:#888fa0;font-size:0.82rem\">Este código expira en <strong>5 minutos</strong>.</p>
+                    <p style=\"color:#888fa0;font-size:0.82rem\">Si no solicitaste este código, ignora este correo.</p>
+                ");
 
                 $emailEnviado = enviarEmail($usuario['correo'], $asunto, $cuerpoHtml);
                 
                 if ($emailEnviado) {
                     $mensaje = "✅ Código enviado a tu email. Revisa bandeja de entrada o spam.";
-                    // Guardar código para debug en caso de falla de SMTP
-                    $_SESSION['otp_debug'] = $otp;
                 } else {
-                    // Si falla el email, mostrar código en pantalla (modo desarrollo)
                     $mensaje = "📧 <span style='color: var(--yellow);'>⚠️ Modo desarrollo:</span> Código: <strong style='font-size: 18px; letter-spacing: 4px; color: var(--cyan);'>{$otp}</strong><br><span style='color: var(--muted); font-size: 11px;'>Expira en 5 min • Configura SMTP para recibir por email</span>";
-                    $_SESSION['otp_debug'] = $otp;
                 }
                 
                 $otp_step = true;
@@ -138,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
                     $_SESSION['usuario_puntos'] = $usuario['puntos'];
                     $_SESSION['usuario_nivel'] = $usuario['nivel'];
+                    $_SESSION['usuario_tipo'] = $usuario['tipo'] ?? 'student';
                     $_SESSION['last_activity'] = time();
 
                     unset($_SESSION['otp_email']);
@@ -184,11 +202,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($nombre_usuario) || empty($contrasena)) {
             $mensaje = '⚠️ Ingresa tu usuario y contraseña.';
         } elseif (isset($_SESSION['login_attempts']) && $_SESSION['login_attempts']['count'] >= 5) {
-            $_SESSION[$bloqueado_key] = time() + 300;
-            unset($_SESSION['login_attempts']);
-            $mensaje = '⏳ Has excedido el límite de intentos. Intenta de nuevo en 5 minutos.';
+            // Resetear si pasaron más de 10 minutos desde el primer intento
+            if (time() - $_SESSION['login_attempts']['first'] > 600) {
+                unset($_SESSION['login_attempts']);
+            } else {
+                $_SESSION[$bloqueado_key] = time() + 300;
+                unset($_SESSION['login_attempts']);
+                logSeguridadEvento('LOGIN_RATE_LIMIT', "Usuario: {$nombre_usuario}");
+                $mensaje = '⏳ Has excedido el límite de intentos. Intenta de nuevo en 5 minutos.';
+            }
         } else {
-            $stmt = $pdo->prepare("SELECT id, nombre_usuario, contrasena_hash, puntos, nivel FROM usuarios WHERE nombre_usuario = ?");
+            $stmt = $pdo->prepare("SELECT id, nombre_usuario, contrasena_hash, puntos, nivel, tipo FROM usuarios WHERE nombre_usuario = ?");
             $stmt->execute([$nombre_usuario]);
             $usuario = $stmt->fetch();
 
@@ -198,7 +222,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
                 $_SESSION['usuario_puntos'] = $usuario['puntos'];
                 $_SESSION['usuario_nivel'] = $usuario['nivel'];
+                $_SESSION['usuario_tipo'] = $usuario['tipo'] ?? 'student';
                 $_SESSION['last_activity'] = time();
+
+                require_once __DIR__ . '/../src/Core/rachas.php';
+                actualizarRacha($usuario['id'], $pdo);
 
                 unset($_SESSION['usuario_es_invitado']);
                 unset($_SESSION['login_attempts']);
@@ -206,6 +234,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!empty($_GET['materia'])) $_SESSION['selected_materia'] = trim($_GET['materia']);
 
+                logSeguridadEvento('LOGIN_SUCCESS', "Usuario: {$usuario['nombre_usuario']} (ID: {$usuario['id']})", $usuario['id']);
+
+                $tipo = $_SESSION['usuario_tipo'] ?? 'student';
+                if ($tipo === 'teacher') {
+                    $final_redirect = 'public/panel_docente.php';
+                } elseif ($tipo === 'admin') {
+                    $final_redirect = 'public/admin/index.php';
+                } elseif (str_contains($final_redirect, 'panel_docente.php')) {
+                    $final_redirect = 'public/dashboard.php';
+                }
                 redirigir($final_redirect);
             } else {
                 $intentos = $_SESSION['login_attempts'] ?? ['count' => 0, 'first' => time()];
@@ -225,7 +263,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
+    <script>window.__APP_ROOT__ = <?= json_encode(appRootPath()) ?>;</script>
     <title>Iniciar Sesión | LC-ADVANCE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -648,7 +688,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         <?php endif; ?>
 
-        <div class="auth-footer">¿No tienes cuenta? <a href="register.php">Regístrate</a></div>
+        <div class="auth-footer">
+            <a href="recuperar.php" style="color:var(--muted);font-size:0.8rem;">¿Olvidaste tu contraseña?</a><br>
+            ¿No tienes cuenta? <a href="register.php">Regístrate</a>
+        </div>
     </div>
 </div>
 
@@ -715,14 +758,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 </script>
 
-<?php if (!empty($_SESSION['otp_debug'])): ?>
-<script>
-    console.log('🔐 CÓDIGO OTP DE PRUEBA: <?php echo $_SESSION['otp_debug']; ?>');
-    console.log('(Este código también se muestra en desarrollo - quitar en producción)');
-</script>
-<?php unset($_SESSION['otp_debug']); endif; ?>
 
-<script src="assets/js/app.js"></script>
+
+<script src="<?= assetUrl('assets/js/loader.js') ?>"></script>
+<script src="<?= assetUrl('assets/js/app.js') ?>"></script>
 <?php if (!empty($_GET['timeout']) || !empty($_GET['logout'])): ?>
 <script>
     for (let i = 0; i < localStorage.length; i++) {

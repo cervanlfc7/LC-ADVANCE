@@ -3,7 +3,8 @@
 // LC-ADVANCE - leccion_detalle.php (Rediseño Premium v2)
 // ==========================================
 require_once __DIR__ . '/../src/Config/config.php';
-requireLogin(true);
+require_once __DIR__ . '/../src/Core/panel_docente.php';
+requireStudent();
 require_once __DIR__ . '/../src/Content/content.php';
 
 $user_id = $_SESSION['usuario_id'] ?? null;
@@ -11,6 +12,19 @@ $slug    = $_GET['slug'] ?? '';
 
 // Buscar lección por slug (usa caché de memoria)
 $leccion = buscarLeccion($slug);
+
+// Usar contenido personalizado de DB si existe (bloques JSON o HTML)
+if ($leccion && isset($pdo)) {
+    $db_content = obtenerContenidoLeccion($pdo, $slug, '');
+    if ($db_content !== '') {
+        if (strlen($db_content) > 0 && $db_content[0] === '[') {
+            require_once __DIR__ . '/src/Core/block_renderer.php';
+            $leccion['contenido'] = renderBlocks($db_content);
+        } else {
+            $leccion['contenido'] = $db_content;
+        }
+    }
+}
 
 if (!$leccion) {
     $redir = !empty($_GET['materia'])
@@ -20,6 +34,25 @@ if (!$leccion) {
     exit;
 }
 
+if ($_SESSION['usuario_tipo'] === 'student' && $user_id) {
+    $assignedLessons = obtenerLeccionesAsignadasPorGrupoParaEstudiante($user_id);
+    $assignedSlugs = [];
+    foreach ($assignedLessons as $groupData) {
+        foreach ($groupData['slugs'] as $assignedSlug) {
+            if (!in_array($assignedSlug, $assignedSlugs, true)) {
+                $assignedSlugs[] = $assignedSlug;
+            }
+        }
+    }
+    if (!empty($assignedSlugs) && !in_array($slug, $assignedSlugs, true)) {
+        $redir = !empty($_GET['materia'])
+            ? 'dashboard.php?materia=' . urlencode($_GET['materia']) . '&error=leccion_no_asignada'
+            : 'dashboard.php?error=leccion_no_asignada';
+        header('Location: ' . $redir);
+        exit;
+    }
+}
+
 $stmt = $pdo->prepare("SELECT * FROM user_progress WHERE user_id = ? AND slug = ?");
 $stmt->execute([$user_id, $slug]);
 $progress  = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -27,7 +60,8 @@ $completed = $progress ? (bool)$progress['completed'] : false;
 $old_score = $progress ? $progress['score'] : 0;
 
 $NUM_PREGUNTAS_QUIZ = 10;
-$quiz_pool = $leccion['quiz'] ?? [];
+require_once __DIR__ . '/../src/Core/admin.php';
+$quiz_pool = obtenerQuizParaLeccion($pdo, $slug, $leccion);
 if (count($quiz_pool) > $NUM_PREGUNTAS_QUIZ) { shuffle($quiz_pool); $quiz_selected = array_slice($quiz_pool, 0, $NUM_PREGUNTAS_QUIZ); }
 else { $quiz_selected = $quiz_pool; }
 $NUM_PREGUNTAS_QUIZ_FINAL = count($quiz_selected);
@@ -83,18 +117,20 @@ $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actua
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
     <title><?= htmlspecialchars($leccion['titulo']) ?> | LC-ADVANCE</title>
+    <script>window.__APP_ROOT__ = <?= json_encode(appRootPath()) ?>;</script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
     <script>MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']] } };</script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <!-- Existing lesson CSS (content styles) -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="<?= assetUrl('assets/css/style.css') ?>">
     <?php
     $cssFiles = glob('assets/css/leccion-*.css');
     foreach ($cssFiles as $f) echo '<link rel="stylesheet" href="' . htmlspecialchars(str_replace('\\','/',$f)) . '">' . "\n";
@@ -1308,7 +1344,7 @@ $examen_slug = "examen_final_" . strtolower(str_replace(' ', '_', $materia_actua
 
     <div class="header-actions">
         <div class="header-volume">
-            <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+            <button class="vol-btn" id="volBtn">🔊</button>
             <div class="vol-slider" id="volSlider">
                 <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.1" value="0.5">
             </div>
@@ -1551,7 +1587,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
         let html = '<form id="quizForm">';
+        html += '<input type="hidden" name="csrf_token" value="' + esc(csrfToken) + '">';
         quizData.forEach((q, i) => {
             const name = `q${i}`;
             const shuffled = [...q.opciones].sort(() => Math.random() - 0.5);
@@ -1580,8 +1619,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         showGlobalLoader('Procesando tu quiz...');
         let oldPuntos = 0, oldNivel = 1;
+        const base = window.__APP_ROOT__ || '.';
         try {
-            const s = await fetch('../src/Core/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
+            const s = await fetch(base + '/src/Core/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
             const d = await s.json();
             oldPuntos = d.puntos || 0;
             oldNivel  = d.nivel  || 1;
@@ -1592,7 +1632,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fd.append('slug', '<?= addslashes($slug) ?>');
 
         try {
-            const r    = await fetch('../src/Core/funciones.php', { method: 'POST', body: fd });
+            const r    = await fetch(base + '/src/Core/funciones.php', { method: 'POST', body: fd });
             const data = await r.json();
 
             if (!data.ok) {
@@ -1603,7 +1643,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const score = data.score || 0;
             const xp    = data.xp_ganado || 0;
 
-            const sr    = await fetch('../src/Core/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
+            const sr    = await fetch(base + '/src/Core/funciones.php', { method: 'POST', body: new URLSearchParams({ accion: 'obtener_estado' }) });
             const state = await sr.json();
 
             updateSidebar(state, score);
@@ -1638,6 +1678,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += `<button class="qm-submit" style="margin-top:20px;" onclick="location.reload()">Cerrar y Continuar</button>`;
             quizBody.innerHTML = html;
+            if (window.MathJax?.typesetPromise) MathJax.typesetPromise([quizBody]);
 
             if (xp > 0) {
                 const el = document.createElement('div');
@@ -1824,6 +1865,8 @@ document.addEventListener('DOMContentLoaded', () => {
         showGlobalLoader('Consultando a LC-Tutor...');
 
         try {
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfTok = csrfMeta ? csrfMeta.getAttribute('content') : '';
             const response = await fetch('ai_tutor.php', {
                 method: 'POST',
                 credentials: 'same-origin',
@@ -1838,7 +1881,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     correctas: 0,
                     total: 1,
                     question,
-                    provider: document.getElementById('lcChatProvider')?.value || 'auto'
+                    provider: document.getElementById('lcChatProvider')?.value || 'auto',
+                    csrf_token: csrfTok
                 })
             });
 
@@ -1878,138 +1922,23 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<script src="assets/js/app.js"></script>
+<script>
+document.querySelectorAll('.lesson-content img').forEach(function(im) { if (!im.hasAttribute('loading')) im.setAttribute('loading', 'lazy'); });
+</script>
+<script src="<?= assetUrl('assets/js/loader.js') ?>"></script>
+<script src="<?= assetUrl('assets/js/app.js') ?>"></script>
+<script src="<?= assetUrl('assets/js/volume_control.js') ?>"></script>
 <audio id="lessonMusic" loop>
   <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
 </audio>
 <script>
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.5, ambiental: 0.8, examenes: 0.8 };
-}
-const volumes = getStoredVolumes();
-const lAudio = document.getElementById('lessonMusic');
-lAudio.volume = volumes.principal;
-lAudio.play().then(() => console.log('Lesson music playing')).catch(e => console.log('Audio error:', e));
-</script>
-<style>
-.header-volume-btn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 9999;
-  background: rgba(0,0,0,0.7);
-  border: 2px solid #00e5ff;
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  color: #00e5ff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.header-volume-btn:hover {
-  background: rgba(0,229,255,0.2);
-}
-.header-volume-slider {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid #00e5ff;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 5px;
-}
-.header-volume-slider.show {
-  display: block;
-}
-.header-volume-slider input {
-  width: 100px;
-  cursor: pointer;
-}
-</style>
-<style>
-.header-volume {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 15px;
-}
-.vol-btn {
-  background: rgba(0,229,255,0.1);
-  border: 1px solid rgba(0,229,255,0.5);
-  border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: #00e5ff;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-.vol-btn:hover {
-  background: rgba(0,229,255,0.2);
-  border-color: #00e5ff;
-}
-.vol-slider {
-  display: none;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid rgba(0,229,255,0.5);
-  border-radius: 1px;
-}
-.vol-slider.show {
-  display: block;
-}
-.vol-slider input {
-  width: 100px;
-  cursor: pointer;
-  -webkit-appearance: none;
-  background: #222;
-  height: 12px;
-  border: 2px solid #00e5ff;
-  border-radius: 4px;
-}
-.vol-slider input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 20px;
-  background: #c9408a;
-  border: 2px solid #fff;
-  cursor: pointer;
-  border-radius: 4px;
-}
-@media (max-width: 768px) {
-  .vol-btn {
-    padding: 4px 6px;
-    font-size: 14px;
-  }
-  .vol-slider {
-    padding: 6px;
-  }
-  .vol-slider input {
-    width: 80px;
-    height: 10px;
-  }
-  .vol-slider input::-webkit-slider-thumb {
-    width: 14px;
-    height: 16px;
-  }
-}
-</style>
-<script>
-function toggleVolumeSlider() {
-  document.getElementById('volSlider').classList.toggle('show');
-}
-const volSlider = document.getElementById('volPrincipalSlider');
-volSlider.value = volumes.principal;
-volSlider.addEventListener('input', function(e) {
-  volumes.principal = parseFloat(e.target.value);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
-  lAudio.volume = volumes.principal;
-  document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+initVolumeControl({
+  audioId: 'lessonMusic',
+  sliderId: 'volPrincipalSlider',
+  btnId: 'volBtn',
+  containerId: 'volSlider',
+  channel: 'principal',
+  defaultVol: 0.5
 });
 </script>
 </body>

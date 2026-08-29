@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/Config/config.php';
-requireLogin();
+require_once __DIR__ . '/../../src/Core/panel_docente.php';
+requireStudent();
 
 // Leer género directamente de la BD para evitar problemas de sesión
 $usuario_id = $_SESSION['usuario_id'] ?? 0;
@@ -41,6 +42,7 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
   <meta charset="UTF-8" />
   <title>LC-ADVANCE.GAME</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape" />
+  <meta name="csrf-token" content="<?= htmlspecialchars(csrfToken()) ?>">
   <style>
     :root { --neon-cyan: #00ffff; --neon-pink: #ff00ff; --neon-yellow: #ffff00; }
     html, body { margin: 0; padding: 0; background: #000; width: 100vw; height: 100vh; overflow: hidden; font-family: 'Press Start 2P', monospace; }
@@ -237,7 +239,7 @@ const NPC_KEY = "<?php echo $npc_key; ?>";
       <div class="volume-section">
         <h3>// VOLUMEN</h3>
         <div class="volume-control">
-          <label>Musica Ambiental</label>
+          <label for="volAmbiental">Musica Ambiental</label>
           <input type="range" id="volAmbiental" min="0" max="1" step="0.1" value="0.8">
         </div>
       </div>
@@ -991,10 +993,12 @@ function cambiarPersonaje(genero) {
   if (charCurrent) charCurrent.classList.add('active');
   try { saveState(); } catch (e) { console.warn('No se pudo guardar la posición al cambiar personaje:', e); }
 
+  var csrfMeta2 = document.querySelector('meta[name="csrf-token"]');
+  var csrfTok2 = csrfMeta2 ? csrfMeta2.getAttribute('content') : '';
   fetch('../guardar_genero.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'genero=' + genero + '&invitado=' + (<?= !empty($_SESSION['usuario_es_invitado']) ? 'true' : 'false' ?> ? '1' : '0')
+    body: 'genero=' + genero + '&invitado=' + (<?= !empty($_SESSION['usuario_es_invitado']) ? 'true' : 'false' ?> ? '1' : '0') + '&csrf_token=' + encodeURIComponent(csrfTok2)
   });
 }
 

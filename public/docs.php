@@ -256,7 +256,7 @@ $navItems = [
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo escapeHtml($file); ?> - LC-ADVANCE Docs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -450,7 +450,7 @@ $navItems = [
                 <?php } ?>
             </nav>
             <div class="header-volume">
-              <button class="vol-btn" id="volBtn" onclick="toggleVolumeSlider()">🔊</button>
+              <button class="vol-btn" id="volBtn">🔊</button>
               <div class="vol-slider" id="volSlider">
                 <input type="range" id="volPrincipalSlider" min="0" max="1" step="0.1" value="0.1">
               </div>
@@ -480,32 +480,18 @@ $navItems = [
             });
         });
     </script>
+<script src="<?= assetUrl('assets/js/volume_control.js') ?>"></script>
 <audio id="pageMusic" loop>
   <source src="assets/music/cuco_pantalla_inicio.mp3" type="audio/mpeg">
 </audio>
 <script>
-const STORAGE_KEY = 'lc_volume_settings';
-function getStoredVolumes() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return { principal: 0.1, ambiental: 0.8, examenes: 0.8 };
-}
-const volumes = getStoredVolumes();
-const pAudio = document.getElementById('pageMusic');
-pAudio.volume = volumes.principal;
-pAudio.play().then(() => console.log('Music playing')).catch(e => console.log('Audio error:', e));
-</script>
-<script>
-function toggleVolumeSlider() {
-  document.getElementById('volSlider').classList.toggle('show');
-}
-const volSlider = document.getElementById('volPrincipalSlider');
-volSlider.value = volumes.principal;
-volSlider.addEventListener('input', function(e) {
-  volumes.principal = parseFloat(e.target.value);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
-  pAudio.volume = volumes.principal;
-  document.getElementById('volBtn').textContent = volumes.principal > 0 ? '🔊' : '🔇';
+initVolumeControl({
+  audioId: 'pageMusic',
+  sliderId: 'volPrincipalSlider',
+  btnId: 'volBtn',
+  containerId: 'volSlider',
+  channel: 'principal',
+  defaultVol: 0.1
 });
 </script>
 </body>
