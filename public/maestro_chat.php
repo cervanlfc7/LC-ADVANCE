@@ -114,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'lesson_title'  => 'Consulta general - ' . $materia,
             'lesson_subject'=> $materia,
             'provider'      => 'auto',
+            'csrf_token'    => csrfToken(),
         ]);
 
         session_write_close();

@@ -1137,29 +1137,6 @@ if ($anuncios):
                 </div>
             </div>
             <?php endif; ?>
-                    <?php foreach ($daily_quests as $quest): ?>
-                        <div class="quest-item" data-quest-id="<?= $quest['id'] ?>">
-                            <div class="quest-info">
-                                <span class="quest-title"><?= htmlspecialchars($quest['titulo'] ?? $quest['quest_type']) ?></span>
-                                <span class="quest-progress-text"><?= (int)$quest['progreso'] ?>/<?= (int)$quest['objetivo'] ?></span>
-                            </div>
-                            <div class="quest-bar-wrapper">
-                                <div class="quest-bar" style="width: <?= min(100, ($quest['objetivo'] > 0 ? ((int)$quest['progreso'] / (int)$quest['objetivo']) * 100 : 0)) ?>%"></div>
-                            </div>
-                            <div class="quest-actions">
-                                <span class="quest-xp">+<?= (int)$quest['recompensa_xp'] ?> XP</span>
-                                <?php if ($quest['completada'] && !$quest['reclamada']): ?>
-                                    <button class="quest-claim-btn" onclick="reclamarMision(<?= (int)$quest['id'] ?>, this)"><?= htmlspecialchars($t[$lang]['claim'] ?? 'Reclamar') ?></button>
-                                <?php elseif ($quest['reclamada']): ?>
-                                    <span class="quest-claimed">✅</span>
-                                <?php else: ?>
-                                    <span class="quest-status <?= $quest['completada'] ? 'done' : '' ?>"><?= $quest['completada'] ? htmlspecialchars($t[$lang]['completed']) : htmlspecialchars($t[$lang]['pending']) ?></span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
 
             <!-- Filtros + combate + lecciones -->
             <div class="card section-card reveal" id="filter-and-combat-area">

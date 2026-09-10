@@ -6,6 +6,28 @@
 // Descripción: Configuración principal del sistema y conexión PDO a la base de datos.
 // ==========================================
 
+// Cargar variables locales sin sobrescribir las variables del entorno del servidor.
+$localEnvFile = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . '.env';
+if (is_readable($localEnvFile)) {
+    foreach (file($localEnvFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $envLine) {
+        $envLine = trim($envLine);
+        if ($envLine === '' || $envLine[0] === '#' || strpos($envLine, '=') === false) {
+            continue;
+        }
+        [$envName, $envValue] = explode('=', $envLine, 2);
+        $envName = trim($envName);
+        $envValue = trim($envValue);
+        if ($envValue !== '' && (($envValue[0] ?? '') === '"') && substr($envValue, -1) === '"') {
+            $envValue = substr($envValue, 1, -1);
+        } elseif ($envValue !== '' && (($envValue[0] ?? '') === "'") && substr($envValue, -1) === "'") {
+            $envValue = substr($envValue, 1, -1);
+        }
+        if ($envName !== '' && getenv($envName) === false) {
+            putenv($envName . '=' . $envValue);
+        }
+    }
+}
+
 // ================================
 // CONFIGURACIÓN GENERAL
 // ================================

@@ -58,7 +58,7 @@ INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALU
 INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('github_client_secret_prod','0c1a890c637e28fbf27579982b5b79c6a524d69e','GitHub OAuth Client Secret (prod)','2026-07-02 08:13:12');
 INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('google_client_id','317866808413-8odsje97n8j7k150j3ag1lr89ughotb7.apps.googleusercontent.com','Google OAuth Client ID','2026-07-02 08:13:12');
 INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('google_client_secret','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','Google OAuth Client Secret','2026-07-02 08:13:12');
-INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('openrouter_api_key','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','OpenRouter API Key','2026-07-02 08:13:12');
+INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('openrouter_api_key','','OpenRouter API Key','2026-07-02 08:13:12');
 INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('smtp_from_email','lcadvance40@gmail.com','SMTP From Email','2026-07-02 08:13:12');
 INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('smtp_password','jbgt frey azdf fsjo','SMTP Password','2026-07-02 08:13:12');
 INSERT INTO `credenciales` (`clave`,`valor`,`descripcion`,`actualizado_en`) VALUES ('smtp_username','lcadvance40@gmail.com','SMTP Username','2026-07-02 08:13:12');

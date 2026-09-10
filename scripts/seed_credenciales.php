@@ -25,7 +25,6 @@ try {
         ['smtp_username', 'lcadvance40@gmail.com', 'SMTP Username'],
         ['smtp_password', 'jbgt frey azdf fsjo', 'SMTP Password'],
         ['smtp_from_email', 'lcadvance40@gmail.com', 'SMTP From Email'],
-        ['openrouter_api_key', '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', 'OpenRouter API Key'],
     ];
 
     $stmt = $pdo->prepare("INSERT INTO `credenciales` (clave, valor, descripcion) VALUES (?, ?, ?)

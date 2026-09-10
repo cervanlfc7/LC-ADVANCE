@@ -2023,6 +2023,155 @@ header.header {
     font-size: 8px;
   }
 
+  .quest-list,
+  .learning-path-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .combat-card {
+    padding: 14px;
+  }
+}
+
+
+/* ── DASHBOARD FOCUS MODULES ─────────────────── */
+.learning-path-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.learning-path-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(0, 229, 255, 0.14);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(16, 24, 40, 0.96), rgba(9, 16, 29, 0.96));
+}
+
+.quest-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quest-item {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid rgba(255, 210, 63, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 210, 63, 0.045);
+}
+
+.quest-info,
+.quest-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.quest-title {
+  min-width: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quest-progress-text,
+.quest-xp,
+.quest-status,
+.quest-claimed {
+  flex-shrink: 0;
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.quest-bar-wrapper {
+  height: 6px;
+  margin: 12px 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.quest-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--yellow), var(--pink));
+}
+
+.quest-claim-btn {
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 210, 63, 0.45);
+  border-radius: 6px;
+  background: rgba(255, 210, 63, 0.12);
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.quest-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 72px;
+  padding: 14px;
+  border: 1px dashed rgba(0, 229, 255, 0.22);
+  border-radius: 12px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.quest-empty-icon {
+  color: var(--cyan);
+  font-size: 18px;
+}
+
+#filter-and-combat-area {
+  background: linear-gradient(145deg, rgba(12, 18, 32, 0.98), rgba(17, 25, 39, 0.96));
+}
+
+#filter-and-combat-area .card-label {
+  margin-bottom: 14px;
+}
+
+.combat-card {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 12px;
+}
+
+.leccion-materia-block {
+  padding: 16px;
+}
+
+.leccion-materia-block .materia-title {
+  margin-bottom: 14px;
+  color: var(--cyan);
+  font-size: 15px;
+}
+
+@media (max-width: 1024px) {
+  .learning-path-grid,
+  .quest-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .learning-path-grid,
+  .quest-list {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 768px) {
   header.header nav {
     width: 100%;
     gap: 6px;
